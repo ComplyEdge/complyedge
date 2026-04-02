@@ -1,0 +1,66 @@
+id: EU_AI_ACT_ART5_BIOMETRIC_001
+jurisdiction: EU
+effective_date: '2025-02-02'
+description: >-
+  Prohibits AI systems that use biometric categorisation to infer race,
+  political opinions, trade union membership, religious or philosophical
+  beliefs, sex life, or sexual orientation. Article 5(1)(g).
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    an AI system that categorises individuals based on their biometric data
+    to deduce or infer their race, political opinions, trade union membership,
+    religious or philosophical beliefs, sex life, or sexual orientation. This
+    is prohibited under EU AI Act Article 5(1)(g), except for lawful labelling
+    or filtering of biometric datasets in law enforcement contexts.
+  model: gpt-4
+- type: regex
+  value: (biometric[- ]?categori[sz]|facial[- ]?classif.*race|biometric.*infer.*(race|religion|politic|sexual|belief|union)|emotion[- ]?recognition.*categori)
+  flags: i
+- type: input_sensitivity
+  sensitivity_type: biometric
+  patterns:
+  - biometric.*classification
+  - facial.*recognition.*categoriz
+  - biometric.*profiling
+  confidence_threshold: 0.85
+  context_required: true
+severity: critical
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 5(1)(g)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 5(1)(g): The placing on the market,
+    the putting into service for this specific purpose, or the use of
+    biometric categorisation systems that categorise individually natural
+    persons based on their biometric data to deduce or infer their race,
+    political opinions, trade union membership, religious or philosophical
+    beliefs, sex life or sexual orientation. This prohibition shall not
+    cover any labelling or filtering of lawfully acquired biometric datasets,
+    such as images, based on biometric data or categorising of biometric
+    data in the area of law enforcement.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 5(1)(g) prohibits AI-based biometric
+    categorisation systems that infer race, political opinions, religion,
+    sex life, sexual orientation, or trade union membership from biometric
+    data. This practice is banned in the EU since February 2, 2025.
+    Penalties: up to €35M or 7% of global revenue.
+  suggestion: >-
+    Remove any biometric categorisation that infers protected characteristics.
+    If biometric processing is required, ensure it does not deduce race,
+    religion, political views, sex life, or other prohibited categories.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-5
+- prohibited-practice
+- biometric-categorisation
+- proactive

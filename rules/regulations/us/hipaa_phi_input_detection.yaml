@@ -1,0 +1,58 @@
+id: HIPAA_PHI_INPUT_001
+jurisdiction: US
+effective_date: '1996-08-21'
+description: Proactively detects protected health information in user inputs before
+  processing
+detection_scope: user_input
+conditions:
+- type: input_sensitivity
+  sensitivity_type: phi
+  patterns:
+  - (?i)\b(diabetes|cancer|depression|anxiety|covid|hiv|aids|bipolar)\b
+  - (?i)\b(insulin|metformin|prozac|xanax|chemotherapy|radiation)\b
+  - (?i)\b(surgery|operation|biopsy|MRI|CT scan|blood test)\b
+  - (?i)\b(doctor|physician|hospital|clinic|emergency room)\b.*\b(said|told|prescribed|diagnosed)\b
+  confidence_threshold: 0.8
+  context_required: true
+- type: regex
+  value: (?i)\b(my (condition|diagnosis|medication|treatment|symptoms?))\b
+  flags: i
+- type: multi_pattern_risk
+  patterns:
+  - medical_term
+  - age_indicator
+  - name
+  threshold: 2
+  window_size: 200
+severity: high
+category: healthcare
+source:
+  regulation: HIPAA
+  article: 45 CFR § 164.502
+  url: https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html
+  last_updated: '2013-01-25'
+exceptions:
+- condition: General health education questions
+  description: Questions about general health topics without personal details
+- condition: Public health information
+  description: Publicly available health information or statistics
+remediation:
+  action: proactive_warn
+  timing: proactive
+  message: 🏥 You're sharing health information that may be protected under HIPAA.
+    Consider if these details are necessary.
+  suggestion: Try asking general health questions without mentioning specific conditions,
+    medications, or personal medical details
+  alternatives:
+  - 'Ask about general symptoms: ''What are common treatments for blood sugar management?'''
+  - 'Request educational information: ''How do diabetes medications work?'''
+  - 'Seek general guidance: ''What should I discuss with my doctor about...'''
+  allow_override: false
+  require_explicit_consent: true
+version: 1.0.0
+tags:
+- hipaa
+- phi
+- health
+- proactive
+- input_protection

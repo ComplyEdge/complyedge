@@ -1,0 +1,58 @@
+id: PCI_DSS_INPUT_001
+jurisdiction: GLOBAL
+effective_date: '2004-12-15'
+description: Proactively detects payment card information in user inputs to prevent
+  PCI DSS violations
+detection_scope: user_input
+conditions:
+- type: input_sensitivity
+  sensitivity_type: financial
+  patterns:
+  - \b4[0-9]{12}(?:[0-9]{3})?\b
+  - \b5[1-5][0-9]{14}\b
+  - \b3[47][0-9]{13}\b
+  - \b6(?:011|5[0-9]{2})[0-9]{12}\b
+  - (?i)\b(credit card|debit card|card number|cvv|cvc|expir)\b
+  confidence_threshold: 0.95
+  context_required: false
+- type: multi_pattern_risk
+  patterns:
+  - credit_card
+  - name
+  - address
+  threshold: 2
+  window_size: 100
+- type: regex
+  value: (?i)\b(my card|my credit|my debit|card.*\d{4})\b
+  flags: i
+severity: high
+category: financial
+source:
+  regulation: PCI DSS
+  article: Requirement 3.4
+  url: https://www.pcisecuritystandards.org/pci_security/
+  last_updated: '2022-03-31'
+exceptions:
+- condition: Masked card references
+  description: References to cards with only last 4 digits (e.g., 'card ending in
+    1234')
+remediation:
+  action: block
+  timing: proactive
+  message: 🏦 Credit card information detected. For your security, we cannot process
+    payment card details in this channel.
+  suggestion: Use our secure payment portal for any payment-related needs
+  alternatives:
+  - Refer to your card as 'my Visa ending in XXXX'
+  - Use our secure payment processing system
+  - Contact customer service through our verified payment channels
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- pci_dss
+- payment
+- financial
+- credit_card
+- proactive
+- security

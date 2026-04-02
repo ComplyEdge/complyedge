@@ -1,0 +1,866 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ComplyEdge Rule Schema",
+  "description": "Schema for defining compliance rules in the ComplyEdge system",
+  "type": "object",
+  "required": [
+    "id",
+    "jurisdiction", 
+    "effective_date",
+    "description",
+    "conditions",
+    "severity"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]+$",
+      "description": "Unique identifier for the rule (e.g., GDPR_CONSENT_001)",
+      "examples": ["GDPR_CONSENT_001", "TCPA_SMS_OPTIN_001"]
+    },
+    "jurisdiction": {
+      "type": "string",
+      "enum": [
+        "EU",
+        "US",
+        "US-CA", 
+        "US-NY",
+        "US-TX",
+        "US-FL",
+        "UK",
+        "CA",
+        "GLOBAL"
+      ],
+      "description": "Legal jurisdiction where this rule applies"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when this regulation became effective (YYYY-MM-DD)"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500,
+      "description": "Clear, concise description of what this rule enforces"
+    },
+    "conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["type", "value"],
+            "properties": {
+              "type": {
+                "const": "regex"
+              },
+              "value": {
+                "type": "string",
+                "description": "Regular expression pattern to match against text"
+              },
+              "flags": {
+                "type": "string",
+                "pattern": "^[gimsuvy]*$",
+                "description": "Regex flags (i=ignoreCase, g=global, m=multiline, etc.)"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object", 
+            "required": ["type", "key", "op", "value"],
+            "properties": {
+              "type": {
+                "const": "metadata"
+              },
+              "key": {
+                "type": "string",
+                "description": "Metadata field name to check"
+              },
+              "op": {
+                "type": "string",
+                "enum": ["==", "!=", "contains", "not_contains", ">", "<", ">=", "<="],
+                "description": "Comparison operator"
+              },
+              "value": {
+                "oneOf": [
+                  {"type": "string"},
+                  {"type": "number"},
+                  {"type": "boolean"}
+                ],
+                "description": "Value to compare against"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["type", "prompt"],
+            "properties": {
+              "type": {
+                "const": "semantic"
+              },
+              "prompt": {
+                "type": "string",
+                "description": "LLM prompt for semantic evaluation"
+              },
+              "model": {
+                "type": "string",
+                "default": "gpt-5.4",
+                "description": "LLM model to use for evaluation"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["type", "sensitivity_type"],
+            "properties": {
+              "type": {
+                "const": "input_sensitivity"
+              },
+              "sensitivity_type": {
+                "type": "string",
+                "enum": [
+                  "pii",
+                  "phi", 
+                  "financial",
+                  "child_data",
+                  "biometric",
+                  "location",
+                  "credential",
+                  "government_id"
+                ],
+                "description": "Type of sensitive information to detect"
+              },
+              "patterns": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of regex patterns or keywords that indicate sensitive data"
+              },
+              "confidence_threshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.8,
+                "description": "Minimum confidence level to trigger (0.0-1.0)"
+              },
+              "context_required": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether contextual analysis is required for detection"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["type", "patterns", "threshold"],
+            "properties": {
+              "type": {
+                "const": "multi_pattern_risk"
+              },
+              "patterns": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "ssn",
+                    "credit_card", 
+                    "phone_number",
+                    "email",
+                    "address",
+                    "name",
+                    "dob",
+                    "medical_term",
+                    "financial_term",
+                    "age_indicator"
+                  ]
+                },
+                "minItems": 2,
+                "description": "Multiple pattern types that increase risk when combined"
+              },
+              "threshold": {
+                "type": "integer",
+                "minimum": 2,
+                "description": "Number of patterns required to trigger the rule"
+              },
+              "window_size": {
+                "type": "integer",
+                "default": 500,
+                "description": "Character window size for pattern co-occurrence"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["type", "quantitative_threshold"],
+            "properties": {
+              "type": {
+                "const": "materiality_assessment"
+              },
+              "quantitative_threshold": {
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 1.0,
+                "default": 0.05,
+                "description": "Materiality threshold as percentage (e.g., 0.05 for SEC SAB 99 5% rule)"
+              },
+              "qualitative_factors": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "guidance_impact",
+                    "earnings_timing", 
+                    "regulatory_sensitivity",
+                    "market_context",
+                    "management_disclosure"
+                  ]
+                },
+                "description": "Qualitative factors that enhance materiality assessment"
+              },
+              "company_context_required": {
+                "type": "boolean",
+                "default": true,
+                "description": "Whether company financial context is required for assessment"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["type", "materiality_threshold", "notification_roles"],
+            "properties": {
+              "type": {
+                "const": "executive_escalation"
+              },
+              "materiality_threshold": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Minimum materiality score to trigger executive escalation"
+              },
+              "notification_roles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "ceo",
+                    "cfo", 
+                    "chief_compliance_officer",
+                    "general_counsel",
+                    "audit_committee_chair",
+                    "board_chair"
+                  ]
+                },
+                "minItems": 1,
+                "description": "Executive roles to notify"
+              },
+              "urgency_mapping": {
+                "type": "object",
+                "properties": {
+                  "critical": {
+                    "type": "number",
+                    "minimum": 0.8,
+                    "maximum": 1.0,
+                    "description": "Materiality threshold for critical urgency"
+                  },
+                  "high": {
+                    "type": "number", 
+                    "minimum": 0.6,
+                    "maximum": 0.9,
+                    "description": "Materiality threshold for high urgency"
+                  },
+                  "medium": {
+                    "type": "number",
+                    "minimum": 0.4,
+                    "maximum": 0.7,
+                    "description": "Materiality threshold for medium urgency"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "const": "sox_timing_check"
+              },
+              "earnings_sensitivity": {
+                "type": "boolean",
+                "default": true,
+                "description": "Whether to apply enhanced sensitivity during earnings periods"
+              },
+              "quiet_period_multiplier": {
+                "type": "number",
+                "minimum": 1.0,
+                "maximum": 3.0,
+                "default": 1.5,
+                "description": "Materiality score multiplier during quiet periods"
+              },
+              "form_8k_deadline_days": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10,
+                "default": 4,
+                "description": "Business days deadline for Form 8-K filing"
+              },
+              "pre_earnings_days": {
+                "type": "integer",
+                "minimum": 7,
+                "maximum": 90,
+                "default": 30,
+                "description": "Days before earnings when quiet period sensitivity applies"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["type", "tier1_config", "tier2_config"],
+            "properties": {
+              "type": {
+                "const": "hybrid_detection"
+              },
+              "tier1_config": {
+                "type": "object",
+                "required": ["safe_bypass_patterns", "risk_flag_patterns"],
+                "properties": {
+                  "safe_bypass_patterns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["pattern", "description"],
+                      "properties": {
+                        "pattern": {
+                          "type": "string",
+                          "description": "Regex pattern that allows immediate bypass"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Human-readable description of what this pattern matches"
+                        },
+                        "flags": {
+                          "type": "string",
+                          "pattern": "^[gimsuvy]*$",
+                          "description": "Regex flags"
+                        }
+                      }
+                    },
+                    "description": "Patterns that allow content to bypass further analysis"
+                  },
+                  "risk_flag_patterns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["pattern", "risk_type", "description"],
+                      "properties": {
+                        "pattern": {
+                          "type": "string",
+                          "description": "Regex pattern that flags content for LLM analysis"
+                        },
+                        "risk_type": {
+                          "type": "string",
+                          "enum": [
+                            "forward_looking",
+                            "material_disclosure",
+                            "insider_information",
+                            "financial_guidance",
+                            "earnings_discussion",
+                            "market_impact"
+                          ],
+                          "description": "Type of compliance risk this pattern detects"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Human-readable description of the risk"
+                        },
+                        "flags": {
+                          "type": "string",
+                          "pattern": "^[gimsuvy]*$",
+                          "description": "Regex flags"
+                        }
+                      }
+                    },
+                    "description": "Patterns that flag content for semantic analysis"
+                  },
+                  "performance_config": {
+                    "type": "object",
+                    "properties": {
+                      "max_latency_ms": {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Maximum allowed latency for Tier 1 processing"
+                      },
+                      "cache_compiled_patterns": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Whether to cache compiled regex patterns"
+                      }
+                    }
+                  }
+                }
+              },
+              "tier2_config": {
+                "type": "object",
+                "required": ["model", "prompt_template", "confidence_thresholds"],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": ["gpt-5.4-mini", "gpt-5.4", "gpt-4o-mini", "gpt-3.5-turbo", "claude-3-haiku", "o3", "o4-mini"],
+                    "default": "gpt-5.4",
+                    "description": "LLM model for semantic analysis"
+                  },
+                  "prompt_template": {
+                    "type": "string",
+                    "description": "Template for LLM analysis prompt with placeholders"
+                  },
+                  "confidence_thresholds": {
+                    "type": "object",
+                    "required": ["safe_threshold", "risk_threshold"],
+                    "properties": {
+                      "safe_threshold": {
+                        "type": "number",
+                        "minimum": 0.0,
+                        "maximum": 0.5,
+                        "default": 0.2,
+                        "description": "Below this confidence, allow content"
+                      },
+                      "risk_threshold": {
+                        "type": "number", 
+                        "minimum": 0.5,
+                        "maximum": 1.0,
+                        "default": 0.8,
+                        "description": "Above this confidence, block content"
+                      }
+                    }
+                  },
+                  "context_enrichment": {
+                    "type": "object",
+                    "properties": {
+                      "include_company_data": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Include company financial context"
+                      },
+                      "include_user_role": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Include user role information"
+                      },
+                      "include_timing_context": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Include earnings period and timing context"
+                      }
+                    }
+                  },
+                  "performance_config": {
+                    "type": "object",
+                    "properties": {
+                      "max_latency_ms": {
+                        "type": "integer",
+                        "default": 300,
+                        "description": "Maximum allowed latency for Tier 2 processing"
+                      },
+                      "timeout_ms": {
+                        "type": "integer",
+                        "default": 5000,
+                        "description": "LLM request timeout"
+                      },
+                      "fallback_action": {
+                        "type": "string",
+                        "enum": ["allow", "block", "escalate"],
+                        "default": "block",
+                        "description": "Action to take if LLM fails"
+                      }
+                    }
+                  }
+                }
+              },
+              "tier3_config": {
+                "type": "object",
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": ["gpt-5.4", "gpt-4o", "claude-3.5-sonnet", "claude-3-opus", "o3"],
+                    "default": "gpt-5.4",
+                    "description": "Expert-level LLM model for complex analysis"
+                  },
+                  "prompt_template": {
+                    "type": "string",
+                    "description": "Expert analysis prompt template with legal reasoning"
+                  },
+                  "trigger_conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "tier2_uncertain",
+                        "executive_user",
+                        "high_materiality",
+                        "earnings_period",
+                        "manual_escalation"
+                      ]
+                    },
+                    "description": "Conditions that trigger Tier 3 analysis"
+                  },
+                  "performance_config": {
+                    "type": "object",
+                    "properties": {
+                      "max_latency_ms": {
+                        "type": "integer",
+                        "default": 1000,
+                        "description": "Maximum allowed latency for Tier 3 processing"
+                      },
+                      "timeout_ms": {
+                        "type": "integer",
+                        "default": 10000,
+                        "description": "Expert LLM request timeout"
+                      }
+                    }
+                  }
+                }
+              },
+              "overall_performance": {
+                "type": "object",
+                "properties": {
+                  "expected_tier1_coverage": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 0.95,
+                    "default": 0.8,
+                    "description": "Expected percentage of traffic handled by Tier 1"
+                  },
+                  "cost_optimization": {
+                    "type": "object",
+                    "properties": {
+                      "enable_caching": {
+                        "type": "boolean",
+                        "default": true
+                      },
+                      "cache_ttl_seconds": {
+                        "type": "integer",
+                        "default": 3600
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "description": "Array of conditions that trigger this rule"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Impact severity if this rule is violated"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "privacy",
+        "security", 
+        "financial",
+        "healthcare",
+        "marketing",
+        "employment",
+        "consumer_protection",
+        "data_retention",
+        "access_rights",
+        "input_protection"
+      ],
+      "description": "Regulatory category this rule belongs to"
+    },
+    "detection_scope": {
+      "type": "string",
+      "enum": [
+        "user_input",
+        "ai_output", 
+        "data_storage",
+        "data_transmission",
+        "all"
+      ],
+      "default": "all",
+      "description": "When this rule should be applied in the data processing pipeline"
+    },
+    "source": {
+      "type": "object",
+      "required": ["regulation"],
+      "properties": {
+        "regulation": {
+          "type": "string",
+          "description": "Name of the source regulation (e.g., GDPR, TCPA)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Full title of the regulation"
+        },
+        "authority": {
+          "type": "string",
+          "description": "Regulatory authority that enforces this regulation"
+        },
+        "effective_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when regulation became effective"
+        },
+        "article": {
+          "type": "string", 
+          "description": "Specific article, section, or clause"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Official URL to the regulation text"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when regulation was last amended"
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Legal citations and references"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Source regulation metadata"
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["condition", "description"],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "description": "When this exception applies"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the exception"
+          },
+          "verification_required": {
+            "type": "boolean",
+            "description": "Whether verification is required for this exception"
+          },
+          "date_threshold": {
+            "type": "string",
+            "description": "Time-based threshold for this exception"
+          },
+          "approval_documentation_required": {
+            "type": "boolean",
+            "description": "Whether approval documentation is required"
+          },
+          "approver_roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Roles that can approve this exception"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Legal exceptions or safe harbors for this rule"
+    },
+    "remediation": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["block", "warn", "log", "require_approval", "proactive_warn", "suggest_alternative", "require_consent", "escalate_executive", "prevent_with_legal", "sox_compliance_block", "hybrid_enforcement"],
+          "description": "Action to take when rule is triggered"
+        },
+        "timing": {
+          "type": "string",
+          "enum": ["reactive", "proactive", "both"],
+          "default": "reactive",
+          "description": "When the rule should be applied - before processing (proactive) or after (reactive)"
+        },
+        "message": {
+          "type": "string",
+          "description": "User-friendly message explaining the violation or warning"
+        },
+        "suggestion": {
+          "type": "string", 
+          "description": "Suggested alternative or fix"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of alternative approaches for user"
+        },
+        "allow_override": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether user can override the protection after warning"
+        },
+        "require_explicit_consent": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether explicit user consent is required to proceed"
+        },
+        "escalation_contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": ["CEO", "CFO", "CCO", "GC", "CLO", "Internal_Auditor", "Legal_Team"],
+                "description": "Executive role to notify"
+              },
+              "urgency_threshold": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"],
+                "description": "Minimum urgency level for this contact"
+              },
+              "timing_hours": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 72,
+                "description": "Hours within which contact must be notified"
+              }
+            },
+            "required": ["role", "urgency_threshold"]
+          },
+          "description": "Executive escalation contacts for SOX violations"
+        },
+        "legal_documentation_required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether legal documentation is required for override"
+        },
+        "audit_trail_enhanced": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether enhanced audit trail logging is required"
+        },
+        "tier_specific_actions": {
+          "type": "object",
+          "properties": {
+            "tier1_action": {
+              "type": "string",
+              "enum": ["allow", "escalate_to_tier2"],
+              "default": "allow",
+              "description": "Action when Tier 1 determines content is safe"
+            },
+            "tier2_action": {
+              "type": "string", 
+              "enum": ["allow", "block", "escalate_to_tier3", "require_approval", "sox_compliance_block"],
+              "description": "Action based on Tier 2 LLM analysis"
+            },
+            "tier3_action": {
+              "type": "string",
+              "enum": ["allow", "block", "require_executive_approval", "legal_review_required"],
+              "description": "Action based on Tier 3 expert analysis"
+            }
+          },
+          "description": "Tier-specific remediation actions for hybrid detection"
+        }
+      },
+      "additionalProperties": false,
+      "description": "How to handle violations of this rule"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of this rule definition"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Additional tags for categorization and filtering"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title for the rule"
+    },
+    "penalty_information": {
+      "type": "object",
+      "properties": {
+        "criminal_penalties": {
+          "type": "object",
+          "properties": {
+            "executives": {
+              "type": "object",
+              "properties": {
+                "fine_max": {
+                  "type": "string",
+                  "description": "Maximum criminal fine amount"
+                },
+                "imprisonment_max": {
+                  "type": "string", 
+                  "description": "Maximum imprisonment term"
+                },
+                "statute": {
+                  "type": "string",
+                  "description": "Legal statute reference"
+                }
+              }
+            },
+            "document_destruction": {
+              "type": "object",
+              "properties": {
+                "fine_max": {
+                  "type": "string"
+                },
+                "imprisonment_max": {
+                  "type": "string"
+                },
+                "statute": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "civil_penalties": {
+          "type": "object",
+          "properties": {
+            "sec_enforcement": {
+              "type": "string"
+            },
+            "private_litigation": {
+              "type": "string"
+            },
+            "reputational": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Information about legal penalties for violations"
+    },
+    "compliance_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Additional compliance guidance and notes"
+    }
+  },
+  "additionalProperties": false
+}

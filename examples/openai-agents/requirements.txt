@@ -1,0 +1,8 @@
+# OpenAI Agents SDK Integration Requirements
+# ===========================================
+
+# OpenAI Agents SDK - Core framework for AI agent development
+# NOTE: Using latest available version - package is in active development
+openai-agents>=0.3.0
+
+# NOTE: ComplyEdge SDK is installed locally from source via setup script

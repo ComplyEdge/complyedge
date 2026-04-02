@@ -1,0 +1,34 @@
+id: GDPR_CONSENT_001
+jurisdiction: EU
+effective_date: '2018-05-25'
+description: Explicit consent required before processing personal data for marketing
+  purposes
+conditions:
+- type: regex
+  value: (process|store|collect).*personal data
+  flags: i
+- type: metadata
+  key: purpose
+  op: contains
+  value: marketing
+- type: metadata
+  key: consent_recorded
+  op: '!='
+  value: true
+severity: high
+category: privacy
+source:
+  regulation: GDPR
+  article: Article 6(1)(a)
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  last_updated: '2016-04-27'
+remediation:
+  action: block
+  message: Cannot process personal data without explicit consent under GDPR
+  suggestion: Obtain and record explicit user consent before processing personal data
+    for marketing
+version: 1.0.0
+tags:
+- consent
+- personal_data
+- marketing

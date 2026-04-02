@@ -1,0 +1,286 @@
+id: SOX_HYBRID_MATERIAL_DISCLOSURE_001
+jurisdiction: US
+title: Hybrid SOX Material Information Disclosure Prevention
+description: Multi-tier hybrid detection system combining regex pre-screening with
+  LLM semantic analysis to prevent material information disclosure violations under
+  Sarbanes-Oxley Act. Provides optimal balance of speed, accuracy, and regulatory
+  defensibility.
+category: financial
+effective_date: '2002-07-30'
+source:
+  regulation: Sarbanes-Oxley Act of 2002
+  title: Sarbanes-Oxley Act of 2002, Sections 302, 404, 906, 807
+  url: https://www.congress.gov/bill/107th-congress/house-bill/3763
+  authority: U.S. Securities and Exchange Commission
+  effective_date: '2002-07-30'
+  citations:
+  - 15 U.S.C. § 7241 (Section 302) - Corporate responsibility for financial reports
+  - 15 U.S.C. § 7262 (Section 404) - Management assessment of internal controls
+  - 18 U.S.C. § 1350 (Section 906) - Criminal penalties for corporate officers
+  - 18 U.S.C. § 1520 (Section 807) - Criminal penalties for records destruction
+  - SEC Staff Accounting Bulletin No. 99 - Materiality standard (5% threshold)
+  - SEC Regulation FD - Fair Disclosure requirements
+conditions:
+- type: hybrid_detection
+  tier1_config:
+    safe_bypass_patterns:
+    - pattern: (?i)\b(historically|previously|last\s+quarter|prior\s+year|publicly\s+disclosed|according\s+to\s+our\s+(?:public\s+|published\s+)?10-[KQ](?:\s+filing)?)\b
+      description: Historical or publicly disclosed information
+      flags: i
+    - pattern: (?i)\b(filed\s+with\s+sec|reported\s+in\s+our\s+8-k|stated\s+in\s+earnings\s+call)\b
+      description: Information already in SEC filings
+      flags: i
+    - pattern: (?i)\b(in\s+line\s+with|consistent\s+with|according\s+to)\s+(market\s+consensus|analyst\s+estimates|industry\s+average|peer\s+comparison)\b
+      description: References to public market benchmarks (not performance vs benchmarks)
+      flags: i
+    - pattern: (?i)\b(above|below)\s+(?:\d+%?\s+|by\s+\d+%?\s+)?(market\s+consensus|analyst\s+estimates|industry\s+average|peer\s+comparison)\b
+      description: Performance relative to public market benchmarks (safe reference)
+      flags: i
+    - pattern: (?i)\b(as\s+previously\s+announced|as\s+disclosed\s+in|consistent\s+with\s+guidance|within\s+guidance\s+range)\b
+      description: References to prior public disclosures
+      flags: i
+    - pattern: (?i)\b(generally\s+accepted\s+accounting\s+principles|gaap|non-gaap|pro\s+forma)\b.*\b(reconciliation|disclosure|footnote)\b
+      description: Standard accounting disclosures
+      flags: i
+    - pattern: (?i)\b(sec\s+form|10-k|10-q|8-k|proxy\s+statement|registration\s+statement)\b.*\b(filed|published|available)\b
+      description: References to public SEC filings
+      flags: i
+    risk_flag_patterns:
+    - pattern: (?i)\b(guidance|forecast|expects?|projects?|anticipates?|plans?|targets?)\b.*\b(?:to\s+)?(?:increase|decrease|grow|decline|achieve|reach|deliver)\b
+      risk_type: forward_looking
+      description: Forward-looking statements requiring analysis
+      flags: i
+    - pattern: (?i)\b(Q[1-4]|quarter|earnings)\s+(?:will|should|likely|expected?)\s+(?:be|show|deliver|report)\b
+      risk_type: earnings_discussion
+      description: Earnings guidance or predictions
+      flags: i
+    - pattern: (?i)\b(material|significant)\s+\w*\s*\b(impact|change|development|event|transaction|contract|deal|acquisition|merger)\b
+      risk_type: material_disclosure
+      description: Material event discussion
+      flags: i
+    - pattern: (?i)\b(revenue|earnings|profit|loss|margin|ebitda|cash\s+flow)\b.*\b(increase|decrease|grow|decline|outperform|underperform)\b
+      risk_type: financial_guidance
+      description: Financial performance guidance
+      flags: i
+    - pattern: (?i)\b(insider|non-public|confidential|privileged|unreported|internal)\s+(?:information|data|knowledge|numbers|projections|estimates|forecasts)\b
+      risk_type: insider_information
+      description: Non-public information references
+      flags: i
+    - pattern: (?i)\b(internal|confidential|non-public)\s+(?:projections|estimates|forecasts|models|analysis)\b
+      risk_type: insider_information  
+      description: Internal projection references
+      flags: i
+    - pattern: (?i)\b(acquisition|merger|joint\s+venture|strategic\s+partnership)\b.*\b(upcoming|planned|pending|undisclosed|material|about)\b
+      risk_type: material_disclosure
+      description: Undisclosed material transactions
+      flags: i
+    - pattern: (?i)\b(material|upcoming|planned|pending|undisclosed)\b.*\b(acquisition|merger|joint\s+venture|strategic\s+partnership)\b
+      risk_type: material_disclosure
+      description: Material transaction discussions
+      flags: i
+    - pattern: (?i)\b(ahead\s+of|behind|below|above|exceed|beat|miss|outperform|underperform)\s+(?:\w+\s+)?(?:expectations|(?<!analyst\s)(?<!market\s)estimates|guidance|consensus|projections)\b
+      risk_type: market_impact
+      description: Performance variance from expectations (excluding public benchmarks)
+      flags: i
+    - pattern: (?i)(?:isn't|not|doesn't)\s+(?:reflected|captured|included)\s+(?:in|by)\s+(?:current|public|existing|published)\s+(?:guidance|estimates|projections|forecasts)\b
+      risk_type: material_disclosure
+      description: Information not reflected in public guidance
+      flags: i
+    - pattern: (?i)\b(expect|anticipate|project|forecast|estimate|predict|likely|probable)\b.*\b(earnings|revenue|growth|performance|results|margin|profitability)\b
+      risk_type: forward_looking
+      description: Forward-looking financial statements requiring safe harbor
+      flags: i
+    - pattern: (?i)\b(intend|plan|believe|target|goal|objective)\b.*\b(quarter|year|fiscal|annual|guidance|outlook)\b
+      risk_type: forward_looking
+      description: Forward-looking guidance statements
+      flags: i
+    - pattern: (?i)\b(outlook|prospects|future\s+performance|expected\s+trends|anticipated\s+results|going\s+forward)\b
+      risk_type: forward_looking
+      description: Forward-looking business outlook
+      flags: i
+    performance_config:
+      max_latency_ms: 1
+      cache_compiled_patterns: true
+  tier2_config:
+    model: gpt-5.4
+    prompt_template: "You are a SOX compliance expert analyzing potential material\
+      \ disclosure violations.\n\nREGULATORY CONTEXT:\n- Sarbanes-Oxley Act Sections\
+      \ 302, 404, 906, 807\n- SEC Staff Accounting Bulletin No. 99 (Materiality: 5%\
+      \ threshold)\n- Regulation FD (Fair Disclosure)\n- Criminal penalties: Up to\
+      \ $5M fine, 20 years imprisonment\n\nMATERIALITY TEST:\nMaterial information\
+      \ = information a reasonable investor would consider important in making investment\
+      \ decisions\n\nTEXT TO ANALYZE: \"{input_text}\"\nTIER 1 ANALYSIS: {tier1_flags}\n\
+      \nEvaluate SOX violation risk considering:\n1. Is this material non-public information?\n\
+      2. Could this influence investor decisions?\n3. Does this constitute selective\
+      \ disclosure?\n4. Is timing during quiet/blackout period?\n\nConsider these\
+      \ factors:\n- Forward-looking statements require safe harbor compliance\n- Earnings\
+      \ guidance must follow Regulation FD\n- Material events require 8-K disclosure\
+      \ within 4 business days\n- Executive communications have heightened scrutiny\n\
+      \nRespond with only a confidence score between 0.0 and 1.0:\n- 0.0-0.2: Public\
+      \ information or immaterial\n- 0.2-0.8: Potentially material, needs expert review\
+      \  \n- 0.8-1.0: Likely material violation\n"
+    confidence_thresholds:
+      safe_threshold: 0.2
+      risk_threshold: 0.8
+    context_enrichment:
+      include_company_data: true
+      include_user_role: true
+      include_timing_context: true
+    performance_config:
+      max_latency_ms: 300
+      timeout_ms: 5000
+      fallback_action: block
+  tier3_config:
+    model: gpt-5.4
+    prompt_template: "You are a securities law expert specializing in SOX compliance\
+      \ and material disclosure requirements.\n\n**REGULATORY FRAMEWORK**:\n- SOX\
+      \ Section 302: CEO/CFO certification of financial statements accuracy\n- SOX\
+      \ Section 404: Internal controls assessment and reporting\n- SOX Section 906:\
+      \ Criminal penalties for false certifications ($5M fine, 20 years imprisonment)\n\
+      - SOX Section 807: Criminal penalties for defrauding shareholders\n- Regulation\
+      \ FD (Fair Disclosure): Prohibits selective disclosure of material information\n\
+      - SEC Staff Accounting Bulletin No. 99: Materiality standards and quantitative/qualitative\
+      \ factors\n\n**MATERIALITY TEST** (apply all four factors):\n1. **Quantitative\
+      \ Impact**: Would a reasonable investor consider this information important\
+      \ in making investment decisions?\n2. **Market Sensitivity**: Could this information\
+      \ affect stock price if disclosed publicly?\n3. **Timing Sensitivity**: Is this\
+      \ information about events not yet publicly announced?\n4. **Regulatory Scope**:\
+      \ Does this relate to financial performance, business operations, or strategic\
+      \ decisions?\n\n**ANALYSIS FRAMEWORK**:\n- Focus on PREVENTION of violations,\
+      \ not just detection\n- Consider criminal penalties and reputational risks\n\
+      - Evaluate need for safe harbor protections for forward-looking statements\n\
+      - Assess disclosure timing and selective disclosure risks\n\nAnalyze this text\
+      \ for SOX material disclosure violations:\n\nText: \"{input_text}\"\nCompany:\
+      \ {company_context}\nUser Role: {user_context}\nTiming: {timing_context}\nTier\
+      \ 1 Flags: {tier1_flags}\nTier 2 Analysis: {tier2_analysis}\n\nProvide your\
+      \ analysis as JSON with this structure:\n{{\n  \"confidence\": 0.85,\n  \"violation_type\"\
+      : \"material_disclosure\",\n  \"sox_section\": \"Section 302\",\n  \"materiality_factors\"\
+      : [\"quantitative_impact\", \"market_sensitivity\"],\n  \"risk_assessment\"\
+      : \"HIGH/MEDIUM/LOW\",\n  \"explanation\": \"Detailed legal reasoning here\"\
+      ,\n  \"remediation\": \"Specific recommendations for compliance\"\n}}\n\nConfidence\
+      \ scale: 0.0-0.2 (safe), 0.2-0.8 (requires review), 0.8+ (block immediately)\n"
+    confidence_thresholds:
+      violation_threshold: 0.8
+      safe_threshold: 0.2
+    criminal_penalties:
+      max_fine_usd: 5000000
+      max_imprisonment_years: 20
+    materiality_factors:
+    - quantitative_impact
+    - market_sensitivity
+    - timing_sensitivity
+    - regulatory_scope
+    trigger_conditions:
+    - tier2_uncertain
+    - executive_user
+    - earnings_period
+    - high_materiality
+    performance_config:
+      max_latency_ms: 1000
+      timeout_ms: 10000
+  overall_performance:
+    expected_tier1_coverage: 0.85
+    cost_optimization:
+      enable_caching: true
+      cache_ttl_seconds: 3600
+- type: materiality_assessment
+  quantitative_threshold: 0.05
+  qualitative_factors:
+  - guidance_impact
+  - earnings_timing
+  - regulatory_sensitivity
+  - market_context
+- type: executive_escalation
+  materiality_threshold: 0.5
+  notification_roles:
+  - ceo
+  - cfo
+  - chief_compliance_officer
+  - general_counsel
+  urgency_mapping:
+    critical: 0.9
+    high: 0.7
+    medium: 0.5
+- type: sox_timing_check
+  earnings_sensitivity: true
+  quiet_period_multiplier: 2.0
+  form_8k_deadline_days: 4
+  pre_earnings_days: 30
+detection_scope: user_input
+severity: critical
+remediation:
+  action: hybrid_enforcement
+  timing: proactive
+  tier_specific_actions:
+    tier1_action: allow
+    tier2_action: sox_compliance_block
+    tier3_action: require_executive_approval
+  message: '⚠️ HYBRID SOX COMPLIANCE PROTECTION: Advanced AI analysis has identified
+    potential material information disclosure risks. This content requires review
+    to ensure Sarbanes-Oxley compliance and prevent criminal penalties.'
+  escalation_contacts:
+  - role: CEO
+    urgency_threshold: critical
+    timing_hours: 1
+  - role: CFO
+    urgency_threshold: high
+    timing_hours: 2
+  - role: GC
+    urgency_threshold: medium
+    timing_hours: 4
+  - role: CCO
+    urgency_threshold: medium
+    timing_hours: 6
+  alternatives:
+  - Use AI-verified publicly disclosed information only
+  - Request Legal team pre-approval for financial discussions
+  - Implement semantic analysis for context verification
+  - Activate enhanced monitoring during earnings periods
+  - Use expert AI analysis for complex compliance scenarios
+  legal_documentation_required: true
+  audit_trail_enhanced: true
+  allow_override: false
+exceptions:
+- condition: publicly_filed_information
+  description: Information already disclosed in SEC filings (10-K, 10-Q, 8-K, etc.)
+  verification_required: true
+- condition: historical_data_only
+  description: Historical financial data more than one fiscal quarter old
+  date_threshold: 90_days
+- condition: legal_department_approval
+  description: Pre-approved by Legal and Compliance departments
+  approval_documentation_required: true
+  approver_roles:
+  - GC
+  - CCO
+penalty_information:
+  criminal_penalties:
+    executives:
+      fine_max: $5,000,000
+      imprisonment_max: 20 years
+      statute: 18 U.S.C. § 1350 (Section 906)
+    document_destruction:
+      fine_max: $250,000
+      imprisonment_max: 20 years
+      statute: 18 U.S.C. § 1520 (Section 807)
+  civil_penalties:
+    sec_enforcement: Civil monetary penalties and disgorgement
+    private_litigation: Securities fraud class action exposure
+    reputational: Loss of investor confidence and market capitalization
+compliance_notes:
+- Material information is defined as information that a reasonable investor would
+  consider important in making investment decisions
+- SEC SAB 99 establishes 5% threshold for quantitative materiality assessment
+- Regulation FD prohibits selective disclosure of material information to analysts
+  or institutional investors
+- Section 302 requires CEO/CFO certification of financial reports and internal controls
+- Section 404 mandates management assessment of internal control effectiveness
+- Enhanced penalties apply during earnings blackout periods and quiet periods
+version: 1.0.0
+tags:
+- sox
+- material-disclosure
+- financial-compliance
+- insider-trading
+- proactive
+- criminal-penalties

@@ -1,0 +1,58 @@
+id: EU_AI_ACT_ART5_SOCIAL_SCORING_001
+jurisdiction: EU
+effective_date: '2025-02-02'
+description: >-
+  Prohibits AI systems that evaluate or classify natural persons based on their
+  social behaviour or personal characteristics, leading to detrimental or
+  unfavourable treatment (social scoring). Article 5(1)(c) of the EU AI Act.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    an AI system that scores, ranks, or classifies individuals based on their
+    social behaviour, personal or personality characteristics, or social credit,
+    leading to detrimental treatment unrelated to the context in which the data
+    was originally generated or collected. This is prohibited under EU AI Act
+    Article 5(1)(c).
+  model: gpt-4
+- type: regex
+  value: (social[- ]?scor|citizen[- ]?scor|social[- ]?credit|behavio(u)?r[- ]?scor|trustworthiness[- ]?scor|social[- ]?rating|social[- ]?rank)
+  flags: i
+severity: critical
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 5(1)(c)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 5(1)(c): The placing on the market,
+    the putting into service for this specific purpose, or the use of AI
+    systems to evaluate or classify natural persons or groups of natural
+    persons over a certain period of time based on their social behaviour
+    or known, inferred or predicted personal or personality characteristics,
+    with the social score leading to either or both of the following:
+    (i) detrimental or unfavourable treatment of certain natural persons
+    or groups of natural persons in social contexts that are unrelated to
+    the contexts in which the data was originally generated or collected;
+    (ii) detrimental or unfavourable treatment of certain natural persons
+    or groups thereof that is unjustified or disproportionate to their
+    social behaviour or its gravity.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 5(1)(c) prohibits AI systems that perform
+    social scoring of natural persons. This practice is banned in the EU
+    since February 2, 2025. Penalties: up to €35M or 7% of global revenue.
+  suggestion: >-
+    Remove any social scoring, citizen ranking, or behaviour-based classification
+    that leads to detrimental treatment outside the original data context.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-5
+- prohibited-practice
+- social-scoring
+- proactive

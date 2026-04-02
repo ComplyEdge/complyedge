@@ -1,0 +1,54 @@
+id: COPPA_CHILD_INPUT_001
+jurisdiction: US
+effective_date: '1998-04-21'
+description: Detects when children under 13 are sharing personal information requiring
+  parental consent
+detection_scope: user_input
+conditions:
+- type: input_sensitivity
+  sensitivity_type: child_data
+  patterns:
+  - (?i)\b(i'?m|i am) (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)
+    (years? old|yr|yrs)\b
+  - (?i)\b(age|born in) (199[5-9]|20[0-1][0-9])\b
+  - (?i)\b(elementary|middle school|grade [1-8])\b
+  confidence_threshold: 0.9
+  context_required: false
+- type: multi_pattern_risk
+  patterns:
+  - age_indicator
+  - email
+  - name
+  - address
+  threshold: 2
+  window_size: 150
+- type: regex
+  value: (?i)\b(my (school|teacher|mom|dad|parent))\b
+  flags: i
+severity: high
+category: privacy
+source:
+  regulation: COPPA
+  article: 15 U.S.C. §§ 6501-6506
+  url: https://www.ftc.gov/enforcement/rules/rulemaking-regulatory-reform-proceedings/childrens-online-privacy-protection-rule
+  last_updated: '2013-07-01'
+remediation:
+  action: require_consent
+  timing: proactive
+  message: 🧒 This appears to be information from someone under 13. COPPA requires
+    parental consent before collecting personal information from children.
+  suggestion: Please have a parent or guardian review this interaction and provide
+    consent if appropriate
+  alternatives:
+  - Ask a parent or guardian to help with this request
+  - Use our child-safe mode that doesn't collect personal information
+  - Visit our educational resources designed for young users
+  allow_override: false
+  require_explicit_consent: true
+version: 1.0.0
+tags:
+- coppa
+- children
+- parental_consent
+- proactive
+- input_protection

@@ -1,0 +1,48 @@
+id: UNIVERSAL_PII_INPUT_001
+jurisdiction: GLOBAL
+effective_date: '2025-01-01'
+description: Detects personally identifiable information in user inputs to prevent
+  inadvertent disclosure
+detection_scope: user_input
+conditions:
+- type: input_sensitivity
+  sensitivity_type: pii
+  patterns:
+  - \b\d{3}-\d{2}-\d{4}\b
+  - \b\d{3}\s?\d{2}\s?\d{4}\b
+  - \b4[0-9]{12}(?:[0-9]{3})?\b
+  - \b5[1-5][0-9]{14}\b
+  - \b3[47][0-9]{13}\b
+  confidence_threshold: 0.9
+  context_required: false
+- type: multi_pattern_risk
+  patterns:
+  - name
+  - address
+  - phone_number
+  - email
+  threshold: 3
+  window_size: 300
+severity: high
+category: input_protection
+source:
+  regulation: Universal Privacy Principles
+  article: PII Protection
+  url: https://www.complyedge.com/universal-pii-protection
+remediation:
+  action: proactive_warn
+  timing: proactive
+  message: 🛡️ You're sharing personal information that could be sensitive. Consider
+    if this information is necessary for your request.
+  alternatives:
+  - Use initials instead of full names
+  - Provide general location instead of full address
+  - Reference 'my card ending in XXXX' instead of full numbers
+  allow_override: true
+  require_explicit_consent: true
+version: 1.0.0
+tags:
+- pii
+- proactive
+- input_protection
+- universal

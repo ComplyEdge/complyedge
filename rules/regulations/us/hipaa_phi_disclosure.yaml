@@ -1,0 +1,42 @@
+id: HIPAA_PHI_DISCLOSURE_001
+jurisdiction: US
+effective_date: '1996-08-21'
+description: Protected Health Information (PHI) cannot be disclosed without patient
+  authorization
+conditions:
+- type: regex
+  value: (disclose|share|transmit|send).*(health|medical|patient) (information|data|records)
+  flags: i
+- type: metadata
+  key: data_type
+  op: contains
+  value: phi
+- type: metadata
+  key: patient_authorization
+  op: '!='
+  value: true
+severity: high
+category: healthcare
+source:
+  regulation: HIPAA
+  article: 45 CFR § 164.502
+  url: https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html
+  last_updated: '2013-01-25'
+exceptions:
+- condition: Treatment, payment, or healthcare operations
+  description: PHI may be used/disclosed for TPO without authorization
+- condition: Required by law
+  description: Disclosures required by legal mandate or court order
+- condition: Public health activities
+  description: Reporting to public health authorities as required
+remediation:
+  action: block
+  message: HIPAA prohibits disclosure of PHI without patient authorization
+  suggestion: Obtain written patient authorization before disclosing protected health
+    information
+version: 1.0.0
+tags:
+- phi
+- healthcare
+- disclosure
+- authorization

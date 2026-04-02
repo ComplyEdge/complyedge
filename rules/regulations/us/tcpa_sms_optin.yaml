@@ -1,0 +1,39 @@
+id: TCPA_SMS_OPTIN_001
+jurisdiction: US
+effective_date: '1991-12-20'
+description: Written consent required before sending marketing SMS messages to consumers
+conditions:
+- type: regex
+  value: (send|transmit).*(sms|text message|text)
+  flags: i
+- type: metadata
+  key: message_type
+  op: ==
+  value: marketing
+- type: metadata
+  key: sms_consent
+  op: '!='
+  value: true
+severity: high
+category: marketing
+source:
+  regulation: TCPA
+  article: 47 U.S.C. § 227
+  url: https://www.fcc.gov/consumers/guides/stop-unwanted-robocalls-and-texts
+  last_updated: '2021-06-17'
+exceptions:
+- condition: Emergency or safety notifications
+  description: Messages related to health, safety, or emergency situations
+- condition: Transactional messages
+  description: Order confirmations, shipping updates, account notifications
+remediation:
+  action: block
+  message: TCPA requires written consent before sending marketing SMS messages
+  suggestion: Obtain explicit written consent with clear opt-in language before sending
+    marketing texts
+version: 1.0.0
+tags:
+- sms
+- consent
+- marketing
+- telecommunications

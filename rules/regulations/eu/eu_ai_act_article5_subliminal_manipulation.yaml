@@ -1,0 +1,57 @@
+id: EU_AI_ACT_ART5_SUBLIMINAL_001
+jurisdiction: EU
+effective_date: '2025-02-02'
+description: >-
+  Prohibits AI systems that deploy subliminal techniques beyond a person's
+  consciousness, or purposefully manipulative or deceptive techniques, to
+  materially distort behaviour causing significant harm. Article 5(1)(a).
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    an AI system that uses subliminal techniques beyond a person's consciousness,
+    or purposefully manipulative or deceptive techniques, with the objective or
+    effect of materially distorting the behaviour of a person or group in a manner
+    that causes or is reasonably likely to cause significant harm. This is
+    prohibited under EU AI Act Article 5(1)(a).
+  model: gpt-4
+- type: regex
+  value: (subliminal|dark[- ]?pattern|manipulat.*behavio(u)?r|covert[- ]?influence|deceptive[- ]?technique|psychological[- ]?manipulation|neuro[- ]?linguistic[- ]?exploit)
+  flags: i
+severity: critical
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 5(1)(a)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 5(1)(a): The placing on the market,
+    the putting into service or the use of AI systems that deploy subliminal
+    techniques beyond a person's consciousness or purposefully manipulative
+    or deceptive techniques, with the objective or the effect of materially
+    distorting the behaviour of a person or a group of persons by appreciably
+    impairing their ability to make an informed decision, thereby causing
+    them to take a decision that they would not have otherwise taken, in a
+    manner that causes or is reasonably likely to cause that person, another
+    person or group of persons significant harm.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 5(1)(a) prohibits AI systems that use
+    subliminal or manipulative techniques to distort behaviour causing
+    significant harm. This practice is banned in the EU since February 2,
+    2025. Penalties: up to €35M or 7% of global revenue.
+  suggestion: >-
+    Remove any subliminal, manipulative, or deceptive techniques designed
+    to distort user behaviour. Ensure AI interactions are transparent and
+    do not impair informed decision-making.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-5
+- prohibited-practice
+- subliminal-manipulation
+- proactive
