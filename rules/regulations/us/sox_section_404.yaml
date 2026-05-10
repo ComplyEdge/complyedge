@@ -1,0 +1,97 @@
+id: SOX_SECTION_404_001
+jurisdiction: US
+effective_date: '2004-06-15'
+description: >-
+  Requires each annual report to contain an internal control report stating
+  management's responsibility for establishing and maintaining adequate
+  internal control structure for financial reporting, plus an assessment of
+  effectiveness. Sarbanes-Oxley Act Section 404, codified at 15 U.S.C. §7262.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    failure to comply with Sarbanes-Oxley Section 404 (15 U.S.C. §7262)
+    requirements for internal control over financial reporting (ICFR). This
+    includes: (1) failing to include the required internal control report in
+    the annual report, (2) failing to assess the effectiveness of internal
+    controls as of the end of the fiscal year, (3) management asserting
+    effectiveness without proper testing or documentation, (4) concealing
+    known material weaknesses or significant deficiencies, (5) issuer's
+    auditor failing to attest to and report on management's assessment when
+    required. Detect intent to circumvent ICFR requirements, hide control
+    deficiencies, or misrepresent control effectiveness. Do NOT flag
+    legitimate disclosures of material weaknesses or remediation discussions.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:no|without|skip|skipping|bypass|omit\w*)\s+(?:internal\s+control|ICFR|SOX\s+404|404)\s+(?:report|assessment|testing|attestation|evaluation)|(?:material\s+weakness|significant\s+deficienc(?:y|ies))\s+(?:not\s+disclosed|hidden|conceal\w*|undisclos\w*|omit\w*)|(?:misrepresent|falsif\w*|overstate\w*)\s+(?:internal\s+control|ICFR|control\s+effectiveness)|(?:circumvent|bypass|override)\s+(?:internal\s+control|ICFR|SOX|control\s+procedure)|(?:internal\s+control|ICFR|SOX\s+404)\s+(?:assessment|testing)\s+(?:not\s+performed|skipped|incomplete|inadequate)|management\s+(?:assertion|certification)\s+(?:without|lacking)\s+(?:basis|testing|documentation|evidence)|(?:annual\s+report|10-K)\s+(?:without|lacking|missing)\s+(?:internal\s+control\s+report|ICFR\s+report|404\s+report))
+  flags: i
+severity: critical
+category: financial
+source:
+  regulation: Sarbanes-Oxley Act
+  article: Section 404 (15 U.S.C. §7262)
+  url: https://www.law.cornell.edu/uscode/text/15/7262
+  last_updated: '2012-04-05'
+  citation: >-
+    15 U.S.C. §7262(a) Rules required: The Commission shall prescribe rules
+    requiring each annual report required by section 78m(a) or 78o(d) of this
+    title to contain an internal control report, which shall — (1) state the
+    responsibility of management for establishing and maintaining an adequate
+    internal control structure and procedures for financial reporting; and
+    (2) contain an assessment, as of the end of the most recent fiscal year
+    of the issuer, of the effectiveness of the internal control structure and
+    procedures of the issuer for financial reporting. §7262(b) Internal
+    control evaluation and reporting: With respect to the internal control
+    assessment required by subsection (a), each registered public accounting
+    firm that prepares or issues the audit report for the issuer, other than
+    an issuer that is an emerging growth company (as defined in section 78c
+    of this title), shall attest to, and report on, the assessment made by
+    the management of the issuer. An attestation made under this subsection
+    shall be made in accordance with standards for attestation engagements
+    issued or adopted by the Board. Any such attestation shall not be the
+    subject of a separate engagement.
+exceptions:
+- condition: Smaller issuer exemption
+  description: >-
+    15 U.S.C. §7262(c): Subsection (b) shall not apply with respect to any
+    audit report prepared for an issuer that is neither a "large accelerated
+    filer" nor an "accelerated filer" as those terms are defined in
+    Rule 12b-2 of the Commission.
+- condition: Emerging growth company
+  description: >-
+    Auditor attestation requirement does not apply to emerging growth
+    companies as defined in section 78c.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      SEC enforcement actions, civil money penalties, disgorgement, officer
+      and director bars. Criminal penalties under Section 906 (18 U.S.C.
+      §1350) for false certifications: up to $5M and 20 years imprisonment
+      for willful violations.
+remediation:
+  action: sox_compliance_block
+  timing: proactive
+  message: >-
+    BLOCKED — Sarbanes-Oxley Section 404 (15 U.S.C. §7262) requires annual
+    internal control reports with management assessment of ICFR effectiveness
+    and (for accelerated filers) auditor attestation. Concealing material
+    weaknesses or misrepresenting control effectiveness carries severe
+    SEC and criminal penalties.
+  suggestion: >-
+    Conduct documented testing of internal controls over financial reporting
+    as of fiscal year-end. Disclose any material weaknesses or significant
+    deficiencies in the internal control report. Ensure management's
+    assessment is supported by sufficient evidence and obtain auditor
+    attestation if you are an accelerated filer. Engage your audit committee
+    and external auditor early.
+version: 1.0.0
+tags:
+- sox
+- section-404
+- icfr
+- internal-controls
+- financial-reporting
+- material-weakness
+tier: enterprise

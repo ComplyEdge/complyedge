@@ -1,0 +1,64 @@
+id: EU_AI_ACT_ART10_DATA_GOVERNANCE_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires that training, validation, and testing datasets for high-risk AI
+  systems are relevant, sufficiently representative, free of errors, complete
+  for the intended purpose, and examined for possible biases. Article 10.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    training, validating, or testing a high-risk AI system using datasets that
+    fail to meet the data governance requirements of EU AI Act Article 10.
+    Datasets must be: relevant to the intended purpose, sufficiently
+    representative, to the best extent possible free of errors, and complete
+    in view of the intended purpose. They must account for characteristics
+    specific to geographic, contextual, behavioral, or functional settings.
+    Datasets must be examined for possible biases that are likely to affect
+    health, safety, or fundamental rights, and gaps or shortcomings must be
+    detected and addressed.
+  model: gpt-4
+- type: regex
+  value: >-
+    (training\s+data\s+(?:not\s+)?(?:representative|biased|incomplete|unvetted)|biased\s+(?:training|dataset|data\s+set)|unrepresentative\s+(?:data|sample|dataset)|data\s+governance\s+(?:not\s+)?(?:implemented|required|performed)|without\s+(?:data\s+)?(?:governance|bias\s+(?:check|assessment|audit))|skip(?:ping)?\s+(?:data|bias)\s+(?:review|assessment|validation)|dataset\s+(?:bias|quality)\s+(?:not\s+)?(?:assessed|checked|verified)|no\s+bias\s+(?:detection|assessment|audit)|training\s+without\s+(?:validation|representative)\s+data|insufficient\s+(?:training|test)\s+data)
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 10
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 10: Training, validation and testing
+    data sets shall be subject to data governance and management practices
+    appropriate for the intended purpose of the high-risk AI system. Training,
+    validation and testing data sets shall be relevant, sufficiently
+    representative, and to the best extent possible, free of errors and
+    complete in view of the intended purpose.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 10 requires data governance for high-risk AI
+    systems. Training, validation, and testing datasets must be relevant,
+    representative, error-free, and examined for biases. Penalties: up to
+    EUR 15M or 3% of global revenue.
+  suggestion: >-
+    Implement data governance practices: ensure datasets are relevant and
+    representative of the deployment context, examine for biases related to
+    protected characteristics, detect and address gaps or shortcomings, and
+    document the data governance process.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-10
+- high-risk
+- data-governance
+- bias
+tier: enterprise

@@ -1,0 +1,57 @@
+id: EU_AI_ACT_GPAI_MODEL_CLASSIFICATION_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires providers of general-purpose AI models to classify their models
+  before placing them on the EU market. Article 51 of the EU AI Act mandates
+  that GPAI models must be classified and registered with the AI Office,
+  including an assessment of systemic risk potential. Deploying or using a
+  GPAI model without proper classification is a compliance violation.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes deploying, releasing,
+    or using a general-purpose AI model, foundation model, or large
+    language model in the EU without having completed the required
+    classification, assessment, or registration under Article 51 of the
+    EU AI Act.
+  model: gpt-4
+- type: regex
+  value: (deploy|launch|release|use|integrate)\w*\s+(a\s+)?(general[\-\s]purpose\s+ai|gpai|foundation\s+model|large\s+language\s+model|llm)\s+(without|lacking|missing|no)\s+(classification|assessment|registration|categorisation|categorization)
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 51
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 51: The Commission shall classify
+    a general-purpose AI model as a general-purpose AI model with systemic
+    risk if it meets any of the criteria referred to in paragraph 1. A
+    provider that has a general-purpose AI model that meets those criteria
+    shall notify the AI Office without delay and in any event within two
+    weeks after those criteria are met.
+remediation:
+  action: warn
+  timing: proactive
+  message: >-
+    WARNING — EU AI Act Article 51 requires general-purpose AI models to be
+    classified and registered with the AI Office before deployment in the EU
+    market. Deploying a GPAI model without classification may result in
+    penalties of up to EUR 15M or 3% of global annual revenue.
+  suggestion: >-
+    Classify your GPAI model according to Article 51 criteria before
+    deployment. Assess whether the model meets systemic risk thresholds.
+    If it does, notify the AI Office within two weeks. Maintain
+    documentation of the classification assessment.
+version: 1.0.0
+tags:
+- eu-ai-act
+- gpai
+- article-51
+- model-classification
+- registration
+tier: enterprise

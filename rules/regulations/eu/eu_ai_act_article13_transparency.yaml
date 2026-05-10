@@ -1,0 +1,64 @@
+id: EU_AI_ACT_ART13_TRANSPARENCY_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires high-risk AI systems to be designed for transparent operation,
+  enabling deployers to interpret output and use appropriately, with sufficient
+  information on provider identity, capabilities, limitations, accuracy levels,
+  and human oversight measures. Article 13.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    providing a high-risk AI system to deployers without sufficient transparency
+    and provision of information as required by EU AI Act Article 13. High-risk
+    AI systems must be designed to ensure sufficiently transparent operation for
+    deployers to interpret output and use it appropriately. Instructions for use
+    must include: provider identity, system characteristics and capabilities,
+    intended purpose, level of accuracy and robustness, known circumstances
+    affecting performance, expected lifetime and maintenance measures, and human
+    oversight measures including technical measures to facilitate interpretation.
+  model: gpt-4
+- type: regex
+  value: >-
+    (without\s+transparency\s+(?:information|documentation|disclosure)|no\s+(?:instructions?\s+for\s+use|deployer\s+(?:information|documentation))|transparency\s+(?:not\s+)?(?:provided|documented|required)|opaque\s+(?:ai\s+)?(?:system|model|decision)|black[\-\s]box\s+(?:ai|system|model|deployment)|undisclosed\s+(?:limitation|capability|accuracy|performance)|deploy(?:ing)?\s+without\s+(?:transparency|documentation|instructions)|no\s+(?:accuracy|robustness|performance)\s+(?:level|information|disclosure)|hidden\s+(?:limitation|bias|capability))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 13
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 13: High-risk AI systems shall be
+    designed and developed in such a way as to ensure that their operation is
+    sufficiently transparent to enable deployers to interpret a system's output
+    and use it appropriately. Instructions for use shall include concise,
+    complete, correct and clear information that is relevant, accessible and
+    comprehensible to deployers.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 13 requires high-risk AI systems to provide
+    sufficient transparency and instructions for use to deployers, including
+    accuracy levels, limitations, and human oversight measures. Penalties: up
+    to EUR 15M or 3% of global revenue.
+  suggestion: >-
+    Provide comprehensive instructions for use including: provider identity,
+    system characteristics, intended purpose, accuracy and robustness levels,
+    known circumstances affecting performance, expected lifetime, and human
+    oversight measures.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-13
+- high-risk
+- transparency
+- deployer-information
+tier: enterprise

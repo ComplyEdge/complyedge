@@ -172,6 +172,8 @@ class TestRulesValidation:
                         "input_sensitivity",
                         "multi_pattern_risk",
                         "hybrid_detection",  # SOX uses this
+                        "semantic",  # EU AI Act Article 5 rules
+                        "regex",  # EU AI Act Article 5 rules
                     ]
                     for condition in conditions
                 )

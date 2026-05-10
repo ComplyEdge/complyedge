@@ -46,12 +46,15 @@ from typing import Any, Dict, List, Optional
 import httpx
 from tenacity import (
     retry,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
 )
 
 __version__ = "0.2.0"
+
+# Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
+DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
 
 # Decorator functionality will be imported at the end to avoid circular imports
 
@@ -164,7 +167,7 @@ class ComplyEdge:
         api_key: str,
         agent_id: str = "default",
         jurisdiction: Optional[str] = None,
-        base_url: str = "https://api.complyedge.io",
+        base_url: str = DEFAULT_BASE_URL,
     ):
         """
         Initialize ComplyEdge client.
@@ -178,7 +181,7 @@ class ComplyEdge:
         self.api_key = api_key
         self.agent_id = agent_id
         self.jurisdiction = jurisdiction
-        self.base_url = base_url.rstrip("/")
+        self.base_url = (base_url or DEFAULT_BASE_URL or "https://api.complyedge.io").rstrip("/")
 
         self._client = httpx.Client(
             base_url=self.base_url,
@@ -310,6 +313,61 @@ class ComplyEdge:
         except httpx.RequestError as e:
             raise ComplianceError(f"Request failed: {str(e)}")
 
+    def assess_pre_deployment(
+        self,
+        system_prompt: str,
+        model_config: Optional[Dict[str, Any]] = None,
+        agent_pipeline: Optional[Dict[str, Any]] = None,
+        jurisdiction: str = "EU",
+    ) -> Dict[str, Any]:
+        """
+        Assess an AI system configuration against EU AI Act requirements
+        BEFORE deployment.
+
+        Args:
+            system_prompt: The system prompt of the AI agent
+            model_config: Model configuration (provider, model_id, temperature)
+            agent_pipeline: Pipeline configuration (tools, memory, autonomy_level)
+            jurisdiction: Regulatory jurisdiction (default: EU)
+
+        Returns:
+            Dict with compliance_score, risk_tier, violations, required_disclosures,
+            eu_ai_act_category, estimated_deadline
+
+        Example:
+            result = ce.assess_pre_deployment(
+                system_prompt="You are a hiring assistant...",
+                model_config={"provider": "openai", "model_id": "gpt-4"},
+                agent_pipeline={"tools": ["resume_scorer"], "autonomy_level": "full"},
+            )
+            print(f"Risk: {result['risk_tier']}, Score: {result['compliance_score']}")
+        """
+        request_data = {
+            "system_prompt": system_prompt,
+            "jurisdiction": jurisdiction,
+        }
+        if model_config:
+            request_data["model_config"] = model_config
+        if agent_pipeline:
+            request_data["agent_pipeline"] = agent_pipeline
+
+        try:
+            response = self._client.post(
+                "/v1/assessment/pre-deployment", json=request_data
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            try:
+                error_detail = e.response.json().get("detail", str(e))
+            except Exception:
+                error_detail = str(e)
+            raise ComplianceError(
+                f"API error ({e.response.status_code}): {error_detail}"
+            )
+        except httpx.RequestError as e:
+            raise ComplianceError(f"Request failed: {str(e)}")
+
     def close(self):
         """Close the HTTP client."""
         self._client.close()
@@ -327,7 +385,7 @@ def is_safe(
     api_key: str,
     agent_id: str = "default",
     jurisdiction: Optional[str] = None,
-    base_url: str = "https://api.complyedge.io",
+    base_url: str = DEFAULT_BASE_URL,
 ) -> bool:
     """
     Global convenience function to check if text is safe.
@@ -362,7 +420,7 @@ def check(
     api_key: str,
     agent_id: str = "default",
     jurisdiction: Optional[str] = None,
-    base_url: str = "https://api.complyedge.io",
+    base_url: str = DEFAULT_BASE_URL,
 ) -> ComplianceResult:
     """
     Global convenience function to check text compliance.
@@ -444,7 +502,7 @@ class ComplyEdgeClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.complyedge.io",
+        base_url: str = DEFAULT_BASE_URL,
         timeout: int = 300,
         max_retries: int = 3,
         verify_ssl: bool = True,
@@ -460,7 +518,7 @@ class ComplyEdgeClient:
             verify_ssl: Whether to verify SSL certificates
         """
         self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
+        self.base_url = (base_url or DEFAULT_BASE_URL or "https://api.complyedge.io").rstrip("/")
 
         self.client = httpx.Client(
             base_url=self.base_url,
@@ -657,14 +715,14 @@ class AsyncComplyEdgeClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.complyedge.io",
+        base_url: str = DEFAULT_BASE_URL,
         timeout: int = 300,
         max_retries: int = 3,
         verify_ssl: bool = True,
     ):
         """Initialize the async ComplyEdge client."""
         self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
+        self.base_url = (base_url or DEFAULT_BASE_URL or "https://api.complyedge.io").rstrip("/")
 
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
@@ -857,7 +915,7 @@ def check_compliance(
 
 def get_api_key() -> Optional[str]:
     """Get API key from environment variables."""
-    return os.environ.get("COMPLYEDGE_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    return os.environ.get("COMPLYEDGE_API_KEY")
 
 
 # Convenience instance with environment configuration
@@ -907,4 +965,8 @@ __all__ = [
 ]
 
 # Import decorator functionality after all classes are defined to avoid circular imports
-from .decorators import compliance_check, ComplianceConfig, default_violation_handler
+from .decorators import (  # noqa: E402
+    ComplianceConfig,
+    compliance_check,
+    default_violation_handler,
+)

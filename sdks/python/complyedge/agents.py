@@ -20,10 +20,14 @@ Usage:
     )
 """
 
-from typing import Any, Callable, List, Optional, Union
 import logging
+import os
+from typing import Any, Callable, List, Union
 
 from . import ComplyEdge
+
+# Resolve default base URL from environment
+_DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL", "https://api.complyedge.io")
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +62,7 @@ def _create_output_guardrail(guardrail_function: Callable, name: str):
 def create_compliance_guardrail(
     api_key: str,
     rules: Union[str, List[str]] = "eu-ai-act/article-5",
-    base_url: str = "https://api.complyedge.io",
+    base_url: str = _DEFAULT_BASE_URL,
     direction: str = "input",
 ) -> Callable:
     """

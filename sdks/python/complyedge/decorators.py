@@ -5,13 +5,16 @@ Provides Pythonic decorator syntax for automatic compliance checking
 in AI agent functions, supporting both input and output validation.
 """
 
-import os
 import functools
 import logging
-from typing import Callable, Any, Optional, Union, Dict, List, TYPE_CHECKING
+import os
+from typing import TYPE_CHECKING, Any, Callable, Optional
+
+# Resolve default base URL from environment
+_DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
 
 if TYPE_CHECKING:
-    from . import ComplianceResult, ComplyEdge
+    from . import ComplianceResult
 
 # Import from existing SDK components
 # Note: Models and clients are defined in __init__.py
@@ -41,7 +44,7 @@ class ComplianceConfig:
         violation_handler: Optional[Callable[["ComplianceResult", str], Any]] = None,
         agent_id: str = "default",
         jurisdiction: Optional[str] = None,
-        base_url: str = "https://api.complyedge.io",
+        base_url: str = _DEFAULT_BASE_URL,
         timeout: int = 300,
         max_retries: int = 3
     ):
@@ -105,7 +108,7 @@ def compliance_check(
     jurisdiction: Optional[str] = None,
     config: Optional[ComplianceConfig] = None,
     violation_handler: Optional[Callable[["ComplianceResult", str], Any]] = None,
-    base_url: str = "https://api.complyedge.io"
+    base_url: str = _DEFAULT_BASE_URL
 ):
     """
     Decorator for automatic ComplyEdge compliance checking.
@@ -173,8 +176,6 @@ def compliance_check(
                 agent = config.agent_id
                 juris = config.jurisdiction
                 api_base_url = config.base_url
-                timeout = config.timeout
-                retries = config.max_retries
             else:
                 check_input = input
                 check_output = output
@@ -184,13 +185,11 @@ def compliance_check(
                 agent = agent_id
                 juris = jurisdiction
                 api_base_url = base_url
-                timeout = 300
-                retries = 3
             
             # Graceful degradation: proceed without compliance if disabled or misconfigured
             if not enabled or not api_key:
-                logger.debug(
-                    "Compliance checking disabled or API key missing - proceeding without checks",
+                logger.warning(
+                    "Compliance checking disabled or API key missing - proceeding WITHOUT compliance checks (fail-open)",
                     extra={
                         "enabled": enabled,
                         "api_key_present": bool(api_key),

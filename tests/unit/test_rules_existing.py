@@ -38,7 +38,7 @@ class TestRulesExisting:
         if not rules_dir.exists():
             pytest.skip("Rules directory not found")
 
-        rule_files = list(rules_dir.rglob("*.yaml"))[:5]  # Sample first 5
+        rule_files = list(rules_dir.rglob("*.yaml"))  # All rule files
 
         if not rule_files:
             pytest.skip("No rule files found")
@@ -126,8 +126,8 @@ class TestRulesExisting:
                     ), f"Regex condition missing pattern/value in {rule_file}"
                 elif condition_type == "semantic":
                     assert (
-                        "description" in condition
-                    ), f"Semantic condition missing description in {rule_file}"
+                        "description" in condition or "prompt" in condition
+                    ), f"Semantic condition missing description/prompt in {rule_file}"
                 elif condition_type == "input_sensitivity":
                     # Input sensitivity conditions use 'patterns' or other fields
                     assert (

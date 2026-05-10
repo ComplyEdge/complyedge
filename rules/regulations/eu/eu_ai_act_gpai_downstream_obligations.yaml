@@ -1,0 +1,61 @@
+id: EU_AI_ACT_GPAI_DOWNSTREAM_OBLIGATIONS_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires providers of general-purpose AI models to make available to
+  downstream deployers the technical documentation and sufficient
+  information about the capabilities and limitations of the model, enabling
+  them to comply with their own obligations under the EU AI Act.
+  Article 53(1)(d-e) mandates transparency towards downstream providers
+  and deployers.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes deploying, distributing,
+    or providing a general-purpose AI model to downstream users or deployers
+    without supplying the required model documentation, information about
+    capabilities, limitations, or integration instructions as mandated by
+    Article 53(1)(d-e) of the EU AI Act.
+  model: gpt-4
+- type: regex
+  value: (deploy|distribut|provid|release|ship)\w*\s+(a\s+|the\s+)?(gpai|general[\-\s]purpose\s+ai|foundation\s+model|large\s+language\s+model|llm)\b.{0,40}(downstream|third[\-\s]part|customer|client|integrator)\w*.{0,20}(without|lacking|no)\s+(model\s+documentation|documentation|capabilities|limitations|integration\s+guide)
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 53(1)(d-e)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 53(1)(d-e): Providers of
+    general-purpose AI models shall make available to providers of AI
+    systems who intend to integrate the general-purpose AI model into
+    their AI system the technical documentation and information that is
+    necessary for those providers to comply with their obligations under
+    this Regulation, including the information set out in Annex XII.
+remediation:
+  action: warn
+  timing: proactive
+  message: >-
+    WARNING — EU AI Act Article 53(1)(d-e) requires GPAI model providers
+    to supply downstream deployers with comprehensive documentation about
+    model capabilities, limitations, and integration requirements.
+    Non-compliance may result in penalties of up to EUR 15M or 3% of
+    global annual revenue.
+  suggestion: >-
+    Before distributing a GPAI model to downstream deployers, prepare and
+    provide documentation following Annex XII of the EU AI Act. Include
+    model capabilities, known limitations, intended use cases, performance
+    benchmarks, and integration guidance. Ensure downstream deployers have
+    sufficient information to meet their own EU AI Act obligations.
+version: 1.0.0
+tags:
+- eu-ai-act
+- gpai
+- article-53
+- downstream-obligations
+- deployer-information
+- transparency
+tier: enterprise

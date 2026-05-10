@@ -64,6 +64,38 @@ else:
     print(f"Blocked: {result.violations}")
 ```
 
+## MCP Server — Use ComplyEdge as an AI Agent Tool
+
+ComplyEdge runs as an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server,
+giving any MCP-compatible agent (Claude, Cursor, etc.) compliance checking with zero integration code.
+
+```bash
+pip install complyedge[mcp]
+```
+
+Add to your MCP client config (e.g. `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "complyedge": {
+      "command": "python",
+      "args": ["-m", "complyedge.mcp_server"]
+    }
+  }
+}
+```
+
+**Exposed tools:**
+
+| Tool | Description |
+|------|-------------|
+| `check_compliance` | Check text against regulation rules. Returns violations or PASS. |
+| `list_rules` | List available rules, filterable by jurisdiction. |
+| `scan_prompt` | Pre-generation compliance check on prompts. |
+
+The MCP server uses the same TrustLint engine as the REST API — deterministic, <1ms per rule.
+
 ## Documentation
 
 See the [ComplyEdge Documentation](https://docs.complyedge.io) for complete guides.

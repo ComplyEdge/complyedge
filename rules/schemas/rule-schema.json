@@ -573,7 +573,7 @@
       "type": "string",
       "enum": [
         "privacy",
-        "security", 
+        "security",
         "financial",
         "healthcare",
         "marketing",
@@ -581,7 +581,8 @@
         "consumer_protection",
         "data_retention",
         "access_rights",
-        "input_protection"
+        "input_protection",
+        "prohibited_practice"
       ],
       "description": "Regulatory category this rule belongs to"
     },
@@ -638,6 +639,10 @@
             "type": "string"
           },
           "description": "Legal citations and references"
+        },
+        "citation": {
+          "type": "string",
+          "description": "Full legal citation text for the specific article"
         }
       },
       "additionalProperties": false,
@@ -793,6 +798,12 @@
         "type": "string"
       },
       "description": "Additional tags for categorization and filtering"
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["community", "developer", "enterprise"],
+      "default": "community",
+      "description": "Commercial tier required to access this rule. community=OSS/free, developer=$99/mo, enterprise=$999/mo"
     },
     "title": {
       "type": "string",
