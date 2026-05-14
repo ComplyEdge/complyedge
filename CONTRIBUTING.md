@@ -40,7 +40,7 @@ The Python SDK lives at `sdks/python/`; there is no top-level `setup.py`. Runnin
 
 - Rules based on keyword matching only, with no legal standard cited.
 - Rules without at least two test cases (one passing, one blocking).
-- Rules that expand scope beyond the EU AI Act. **No GDPR, no HIPAA, no NIST, no SOX.** Scope discipline is the product. See `rules/rule_standard_intent.yaml` for why.
+- Rules that expand scope beyond the EU AI Act. **External contributions are scoped to EU AI Act Articles 5, 50, and GPAI (Articles 51–55) only.** The repo contains rules for other regulations (GDPR, HIPAA, SOX) built by the core team — those are not open for community contributions in 2026. Scope discipline is what makes the EU AI Act corpus defensible to a regulator.
 - Rules that do not conform to [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md) (mandatory ID format, citation format, header fields, test requirements).
 - PRs without an explicit human approval comment from the contributor (see step 5 below).
 
