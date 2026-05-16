@@ -39,7 +39,7 @@ The Python SDK lives at `sdks/python/`; there is no top-level `setup.py`. Runnin
 ## What we reject (automatically)
 
 - Rules based on keyword matching only, with no legal standard cited.
-- Rules without at least two test cases (one passing, one blocking).
+- Rules without at least four test cases: two true positives (inputs that must trigger a violation), one true negative (legitimate input that must not trigger), and one jurisdiction guard (same violating input with a non-EU jurisdiction — must not trigger).
 - Rules that expand scope beyond the EU AI Act. **External contributions are scoped to EU AI Act Articles 5, 50, and GPAI (Articles 51–55) only.** The repo contains rules for other regulations (GDPR, HIPAA, SOX) built by the core team — those are not open for community contributions in 2026. Scope discipline is what makes the EU AI Act corpus defensible to a regulator.
 - Rules that do not conform to [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md) (mandatory ID format, citation format, header fields, test requirements).
 - PRs without an explicit human approval comment from the contributor (see step 5 below).
@@ -64,13 +64,13 @@ What exact behavior does this clause prohibit or require? The condition must be 
 - Bad: "checks for manipulative language."
 - Good: "detects whether AI output deploys subliminal techniques that distort a person's behaviour in a way that impairs their ability to make an informed decision" — Article 5(1)(a).
 
-If the condition is deterministic (regex, structural check), it goes in Layer 1 (Rego). If it requires interpretation, it goes in Layer 2 (LLM-backed). RULE_STANDARD.md has the decision matrix.
+If the condition is deterministic (regex, structural check), it goes in Layer 1 (Rego). If it requires interpretation, it goes in Layer 2 (LLM-backed). Set the `Condition type` header field accordingly (`deterministic`, `semantic`, or `hybrid`) — see RULE_STANDARD.md §2.2 for the field definition.
 
 ### Step 3 — Write the rule per RULE_STANDARD.md
 
 Look at an existing rule in the same article as a template. Good reference rules:
 
-- [`rules/rego/complyedge/article5/social_scoring.rego`](rules/rego/complyedge/article5/social_scoring.rego) — Article 5(1)(c), passes 5/7 quality fields.
+- [`rules/rego/complyedge/article5/social_scoring.rego`](rules/rego/complyedge/article5/social_scoring.rego) — Article 5(1)(c); good example of condition precision and test coverage. Note: missing some header fields (recital, status, approved_by) per RULE_STANDARD.md worked example — your rule should have all fields populated.
 - [`rules/rego/complyedge/article50/deepfake_disclosure.rego`](rules/rego/complyedge/article50/deepfake_disclosure.rego) — Article 50 transparency.
 - [`rules/rego/complyedge/gpai/model_classification.rego`](rules/rego/complyedge/gpai/model_classification.rego) — Article 51 GPAI.
 
@@ -78,14 +78,26 @@ Naming convention is mandatory: `rego-art{N}-{paragraph}{sub}-{seq}` (e.g. `rego
 
 ### Step 4 — Write test cases
 
-Minimum: two test cases per rule.
+Minimum: four test cases per rule.
 
-- One that **passes** (the rule does not fire on legitimate AI use).
-- One that **blocks** (the rule fires on a clear violation).
+- **Two true positives** — inputs that must trigger a violation (use realistic AI output text, not toy strings).
+- **One true negative** — a legitimate input that must not trigger.
+- **One jurisdiction guard** — the same violating input but with `jurisdiction: "US"` (or any non-EU jurisdiction). It must not trigger. This prevents over-broad rules that fire outside their legal scope.
 
-Test cases must use realistic AI output text, not toy strings. Reference: [`rules/rego/complyedge/test/article5_test.rego`](rules/rego/complyedge/test/article5_test.rego).
+Reference: [`rules/rego/complyedge/test/article5_test.rego`](rules/rego/complyedge/test/article5_test.rego).
 
-Run the suite locally before opening the PR:
+Install OPA locally if you haven't already:
+
+```bash
+# macOS
+brew install opa
+
+# Linux / other
+curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64
+chmod +x opa && sudo mv opa /usr/local/bin/opa
+```
+
+Run the full suite before opening the PR:
 
 ```bash
 opa test rules/rego/ -v
@@ -108,7 +120,17 @@ PR description must include:
 **Add a comment on your own PR** with this exact format:
 
 ```
-APPROVED: <your name> <YYYY-MM-DD> — confirmed Article X(Y)(Z) condition matches the legal standard.
+APPROVED: <your name> <YYYY-MM-DD> — confirmed Article X(Y)(Z) condition and test cases
+
+Checklist:
+- [x] Legal text read in full (Regulation (EU) 2024/1689, Article X)
+- [x] Recital <N> reviewed for legislative intent
+- [x] Condition maps to a verifiable behavior (not inferred)
+- [x] Test cases cover pass AND fail scenarios
+- [x] Jurisdiction guard test present
+- [x] No false positives introduced in existing test suite (opa test rules/rego/ -v)
+- [x] rule_id follows naming convention
+- [x] Citation is precise (paragraph + sub-paragraph level)
 ```
 
 This is the human approval step. Without it, the PR will not be merged. The reason is that compliance rules carry legal weight — we will not infer your intent from a thumbs-up emoji.
