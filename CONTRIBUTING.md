@@ -59,12 +59,14 @@ Read the corresponding **Recital** for legislative intent. The recital tells you
 
 ### Step 2 — Write the condition
 
+Rules you write here run through OPA — CE's deterministic Layer 1 enforcement path. When CE evaluates an AI request, your rule fires as a binary pass/block decision with your citation attached. Write the condition as if a lawyer will read it and a machine will execute it.
+
 What exact behavior does this clause prohibit or require? The condition must be **verifiable**, not inferred.
 
 - Bad: "checks for manipulative language."
 - Good: "detects whether AI output deploys subliminal techniques that distort a person's behaviour in a way that impairs their ability to make an informed decision" — Article 5(1)(a).
 
-If the condition is deterministic (regex, structural check), it goes in Layer 1 (Rego). If it requires interpretation, it goes in Layer 2 (LLM-backed). Set the `Condition type` header field accordingly (`deterministic`, `semantic`, or `hybrid`) — see RULE_STANDARD.md §2.2 for the field definition.
+Community contributions are Layer 1 (Rego) only — deterministic conditions expressible as logic checks. If a clause cannot be reduced to a structural check, it is out of scope for this guide. Mark your rule `Condition type: deterministic`. If a clause has both a detectable structural component and an interpretive component, write the Rego for the structural part and mark it `Condition type: hybrid` — the core team handles the interpretive layer. When in doubt, open a GitHub Discussion before writing code.
 
 ### Step 3 — Write the rule per RULE_STANDARD.md
 
