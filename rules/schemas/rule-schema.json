@@ -582,7 +582,8 @@
         "data_retention",
         "access_rights",
         "input_protection",
-        "prohibited_practice"
+        "prohibited_practice",
+        "sanctions"
       ],
       "description": "Regulatory category this rule belongs to"
     },
@@ -871,6 +872,86 @@
         "type": "string"
       },
       "description": "Additional compliance guidance and notes"
+    },
+    "effective_window": {
+      "type": "object",
+      "description": "Temporal validity scope for rules whose effective date is not a single point (e.g., OFAC wind-down periods, General Licenses with expiry). When present, this supplements 'effective_date' rather than replacing it.",
+      "required": ["starts"],
+      "properties": {
+        "starts": {
+          "type": "string",
+          "format": "date",
+          "description": "Date this rule begins to apply (ISO 8601, YYYY-MM-DD)"
+        },
+        "ends": {
+          "type": "string",
+          "format": "date",
+          "description": "Date this rule ceases to apply. Absent means open-ended. (ISO 8601, YYYY-MM-DD)"
+        },
+        "superseded_by": {
+          "type": "string",
+          "description": "Rule ID that supersedes this rule when 'ends' is reached. Forms a chain with the corresponding 'supersedes' entry on the successor rule."
+        }
+      },
+      "additionalProperties": false
+    },
+    "supersedes": {
+      "type": "array",
+      "description": "Rules this rule replaces. Used to model OFAC General License revisions (e.g., GL 8C replacing GL 8B) or EU regulation amendments. Each entry should have a corresponding 'superseded_by' on the predecessor's 'effective_window'.",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "effective_replacement"],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "description": "ID of the rule being superseded"
+          },
+          "effective_replacement": {
+            "type": "string",
+            "format": "date",
+            "description": "Date on which the replacement takes effect (ISO 8601, YYYY-MM-DD)"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Short human-readable summary of what changed (e.g., 'narrows the GL to non-IRGC counterparties only')"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "conditional_on": {
+      "type": "array",
+      "description": "External-state conditions that must hold for this rule to apply. Used to model partial-delisting carve-outs (e.g., 'Iran sanctions lifted EXCEPT IRGC-affiliated entities') and ceasefire-conditional regimes. All conditions in the list are AND-combined; evaluation passes only when every condition is true.",
+      "items": {
+        "type": "object",
+        "required": ["parameter", "operator", "value", "rationale"],
+        "properties": {
+          "parameter": {
+            "type": "string",
+            "description": "Name of the external state parameter to check (e.g., 'counterparty_irgc_status', 'nuclear_program_affiliation')"
+          },
+          "operator": {
+            "type": "string",
+            "enum": ["==", "!=", "in", "not_in", "<", ">", "<=", ">="],
+            "description": "Comparison operator"
+          },
+          "value": {
+            "oneOf": [
+              {"type": "string"},
+              {"type": "number"},
+              {"type": "boolean"},
+              {"type": "array", "items": {"type": ["string", "number", "boolean"]}}
+            ],
+            "description": "Value to compare against"
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 10,
+            "description": "Plain-language explanation of why this conditional gates the rule (cite the legal basis)"
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false
