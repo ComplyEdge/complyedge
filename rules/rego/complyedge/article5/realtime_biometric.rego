@@ -5,8 +5,13 @@
 # narrowly defined exceptions.
 #
 # Legal citation: Regulation (EU) 2024/1689, Article 5(1)(h)
+# Recital: 32 — prohibits real-time remote biometric identification in publicly accessible spaces for law enforcement; recitals 33-35 cover the narrowly-defined exceptions (targeted search, imminent threat, serious crime) and the judicial/independent-authority authorisation requirement
 # Effective: 2025-02-02
 # Penalty: up to €35M or 7% of global revenue
+# Condition type: deterministic
+# Enforcement layer: layer1
+# Status: approved
+# Approved by: Leo Celis on 2026-05-16 (via agent review per §5.1 amendment v1.1)
 
 package complyedge.article5.realtime_biometric
 

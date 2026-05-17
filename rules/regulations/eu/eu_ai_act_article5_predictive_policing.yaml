@@ -5,7 +5,7 @@ description: >-
   Prohibits AI systems that make risk assessments of natural persons to
   predict the probability of committing a criminal offence, based solely on
   profiling or on assessing their personality traits and characteristics.
-  Article 5(1)(e) of the EU AI Act. The prohibition does not apply to AI
+  Article 5(1)(d) of the EU AI Act. The prohibition does not apply to AI
   systems used to support human assessment based on objective and verifiable
   facts directly linked to a criminal activity.
 detection_scope: all
@@ -17,7 +17,7 @@ conditions:
     criminal offence based solely on profiling or personality traits
     (predictive policing), without human assessment grounded in objective,
     verifiable facts directly linked to criminal activity. This is prohibited
-    under EU AI Act Article 5(1)(e).
+    under EU AI Act Article 5(1)(d).
   model: gpt-4
 - type: regex
   value: (predictive\s+policing|pre[- ]?crime\s+(predict|assess|detect)|(predict|assess|forecast)\w*\s+(the\s+)?(probability|risk|likelihood)\s+of\s+(a\s+)?(crime|criminal|offence|offense|reoffend)|(crime|criminal)\s+(probability|risk)\s+(predict|score|assess)|(score|assess|predict|rank|rate)\w*\s+(an\s+)?individual\s+(criminal|crime|offender)\s+(risk|probability|propensity)|individual\s+criminal\s+(risk|probability|propensity)|(offender|recidivism)\s+(risk|probability)\s+(predict|score)\s+(based\s+on\s+profil|from\s+profil|from\s+personality)|profiling[- ]?based\s+(crime|criminal|offence)\s+(predict|risk)|personality[- ]?based\s+(crime|criminal|offence)\s+(predict|risk)|criminal\s+risk\s+from\s+personality)
@@ -44,7 +44,7 @@ remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 5(1)(e) prohibits AI systems that predict
+    BLOCKED — EU AI Act Article 5(1)(d) prohibits AI systems that predict
     individual criminal risk based solely on profiling or personality traits.
     This is banned in the EU since February 2, 2025. AI assisting human
     assessment based on objective verifiable facts linked to criminal

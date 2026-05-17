@@ -8,37 +8,36 @@ Runtime compliance engine for EU AI Act. Open source. Deterministic.
 pip install complyedge
 ```
 
-## Quick Start — EU AI Act Article 5 in Three Lines
+## Quick Start — EU AI Act in Three Lines
 
 ```python
 from complyedge import compliance_check
 
-@compliance_check(rules="eu-ai-act/article-5")
+@compliance_check(jurisdiction="EU", agent_id="my-agent")
 def my_agent(prompt):
-    return llm.generate(prompt)  # every output checked
+    return llm.generate(prompt)  # every input and output checked
 ```
 
-That's it. Every input and output is checked against Article 5 prohibited practices. Violations are blocked before they reach the user, with legal citation, rule ID, and timestamp on every check.
+That's it. Every input and output is checked against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations are blocked before they reach the user, with legal citation, rule ID, and timestamp on every check.
 
-## Multi-Regulation Enforcement
+The decorator reads your API key from the `COMPLYEDGE_API_KEY` environment variable by default. Pass `api_key_env="MY_VAR"` to use a different one.
+
+## Multi-Jurisdiction Enforcement
+
+`jurisdiction` selects which rule corpus is evaluated server-side.
+
+| Value | Corpus |
+|---|---|
+| `EU` | EU AI Act Article 5 + Article 50 + GPAI (Articles 51–55) |
+| `US` | HIPAA, SOX, COPPA, TCPA, BIPA |
 
 ```python
-# Enforce multiple rules — same pattern
-@compliance_check(rules=["eu-ai-act/article-5", "eu-ai-act/article-50"])
-def my_agent(prompt):
-    return llm.generate(prompt)
-
-# Add GDPR tomorrow — no API changes
-@compliance_check(rules=["eu-ai-act/article-5", "gdpr/article-17"])
-def my_agent(prompt):
-    return llm.generate(prompt)
+@compliance_check(jurisdiction="EU", agent_id="hr-screening")
+def hr_screening(candidate: str) -> str:
+    return llm.generate(candidate)
 ```
 
-Rule paths map 1:1 to OPA/Rego policy paths. Same engine, any regulation.
-
-> **Note:** The `rules=` path pattern is the canonical API (decided 2026-03-29).
-> Legacy patterns (`jurisdiction=`, `create_sox_guardrail()`) are from the pre-pivot
-> product and will be deprecated.
+Per-rule scoping (e.g. only Article 5) is planned but not yet exposed in the SDK — all rules for the selected jurisdiction run today.
 
 ## Additional Installation Options
 
@@ -50,18 +49,35 @@ pip install complyedge[dev]
 pip install -e ./sdks/python
 ```
 
-## Client API Usage
+## Client API — Without the Decorator
 
 ```python
 from complyedge import ComplyEdge
 
 ce = ComplyEdge(api_key="your-key")
-result = ce.check("AI-generated content", rules="eu-ai-act/article-5")
+result = ce.check("AI-generated content", jurisdiction="EU")
 
-if result.safe:
+if result.allowed:
     print("Content approved")
 else:
-    print(f"Blocked: {result.violations}")
+    for v in result.violations:
+        print(f"{v.rule_id}: {v.citation}")
+```
+
+Or the global convenience functions:
+
+```python
+from complyedge import is_safe, check
+import os
+
+api_key = os.environ["COMPLYEDGE_API_KEY"]
+
+# Boolean check
+if not is_safe(text, api_key=api_key, jurisdiction="EU"):
+    raise ValueError("Compliance violation")
+
+# Full result
+result = check(text, api_key=api_key, jurisdiction="EU")
 ```
 
 ## MCP Server — Use ComplyEdge as an AI Agent Tool
@@ -94,7 +110,7 @@ Add to your MCP client config (e.g. `claude_desktop_config.json`):
 | `list_rules` | List available rules, filterable by jurisdiction. |
 | `scan_prompt` | Pre-generation compliance check on prompts. |
 
-The MCP server uses the same TrustLint engine as the REST API — deterministic, <1ms per rule.
+The MCP server uses the same engine as the REST API — deterministic OPA/Rego on the hot path.
 
 ## Documentation
 

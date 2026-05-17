@@ -2,6 +2,18 @@
 #
 # This policy aggregates all Article 50 sub-checks and returns a unified result.
 # OPA queries this package at: POST /v1/data/complyedge/article50
+#
+# Aggregator carve-out (RULE_STANDARD.md §5.6, added v1.1):
+# This file imports and combines other rules' violation results — it has no
+# legal condition of its own. Exempt from §5 approval headers. Correctness
+# derives from the correctness of the imported sub-rules, each of which is
+# individually subject to §5 sign-off.
+#
+# Imported rules covered by individual §5 approvals:
+#   - article50.chatbot_disclosure (Art 50(1)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - article50.gpai_content_disclosure (Art 50(2)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - article50.synthetic_media_watermark (Art 50(2)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - article50.deepfake_disclosure (Art 50(4)) — approved by Leo Celis 2026-05-16 (agent review)
 
 package complyedge.article50
 

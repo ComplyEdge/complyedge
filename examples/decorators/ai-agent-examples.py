@@ -3,7 +3,7 @@
 ComplyEdge Decorator: AI Agent Examples
 
 Shows how to add EU AI Act compliance to any Python function
-with one decorator. Each example uses the canonical rules= API.
+with one decorator. Each example uses the jurisdiction= API.
 
 Usage:
     pip install complyedge
@@ -13,7 +13,7 @@ Usage:
 
 import os
 import sys
-from typing import Dict, List
+from typing import Dict
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "sdks", "python"))
 
@@ -21,10 +21,11 @@ from complyedge import compliance_check, ComplianceConfig
 
 
 # =============================================================================
-# EU AI ACT ARTICLE 5 — Prohibited Practices (law since Feb 2, 2025)
+# EU AI ACT — Article 5 (prohibited), Article 50 (transparency), GPAI
 # =============================================================================
+# `jurisdiction="EU"` evaluates against the full EU rule corpus on the API.
 
-@compliance_check(rules="eu-ai-act/article-5", agent_id="hr-screening")
+@compliance_check(jurisdiction="EU", agent_id="hr-screening")
 def hr_screening_agent(candidate_profile: str) -> str:
     """
     HR screening agent. Article 5 blocks social scoring and
@@ -33,7 +34,7 @@ def hr_screening_agent(candidate_profile: str) -> str:
     return f"Candidate evaluation: {candidate_profile}. Assessment based on qualifications only."
 
 
-@compliance_check(rules="eu-ai-act/article-5", agent_id="content-moderation")
+@compliance_check(jurisdiction="EU", agent_id="content-moderation")
 def content_moderation_agent(user_content: str) -> str:
     """
     Content moderation agent. Article 5 blocks subliminal manipulation
@@ -42,7 +43,7 @@ def content_moderation_agent(user_content: str) -> str:
     return f"Content reviewed: {user_content}. No prohibited practices detected."
 
 
-@compliance_check(rules="eu-ai-act/article-5", agent_id="credit-decision")
+@compliance_check(jurisdiction="EU", agent_id="credit-decision")
 def credit_decision_agent(applicant_data: str) -> str:
     """
     Credit decision agent. Article 5 blocks exploitation of
@@ -52,29 +53,21 @@ def credit_decision_agent(applicant_data: str) -> str:
 
 
 # =============================================================================
-# MULTI-REGULATION — Same decorator, multiple rules
+# CROSS-JURISDICTION — US HIPAA, SOX, COPPA, TCPA, BIPA
 # =============================================================================
 
-@compliance_check(
-    rules=["eu-ai-act/article-5", "gdpr/consent"],
-    agent_id="customer-service",
-)
+@compliance_check(jurisdiction="US", agent_id="customer-service")
 def customer_service_agent(message: str, account: Dict) -> str:
     """
-    Customer service agent checked against Article 5 AND GDPR consent rules.
-    One decorator, multiple regulations, same pattern.
+    Customer service agent checked against US rule corpus (HIPAA, TCPA, BIPA, etc.).
     """
     return f"Support response for: {message}"
 
 
-@compliance_check(
-    rules=["eu-ai-act/article-5", "pii/detection"],
-    agent_id="medical-info",
-)
+@compliance_check(jurisdiction="US", agent_id="medical-info")
 def medical_information_agent(query: str) -> str:
     """
-    Medical information agent. Article 5 + PII detection.
-    Blocks prohibited practices and protects personal data.
+    Medical information agent — HIPAA minimum-necessary + PHI disclosure rules apply.
     """
     response = f"General information: {query}"
     response += "\n\nDisclaimer: Consult a healthcare professional for medical advice."
@@ -85,7 +78,7 @@ def medical_information_agent(query: str) -> str:
 # INPUT-ONLY vs OUTPUT-ONLY checking
 # =============================================================================
 
-@compliance_check(rules="eu-ai-act/article-5", input=True, output=False, agent_id="intake")
+@compliance_check(jurisdiction="EU", input=True, output=False, agent_id="intake")
 def intake_agent(user_message: str) -> str:
     """
     Input-only checking. Catches prohibited requests before
@@ -94,7 +87,7 @@ def intake_agent(user_message: str) -> str:
     return f"Processing: {user_message}"
 
 
-@compliance_check(rules="eu-ai-act/article-5", input=False, output=True, agent_id="generator")
+@compliance_check(jurisdiction="EU", input=False, output=True, agent_id="generator")
 def generation_agent(prompt: str) -> str:
     """
     Output-only checking. LLM generates freely, but output
@@ -112,6 +105,7 @@ enterprise_config = ComplianceConfig(
     check_input=True,
     check_output=True,
     agent_id="enterprise-agent",
+    jurisdiction="EU",
     enable_condition=lambda: os.getenv("ENVIRONMENT") == "production",
 )
 
@@ -128,20 +122,20 @@ def enterprise_agent(request: str) -> str:
 
 def main():
     print("=" * 60)
-    print("ComplyEdge Decorator Examples — EU AI Act")
+    print("ComplyEdge Decorator Examples — EU AI Act + US compliance")
     print("=" * 60)
 
     os.environ["COMPLYEDGE_ENABLED"] = "false"  # Demo mode
     os.environ["COMPLYEDGE_API_KEY"] = "demo_key"
 
-    print("\n1. ARTICLE 5 — Prohibited Practices")
+    print("\n1. EU AI ACT — Article 5, Article 50, GPAI")
     print("-" * 40)
 
     print(f"  HR Agent: {hr_screening_agent('Senior developer, 5 years experience')[:80]}")
     print(f"  Content: {content_moderation_agent('Review this marketing copy')[:80]}")
     print(f"  Credit:  {credit_decision_agent('Applicant income 50K, credit score 720')[:80]}")
 
-    print("\n2. MULTI-REGULATION")
+    print("\n2. US COMPLIANCE — HIPAA, SOX, COPPA, TCPA, BIPA")
     print("-" * 40)
 
     print(f"  Support: {customer_service_agent('Help with billing', {'tier': 'premium'})[:80]}")
@@ -155,7 +149,7 @@ def main():
 
     print("\n" + "=" * 60)
     print("Every agent protected with one line:")
-    print('  @compliance_check(rules="eu-ai-act/article-5")')
+    print('  @compliance_check(jurisdiction="EU", agent_id="my-agent")')
     print("=" * 60)
 
 

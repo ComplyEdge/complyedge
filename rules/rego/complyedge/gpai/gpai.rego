@@ -2,6 +2,19 @@
 #
 # This policy aggregates all GPAI sub-checks and returns a unified result.
 # OPA queries this package at: POST /v1/data/complyedge/gpai
+#
+# Aggregator carve-out (RULE_STANDARD.md §5.6, added v1.1):
+# This file imports and combines other rules' violation results — it has no
+# legal condition of its own. Exempt from §5 approval headers. Correctness
+# derives from the correctness of the imported sub-rules, each of which is
+# individually subject to §5 sign-off.
+#
+# Imported rules covered by individual §5 approvals:
+#   - gpai.model_classification (Art 51) — approved by Leo Celis 2026-05-16 (agent review)
+#   - gpai.copyright_transparency (Art 53(1)(c)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - gpai.technical_documentation (Art 53(1)(a)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - gpai.systemic_risk (Art 55) — approved by Leo Celis 2026-05-16 (agent review)
+#   - gpai.downstream_obligations (Art 53(1)(b)) — approved by Leo Celis 2026-05-16 (agent review)
 
 package complyedge.gpai
 

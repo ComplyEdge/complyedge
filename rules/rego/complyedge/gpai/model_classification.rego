@@ -5,8 +5,18 @@
 # whether the model presents systemic risks.
 #
 # Legal citation: Regulation (EU) 2024/1689, Article 51
+# Recital: 110 — defines systemic risks as actual or reasonably foreseeable negative effects on public health/safety, democratic processes, fundamental rights, or critical sectors. Recitals 111-112 operationalise the 10²⁵ FLOPs training-compute threshold and the Commission's designation procedure
 # Effective: 2026-08-02
 # Penalty: up to €15M or 3% of global revenue
+# Condition type: deterministic
+# Enforcement layer: layer1
+# Status: approved
+# Approved by: Leo Celis on 2026-05-16 (via agent review per §5.1 amendment v1.1)
+#
+# Scope note: Art 51 classifies GPAI models w/ systemic risk based on high-impact
+# capabilities (presumed at >10²⁵ FLOPs cumulative training compute). The related
+# notification obligation under Art 52 (notify Commission within 2 weeks of
+# crossing the threshold) is a separate procedural obligation not enforced here.
 
 package complyedge.gpai.model_classification
 

@@ -1,0 +1,205 @@
+provider_id: xai
+provider_name: xAI (Grok)
+model_class: closed_api
+systemic_risk_threshold: true
+last_updated: '2026-05-09'
+verification_status: needs_review
+
+obligations:
+
+  art_50_2_content_disclosure:
+    score: 0
+    rationale: >-
+      xAI ships consumer and API surfaces for AI-generated images
+      (Imagine API), AI-generated video (Grok Imagine Quality Mode),
+      AI-generated voice (Grok Voice / TTS API, including custom voice
+      cloning), and an autoregressive image model (Aurora). The
+      Acceptable Use Policy places the disclosure burden on the
+      deployer ("You should be transparent and disclose your use of AI
+      assistance"), not on the model itself. No machine-readable
+      content marking, watermarking, C2PA metadata, or provenance
+      signal is documented on any official xAI surface (x.ai/news,
+      docs.x.ai, x.ai/legal). Score is 0: Article 50(2) requires
+      providers to mark AI-generated outputs in machine-readable form;
+      xAI offloads the obligation to deployers.
+    evidence:
+    - url: https://x.ai/legal/acceptable-use-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Acceptable Use Policy (effective January 2, 2025) places
+        AI-disclosure obligation on the deployer ("You should be
+        transparent and disclose your use of AI assistance") with no
+        provider-side machine-readable marking commitment.
+      sha256: 94363ae4e6ca4deddbe21db8d09941fe8c83f7086344c0c1a48688b884856576
+    - url: https://docs.x.ai/developers/models/grok-4.3
+      verified_date: '2026-05-09'
+      doc_type: api_doc
+      summary: >-
+        Grok 4.3 model documentation enumerates capabilities (function
+        calling, structured outputs, configurable reasoning) but
+        documents no content-provenance, watermarking, or C2PA output
+        metadata feature.
+
+      sha256: 3732258bbaa70afb80337e56b870a1c2a9645c628207206e267768afa6f71e15
+      wayback_url: https://web.archive.org/web/20260509180132/https://docs.x.ai/developers/models/grok-4.3
+      archived_date: '2026-05-09'
+  art_51_model_classification:
+    score: 0
+    rationale: >-
+      No public xAI artefact classifies any Grok model under the EU AI
+      Act's "General Purpose AI Model" or "General Purpose AI Model
+      with Systemic Risk" taxonomy. The Grok 4 launch documents
+      training on the Colossus 200,000-GPU cluster with "an order of
+      magnitude more compute than had been used previously" (placing
+      it firmly in frontier territory and well above the Article
+      51(1)(a) 10^25 FLOPs threshold), yet xAI publishes no Article 52
+      AI Office notification or systemic-risk self-designation. Score
+      is 0: complete absence of classification disclosure for an
+      almost-certainly systemic-risk model.
+    evidence:
+    - url: https://x.ai/news/grok-4
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Grok 4 announcement (July 9, 2025) documenting training on
+        the Colossus 200,000-GPU cluster with reinforcement learning
+        at "more than an order of magnitude" the previous compute
+        scale, frontier benchmarks (50.7% Humanity's Last Exam, 88.4%
+        GPQA, 100% AIME'25), but containing no GPAI / systemic-risk
+        classification statement.
+
+      sha256: 998213b141b06d07efce470ef1915bc23c31855956e0120b912e0c60f2d642fb
+  art_52_53_1_a_b_technical_documentation:
+    score: 1
+    rationale: >-
+      xAI publishes minimal per-model documentation: docs.x.ai model
+      pages (e.g. grok-4.3) list context window (1M tokens), pricing,
+      modalities, and capability flags only. Launch blog posts
+      (x.ai/news/grok-4, grok-3, grok-1.5) include benchmark results
+      (HLE, GPQA, AIME, USAMO, ARC-AGI-2) and high-level architecture
+      narrative. Critically absent: training-compute disclosure in
+      FLOPs, formal model cards in the structured Annex XI / XII
+      template, training-data taxonomy, energy consumption, model
+      parameter counts (other than legacy Grok-1 = 314B MoE), or
+      published evaluation reports. Score is 1: launch announcements
+      and pricing pages provide a thin technical baseline but fall far
+      short of EU AI Act Article 53(1)(a-b) Annex requirements.
+    evidence:
+    - url: https://docs.x.ai/developers/models/grok-4.3
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Grok 4.3 documentation page covering 1M context window,
+        modalities, pricing, function calling, structured outputs, and
+        configurable reasoning effort levels — without parameter
+        count, training compute, training data taxonomy, or
+        evaluation report.
+      sha256: 6b7ae3ea2ce7cdf8ac187877d25828751ad9630a3936deef9ba3533656d2b8ec
+      wayback_url: https://web.archive.org/web/20260509180132/https://docs.x.ai/developers/models/grok-4.3
+      archived_date: '2026-05-09'
+    - url: https://x.ai/news/grok-4
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Grok 4 announcement publishing benchmark results across
+        Humanity's Last Exam, GPQA, LiveCodeBench, USAMO 2025, HMMT
+        2025, AIME'25, ARC-AGI-2, Vending-Bench with comparative
+        figures vs Claude Opus 4, Gemini 2.5 Pro, o3 — but providing
+        no FLOPs disclosure or structured technical documentation.
+      sha256: 45e01e809a14d272b0fdf03397892a0da0a8aba2d5062d06ad13e576441d507a
+    - url: https://docs.x.ai/docs/overview
+      verified_date: '2026-05-09'
+      doc_type: api_doc
+      summary: >-
+        Developer overview cataloguing Grok 4.3 (text), Voice API,
+        and Imagine API (image/video) with capability summaries and
+        quickstart code samples.
+
+      sha256: f79788983c2f0190af6e33d085652d17006b5866e85ec0be36bfea193bece76f
+      wayback_url: https://web.archive.org/web/20260509180304/https://docs.x.ai/overview
+      archived_date: '2026-05-09'
+  art_53_1_c_copyright_transparency:
+    score: 0
+    rationale: >-
+      xAI's Privacy Policy section 2 acknowledges training on "publicly
+      available data" from "publicly available resources and providers"
+      and on "Public X Posts and Internet Search Data" provided by X
+      (with which xAI has a corporate-affiliate data-sharing
+      relationship). No Annex IX-style training-data summary in the EU
+      AI Office template format is published. No dedicated AI-training
+      crawler identifier with documented robots.txt opt-out exists
+      (Google operates Google-Extended, Meta operates
+      Meta-ExternalAgent — xAI documents no equivalent). The reliance
+      on X public posts as a primary training source raises additional
+      copyright-transparency concerns around third-party rightsholder
+      content shared on X. Score is 0: bare-minimum privacy-policy
+      acknowledgement without structured Article 53(1)(c) disclosure.
+    evidence:
+    - url: https://x.ai/legal/privacy-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Privacy Policy (effective April 4, 2026) section 2
+        documenting training-data sources as "Publicly Available Data"
+        and "Public X Posts and Internet Search Data" without
+        structured Annex IX summary, dataset-level inventory, or
+        rightsholder opt-out crawler identifier.
+
+      sha256: 3d41dbf7fc7a843e335373d7f7326909ad1619010ff06d99b9c4e43bcb4dab28
+  art_53_1_d_e_downstream_obligations:
+    score: 1
+    rationale: >-
+      xAI's Acceptable Use Policy (effective January 2, 2025) is brief
+      and high-level, enumerating prohibited categories (illegal
+      activity, IP violations, privacy violations, CSAM, deepfake
+      pornography, regulated-industry compliance failure, fraud,
+      espionage, harm-to-life, bioweapons / CMD weapons, property
+      destruction, safeguard circumvention, AI-disclosure failures).
+      Tiered terms exist (Consumer ToS, Enterprise ToS). Critically
+      absent for a frontier provider: no published moderation /
+      guardrails API equivalent to OpenAI's Moderations endpoint,
+      Mistral's Moderation API, or Google's safety filters; no
+      published downstream-deployer compliance documentation; no
+      jailbreak / prompt-injection mitigation guidance; no Data
+      Processing Addendum surfaced on the legal hub. Score is 1: AUP
+      provides minimum policy floor but downstream-deployer tooling
+      is materially weaker than peer providers.
+    evidence:
+    - url: https://x.ai/legal/acceptable-use-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Acceptable Use Policy enumerating prohibited content
+        categories (illegal activity, IP infringement, CSAM, deepfake
+        pornography, regulated-industry violations, fraud, espionage,
+        harm-to-life, bioweapons, property destruction, safeguard
+        circumvention, undisclosed AI use).
+      sha256: d3364897053dca428906afc1317408341d808275a6d264c8ea33a75f5d289aad
+    - url: https://x.ai/legal
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Legal policies index linking Consumer Terms of Service,
+        Enterprise Terms of Service, Acceptable Use Policy, Privacy
+        Policy, Europe Privacy Policy Addendum, and Cookie Policy.
+
+      sha256: 5b9313846924ce2faaee355ebaed9c970799afcf92d40bb7a204013167dc5d92
+  art_55_systemic_risk:
+    score: 0
+    rationale: >-
+      xAI publishes no frontier-AI safety framework analogous to
+      Google's Frontier Safety Framework, Meta's Advanced AI Scaling
+      Framework v2, OpenAI's Preparedness Framework, or Anthropic's
+      Responsible Scaling Policy. No documented capability evaluation
+      thresholds for catastrophic-risk domains (CBRN, cyber-offence,
+      autonomous replication, persuasion). No published red-team
+      report. No model-evaluation report addressing systemic-risk
+      categories. No AI Office Article 52 notification documented.
+      Article 55 obligations (model evaluation, systemic-risk
+      assessment, adversarial testing, serious-incident tracking,
+      cybersecurity protection) have no public evidence trail for a
+      provider whose flagship model trains on a 200,000-GPU cluster
+      and self-describes as "the most intelligent model in the world".
+      Score 0 reflects complete absence of Article 55 infrastructure.
+    evidence: []

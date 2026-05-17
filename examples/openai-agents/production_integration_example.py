@@ -49,7 +49,6 @@ COMPLYEDGE_API_KEY = os.getenv("COMPLYEDGE_API_KEY", "your-complyedge-key")
 
 eu_ai_act_guardrail = create_compliance_guardrail(
     api_key=COMPLYEDGE_API_KEY,
-    rules="eu-ai-act/article-5",
 )
 
 # =============================================================================

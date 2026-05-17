@@ -1,0 +1,201 @@
+provider_id: cohere
+provider_name: Cohere
+model_class: closed_api
+systemic_risk_threshold: false
+last_updated: '2026-05-09'
+verification_status: needs_review
+
+obligations:
+
+  art_50_2_content_disclosure:
+    score: 1
+    rationale: >-
+      Cohere's Usage Policy requires deployers of public-facing
+      Customer Applications to "disclose to the users that they are
+      interacting with an AI system rather than a human" and prohibits
+      generation of "deep fakes" or content "falsely appear[ing] as
+      having been created by a human". Cohere also defines "Outputs"
+      as "information, text, image, audio or video content
+      artificially created by Cohere Services" — establishing a
+      taxonomy for AI-generated content. However, Cohere's models are
+      text-focused (Command A, Command A Reasoning, Aya) without
+      hosted image/video/audio generation requiring machine-readable
+      provenance. No watermarking, C2PA metadata, or output-marking
+      mechanism is documented. Score is 1: policy-level disclosure
+      obligation imposed on deployers, but no provider-side
+      machine-readable marking — which is acceptable for text-only
+      models but does not fully satisfy Article 50(2).
+    evidence:
+    - url: https://docs.cohere.com/docs/usage-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Usage Policy (updated 2024-11-21) Customer Application
+        Requirements mandating AI-disclosure to end users for
+        public-facing applications and prohibiting deepfakes / fake
+        human-authored content under "Fraudulent, Abusive,
+        Misleading, or Deceptive Practices".
+
+      sha256: d96e12af76085382f2d93256411bf2c25ec3c6ce17e907eefc6609b2d7b76bbc
+      wayback_url: https://web.archive.org/web/20260509181632/https://docs.cohere.com/docs/usage-policy
+      archived_date: '2026-05-09'
+  art_51_model_classification:
+    score: 0
+    rationale: >-
+      No public Cohere artefact classifies any Command-family model
+      under the EU AI Act's "General Purpose AI Model" or
+      "General-Purpose AI Model with Systemic Risk" taxonomy. Command
+      A (the flagship) is documented at 111B parameters with 256k
+      context, well below frontier compute scale and below the Article
+      51(1)(a) 10^25 FLOPs threshold. Cohere is Canadian (non-EU
+      domiciled) but no Article 52 AI Office notification is
+      published, and no GPAI self-classification statement appears on
+      the Cohere Trust Center, Responsibility hub, or Usage Policy.
+      Score is 0: complete absence of explicit GPAI classification.
+    evidence: []
+
+  art_52_53_1_a_b_technical_documentation:
+    score: 2
+    rationale: >-
+      Cohere publishes per-model documentation on docs.cohere.com
+      including Command A model card with parameter count (111B),
+      context window (256k), max output (8k), knowledge cutoff
+      (June 2024), hardware requirements (2x A100/H100), pricing,
+      capabilities matrix, supported languages (23), and API endpoint
+      details. Separate "Command R / Command R+ Model Card" document
+      provides safety benchmarks (BOLD bias evaluation across 24,000
+      prompts), intended/unintended use cases, technical notes on
+      sampling parameters, language limitations, and potential-for-
+      misuse documentation. Cohere also operates a public research
+      arm (Cohere Labs / Cohere For AI) with peer-reviewed
+      publications. Score is 2 (not 3) because no FLOPs disclosure,
+      no detailed Annex XI/XII training-data taxonomy, and no
+      structured Annex IX template; documentation is well-organised
+      but does not yet reach Google/Meta/Mistral comprehensive level.
+    evidence:
+    - url: https://docs.cohere.com/docs/command-a
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Command A model documentation (model ID command-a-03-2025)
+        covering 111B parameters, 256k context, 8k max output,
+        knowledge cutoff June 1 2024, hardware (2x A100/H100),
+        pricing ($2.5/$10 per 1M tokens), 23-language support,
+        capabilities (multilingual, safety modes, citations, tool
+        use, structured outputs, reasoning, image inputs).
+      sha256: 0d51584af50cbebe3f76c0b0128d6b7daf6ca137cc231afd73922ec406051e10
+      wayback_url: https://web.archive.org/web/20260509181710/https://docs.cohere.com/docs/command-a
+      archived_date: '2026-05-09'
+    - url: https://docs.cohere.com/docs/responsible-use
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Command R / Command R+ Model Card documenting safety
+        benchmarks on the BOLD dataset (24,000 bias-test prompts
+        across profession, gender, race, religion, political
+        ideology), intended use cases (text generation, RAG,
+        tool-use), unintended use cases (significant-impact
+        decisions, financial services, employment, housing),
+        model toxicity and bias notes, and potential-for-misuse
+        taxonomy (astroturfing, misinformation, human-out-of-loop).
+
+      sha256: 8e2f17428e5b146fdd8605a143455f26a18963663f414eaba7e0562795210377
+      wayback_url: https://web.archive.org/web/20260509181740/https://docs.cohere.com/docs/responsible-use
+      archived_date: '2026-05-09'
+  art_53_1_c_copyright_transparency:
+    score: 0
+    rationale: >-
+      No public Cohere artefact provides a structured Article 53(1)(c)
+      training-data summary in the EU AI Office Annex IX template
+      format. The Command R / Command R+ Model Card mentions only
+      that models were "trained on a wide variety of text from many
+      sources that contain toxic content" with a citation to academic
+      literature (Luccioni and Viviano 2021) — this is a high-level
+      acknowledgement, not a structured disclosure. No dedicated
+      AI-training crawler identifier (Google-Extended /
+      Meta-ExternalAgent equivalent) with documented robots.txt
+      opt-out is published. No rightsholder opt-out mechanism is
+      documented. Score is 0: bare academic-citation-level disclosure
+      falls below even OpenAI/Anthropic's policy-level training-data
+      acknowledgements.
+    evidence: []
+
+  art_53_1_d_e_downstream_obligations:
+    score: 3
+    rationale: >-
+      Cohere publishes a comprehensive Usage Policy enumerating 11
+      Universal Requirements (CSAM zero-tolerance, incitement of
+      violence/harm, illegal activities, weapons/controlled
+      substances, privacy/identity violations including biometric
+      categorisation, security compromises, surveillance/predictive
+      policing, fraud/deepfakes, misinformation/political
+      manipulation, abuse of services, high-risk activities including
+      employment/healthcare/migration/housing/law-enforcement
+      automation). Customer Application Requirements impose
+      flow-down obligations on deployers including AI-disclosure and
+      child-safety controls. Per-model usage notes (Command R/R+
+      Model Card) document toxicity risks, bias caveats, language
+      limitations, and misuse taxonomy with concrete examples. Tiered
+      legal stack: Terms of Use, Subscription Agreements, SaaS
+      Agreement, Privacy Policy, Modern Slavery Statement, Trust
+      Center for compliance certifications. Cohere also operates a
+      dedicated safety@cohere.com reporting channel. Score is 3:
+      Cohere's downstream-deployer documentation is among the
+      strongest in the benchmark.
+    evidence:
+    - url: https://docs.cohere.com/docs/usage-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Comprehensive Usage Policy (updated 2024-11-21) with 11
+        Universal Requirements covering CSAM, violence,
+        illegal activities, weapons, privacy violations including
+        biometric categorisation and social scoring, security,
+        surveillance/predictive policing, fraud/deepfakes,
+        misinformation, service abuse, and high-risk activities
+        (employment, education, healthcare, migration, housing,
+        law enforcement, finance/insurance) plus Customer
+        Application flow-down requirements.
+      sha256: d96e12af76085382f2d93256411bf2c25ec3c6ce17e907eefc6609b2d7b76bbc
+      wayback_url: https://web.archive.org/web/20260509181632/https://docs.cohere.com/docs/usage-policy
+      archived_date: '2026-05-09'
+    - url: https://docs.cohere.com/docs/responsible-use
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Responsible-Use page providing per-model toxicity / bias
+        benchmarks, intended and prohibited use cases, technical
+        notes on language limitations, sampling parameters, and
+        a taxonomy of potential misuses with concrete examples
+        for downstream-deployer awareness.
+      sha256: 8e2f17428e5b146fdd8605a143455f26a18963663f414eaba7e0562795210377
+      wayback_url: https://web.archive.org/web/20260509181740/https://docs.cohere.com/docs/responsible-use
+      archived_date: '2026-05-09'
+    - url: https://cohere.com/terms-of-use
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Terms of Use establishing tiered legal framework
+        (Subscription Agreements, Responsible Use Guidelines
+        incorporating model cards / data statement / usage
+        guidelines by reference) with detailed prohibited-use
+        enumeration in Section 14 (No Unlawful or Prohibited Use).
+
+      sha256: fd7d6753f5cd436c512c446db76a97d86fa7fa90e8e16cb27625a954d40ce5be
+      wayback_url: https://web.archive.org/web/20260509181834/https://cohere.com/terms-of-use
+      archived_date: '2026-05-09'
+  art_55_systemic_risk:
+    score: 0
+    rationale: >-
+      Cohere has not designated any model as systemic-risk. Command A
+      at 111B parameters is below frontier compute scale. No
+      published frontier-AI safety framework comparable to Google's
+      Frontier Safety Framework, Meta's Advanced AI Scaling Framework
+      v2, OpenAI's Preparedness Framework, or Anthropic's Responsible
+      Scaling Policy. Cohere does publish per-model bias evaluations
+      (BOLD dataset on Command R/R+) but not catastrophic-risk
+      evaluations (CBRN, cyber-offence, autonomous replication).
+      Given Cohere's model scale and self-classification as
+      non-systemic, this obligation is marked not applicable for
+      scoring purposes (`systemic_risk_threshold: false`).
+    evidence: []

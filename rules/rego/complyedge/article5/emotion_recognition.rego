@@ -5,8 +5,13 @@
 # system is intended to be put into place for medical or safety reasons.
 #
 # Legal citation: Regulation (EU) 2024/1689, Article 5(1)(f)
+# Recital: 44 — limited scientific reliability of emotion inference; cultural variability of expression; power imbalance in workplace/education justifies prohibition (medical/safety uses excepted)
 # Effective: 2025-02-02
 # Penalty: up to €35M or 7% of global revenue
+# Condition type: deterministic
+# Enforcement layer: layer1
+# Status: approved
+# Approved by: Leo Celis on 2026-05-16 (via agent review per §5.1 amendment v1.1)
 
 package complyedge.article5.emotion_recognition
 

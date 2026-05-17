@@ -26,10 +26,7 @@ Shows how to add EU AI Act compliance to OpenAI Agents with one line of code.
 from agents import Agent
 from complyedge.agents import create_compliance_guardrail
 
-guardrail = create_compliance_guardrail(
-    api_key="your-key",
-    rules="eu-ai-act/article-5",
-)
+guardrail = create_compliance_guardrail(api_key="your-key")
 
 agent = Agent(
     name="Compliant Agent",
@@ -40,6 +37,6 @@ agent = Agent(
 ## How It Works
 
 1. User input goes through ComplyEdge guardrail first
-2. Production API checks against the specified rules
+2. Production API checks input against the active rule corpus
 3. Safe content passes to the agent; violations are blocked
 4. Conservative blocking on any API errors

@@ -1,0 +1,206 @@
+provider_id: ai21
+provider_name: AI21 Labs
+model_class: open_weights
+systemic_risk_threshold: false
+last_updated: '2026-05-09'
+verification_status: needs_review
+
+obligations:
+
+  art_50_2_content_disclosure:
+    score: 1
+    rationale: >-
+      AI21's Acceptable Use Guidelines (Section 2.2 Interaction
+      Requirements) require deployers to notify end-users that "they
+      are interacting with an AI machine/application and not with a
+      human person", and Section 2.1 prohibits automated posting of
+      AI-generated content to public platforms without human
+      intervention. AI21 also requires deployers to provide a
+      "flag-as-inappropriate" reporting mechanism. Jamba and Jamba2
+      are text-only models without image/video/audio generation
+      requiring machine-readable provenance. No watermarking, C2PA, or
+      output-marking mechanism is documented. Score is 1: policy-level
+      AI-disclosure obligation flowed down to deployers, no
+      provider-side machine-readable marking — appropriate for
+      text-only models but does not fully satisfy Article 50(2).
+    evidence:
+    - url: https://www.ai21.com/terms-policies/acceptable-use/
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Acceptable Use Guidelines (last updated 2025-07-29) Section
+        2 Interaction Requirements mandating end-user AI-disclosure,
+        prohibiting automated posting of AI outputs to public
+        platforms without human intervention, and requiring deployers
+        to implement a flag-as-inappropriate reporting mechanism.
+
+      sha256: 0859d7598a62624947604dcc1f839eec5ef21804fe09703741ddfecc4b76bb15
+      wayback_url: https://web.archive.org/web/20260509180446/https://www.ai21.com/terms-policies/acceptable-use/
+      archived_date: '2026-05-09'
+  art_51_model_classification:
+    score: 0
+    rationale: >-
+      No public AI21 artefact classifies any Jamba-family model under
+      the EU AI Act's "General Purpose AI Model" or "General-Purpose
+      AI Model with Systemic Risk" taxonomy. Jamba2 Mini (the
+      flagship released January 2026) is documented at 12B active /
+      52B total parameters under Apache 2.0 — substantially below
+      frontier compute scale and well below the Article 51(1)(a)
+      10^25 FLOPs threshold. AI21 is Israeli-domiciled with EU
+      market presence (named EU Article 11 representative not
+      published). No GPAI self-classification statement appears on
+      ai21.com, the Trust Center, or model documentation. Score is 0:
+      complete absence of explicit GPAI classification.
+    evidence: []
+
+  art_52_53_1_a_b_technical_documentation:
+    score: 2
+    rationale: >-
+      AI21 publishes technical documentation across multiple surfaces:
+      (a) Hugging Face model cards for each Jamba model (Jamba2 Mini,
+      Jamba2 3B, Jamba Reasoning 3B) with parameter counts, license
+      (Apache 2.0), context window (256k), architecture
+      (SSM-Transformer / hybrid Mamba-Transformer), training pipeline
+      details (mid-training on 500B tokens, state-passing phase, cold-
+      start SFT, DPO, on-policy RL phases), and quickstart code
+      examples; (b) launch blog posts with benchmark evaluations
+      (IFBench, IFEval, Collie for instruction-following; FACTS for
+      grounding; human preference vs Ministral3 14B); (c) original
+      research paper on SSM-Transformer architecture (arxiv
+      2403.19887); (d) bias evaluation paper (arxiv 2408.12570). Score
+      is 2: model cards + benchmarks + arxiv papers provide
+      substantial technical documentation but no FLOPs disclosure, no
+      structured Annex XI/XII training-data taxonomy, and no Annex IX
+      template summary.
+    evidence:
+    - url: https://huggingface.co/ai21labs/AI21-Jamba2-Mini
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Hugging Face model card for AI21-Jamba2-Mini (52B total /
+        12B active parameters MoE SSM-Transformer, 256k context,
+        Apache 2.0) with training pipeline details (mid-training on
+        500B tokens, state-passing phase for Mamba layers, cold-start
+        SFT, DPO, on-policy RL), evaluation results (IFBench, IFEval,
+        Collie, FACTS), and deployment quickstart for vLLM and
+        Transformers.
+      sha256: 2e3227badf49ca3c30a49f70f26a2446e2928569958608419e65571faf370819
+      wayback_url: https://web.archive.org/web/20260509180516/https://huggingface.co/ai21labs/AI21-Jamba2-Mini
+      archived_date: '2026-05-09'
+    - url: https://www.ai21.com/blog/introducing-jamba2/
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Jamba2 launch announcement (Jan 8, 2026) documenting model
+        family fast facts (3B dense, 12B/52B MoE, 256k context,
+        Apache 2.0), benchmark performance against Ministral3 14B,
+        architecture notes (SSM-Transformer hybrid built on Jamba
+        1.5 pre-training), training pipeline (500B mid-training
+        tokens, state-passing, SFT, DPO, on-policy RL).
+      sha256: 122b5c5812ae04f376ea2ce60e82c04d7d2cf8af7a09d32b402d2df0e56f5169
+      wayback_url: https://web.archive.org/web/20260509180542/https://www.ai21.com/blog/introducing-jamba2/
+      archived_date: '2026-05-09'
+    - url: https://www.ai21.com/jamba/
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Jamba product page enumerating the open Jamba model family
+        (Jamba2 3B, Jamba2 Mini, Jamba Reasoning 3B) with
+        architecture summary (hybrid Mamba-Transformer), context
+        window (256K), deployment options (self-hosted, cloud,
+        private-by-design), and Hugging Face download links.
+
+      sha256: f4011a513d3fb13b56a2d354a9a8f65348fb3ad0b2efe7135572797d0f56a759
+      wayback_url: https://web.archive.org/web/20260509180608/https://www.ai21.com/jamba/
+      archived_date: '2026-05-09'
+  art_53_1_c_copyright_transparency:
+    score: 0
+    rationale: >-
+      AI21's Privacy Policy mentions training-data sources at a
+      generic level (improving the Services through aggregated and
+      de-identified information). The Jamba2 launch blog mentions
+      "high-quality web data and long documents" with increased
+      math/code representation in mid-training but provides no
+      structured dataset inventory, no Annex IX-style training-data
+      summary in the EU AI Office template format, and no rightsholder
+      opt-out mechanism. No dedicated AI-training crawler identifier
+      with documented robots.txt opt-out is published. Score is 0:
+      below even OpenAI/Anthropic level of training-data
+      acknowledgement.
+    evidence: []
+
+  art_53_1_d_e_downstream_obligations:
+    score: 2
+    rationale: >-
+      AI21's Acceptable Use Guidelines enumerate detailed prohibited
+      activities aligned with EU AI Act Article 5 prohibitions:
+      manipulative/subliminal techniques (1.1), exploitation of
+      vulnerabilities (1.2), psychological harm (1.3), misinformation
+      (1.4), privacy/child safety (1.5), social scoring (1.6.1),
+      profiling on protected characteristics (1.6.2), predictive
+      policing (1.6.3), automated denial of benefits/services (1.7),
+      illegal activities including hate speech/CSAM/human trafficking
+      (1.8), biometric categorisation (1.9.i-ii), real-time remote
+      biometric identification (1.9.iii), workplace/education emotion
+      detection (1.10), high-risk life-safety activities (1.11). Plus
+      Section 2 Interaction Requirements (AI-disclosure, harm
+      reporting). Score is 2: AUP is comprehensive and EU-AI-Act
+      aligned, but no published moderation/guardrails API, no per-
+      model toxicity benchmarks beyond a single arxiv paper, no Data
+      Processing Addendum surfaced on the legal hub. Below Cohere/
+      Mistral score of 3.
+    evidence:
+    - url: https://www.ai21.com/terms-policies/acceptable-use/
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Acceptable Use Guidelines (last updated 2025-07-29)
+        enumerating 11 categories of prohibited use closely mirroring
+        EU AI Act Article 5 prohibitions, including manipulation,
+        exploitation of vulnerabilities, social scoring, profiling
+        on protected characteristics, predictive policing,
+        biometric categorisation, real-time remote biometric
+        identification, emotion detection in workplace/education,
+        and high-risk life-safety applications.
+      sha256: fc6594264d65c7c5ff9c7213811b83ec9ea2362b10454d13d8c32c8750a09002
+      wayback_url: https://web.archive.org/web/20260509180446/https://www.ai21.com/terms-policies/acceptable-use/
+      archived_date: '2026-05-09'
+    - url: https://www.ai21.com/terms-of-use/
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Website Terms of Service (last updated 2024-11-19) with
+        Section 3 Usage Restrictions enumerating prohibited
+        deployer activities (scraping, redistribution, reverse-
+        engineering, derivative-works for competitive products,
+        IP/privacy violations).
+      sha256: 010a10b6617ccaabb47dc6cb72eea185b39c037be2a2b9d58865172e6b554056
+      wayback_url: https://web.archive.org/web/20260509180654/https://www.ai21.com/terms-of-service/
+      archived_date: '2026-05-09'
+    - url: https://www.ai21.com/terms-policies/privacy-policy/
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Privacy Policy (last updated 2025-07-29) covering customer-
+        information data-controller/data-processor distinction,
+        GDPR-aligned data subject rights, EU/UK transfer mechanisms
+        (Standard Contractual Clauses, adequacy decisions, Data
+        Privacy Framework certification), and CCPA-specific
+        provisions.
+
+      sha256: a20ab1bb4d9da981a88a34d074fa79f04feb3f630c7801527a201dfcb03e0022
+      wayback_url: https://web.archive.org/web/20260509180721/https://www.ai21.com/terms-policies/privacy-policy/
+      archived_date: '2026-05-09'
+  art_55_systemic_risk:
+    score: 0
+    rationale: >-
+      AI21 has not designated any Jamba model as systemic-risk. Jamba2
+      Mini at 12B active / 52B total parameters (MoE) is well below
+      frontier compute scale. No published frontier-AI safety
+      framework comparable to peer providers. AI21 publishes
+      bias-evaluation research (arxiv 2408.12570 referenced in the
+      AUP) but not catastrophic-risk evaluations (CBRN,
+      cyber-offence, autonomous replication). With
+      `systemic_risk_threshold: false`, this obligation is excluded
+      from scoring as not applicable.
+    evidence: []

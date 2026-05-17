@@ -5,9 +5,11 @@ description: >-
   Requires providers of general-purpose AI models to draw up and keep
   up-to-date technical documentation of the model, including training and
   testing processes and evaluation results, and to make it available to the
-  AI Office and national competent authorities on request. Articles 52 and
-  53(1)(a-b) of the EU AI Act mandate comprehensive technical documentation
-  for all GPAI models.
+  AI Office and national competent authorities on request. Article 53(1)(a) of the EU AI Act mandates comprehensive technical
+  documentation for all GPAI models (the documentation must contain, at a
+  minimum, the information set out in Annex XI). Note: Article 52 in the
+  final adopted text is the separate notification procedure for systemic-risk
+  GPAI models, not technical documentation.
 detection_scope: all
 conditions:
 - type: semantic
@@ -15,7 +17,7 @@ conditions:
     Determine whether the following text describes deploying, distributing,
     or releasing a general-purpose AI model without the required technical
     documentation, model card, or documentation of training and evaluation
-    processes as mandated by Articles 52 and 53(1)(a-b) of the EU AI Act.
+    processes as mandated by Article 53(1)(a) of the EU AI Act.
   model: gpt-4
 - type: regex
   value: (deploy|release|distribute|ship|launch)\w*\s+(a\s+|the\s+)?(gpai|general[\-\s]purpose\s+ai|foundation\s+model|large\s+language\s+model|llm)\s+(without|lacking|missing|no)\s+(documentation|model\s+card|technical\s+documentation|technical\s+docs|data\s+sheet)
@@ -24,7 +26,7 @@ severity: high
 category: consumer_protection
 source:
   regulation: EU AI Act
-  article: Articles 52, 53(1)(a-b)
+  article: Article 53(1)(a)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
@@ -39,9 +41,10 @@ remediation:
   action: warn
   timing: proactive
   message: >-
-    WARNING — EU AI Act Articles 52 and 53(1)(a-b) require GPAI model
-    providers to maintain comprehensive technical documentation including
-    training processes, testing methodology, and evaluation results.
+    WARNING — EU AI Act Article 53(1)(a) requires GPAI model providers to
+    maintain comprehensive technical documentation including training
+    processes, testing methodology, and evaluation results (minimum content
+    set out in Annex XI).
     Deploying without documentation may result in penalties of up to
     EUR 15M or 3% of global annual revenue.
   suggestion: >-
@@ -53,7 +56,6 @@ version: 1.0.0
 tags:
 - eu-ai-act
 - gpai
-- article-52
 - article-53
 - technical-documentation
 - model-card

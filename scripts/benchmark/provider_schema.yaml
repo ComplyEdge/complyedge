@@ -1,0 +1,130 @@
+# GPAI Compliance Benchmark — Provider Evidence Schema
+#
+# Every file in providers/*.yaml conforms to this shape. The benchmark
+# runner validates against this schema before scoring.
+#
+# Scoring scale (per obligation):
+#   0 — no evidence (provider does not address the obligation publicly)
+#   1 — partial   (mention without verifiable detail)
+#   2 — adequate  (clear, specific, sourced documentation)
+#   3 — exceeds   (machine-readable, regularly updated, audited)
+#
+# Evidence rule: public documentation only. Each evidence item must have
+# a URL, a verified_date (YYYY-MM-DD), and a quote or summary.
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: GPAI Provider Evidence
+type: object
+required:
+  - provider_id
+  - provider_name
+  - model_class
+  - obligations
+  - last_updated
+  - verification_status
+
+properties:
+  provider_id:
+    type: string
+    pattern: "^[a-z0-9_-]+$"
+    description: Stable lowercase identifier, e.g. `openai`, `meta_llama`.
+
+  provider_name:
+    type: string
+    description: Display name, e.g. "OpenAI" or "Meta (Llama family)".
+
+  model_class:
+    type: string
+    enum: [closed_api, open_weights, hybrid]
+    description: |
+      `closed_api` — provider only ships the model behind an API.
+      `open_weights` — model weights are publicly downloadable.
+      `hybrid` — both (e.g. Mistral, Cohere).
+
+  systemic_risk_threshold:
+    type: boolean
+    description: |
+      True if the provider's flagship model is at or above the EU AI Act
+      Article 51(2) compute threshold (10^25 FLOPs cumulative training).
+      Determines whether Article 55 obligations are scored.
+
+  last_updated:
+    type: string
+    format: date
+    description: Date the evidence in this file was last refreshed.
+
+  verification_status:
+    type: string
+    enum: [verified, needs_review, pending]
+    description: |
+      `verified`   — every URL fetched and the quoted text confirmed.
+      `needs_review` — URLs cited but not all manually re-confirmed.
+      `pending`    — stub entries; do not include in published scores.
+
+  obligations:
+    type: object
+    required:
+      - art_50_2_content_disclosure
+      - art_51_model_classification
+      - art_52_53_1_a_b_technical_documentation
+      - art_53_1_c_copyright_transparency
+      - art_53_1_d_e_downstream_obligations
+      - art_55_systemic_risk
+    additionalProperties: false
+    properties:
+      art_50_2_content_disclosure:    { $ref: "#/definitions/obligation" }
+      art_51_model_classification:    { $ref: "#/definitions/obligation" }
+      art_52_53_1_a_b_technical_documentation: { $ref: "#/definitions/obligation" }
+      art_53_1_c_copyright_transparency: { $ref: "#/definitions/obligation" }
+      art_53_1_d_e_downstream_obligations: { $ref: "#/definitions/obligation" }
+      art_55_systemic_risk:           { $ref: "#/definitions/obligation" }
+
+definitions:
+  obligation:
+    type: object
+    required: [score, rationale, evidence]
+    properties:
+      score:
+        type: integer
+        minimum: 0
+        maximum: 3
+      rationale:
+        type: string
+        description: One-sentence explanation of the score.
+      evidence:
+        type: array
+        items:
+          type: object
+          required: [url, verified_date, summary]
+          properties:
+            url:
+              type: string
+              format: uri
+            verified_date:
+              type: string
+              format: date
+            summary:
+              type: string
+              description: Short quote or summary of the evidence.
+            doc_type:
+              type: string
+              enum: [model_card, terms_of_service, api_doc, paper, blog, transparency_report, other]
+            wayback_url:
+              type: string
+              format: uri
+              description: |
+                Internet Archive Wayback Machine snapshot URL captured on
+                `archived_date`. Provides tamper-evident provenance: even if
+                the live URL changes, the snapshot preserves the page state
+                at verification time.
+            archived_date:
+              type: string
+              format: date
+              description: Date the Wayback snapshot was captured.
+            sha256:
+              type: string
+              pattern: "^[a-f0-9]{64}$"
+              description: |
+                SHA-256 hash of the live URL's HTTP response body at
+                `verified_date`. Cryptographic proof of the exact bytes the
+                rater observed; reviewers can re-fetch and compare.

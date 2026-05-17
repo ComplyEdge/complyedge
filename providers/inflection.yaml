@@ -1,0 +1,157 @@
+provider_id: inflection
+provider_name: Inflection AI
+model_class: closed_api
+systemic_risk_threshold: false
+last_updated: '2026-05-09'
+verification_status: needs_review
+
+obligations:
+
+  art_50_2_content_disclosure:
+    score: 1
+    rationale: >-
+      Inflection AI's Terms of Service (last updated 2025-12-22)
+      Section 3 Acceptable Use enumerates "you may not falsely
+      represent Outputs as human-generated" as a deployer obligation,
+      flowing through to all Pi consumer-product users and Inflection
+      for Enterprise customers. The Pi product is text-conversational
+      only with no image/audio/video generation requiring machine-
+      readable provenance. No watermarking, C2PA, or output-marking
+      mechanism is documented for Inflection-2.5 outputs. Score is 1:
+      explicit deployer-side AI-disclosure clause for text outputs,
+      no provider-side machine-readable marking documented.
+    evidence:
+    - url: https://inflection.ai/privacy-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Combined Terms of Service / Privacy Policy / Cookie Policy
+        page. Terms of Service Section 3 Acceptable Use
+        (last updated 2025-12-22) prohibits users from falsely
+        representing Outputs as human-generated and from deploying
+        subliminal, manipulative, or deceptive techniques.
+
+      sha256: 0c523bfa77b33ffbb0927bd491b1458f4e80c911eedc7c658beb7b368bb196dd
+  art_51_model_classification:
+    score: 0
+    rationale: >-
+      No public Inflection AI artefact classifies Inflection-1,
+      Inflection-2, or Inflection-2.5 under the EU AI Act's
+      "General Purpose AI Model" or "GPAI Model with Systemic Risk"
+      taxonomy. Following the March 2024 Microsoft acquihire of
+      Inflection's founding team and Pi infrastructure, Inflection
+      pivoted to enterprise (Oct 2024). The last published consumer
+      model (Inflection-2.5, March 2024) is sub-frontier and below
+      the Article 51(1)(a) 10^25 FLOPs threshold. No GPAI
+      self-classification statement on inflection.ai or in product
+      documentation. Score is 0.
+    evidence: []
+
+  art_52_53_1_a_b_technical_documentation:
+    score: 1
+    rationale: >-
+      Inflection AI's technical documentation is limited to a
+      sequence of launch blog posts: Inflection-1 (Jun 22, 2023),
+      Inflection-2 (Nov 22, 2023), Inflection-2.5 (Mar 7, 2024)
+      describing positioning ("world's best personal AI"), and an
+      MLPerf collaboration with NVIDIA/CoreWeave (Jun 27, 2023). No
+      Hugging Face model card (Inflection models are closed-API
+      only, not released as weights), no detailed architecture paper
+      in arxiv-style format, no training-pipeline documentation,
+      no parameter count or context-window specification, no
+      structured benchmarks beyond marketing comparisons. Subsequent
+      enterprise-pivot blogs (Inflection for Enterprise, Inflection
+      Insights, Agentic Workflows) describe products rather than
+      models. Score is 1: minimal blog-only documentation, far below
+      OpenAI/Anthropic/Mistral level.
+    evidence:
+    - url: https://inflection.ai/blog
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Blog index listing Inflection-1, Inflection-2, and
+        Inflection-2.5 model launch announcements (Jun 2023, Nov
+        2023, Mar 2024) plus subsequent enterprise-product
+        announcements (Inflection for Enterprise Oct 2024,
+        Agentic Workflows Oct 2024, Inflection Insights Mar 2025).
+
+      sha256: 4e61c3e20a98f550e1f81c50c5e080fde933bb78b4d1eccfddd51822bd0719f1
+      wayback_url: https://web.archive.org/web/20260509193455/https://inflection.ai/blog
+      archived_date: '2026-05-09'
+  art_53_1_c_copyright_transparency:
+    score: 0
+    rationale: >-
+      No Inflection AI artefact discloses training data sources,
+      composition, dataset inventory, or rightsholder opt-out
+      mechanism for Inflection-1, Inflection-2, or Inflection-2.5.
+      The Privacy Policy mentions using user inputs to "develop and
+      train our AI models / large language models that power our
+      Services" but provides no upstream training-data taxonomy,
+      no dedicated AI-training crawler identifier with documented
+      robots.txt opt-out, and no Annex IX-style training-data
+      summary. Score is 0: complete absence of training-data
+      transparency.
+    evidence: []
+
+  art_53_1_d_e_downstream_obligations:
+    score: 3
+    rationale: >-
+      Inflection AI's Terms of Service Section 3 Acceptable Use
+      (last updated 2025-12-22) is exceptionally well aligned with
+      EU AI Act Article 5 prohibitions, with dedicated clauses on:
+      Illegal Use; Harmful or Manipulative Uses (subliminal,
+      manipulative or deceptive techniques distorting behavior or
+      exploiting vulnerabilities due to age, disability, social or
+      economic situation); Abusive Content (hateful, sexually
+      explicit, graphic violence); Infringing Rights (privacy and IP);
+      Security (no bypass of content filters or moderation);
+      Reverse Engineering; Scraping; Biometric Categorization
+      (verbatim Article 5 language: "categorize people based on
+      their biometric data to infer their race, political opinions,
+      trade union membership, religious or philosophical beliefs,
+      sex life or sexual orientation"); Surveillance or Facial
+      Recognition (mass public surveillance, real-time RBI in public
+      spaces, untargeted scraping of facial images); Emotional
+      recognition (workplace/education with medical/safety carve-out);
+      Social scoring; Criminal Profiling. Plus Privacy Policy
+      establishes EU/UK Representatives (DataRep), GDPR-aligned data
+      subject rights with appeals mechanism, DPO contact, and
+      international transfer safeguards. Score is 3: industry-
+      leading AUP that maps directly to EU AI Act Article 5
+      prohibitions, supplemented by GDPR-grade privacy infrastructure.
+    evidence:
+    - url: https://inflection.ai/privacy-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Combined ToS/Privacy/Cookie page. Terms of Service Section 3
+        Acceptable Use enumerates EU AI Act Article 5 prohibitions
+        verbatim including biometric categorisation for protected
+        attributes, mass public surveillance / real-time biometric
+        identification, emotion inference in workplace/education,
+        social scoring, criminal profiling, plus subliminal/
+        manipulative techniques and vulnerability exploitation.
+        Privacy Policy (last updated 2025-08-08) appoints DataRep as
+        EU and UK Representative, establishes DPO contact at
+        privacy@inflection.ai, GDPR-aligned data subject rights
+        including appeal mechanism, and Standard Contractual
+        Clauses for international transfers.
+
+      sha256: 0c523bfa77b33ffbb0927bd491b1458f4e80c911eedc7c658beb7b368bb196dd
+      wayback_url: https://web.archive.org/web/20260508194232/https://inflection.ai/privacy-policy
+      archived_date: '2026-05-09'
+  art_55_systemic_risk:
+    score: 0
+    rationale: >-
+      Inflection AI has not designated any model as systemic-risk
+      under EU AI Act Article 51. Following the March 2024
+      Microsoft acquihire, Inflection's frontier-model trajectory
+      effectively transferred to Microsoft AI; the last published
+      Inflection-branded model (Inflection-2.5, March 2024) is
+      well below the Article 51(1)(a) 10^25 FLOPs threshold and
+      below frontier compute scale. No published frontier-AI safety
+      framework, no catastrophic-risk evaluations (CBRN, cyber-
+      offence, autonomous replication). With
+      `systemic_risk_threshold: false`, this obligation is excluded
+      from scoring as not applicable.
+    evidence: []
