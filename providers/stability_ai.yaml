@@ -1,0 +1,257 @@
+provider_id: stability_ai
+provider_name: Stability AI
+model_class: open_weights
+systemic_risk_threshold: false
+last_updated: '2026-05-09'
+verification_status: needs_review
+
+obligations:
+
+  art_50_2_content_disclosure:
+    score: 1
+    rationale: >-
+      Stability's Acceptable Use Policy (effective 2025-07-31)
+      explicitly prohibits "misleading end users about the nature of
+      outputs from Stability AI Technology (such as pretending it was
+      made by a human) or failing to appropriately disclose when
+      someone is interacting with AI where it is not apparent" — a
+      deployer-side AI-disclosure obligation flowed through the AUP
+      to all downstream users of Stable Diffusion, Stable Video,
+      Stable Audio and Stable 3D models. Stability's Annual Integrity
+      Transparency Report (Sept 2025) and Tech Coalition membership
+      (Feb 2026) signal commitment to provenance-related responsible
+      AI. However, no published model card for SD 3.5 Large, Stable
+      Audio 2.5, or Stable Video documents a Stability-implemented
+      C2PA Content Credentials manifest, invisible-watermark, or
+      machine-readable provenance signal applied at inference time
+      across all model surfaces. Score is 1: strong deployer-flow-down
+      AUP clause + transparency culture, but no provider-side
+      machine-readable marking documented for synthetic image / audio
+      / video output.
+    evidence:
+    - url: https://stability.ai/use-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Acceptable Use Policy (effective 2025-07-31) Section "We
+        Prohibit Deceiving or Misleading Others" requiring deployers
+        to disclose AI-generated nature of outputs and prohibiting
+        impersonation, misinformation, and election-disrupting
+        content.
+      sha256: 36d65e871f2529c47301e6497c2bbcbb303f49781b51ee63e76d3cb9e3b7769b
+      wayback_url: https://web.archive.org/web/20260509195545/https://stability.ai/use-policy
+      archived_date: '2026-05-09'
+    - url: https://stability.ai/news-updates/stability-ais-annual-integrity-transparency-report
+      verified_date: '2026-05-09'
+      doc_type: transparency_report
+      summary: >-
+        Annual Integrity Transparency Report (Sept 17, 2025)
+        documenting Stability AI's responsible-AI deployment
+        practices, safety measures, and integrity evaluations across
+        image, video, audio and 3D model surfaces.
+
+      sha256: baa75d2c5efb64ccddac2764ff0bfda2a52c8f5add8281170cbec41d0bb4a4b3
+      wayback_url: https://web.archive.org/web/20260509195648/https://stability.ai/news-updates/stability-ais-annual-integrity-transparency-report
+      archived_date: '2026-05-09'
+  art_51_model_classification:
+    score: 0
+    rationale: >-
+      No public Stability AI artefact classifies any released model
+      (SD 3.5 family, Stable Video, Stable Audio 2.5, Stable Audio
+      Open, Stable 3D, SPAR3D, SV4D 2.0) under the EU AI Act's
+      "General Purpose AI Model" or "GPAI Model with Systemic Risk"
+      taxonomy. SD 3.5 Large is a text-to-image MMDiT model trained
+      with substantially less compute than the Article 51(1)(a) 10^25
+      FLOPs threshold. Stability is UK-domiciled (Stability AI Ltd).
+      No GPAI self-classification statement is published on
+      stability.ai, the Trust Center, or model cards. Score is 0.
+    evidence: []
+
+  art_52_53_1_a_b_technical_documentation:
+    score: 2
+    rationale: >-
+      Stability publishes technical documentation across multiple
+      surfaces: (a) Hugging Face model cards for each major model
+      (Stable Diffusion 3.5 Large, Stable Audio Open Small, etc.)
+      with model type, architecture (MMDiT — Multimodal Diffusion
+      Transformer), text encoders enumerated (OpenCLIP-ViT/G,
+      CLIP-ViT/L, T5-xxl with context lengths), implementation
+      details (QK normalization), license terms, intended uses, and
+      out-of-scope uses; (b) original research paper on MMDiT
+      architecture (arxiv 2403.03206 — "Scaling Rectified Flow
+      Transformers for High-Resolution Image Synthesis"); (c) launch
+      blogs (introducing-stable-diffusion-3-5, sd3.5 NIM, SV4D 2.0)
+      with comparative benchmark and integration details; (d) GitHub
+      reference implementation at Stability-AI/sd3.5. Score is 2:
+      strong cards + research papers but no FLOPs disclosure, no
+      Annex IX EU AI Office template summary, no structured Annex XI
+      enumeration of computational resources or energy consumption.
+    evidence:
+    - url: https://huggingface.co/stabilityai/stable-diffusion-3.5-large
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Hugging Face model card for Stable Diffusion 3.5 Large
+        documenting MMDiT architecture, three pretrained text
+        encoders (OpenCLIP-ViT/G, CLIP-ViT/L, T5-xxl), QK
+        normalization implementation, training data summary
+        ("synthetic data and filtered publicly available data"),
+        intended uses, out-of-scope uses, integrity evaluation, and
+        identified risks/mitigations.
+      sha256: 98a91a22e233435f1be2959020ecc291f33f6027f5da3de2a63871db71f02ce5
+      wayback_url: https://web.archive.org/web/20260509195723/https://huggingface.co/stabilityai/stable-diffusion-3.5-large
+      archived_date: '2026-05-09'
+    - url: https://stability.ai/news-updates/introducing-stable-diffusion-3-5
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Stable Diffusion 3.5 product announcement (October 22, 2024)
+        introducing SD 3.5 Large, SD 3.5 Large Turbo, and SD 3.5
+        Medium model variants with comparative quality and prompt-
+        adherence benchmarks.
+
+      sha256: efc811a9060abe08789fab5ece0e720da96a2e9f6d1fecaada35f80c6969a11d
+      wayback_url: https://web.archive.org/web/20260509195837/https://stability.ai/news-updates/introducing-stable-diffusion-3-5
+      archived_date: '2026-05-09'
+  art_53_1_c_copyright_transparency:
+    score: 1
+    rationale: >-
+      The SD 3.5 Large model card explicitly acknowledges training
+      data composition at a high level: "This model was trained on a
+      wide variety of data, including synthetic data and filtered
+      publicly available data." Stability has additionally publicised
+      strategic music-training partnerships with Universal Music
+      Group (Oct 2025) and Warner Music Group (Nov 2025) for
+      "responsibly trained generative audio", and joined the Tech
+      Coalition (Feb 2026) to combat CSAM in training pipelines.
+      However, no structured training-data inventory in EU AI Office
+      template format is published, no per-model dataset
+      provenance/source enumeration, no rightsholder opt-out
+      mechanism is documented (no dedicated AI-training crawler
+      identifier with robots.txt opt-out), and no public ContentAuth /
+      Spawning.ai integration is documented. Score is 1: explicit
+      acknowledgement of training data + responsible-licensing
+      partnerships, but below structured Annex IX summary level.
+    evidence:
+    - url: https://stability.ai/news-updates/universal-music-group-and-stability-ai-announce-strategic-alliance
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Universal Music Group strategic alliance announcement (Oct
+        30, 2025) for co-developing professional AI music creation
+        tools "powered by responsibly trained generative AI",
+        signalling licensed training-data partnerships for the
+        Stable Audio model family.
+      sha256: 6e3093961363edbe36f2b2d2c667e0557362a764fdc8a56f5ffa44a27d61f410
+      wayback_url: https://web.archive.org/web/20260509195906/https://stability.ai/news-updates/universal-music-group-and-stability-ai-announce-strategic-alliance
+      archived_date: '2026-05-09'
+    - url: https://stability.ai/news-updates/warner-music-group-and-stability-ai-join-forces-to-build-next-gen-tools
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Warner Music Group collaboration announcement (Nov 19, 2025)
+        for "responsible AI tools for music creation" combining
+        WMG's principled-innovation advocacy with Stability AI's
+        commercially-safe generative audio expertise.
+
+      sha256: 71cc86b9f15c202d3c90cd8aba99bcb39b02f1d847bd3b3bc6be193f176dba8c
+      wayback_url: https://web.archive.org/web/20260509200026/https://stability.ai/news-updates/warner-music-group-and-stability-ai-join-forces-to-build-next-gen-tools
+      archived_date: '2026-05-09'
+  art_53_1_d_e_downstream_obligations:
+    score: 3
+    rationale: >-
+      Stability's Acceptable Use Policy (effective 2025-07-31) is the
+      most thoroughly EU-AI-Act-aligned AUP among the 8 providers
+      benchmarked. It explicitly enumerates Article 5 prohibited
+      practices verbatim: subliminal/manipulative/deceptive techniques
+      causing harm; exploitation of vulnerabilities (age, disability,
+      socio-economic); social scoring leading to detrimental
+      treatment; predictive policing based solely on profiling;
+      creation/expansion of facial recognition databases without
+      consent; emotion inference in workplace/education (with medical/
+      safety carve-out); biometric categorisation to infer protected
+      attributes (race, political opinion, trade-union membership,
+      religion, sex life, sexual orientation); real-time biometric
+      identification in public for law enforcement. Plus dedicated
+      sections prohibiting CSAM/grooming/trafficking (with reporting
+      to authorities), NCII, deception/AI-disclosure violations,
+      election-disruption content, weapons development, safeguard
+      circumvention, and self-harm content. Backed by joining the
+      Tech Coalition (Feb 2026) for CSAM combat, SOC 2 Type II + SOC
+      3 compliance (Aug 2025), Annual Integrity Transparency Report
+      (Sept 2025), Trust Center at trust.stability.ai, and tiered
+      Community vs Enterprise licensing with downstream-developer
+      obligations. Score is 3: industry-leading AUP that maps
+      directly to EU AI Act Article 5, supported by enterprise-grade
+      compliance certifications and published transparency reporting.
+    evidence:
+    - url: https://stability.ai/use-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Acceptable Use Policy (effective 2025-07-31) explicitly
+        enumerating EU AI Act Article 5 prohibited practices
+        including subliminal/manipulative techniques, vulnerability
+        exploitation, social scoring, predictive policing,
+        untargeted facial-recognition scraping, workplace/education
+        emotion inference, biometric categorisation for protected
+        attributes, real-time public-space biometric identification,
+        plus CSAM/NCII/election-disruption/weapons/self-harm
+        prohibitions and deployer AI-disclosure obligations.
+      sha256: 36d65e871f2529c47301e6497c2bbcbb303f49781b51ee63e76d3cb9e3b7769b
+      wayback_url: https://web.archive.org/web/20260509195545/https://stability.ai/use-policy
+      archived_date: '2026-05-09'
+    - url: https://stability.ai/license
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Stability AI License page documenting tiered licensing
+        structure: free Community License for users with less than
+        $1M annual revenue (covering SD 3.5 Suite, SDXL Turbo,
+        Stable Audio Open, Stable Fast 3D, etc.) and Enterprise
+        License for higher-revenue commercial deployers, with
+        downstream-developer obligations enforced via revocable
+        license terms.
+      sha256: 47c5a7c29b69f480a3556bdab11c5798f56edd8cbe421431405cd4d28e5d2599
+      wayback_url: https://web.archive.org/web/20260509200110/https://stability.ai/license
+      archived_date: '2026-05-09'
+    - url: https://stability.ai/news-updates/stability-ai-joins-the-tech-coalition
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        Tech Coalition membership announcement (Feb 11, 2026)
+        confirming Stability AI's participation in the global
+        alliance combating online child sexual exploitation and
+        abuse (CSAM) — operationalising the AUP CSAM prohibition
+        through industry collaboration.
+      sha256: 78d3c9e7d95e5de02e6c8ac4fc910c4961b9bb67856d0252e78f8b700ac38982
+      wayback_url: https://web.archive.org/web/20260509200137/https://stability.ai/news-updates/stability-ai-joins-the-tech-coalition
+      archived_date: '2026-05-09'
+    - url: https://stability.ai/news-updates/stability-ai-achieves-soc-2-type-ii-and-soc-3-compliance
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        SOC 2 Type II and SOC 3 compliance attestation announcement
+        (Aug 4, 2025) confirming third-party-audited security
+        controls and data protection practices supporting
+        enterprise downstream-deployer obligations.
+
+      sha256: 81bfe63fc0764907007c9b4b84541a9fe8a43970d34c9a4cbbff8d0ad80d8534
+      wayback_url: https://web.archive.org/web/20260509200202/https://stability.ai/news-updates/stability-ai-achieves-soc-2-type-ii-and-soc-3-compliance
+      archived_date: '2026-05-09'
+  art_55_systemic_risk:
+    score: 0
+    rationale: >-
+      Stability AI has not designated any released model as systemic-
+      risk under EU AI Act Article 51. The model portfolio (SD 3.5
+      Large MMDiT image-generation, Stable Audio 2.5, Stable Video,
+      Stable 3D variants) operates at compute scales substantially
+      below the Article 51(1)(a) 10^25 FLOPs threshold. No published
+      frontier-AI safety framework comparable to closed-API frontier
+      providers; Integrity Transparency Report and integrity
+      evaluations focus on harm categories appropriate for image/
+      audio/video generation (red-teaming, content filtering)
+      rather than catastrophic-risk categories. With
+      `systemic_risk_threshold: false`, this obligation is excluded
+      from scoring as not applicable.
+    evidence: []

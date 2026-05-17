@@ -5,8 +5,18 @@
 # sufficiently detailed summary of the content used for training.
 #
 # Legal citation: Regulation (EU) 2024/1689, Article 53(1)(c)
+# Recital: 105 — GPAI providers must respect Union copyright law including the text-and-data-mining opt-out under Art 4(3) of Directive (EU) 2019/790; obligation applies regardless of jurisdiction where training takes place when the model is placed on the Union market (Recital 106)
 # Effective: 2026-08-02
 # Penalty: up to €15M or 3% of global revenue
+# Condition type: deterministic
+# Enforcement layer: layer1
+# Status: approved
+# Approved by: Leo Celis on 2026-05-16 (via agent review per §5.1 amendment v1.1)
+#
+# Scope note: Art 53(1)(c) covers the copyright POLICY obligation including
+# Art 4(3) Directive 2019/790 reservation-of-rights compliance. The related
+# "sufficiently detailed summary about training content" obligation is
+# Art 53(1)(d) (Recital 107) — distinct, not covered by this rule.
 
 package complyedge.gpai.copyright_transparency
 

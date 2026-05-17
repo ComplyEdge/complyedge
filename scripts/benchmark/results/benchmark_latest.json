@@ -1,0 +1,470 @@
+{
+  "generated_at": "2026-05-09T22:06:31.466025+00:00",
+  "methodology_version": "1.0",
+  "scored_providers": [
+    {
+      "provider_id": "google",
+      "provider_name": "Google (DeepMind)",
+      "model_class": "closed_api",
+      "systemic_risk_threshold": true,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": 3,
+          "applicable": true
+        }
+      },
+      "aggregate_score": 15,
+      "max_score": 18,
+      "compliance_pct": 83.3,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "meta",
+      "provider_name": "Meta (Llama)",
+      "model_class": "open_weights",
+      "systemic_risk_threshold": true,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": 3,
+          "applicable": true
+        }
+      },
+      "aggregate_score": 14,
+      "max_score": 18,
+      "compliance_pct": 77.8,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "anthropic",
+      "provider_name": "Anthropic",
+      "model_class": "closed_api",
+      "systemic_risk_threshold": true,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": 3,
+          "applicable": true
+        }
+      },
+      "aggregate_score": 12,
+      "max_score": 18,
+      "compliance_pct": 66.7,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "mistral",
+      "provider_name": "Mistral AI",
+      "model_class": "open_weights",
+      "systemic_risk_threshold": false,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": null,
+          "applicable": false
+        }
+      },
+      "aggregate_score": 10,
+      "max_score": 15,
+      "compliance_pct": 66.7,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "hugging_face",
+      "provider_name": "Hugging Face (first-party models \u2014 SmolLM3 / SmolLM family)",
+      "model_class": "open_weights",
+      "systemic_risk_threshold": false,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": null,
+          "applicable": false
+        }
+      },
+      "aggregate_score": 9,
+      "max_score": 15,
+      "compliance_pct": 60.0,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "openai",
+      "provider_name": "OpenAI",
+      "model_class": "closed_api",
+      "systemic_risk_threshold": true,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": 2,
+          "applicable": true
+        }
+      },
+      "aggregate_score": 9,
+      "max_score": 18,
+      "compliance_pct": 50.0,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "stability_ai",
+      "provider_name": "Stability AI",
+      "model_class": "open_weights",
+      "systemic_risk_threshold": false,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": null,
+          "applicable": false
+        }
+      },
+      "aggregate_score": 7,
+      "max_score": 15,
+      "compliance_pct": 46.7,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "cohere",
+      "provider_name": "Cohere",
+      "model_class": "closed_api",
+      "systemic_risk_threshold": false,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": null,
+          "applicable": false
+        }
+      },
+      "aggregate_score": 6,
+      "max_score": 15,
+      "compliance_pct": 40.0,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "ai21",
+      "provider_name": "AI21 Labs",
+      "model_class": "open_weights",
+      "systemic_risk_threshold": false,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": null,
+          "applicable": false
+        }
+      },
+      "aggregate_score": 5,
+      "max_score": 15,
+      "compliance_pct": 33.3,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "inflection",
+      "provider_name": "Inflection AI",
+      "model_class": "closed_api",
+      "systemic_risk_threshold": false,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 3,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": null,
+          "applicable": false
+        }
+      },
+      "aggregate_score": 5,
+      "max_score": 15,
+      "compliance_pct": 33.3,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "amazon_titan",
+      "provider_name": "Amazon (Titan / Nova)",
+      "model_class": "closed_api",
+      "systemic_risk_threshold": false,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 2,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": null,
+          "applicable": false
+        }
+      },
+      "aggregate_score": 4,
+      "max_score": 15,
+      "compliance_pct": 26.7,
+      "stale_evidence": []
+    },
+    {
+      "provider_id": "xai",
+      "provider_name": "xAI (Grok)",
+      "model_class": "closed_api",
+      "systemic_risk_threshold": true,
+      "verification_status": "needs_review",
+      "last_updated": "2026-05-09",
+      "per_obligation": {
+        "art_50_2_content_disclosure": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_51_model_classification": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_52_53_1_a_b_technical_documentation": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_53_1_c_copyright_transparency": {
+          "score": 0,
+          "applicable": true
+        },
+        "art_53_1_d_e_downstream_obligations": {
+          "score": 1,
+          "applicable": true
+        },
+        "art_55_systemic_risk": {
+          "score": 0,
+          "applicable": true
+        }
+      },
+      "aggregate_score": 2,
+      "max_score": 18,
+      "compliance_pct": 11.1,
+      "stale_evidence": []
+    }
+  ],
+  "pending_providers": [],
+  "summary": {
+    "total_scored": 12,
+    "total_pending": 0,
+    "avg_compliance_pct": 49.6,
+    "best": "google",
+    "worst": "xai"
+  }
+}

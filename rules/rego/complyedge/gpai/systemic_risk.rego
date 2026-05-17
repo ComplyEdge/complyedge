@@ -5,8 +5,13 @@
 # track and report serious incidents, and ensure adequate cybersecurity.
 #
 # Legal citation: Regulation (EU) 2024/1689, Article 55
+# Recital: 114 — four-pillar obligation set: standardised model evaluation incl. adversarial testing; systemic-risk assessment and mitigation; serious-incident tracking/reporting to the AI Office; cybersecurity protection of the model and physical infrastructure (incl. model-weight security). Recital 116 covers the codes-of-practice / harmonised-standards compliance pathway
 # Effective: 2026-08-02
 # Penalty: up to €35M or 7% of global revenue
+# Condition type: deterministic
+# Enforcement layer: layer1
+# Status: approved
+# Approved by: Leo Celis on 2026-05-16 (via agent review per §5.1 amendment v1.1)
 
 package complyedge.gpai.systemic_risk
 

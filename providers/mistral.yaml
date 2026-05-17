@@ -1,0 +1,239 @@
+provider_id: mistral
+provider_name: Mistral AI
+model_class: open_weights
+systemic_risk_threshold: false
+last_updated: '2026-05-09'
+verification_status: needs_review
+
+obligations:
+
+  art_50_2_content_disclosure:
+    score: 1
+    rationale: >-
+      Mistral operates a dedicated Moderation API (mistral-moderation-2603)
+      and Custom Guardrails system covering 10+ policy categories
+      including jailbreaking detection. Le Chat (the consumer product)
+      offers image generation via partner integrations but no
+      Mistral-published evidence of model-layer machine-readable AI
+      output marking (no C2PA membership, no SynthID equivalent, no
+      cryptographic watermark on text generations). Score is 1: input
+      moderation infrastructure exists but Article 50(2) requires
+      machine-readable marking of AI outputs themselves, which is not
+      evidenced for Mistral's text or multimodal outputs.
+    evidence:
+    - url: https://docs.mistral.ai/capabilities/guardrailing/
+      verified_date: '2026-05-09'
+      doc_type: api_doc
+      summary: >-
+        Moderation & Guardrailing documentation describing the
+        mistral-moderation-2603 API across 10 policy categories
+        (sexual, hate, violence, dangerous, criminal, self-harm,
+        health, financial, law, PII, jailbreaking) and the Custom
+        Guardrails system for inline request-level moderation.
+
+      sha256: 9abf48bb513e4dc823b6fb840ebb691fd5fbc050e13c55aa25f99417e8bb3664
+      wayback_url: https://web.archive.org/web/20260509200250/https://docs.mistral.ai/studio-api/conversations/moderation
+      archived_date: '2026-05-09'
+  art_51_model_classification:
+    score: 2
+    rationale: >-
+      Mistral operates a formal AI Compliance Hub at
+      legal.mistral.ai/ai-governance with per-model legal pages that
+      explicitly classify each of 28+ models as a "General Purpose AI
+      Model" using EU AI Act terminology, with documented release
+      dates, model lifecycle status (Active / Update / Version), and
+      designation between Base Model and Model Version per Article 51
+      taxonomy. As a French EU-domiciled provider, Mistral has the
+      strongest jurisdictional alignment with the AI Act. Score is 2
+      (not 3) because no public artefact designates any Mistral model
+      as meeting the Article 51(1)(a) compute threshold (10^25 FLOPs)
+      or carrying the systemic-risk designation, and the provider has
+      self-assessed all models as non-systemic (which is plausible
+      given Mistral Large 3 reports 41B active / 675B total
+      parameters).
+    evidence:
+    - url: https://legal.mistral.ai/ai-governance/models
+      verified_date: '2026-05-09'
+      doc_type: api_doc
+      summary: >-
+        AI Compliance Hub model index listing 28+ Mistral models
+        (Mistral Large 1-3, Medium 1-3, Small 1-4, Ministral, Mixtral,
+        Codestral, Devstral, Pixtral, Voxtral, Magistral, Mathstral,
+        OCR, Moderation, Embed) each with dedicated AI-governance
+        documentation page using EU AI Act "General Purpose AI Model"
+        terminology.
+      sha256: 479cb583f613ca36a3fd88053f791258748648d01fd9db93d0d9b898ace7af01
+      wayback_url: https://web.archive.org/web/20260509200420/https://legal.mistral.ai/ai-governance/models
+      archived_date: '2026-05-09'
+    - url: https://legal.mistral.ai/ai-governance/models/mistral-large-3
+      verified_date: '2026-05-09'
+      doc_type: api_doc
+      summary: >-
+        Mistral Large 3.0 governance page classifying both Base Model
+        and Instruct Model Version as "General Purpose AI Model" with
+        release date (December 2, 2025) and Active lifecycle status,
+        plus downloadable technical documentation bundle.
+
+      sha256: 63022c4ca694986d6669804ac6da18c2cc7649309e558fd01dd4b32cdefa69cd
+      wayback_url: https://web.archive.org/web/20260509200444/https://legal.mistral.ai/ai-governance/models/mistral-large-3
+      archived_date: '2026-05-09'
+  art_52_53_1_a_b_technical_documentation:
+    score: 3
+    rationale: >-
+      Mistral publishes per-model technical documentation across two
+      official surfaces: (a) docs.mistral.ai model cards for every
+      active model with architecture (e.g. Mistral Large 3 = 41B active
+      / 675B total Mixture-of-Experts), context windows, modalities,
+      pricing, capability features, and version YY.MM tags; (b)
+      legal.mistral.ai/ai-governance/models per-model legal pages with
+      downloadable technical-documentation ZIP bundles (Annex XI / XII
+      style) cited explicitly per model release. Original announcement
+      blog posts (e.g. "Large Enough" for Mistral Large 2) provide
+      detailed benchmarks across MMLU, MT-Bench, multilingual MMLU,
+      code, math, and tool-use evaluations. Documentation depth
+      compares favourably to Anthropic and Google.
+    evidence:
+    - url: https://docs.mistral.ai/getting-started/models/models_overview/
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Models Overview documenting all featured, frontier, specialist,
+        legacy, and deprecated Mistral models with version tags and
+        deep-link to per-model cards.
+      sha256: 21564baba049a9aa34414ddbea7175a695e44c16163e3232a24914b2a7251b9b
+      wayback_url: https://web.archive.org/web/20260508021036/https://docs.mistral.ai/models/overview
+      archived_date: '2026-05-09'
+    - url: https://docs.mistral.ai/models/model-cards/mistral-large-3-25-12
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Mistral Large 3 model card (version 25.12, mistral-large-2512)
+        documenting open-weight Mixture-of-Experts architecture (41B
+        active / 675B total), 256k context window, multimodal
+        capabilities, pricing, and feature matrix.
+      sha256: fdfada4e9e7949d697fedbdc57fd3d21bbc77d9a1d6bdcd0b97f4864f372c19d
+      wayback_url: https://web.archive.org/web/20260508021011/https://docs.mistral.ai/models/model-cards/mistral-large-3-25-12
+      archived_date: '2026-05-09'
+    - url: https://legal.cms.mistral.ai/assets/1e37fffd-7ea5-469b-822f-05dcfbb43623
+      verified_date: '2026-05-09'
+      doc_type: other
+      summary: >-
+        Downloadable technical-documentation bundle (ZIP) for Mistral
+        Large 3 linked from legal.mistral.ai/ai-governance/models/mistral-large-3,
+        structured for EU AI Act Annex XI / XII compliance.
+      sha256: 97b6dfb0746e7575e157bfb0f86c7b40df0aa98df33e4b5c01d64287ee4b98da
+      wayback_url: https://web.archive.org/web/20260428023059/https://legal.cms.mistral.ai/assets/1e37fffd-7ea5-469b-822f-05dcfbb43623
+      archived_date: '2026-05-09'
+    - url: https://mistral.ai/news/mistral-large-2407
+      verified_date: '2026-05-09'
+      doc_type: blog
+      summary: >-
+        "Large Enough" announcement for Mistral Large 2 documenting
+        performance evaluations across MMLU (84.0%), code (HumanEval,
+        MultiPL-E), math (GSM8K, MATH), instruction-following
+        (MT-Bench, Wild Bench, Arena Hard), multilingual (Multilingual
+        MMLU), and function-calling benchmarks.
+
+      sha256: 10e716ab2eff61e1ee4e8980e5971caee8511d3f12acb06c3cd3d8adcd06d2fc
+      wayback_url: https://web.archive.org/web/20260509200831/https://mistral.ai/news/mistral-large-2407
+      archived_date: '2026-05-09'
+  art_53_1_c_copyright_transparency:
+    score: 1
+    rationale: >-
+      Mistral's Privacy Policy (effective April 7, 2026) discloses
+      training-data sources at category level: "publicly available
+      sources on the internet", "non-public third-party databases",
+      "user data subject to opt-out", "internally generated data",
+      "curated datasets", and "synthetic data". The policy commits to
+      good-practice PII filtering and offers users an opt-out from
+      Input/Output use in training via account controls, with the
+      Memory feature explicitly opt-out. However, no Annex IX-style
+      structured training-data summary in the EU AI Office template
+      format has been published, and no dedicated AI-training crawler
+      identifier (Google-Extended / Meta-ExternalAgent equivalent)
+      with documented robots.txt opt-out is documented on official
+      Mistral surfaces. Score is 1: category disclosure exists but
+      opt-out mechanisms are limited to direct-user data, not third-
+      party rightsholders' web content.
+    evidence:
+    - url: https://legal.mistral.ai/terms/privacy-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Privacy Policy section 9 (US Users) listing training-data
+        sources (publicly available datasets, non-public third-party
+        databases, user products data subject to applicable terms,
+        internally generated data, curated datasets, synthetic data)
+        and section 8 documenting user opt-out from Input/Output use
+        for model training via account controls.
+
+      sha256: 4a71a328279928213bd3eb3a565613067114b9d54ae2795e941eabd8f5e530ea
+      wayback_url: https://web.archive.org/web/20260509201014/https://legal.mistral.ai/terms/privacy-policy
+      archived_date: '2026-05-09'
+  art_53_1_d_e_downstream_obligations:
+    score: 3
+    rationale: >-
+      Mistral provides comprehensive downstream-deployer documentation:
+      Usage Policy (effective March 24, 2026) enumerating prohibited
+      content across illegal activity, CSAM (zero-tolerance), NCII,
+      hate/discrimination, violence, self-harm, fraud, misinformation,
+      privacy violations, professional advice, and security violations;
+      License Notice covering open-weights and commercial licensing;
+      Mistral Research License (MRL) and Apache 2.0 distribution for
+      open models; production-grade Moderation API and Custom Guardrails
+      with agent-level configuration available to all deployers;
+      tiered terms of service distinguishing EU consumer, ROW consumer,
+      and commercial customer with separate Data Processing Addendum.
+    evidence:
+    - url: https://legal.mistral.ai/terms/usage-policy
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Usage Policy (effective March 24, 2026) enumerating prohibited
+        downstream content categories (illegal activity, CSAM, NCII,
+        hate, violence, self-harm, fraud, misinformation, privacy
+        violations, unauthorised professional advice, security
+        violations) with enforcement and reporting procedures.
+      sha256: 7fd58dba4f30dba82c8ec7541176912403807a0004ecf5a45915951d5c1e9881
+      wayback_url: https://web.archive.org/web/20260509201206/https://legal.mistral.ai/terms/usage-policy
+      archived_date: '2026-05-09'
+    - url: https://legal.mistral.ai/terms
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        Legal Center index documenting tiered terms (EU consumer,
+        ROW consumer, commercial customer, partner) plus Data
+        Processing Addendum, License Notice, and Privacy Policy
+        governing downstream deployment.
+      sha256: b88967c70730aadde7653c4d6e958e8148f46b3c62a4cd8e19ac5ea3d7277c39
+      wayback_url: https://web.archive.org/web/20260509201457/https://legal.mistral.ai/terms
+      archived_date: '2026-05-09'
+    - url: https://docs.mistral.ai/capabilities/guardrailing/
+      verified_date: '2026-05-09'
+      doc_type: api_doc
+      summary: >-
+        Moderation & Custom Guardrails documentation providing
+        deployers with production-grade safety tooling, agent-level
+        guardrail configuration, and customisable category thresholds.
+
+      sha256: 9abf48bb513e4dc823b6fb840ebb691fd5fbc050e13c55aa25f99417e8bb3664
+      wayback_url: https://web.archive.org/web/20260509200250/https://docs.mistral.ai/studio-api/conversations/moderation
+      archived_date: '2026-05-09'
+  art_55_systemic_risk:
+    score: 0
+    rationale: >-
+      Mistral has self-assessed (via the AI Compliance Hub's per-model
+      pages classifying all models as standard "General Purpose AI
+      Model" without systemic-risk designation) that none of its models
+      currently meet the Article 55 systemic-risk threshold. Largest
+      model (Mistral Large 3) reports 41B active / 675B total
+      parameters. No published frontier-AI safety framework with
+      catastrophic-risk thresholds (Cybersecurity / CBRN / Loss of
+      Control) comparable to Google's Frontier Safety Framework, Meta's
+      Advanced AI Scaling Framework, or Anthropic's Responsible Scaling
+      Policy is evidenced on official Mistral surfaces. Score 0
+      reflects absence of systemic-risk infrastructure; if Mistral's
+      self-classification as non-systemic is accepted as accurate, this
+      obligation does not strictly apply (and would be excluded from
+      the maximum score).
+    evidence: []

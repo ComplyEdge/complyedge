@@ -1,0 +1,59 @@
+# prompt_schema.yaml
+# JSON Schema (Draft 7) for runtime benchmark prompt files.
+# Each YAML in scripts/benchmark/prompts/ must validate against this.
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "GPAI Runtime Benchmark Prompt Corpus"
+type: object
+required:
+  - category
+  - prompts
+properties:
+  category:
+    type: string
+    enum: ["article5", "article50", "gpai", "safe_harbor", "us_corpus", "edge"]
+  description:
+    type: string
+  prompts:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required:
+        - id
+        - text
+        - jurisdiction
+        - expected_decision
+      properties:
+        id:
+          type: string
+          pattern: "^[A-Z0-9_]+$"
+        text:
+          type: string
+          minLength: 1
+          maxLength: 50000
+        jurisdiction:
+          type: string
+          enum: ["EU", "US", "US-CA", "GLOBAL"]
+        direction:
+          type: string
+          enum: ["prompt", "output"]
+          default: "output"
+        expected_decision:
+          type: string
+          enum: ["block", "allow"]
+        expected_rule_id_pattern:
+          type: string
+          description: >-
+            Optional regex matched against returned violations[].rule_id.
+            If set and prompt was blocked, scorer awards bonus for
+            correct-rule attribution.
+        notes:
+          type: string
+        critical:
+          type: boolean
+          default: true
+          description: >-
+            If true, a wrong decision contributes to critical_failures.
+            Defaults to true for blocked-content and safe-harbor;
+            edge cases may set false.

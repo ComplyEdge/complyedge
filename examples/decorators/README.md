@@ -15,36 +15,35 @@ python ai-agent-examples.py
 ```python
 from complyedge import compliance_check
 
-@compliance_check(rules="eu-ai-act/article-5")
+@compliance_check(jurisdiction="EU", agent_id="my-agent")
 def my_agent(prompt: str) -> str:
     return llm.generate(prompt)
 ```
 
-## Multiple Rules
+The `jurisdiction` parameter selects the rule corpus evaluated server-side:
 
-```python
-@compliance_check(rules=["eu-ai-act/article-5", "gdpr/consent"])
-def my_agent(prompt: str) -> str:
-    return llm.generate(prompt)
-```
+| Value | Corpus |
+|---|---|
+| `EU` | EU AI Act Article 5 + Article 50 + GPAI (Articles 51–55) |
+| `US` | HIPAA, SOX, COPPA, TCPA, BIPA |
 
 ## Input-Only / Output-Only
 
 ```python
 # Check input before it reaches the LLM
-@compliance_check(rules="eu-ai-act/article-5", input=True, output=False)
+@compliance_check(jurisdiction="EU", input=True, output=False, agent_id="intake")
 def intake_agent(prompt: str) -> str:
     return llm.generate(prompt)
 
 # Check output before it reaches the user
-@compliance_check(rules="eu-ai-act/article-5", input=False, output=True)
+@compliance_check(jurisdiction="EU", input=False, output=True, agent_id="generator")
 def generation_agent(prompt: str) -> str:
     return llm.generate(prompt)
 ```
 
 ## Example File
 
-- **`ai-agent-examples.py`** — EU AI Act Article 5, multi-regulation, input/output control, enterprise configuration
+- **`ai-agent-examples.py`** — EU AI Act, US compliance, input/output control, enterprise configuration
 
 ## Environment Setup
 

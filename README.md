@@ -20,22 +20,33 @@ pip install complyedge
 ```python
 from complyedge import compliance_check
 
-@compliance_check(rules="eu-ai-act/article-5")
+@compliance_check(jurisdiction="EU", agent_id="my-agent")
 def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-Three lines. Every AI input and output evaluated against EU AI Act Article 5 prohibited practices. Violations blocked before they reach the user — with article citation, rule ID, and timestamp on every decision.
+Three lines. Every AI input and output evaluated against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations blocked before they reach the user — with article citation, rule ID, and timestamp on every decision.
 
-## Multi-Regulation Enforcement
+## Without a decorator
 
 ```python
-@compliance_check(rules=["eu-ai-act/article-5", "eu-ai-act/article-50"])
-def my_agent(prompt):
-    return llm.generate(prompt)
+from complyedge import is_safe, check
+import os
+
+api_key = os.environ["COMPLYEDGE_API_KEY"]
+
+# Boolean check — returns True if no violations
+if not is_safe(prompt, api_key=api_key, jurisdiction="EU"):
+    raise ValueError("Prompt violates EU AI Act")
+
+# Full result — returns ComplianceResult with violations + citations
+result = check(prompt, api_key=api_key, jurisdiction="EU")
+if not result.allowed:
+    for v in result.violations:
+        print(v.rule_id, v.citation)
 ```
 
-Rule paths map 1:1 to OPA/Rego policy paths. Same engine, any regulation.
+Jurisdiction maps to the rule corpus: `EU` evaluates against EU AI Act Article 5, Article 50, and GPAI obligations. `US` evaluates against HIPAA, SOX, COPPA, TCPA, BIPA.
 
 ## TrustLint — Offline Linter
 
@@ -96,7 +107,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1 — Deterministic (hot path, < 5ms):** 19 OPA/Rego policies + TrustLint regex engine fire on every request. Binary pass/block. Legal citation attached to every decision. No LLM on the hot path.
+**Layer 1 — Deterministic (hot path, <100ms p99):** 19 OPA/Rego policies + TrustLint regex engine fire on every request. Binary pass/block. Legal citation attached to every decision. No LLM on the hot path.
 
 **Layer 2 — Interpretive (async, never blocks):** Clauses requiring legal judgment are queued for LLM analysis in background. The LLM never makes a blocking decision — it surfaces evidence for humans to decide.
 

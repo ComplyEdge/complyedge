@@ -9,7 +9,7 @@ Add compliance to any Python function with one line:
 ```python
 from complyedge import compliance_check
 
-@compliance_check(rules="eu-ai-act/article-5")
+@compliance_check(jurisdiction="EU", agent_id="my-agent")
 def my_agent(prompt: str) -> str:
     return llm.generate(prompt)
 ```
@@ -24,10 +24,7 @@ Add compliance guardrails to OpenAI Agents:
 from complyedge.agents import create_compliance_guardrail
 from agents import Agent
 
-guardrail = create_compliance_guardrail(
-    api_key="your-key",
-    rules="eu-ai-act/article-5",
-)
+guardrail = create_compliance_guardrail(api_key="your-key")
 
 agent = Agent(
     name="Compliant Agent",

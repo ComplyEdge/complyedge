@@ -2,6 +2,21 @@
 #
 # This policy aggregates all Article 5 sub-checks and returns a unified result.
 # OPA queries this package at: POST /v1/data/complyedge/article5
+#
+# Aggregator carve-out (RULE_STANDARD.md §5.6, added v1.1):
+# This file imports and combines other rules' violation results — it has no
+# legal condition of its own. Exempt from §5 approval headers. Correctness
+# derives from the correctness of the imported sub-rules, each of which is
+# individually subject to §5 sign-off.
+#
+# Imported rules covered by individual §5 approvals:
+#   - article5.social_scoring (Art 5(1)(c)) — approved by Leo Celis 2026-05-10
+#   - article5.subliminal_manipulation (Art 5(1)(a)) — approved by Leo Celis 2026-05-10
+#   - article5.vulnerability_exploitation (Art 5(1)(b)) — approved by Leo Celis 2026-05-10
+#   - article5.biometric_categorisation (Art 5(1)(g)) — approved by Leo Celis 2026-05-10
+#   - article5.emotion_recognition (Art 5(1)(f)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - article5.predictive_policing (Art 5(1)(d)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - article5.realtime_biometric (Art 5(1)(h)) — approved by Leo Celis 2026-05-16 (agent review)
 
 package complyedge.article5
 

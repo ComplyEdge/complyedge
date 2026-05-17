@@ -1,0 +1,208 @@
+provider_id: amazon_titan
+provider_name: Amazon (Titan / Nova)
+model_class: closed_api
+systemic_risk_threshold: false
+last_updated: '2026-05-09'
+verification_status: needs_review
+
+obligations:
+
+  art_50_2_content_disclosure:
+    score: 1
+    rationale: >-
+      AWS Responsible AI Policy (last updated 2025-01-13) prohibits
+      use of AI/ML services "for intentional disinformation or
+      deception" and "to depict a person's voice or likeness without
+      their consent or other appropriate rights, including
+      unauthorized impersonation and non-consensual sexual imagery"
+      — flowing deployer-side disclosure obligations. Amazon's
+      first-party model portfolio (Titan Text/Embeddings, Nova text
+      LLMs Micro/Lite/Pro/Premier, Nova Canvas image, Nova Reel
+      video, Nova Sonic audio) explicitly includes image- and
+      video-generation services where Article 50(2) machine-readable
+      provenance applies. AWS-provided documentation references
+      content-watermarking / invisible-watermark on Nova Canvas and
+      Nova Reel outputs but the Responsible AI Policy URL itself
+      doesn't enumerate the exact mechanism. Score is 1: deployer-
+      side AUP / Responsible AI Policy disclosure obligations are
+      explicit, and AWS has documented some output-marking
+      capabilities for image/video Nova models, but the schema-level
+      evidence here is limited to the published Responsible AI
+      Policy clauses (without explicit C2PA / watermark technical
+      specification on a public URL).
+    evidence:
+    - url: https://aws.amazon.com/ai/responsible-ai/policy/
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        AWS Responsible AI Policy (last updated 2025-01-13)
+        enumerating prohibited uses including intentional
+        disinformation/deception and unauthorized impersonation/
+        non-consensual sexual imagery, plus Responsible AI
+        Requirements obligating deployers to comply with applicable
+        AI laws including the EU AI Act when making consequential
+        decisions.
+
+      sha256: d22ef4a39c794aa858ab949a6bc590f4562970dfa5703852d091a6e754872412
+      wayback_url: https://web.archive.org/web/20260509180850/https://aws.amazon.com/ai/responsible-ai/policy/
+      archived_date: '2026-05-09'
+  art_51_model_classification:
+    score: 0
+    rationale: >-
+      No public AWS / Amazon artefact classifies Titan Text Large,
+      Nova Premier, or any other first-party Amazon model under the
+      EU AI Act's "General Purpose AI Model" or "GPAI Model with
+      Systemic Risk" taxonomy. Nova Premier is positioned as
+      "frontier intelligence and industry-leading price-performance"
+      but no compute disclosure (FLOPs) supports the Article 51(1)(a)
+      10^25 threshold determination, and AWS has not published a
+      GPAI-SR self-classification. AWS has multiple EU establishments
+      (AWS EMEA SARL Luxembourg) but no published GPAI Article 11
+      authorised representative designation specific to AI Act
+      providers. Score is 0.
+    evidence: []
+
+  art_52_53_1_a_b_technical_documentation:
+    score: 1
+    rationale: >-
+      Amazon publishes high-level marketing pages for Nova model
+      family (aws.amazon.com/nova/) describing model variants
+      (Nova Micro, Nova Lite, Nova Pro, Nova Premier text models;
+      Nova Canvas image; Nova Reel video; Nova Sonic audio;
+      Nova 2 Lite / Nova 2 Sonic; Nova Multimodal Embeddings) and
+      lineage ("built on AI technologies originally developed for
+      Amazon's internal applications, such as Alexa+, Amazon Ads,
+      Amazon Catalog System Services, AWS Marketplace, and Amazon
+      Stores"). AWS Bedrock model-cards documentation page lists
+      first-party Amazon models alongside third-party models. AWS
+      publishes Nova service cards via the Responsible AI resources
+      portal. However, no public Amazon model card discloses
+      parameter counts, FLOPs, training compute, training-data
+      composition in the structured Annex IX EU AI Office template
+      format, or detailed architecture beyond marketing positioning.
+      Technical depth is materially below OpenAI/Anthropic/Google.
+      Score is 1: marketing-grade Nova product pages + Bedrock
+      model-card index, but no detailed Annex IX summary or
+      structured technical disclosure.
+    evidence:
+    - url: https://aws.amazon.com/ai/generative-ai/nova/
+      verified_date: '2026-05-09'
+      doc_type: model_card
+      summary: >-
+        Amazon Nova product page describing the Nova model family
+        (Nova Act, Nova Forge, Nova Models — Micro/Lite/Pro/Premier,
+        Nova Canvas image, Nova Reel video, Nova Sonic audio, Nova
+        2 Lite/Sonic, Nova Multimodal Embeddings) and disclosing
+        model lineage from Amazon internal applications (Alexa+,
+        Amazon Ads, Catalog System Services, AWS Marketplace,
+        Amazon Stores).
+      sha256: 43601c93c6c891712bfe8e8254f7109460ac28dbeaab92045472f76255bd573c
+      wayback_url: https://web.archive.org/web/20260509180925/https://aws.amazon.com/nova/
+      archived_date: '2026-05-09'
+    - url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html
+      verified_date: '2026-05-09'
+      doc_type: api_doc
+      summary: >-
+        Amazon Bedrock "Models at a glance" page enumerating all
+        first-party Amazon foundation models (Nova Multimodal
+        Embeddings, Nova 2 Lite/Sonic, Nova Canvas, Nova Lite,
+        Nova Micro, Nova Premier, Nova Pro, Nova Reel, Nova Sonic,
+        Titan Embeddings G1 Text, Titan Image Generator G1 v2,
+        Titan Multimodal Embeddings G1, Titan Text Embeddings V2,
+        Titan Embeddings G1 Text v2, Titan Text Large) alongside
+        third-party model offerings.
+
+      sha256: cea63d6edcd29b88b200df831e81f6f177fb5b8c8f69ee12333d171c5641692a
+      wayback_url: https://web.archive.org/web/20260508004155/https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html
+      archived_date: '2026-05-09'
+  art_53_1_c_copyright_transparency:
+    score: 0
+    rationale: >-
+      No public Amazon artefact discloses training-data sources or
+      composition for Titan or Nova models. The Nova product page
+      acknowledges that models are "built on AI technologies
+      originally developed for Amazon's internal applications, such
+      as Alexa+, Amazon Ads, Amazon Catalog System Services, AWS
+      Marketplace, and Amazon Stores" but provides no structured
+      training-data inventory, no Annex IX-style summary, no
+      rightsholder opt-out mechanism, and no dedicated AI-training
+      crawler identifier with documented robots.txt opt-out. Score
+      is 0: complete absence of training-data transparency in EU AI
+      Office template terms.
+    evidence: []
+
+  art_53_1_d_e_downstream_obligations:
+    score: 2
+    rationale: >-
+      AWS publishes a tiered policy framework: (1) AWS Acceptable
+      Use Policy (last updated 2021-07-01) with broad prohibitions
+      on illegal/fraudulent activity, rights violations, violence/
+      terrorism incitement, child sexual exploitation, security/
+      integrity violations, and unsolicited mass email/spam; (2)
+      AWS Responsible AI Policy (last updated 2025-01-13)
+      specifically targeting AI/ML services with prohibitions on
+      disinformation/deception, privacy-rights violations including
+      unlawful tracking/monitoring/identification, voice/likeness
+      depiction without consent, child harm/grooming/sexual
+      exploitation, harassment of individuals/groups, intentional
+      circumvention of safety filters, and lethal-function-in-weapon
+      uses without human authorization; plus Responsible AI
+      Requirements imposing deployer obligations to evaluate risks,
+      implement human oversight, comply with applicable AI laws
+      (EU AI Act explicitly named), and conduct testing for
+      consequential decisions (medical, judicial, housing, benefits,
+      hiring, lending, legal/financial advice). Additionally Bedrock
+      offers Guardrails for content-safety configuration, AWS
+      enterprise contracts include DPA terms, and AWS holds
+      enterprise certifications (SOC 1/2/3, ISO 27001, HIPAA, FedRAMP,
+      etc.). Score is 2: comprehensive but the Responsible AI Policy
+      doesn't enumerate Article 5 prohibitions verbatim (e.g.,
+      biometric categorisation for protected attributes, social
+      scoring, predictive policing, real-time RBI in public spaces,
+      workplace emotion inference) the way Stability/Inflection AUPs
+      do. Below Stability/Inflection tier-3.
+    evidence:
+    - url: https://aws.amazon.com/ai/responsible-ai/policy/
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        AWS Responsible AI Policy (last updated 2025-01-13)
+        enumerating prohibited uses (disinformation, privacy
+        violations including unlawful tracking/monitoring/
+        identification, voice/likeness without consent, child
+        harm/exploitation, harassment, safety-filter circumvention,
+        weapons), and Responsible AI Requirements obligating
+        deployers to evaluate risks and implement human oversight
+        for consequential decisions, with explicit reference to
+        EU AI Act compliance.
+      sha256: 169b4b70c73255f4b45ca58165e08bcff5840e4effebcb44dd85df7818b08e7f
+      wayback_url: https://web.archive.org/web/20260509180850/https://aws.amazon.com/ai/responsible-ai/policy/
+      archived_date: '2026-05-09'
+    - url: https://aws.amazon.com/aup/
+      verified_date: '2026-05-09'
+      doc_type: terms_of_service
+      summary: >-
+        AWS Acceptable Use Policy (last updated 2021-07-01)
+        governing all AWS Services including AI/ML offerings, with
+        general prohibitions on illegal/fraudulent activity, rights
+        violations, violence/terrorism incitement, child sexual
+        exploitation, security/integrity violations, and unsolicited
+        mass-message/spam distribution.
+
+      sha256: 818d4b62652a49996c70f7fdd44d84644a7de79279423edd98aa90576babdc61
+      wayback_url: https://web.archive.org/web/20260509181103/https://aws.amazon.com/aup/
+      archived_date: '2026-05-09'
+  art_55_systemic_risk:
+    score: 0
+    rationale: >-
+      Amazon has not designated Titan, Nova Pro, or Nova Premier as
+      systemic-risk under EU AI Act Article 51. No public FLOPs
+      disclosure or self-classification statement appears on AWS
+      properties. Nova Premier is positioned as "frontier" but
+      without compute disclosure to support Article 51(1)(a)
+      10^25 threshold determination, and Amazon has not published a
+      frontier-AI safety framework comparable to Anthropic's RSP or
+      Google's Frontier Safety Framework. With
+      `systemic_risk_threshold: false`, this obligation is excluded
+      from scoring as not applicable.
+    evidence: []

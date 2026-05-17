@@ -5,8 +5,13 @@
 # watermarking techniques that survive common transformations.
 #
 # Legal citation: Regulation (EU) 2024/1689, Article 50(2)
+# Recital: 133 — same recital as gpai_content_disclosure; this rule specifically targets the technical-effectiveness aspect: machine-readable markers must be robust against common transformations (compression, cropping, format conversion) per Recital 133's "effective, interoperable, robust and reliable" requirement
 # Effective: 2026-08-02
 # Penalty: up to €15M or 3% of global revenue
+# Condition type: deterministic
+# Enforcement layer: layer1
+# Status: approved
+# Approved by: Leo Celis on 2026-05-16 (via agent review per §5.1 amendment v1.1)
 
 package complyedge.article50.synthetic_media_watermark
 
