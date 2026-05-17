@@ -54,7 +54,7 @@ citation := "Regulation (EU) 2024/1689, Article 5(1)(c)"
 
 When OPA fires, the response carries the legal citation, the rule ID, and the input hash. That is the audit trail. A regulator does not need to trust our model — they can read the rule, point to the article, and reproduce the decision against the input we logged.
 
-The engine is an embedded OPA daemon (v0.66.0) spawned at Lambda init, listening on loopback. The supervisor budgets 800ms for OPA to report healthy on cold start. Each policy evaluation is regex-based and runs against the prompt text and jurisdiction. We measured 39–81ms for true OPA fast-path hits — the cases where a Rego rule matches the input directly. Subliminal manipulation, social scoring, vulnerability exploitation, and emotion-recognition-at-school all land in this range on our benchmark. Other Article 5 cases (some biometric, some predictive policing phrasings) fall through to Layer 2 because the Rego pattern doesn't catch them yet — that's where the LLM picks up.
+The engine is an embedded OPA daemon (v0.66.0) spawned at Lambda init, listening on loopback. The supervisor budgets 800ms for OPA to report healthy on cold start. Each policy evaluation is regex-based and runs against the prompt text and jurisdiction. On our 50-prompt benchmark, true OPA fast-path hits land in **37–100ms** (median 61ms, n=14). Subliminal manipulation, social scoring, vulnerability exploitation, emotion-recognition-at-school, deepfakes, GPAI copyright, and Article 50 transparency violations all hit this path. Other cases (some biometric, some predictive policing phrasings) fall through to Layer 2 because the Rego pattern doesn't catch them yet — that's where the LLM picks up.
 
 ## Layer 2: LLM, interpretive
 
