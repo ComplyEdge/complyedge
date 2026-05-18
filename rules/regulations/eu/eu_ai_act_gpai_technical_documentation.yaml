@@ -5,11 +5,8 @@ description: >-
   Requires providers of general-purpose AI models to draw up and keep
   up-to-date technical documentation of the model, including training and
   testing processes and evaluation results, and to make it available to the
-  AI Office and national competent authorities on request. Article 53(1)(a) of the EU AI Act mandates comprehensive technical
-  documentation for all GPAI models (the documentation must contain, at a
-  minimum, the information set out in Annex XI). Note: Article 52 in the
-  final adopted text is the separate notification procedure for systemic-risk
-  GPAI models, not technical documentation.
+  AI Office and national competent authorities on request. Article 53(1)(a)
+  mandates technical documentation per Annex XI.
 detection_scope: all
 conditions:
 - type: semantic
