@@ -7,9 +7,7 @@ description: >-
   information about the capabilities and limitations of the model, enabling
   them to comply with their own obligations under the EU AI Act.
   Article 53(1)(b) mandates transparency towards downstream providers
-  and deployers (minimum content set out in Annex XII). Note: Article
-  53(1)(d) — the public training-data summary — is a related but distinct
-  obligation covered separately.
+  and deployers (minimum content set out in Annex XII).
 detection_scope: all
 conditions:
 - type: semantic
