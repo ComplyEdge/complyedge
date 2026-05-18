@@ -54,7 +54,7 @@ citation := "Regulation (EU) 2024/1689, Article 5(1)(c)"
 
 When OPA fires, the response carries the legal citation, the rule ID, and the input hash. That is the audit trail. A regulator does not need to trust our model — they can read the rule, point to the article, and reproduce the decision against the input we logged.
 
-The engine is an embedded OPA daemon (v0.66.0) spawned at Lambda init, listening on loopback. The supervisor budgets 800ms for OPA to report healthy on cold start. Each policy evaluation is regex-based and runs against the prompt text and jurisdiction. On our 50-prompt benchmark, true OPA fast-path hits land in **37–100ms** (median 61ms, n=14). Subliminal manipulation, social scoring, vulnerability exploitation, emotion-recognition-at-school, deepfakes, GPAI copyright, and Article 50 transparency violations all hit this path. Other cases (some biometric, some predictive policing phrasings) fall through to Layer 2 because the Rego pattern doesn't catch them yet — that's where the LLM picks up.
+The engine is an embedded OPA daemon (v0.66.0) spawned at Lambda init, listening on loopback. The supervisor budgets 800ms for OPA to report healthy on cold start. Each policy evaluation is regex-based and runs against the prompt text and jurisdiction. On our 50-prompt benchmark, true OPA fast-path hits land in **38–96ms** (median 58ms, n=14). Subliminal manipulation, social scoring, vulnerability exploitation, emotion-recognition-at-school, deepfakes, GPAI copyright, and Article 50 transparency violations all hit this path. Other cases (some biometric, some predictive policing phrasings) fall through to Layer 2 because the Rego pattern doesn't catch them yet — that's where the LLM picks up.
 
 ## Layer 2: LLM, interpretive
 
@@ -67,24 +67,26 @@ This is honestly slow. We do not pretend otherwise. The two-layer design is a tr
 - For the rules that can be expressed deterministically, you get a sub-100ms enforcement path with a legal citation.
 - For the rules that cannot be — the ambiguous, the contextual, the multilingual — you get an interpretive layer that is slower but extensible.
 
-The user picks per-request via a single flag (`use_semantic_fallback: true`). If they want the fast deterministic path only, they get it. If they want LLM coverage of the long tail, they pay the latency.
+The default is OPA-only. The user opts in to Layer 2 per-request via a single flag (`use_semantic_fallback=True`). If they want the fast deterministic path only, they get it at median 73ms across the full corpus. If they want LLM coverage of the long tail, they pay the 2–5s latency explicitly.
 
 ## What the benchmark shows
 
 We maintain a 50-prompt benchmark corpus that runs against the live API. The prompts cover six categories: Article 5 prohibitions, Article 50 transparency, GPAI obligations, US compliance (SOX, HIPAA, BIPA), edge cases, and safe-harbor prompts that should pass.
 
-The latest run (May 16, 2026), on that corpus:
+The latest run (May 18, 2026), Layer 1 OPA-only path (`use_semantic_fallback=False`):
 
-| Category | Pass rate | Critical failures |
-|---|---|---|
-| Article 5 | 100% | 0 |
-| Article 50 | 100% | 0 |
-| GPAI | 100% | 0 |
-| US corpus | 100% | 0 |
-| Safe harbor | 100% (0 false positives) | 0 |
-| Edge cases | 100% | 0 |
+| Category | Layer 1 (OPA) | Needs Layer 2 | Notes |
+|---|---|---|---|
+| Article 5 | 5/10 | 5/10 | OPA catches canonical phrasings; complex variants fall to Layer 2 |
+| Article 50 | 4/8 | 4/8 | Same — pattern coverage grows with community PRs |
+| GPAI | 4/5 | 1/5 | |
+| Safe harbor | 10/10 ✓ | — | Zero false positives on the OPA path |
+| Edge cases | 5/7 | 2/7 | |
+| US corpus | 0/10 OPA | 10/10 | US statutes (HIPAA, SOX, BIPA, TCPA…) are too pattern-diverse for deterministic Rego; they require semantic evaluation |
 
-The corpus is curated, not adversarial. It encodes our reading of what each obligation looks like in production prompts. Real-world inputs will surface gaps — that is the point of open-sourcing it. The benchmark code, the prompt YAMLs, and the result JSON are all in [`scripts/benchmark/`](https://github.com/ComplyEdge/complyedge/tree/main/scripts/benchmark). The runner is idempotent. Anyone with an API key can reproduce the numbers. If you have a prompt the corpus should cover, open a PR.
+Layer 1 correctly allows all ten safe-harbor prompts. For EU obligations, OPA catches the unambiguous canonical phrasings immediately with a legal citation — the remaining cases fall to Layer 2 LLM. **US statute enforcement requires `use_semantic_fallback=True`** — those pattern spaces (PHI disclosure, material non-public information, biometric data collection) are contextual enough that an LLM is the right evaluator.
+
+The table is not a claim of complete coverage — it is a claim about what each layer *does*. The benchmark code, prompt YAMLs, and result JSON are in [`scripts/benchmark/`](https://github.com/ComplyEdge/complyedge/tree/main/scripts/benchmark). The runner is idempotent; run it yourself with any API key. If you have a prompt the corpus should cover, open a PR.
 
 ## What this is not
 

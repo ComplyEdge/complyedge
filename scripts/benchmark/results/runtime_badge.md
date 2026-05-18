@@ -1,3 +1,3 @@
-![Detection Rate](https://img.shields.io/badge/detection-100.0%25-brightgreen)
+![Detection Rate](https://img.shields.io/badge/detection-39.4%25-red)
 
-_GPAI Runtime Benchmark · 50 prompts · 2026-05-16T22:41:14.184043+00:00_
+_GPAI Runtime Benchmark · 50 prompts · 2026-05-18T15:02:32.551874+00:00_

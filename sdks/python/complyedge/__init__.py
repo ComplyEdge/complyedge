@@ -51,7 +51,7 @@ from tenacity import (
     wait_exponential,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.2.2"
 
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
@@ -243,7 +243,7 @@ class ComplyEdge:
             "jurisdiction": jurisdiction or self.jurisdiction or "EU",
             "agent_id": agent_id or self.agent_id,
             "direction": "output",
-            "use_semantic_fallback": True,
+            "use_semantic_fallback": False,
         }
 
         try:
@@ -527,7 +527,7 @@ class ComplyEdgeClient:
         jurisdiction: Optional[str] = None,
         direction: DirectionType = DirectionType.OUTPUT,
         context: Optional[Dict[str, Any]] = None,
-        use_semantic_fallback: bool = True,
+        use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
     ) -> ComplianceResult:
         """
@@ -539,7 +539,9 @@ class ComplyEdgeClient:
             jurisdiction: Regulatory jurisdiction (e.g., 'EU', 'US', 'US-CA')
             direction: Whether this is a prompt or output
             context: Additional context for evaluation
-            use_semantic_fallback: Use LLM-based evaluation for ambiguous cases
+            use_semantic_fallback: Enable LLM-based Layer 2 evaluation for ambiguous
+                cases. Defaults to False (OPA fast-path only, ~73ms median). Set True
+                to add 2-5s LLM deepening on cases OPA passes.
             raise_on_violation: Raise ComplianceError if violations are found
 
         Returns:
@@ -697,7 +699,7 @@ class AsyncComplyEdgeClient:
         jurisdiction: Optional[str] = None,
         direction: DirectionType = DirectionType.OUTPUT,
         context: Optional[Dict[str, Any]] = None,
-        use_semantic_fallback: bool = True,
+        use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
     ) -> ComplianceResult:
         """Async version of check_compliance."""

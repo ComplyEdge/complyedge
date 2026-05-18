@@ -65,7 +65,7 @@ Exit codes: `0` = pass, `1` = violations found. Designed for CI/CD pipelines.
 
 ```
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
-rules/regulations/    25 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS)
+rules/regulations/    53 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
 rules/rego/           19 OPA/Rego policies (EU AI Act Article 5, 50, GPAI)
 rules/schemas/        Rule validation schema
 examples/             Usage examples (decorators, OpenAI Agents)
@@ -74,14 +74,14 @@ tests/                Rule validation tests
 
 ## Rules
 
-25 YAML rules + 19 OPA/Rego policies across 4 jurisdictions:
+53 YAML rules + 19 OPA/Rego policies across 4 jurisdictions:
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 18 YAML + 19 Rego | EU AI Act Article 5, Article 50, GPAI, GDPR |
-| **US** | 5 YAML | HIPAA, SOX, COPPA, TCPA |
+| **EU** | 36 YAML + 19 Rego | EU AI Act Articles 4–27, 50, 53, GPAI, GDPR |
+| **US** | 13 YAML | HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA |
 | **Global** | 1 YAML | PCI DSS |
-| **Universal** | 1 YAML | PII detection |
+| **Universal** | 3 YAML | PII detection, prompt injection (direct + indirect) |
 
 Each rule specifies conditions, severity, detection scope, and remediation with legal citations. See the [rule schema](rules/schemas/rule-schema.json) for the format.
 
