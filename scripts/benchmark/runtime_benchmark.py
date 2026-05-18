@@ -121,7 +121,7 @@ async def check_one(
         "agent_id": "runtime-benchmark",
         "jurisdiction": prompt["jurisdiction"],
         "direction": prompt.get("direction", "output"),
-        "use_semantic_fallback": True,
+        "use_semantic_fallback": False,  # benchmark tests OPA detection only; LLM adds cost with no signal
     }
     started = datetime.now(timezone.utc)
     try:
