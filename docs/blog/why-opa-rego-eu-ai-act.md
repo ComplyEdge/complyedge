@@ -85,7 +85,7 @@ The latest run (May 18, 2026), Layer 1 OPA-only path (`use_semantic_fallback=Fal
 | GPAI | 4/5 | 1/5 | |
 | Safe harbor | 10/10 ✓ | — | Zero false positives on the OPA path |
 | Edge cases | 5/7 | 2/7 | |
-| US corpus | 0/10 OPA | 10/10 | US statutes (HIPAA, SOX, BIPA, TCPA…) are too pattern-diverse for deterministic Rego; they require semantic evaluation |
+| US corpus (SOX, HIPAA, BIPA…) | 0/10 OPA | 10/10 | US statutes require `use_semantic_fallback=True` — contextual enough that deterministic Rego patterns don't cover them |
 
 Layer 1 correctly allows all ten safe-harbor prompts. For EU obligations, OPA catches the unambiguous canonical phrasings immediately with a legal citation — the remaining cases fall to Layer 2 LLM. **US statute enforcement requires `use_semantic_fallback=True`** — those pattern spaces (PHI disclosure, material non-public information, biometric data collection) are contextual enough that an LLM is the right evaluator.
 
