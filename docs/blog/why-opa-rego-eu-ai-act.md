@@ -1,6 +1,6 @@
 # Why we built EU AI Act enforcement on OPA/Rego, not an LLM
 
-*May 19, 2026*
+*May 18, 2026*
 
 ---
 
@@ -38,23 +38,26 @@ That asymmetry is the architectural decision. Everything else — the specific r
 
 [Open Policy Agent](https://www.openpolicyagent.org/) is a CNCF graduated project used by Netflix, Google, and others for runtime policy enforcement. Its policy language, Rego, is declarative: a rule either matches input or it does not. There is no temperature parameter.
 
-We wrote 19 Rego policies covering EU AI Act Article 5 (prohibited practices), Article 50 (transparency obligations), and the GPAI provider chapter (Articles 51–55). Each policy is a single file with three things:
+We wrote 19 Rego policies covering EU AI Act Article 5 (prohibited practices), Article 50 (transparency obligations), and the GPAI provider chapter (Articles 51–55). Each policy is a single file. The audit-critical structure is three fields — a violation condition, a stable rule ID, and a verbatim legal citation — plus regex pattern helpers, severity, and remediation guidance:
 
 ```rego
 # Article 5(1)(c): Social scoring by public authorities
 violation if {
     input.jurisdiction == "EU"
-    social_scoring_pattern_match
+    social_scoring_pattern_match  # regex patterns defined below
 }
 
 rule_id := "rego-art5-1c-001"
 
 citation := "Regulation (EU) 2024/1689, Article 5(1)(c)"
+
+severity  := "critical"
+remediation := "Remove social scoring or behaviour-based classification..."
 ```
 
 When OPA fires, the response carries the legal citation, the rule ID, and the input hash. That is the audit trail. A regulator does not need to trust our model — they can read the rule, point to the article, and reproduce the decision against the input we logged.
 
-The engine is an embedded OPA daemon (v0.66.0) spawned at Lambda init, listening on loopback. The supervisor budgets 800ms for OPA to report healthy on cold start. Each policy evaluation is regex-based and runs against the prompt text and jurisdiction. On our 50-prompt benchmark, true OPA fast-path hits land in **38–96ms** (median 58ms, n=14). Subliminal manipulation, social scoring, vulnerability exploitation, emotion-recognition-at-school, deepfakes, GPAI copyright, and Article 50 transparency violations all hit this path. Other cases (some biometric, some predictive policing phrasings) fall through to Layer 2 because the Rego pattern doesn't catch them yet — that's where the LLM picks up.
+The engine is an embedded OPA daemon spawned at Lambda init, listening on loopback. The supervisor budgets 800ms for OPA to report healthy on cold start; the live version string is exposed at `/health` for anyone who wants to verify. Each policy evaluation is regex-based and runs against the prompt text and jurisdiction. On our 50-prompt benchmark, true OPA fast-path hits land in **38–96ms** (median 58ms, n=14). Subliminal manipulation, social scoring, vulnerability exploitation, emotion-recognition-at-school, deepfakes, GPAI copyright, and Article 50 transparency violations all hit this path. Other cases (some biometric, some predictive policing phrasings) fall through to Layer 2 because the Rego pattern doesn't catch them yet — that's where the LLM picks up.
 
 ## Layer 2: LLM, interpretive
 
