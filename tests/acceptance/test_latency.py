@@ -125,7 +125,7 @@ class TestLiveLatency:
         elapsed_ms = (time.monotonic() - t0) * 1000
 
         assert resp.status_code == 200, (
-            f"Expected 200 from /v1/compliance/check, got {resp.status_code}: {resp.text[:200]}"
+            f"Expected 200 from {api_base_url}/v1/check, got {resp.status_code}: {resp.text[:200]}"
         )
         # Use server-reported latency if available, else fall back to wall-clock
         data = resp.json()
