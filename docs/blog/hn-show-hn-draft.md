@@ -65,7 +65,7 @@ Article 5 has been law since February 2, 2025. GPAI enforcement starts August 2,
 Yes — the engine is Apache 2.0 for exactly that. The value is the curated corpus + citation chain + immutable audit log, not the matcher. Same relationship as Snyk vs writing your own vuln scanner.
 
 **"Your benchmark shows 855ms median / 2.7s p99, not 100ms."**
-Honest split: 38–96ms (median 58ms, n=14) is the OPA-violation fast path — OPA fires, pattern matches, blocks immediately. For the other 36 allow cases with default settings (`use_semantic_fallback=True`), Layer 2 LLM adds 1.6–2.8s. Pass `use_semantic_fallback=False` and the whole 50-prompt benchmark runs at median 73ms, p99 135ms — that's the OPA-only number. Both modes and their raw latencies are in the benchmark JSON in the repo — run it yourself with `scripts/benchmark/runtime_benchmark.py`.
+Honest split: 38–96ms (median 58ms, n=14) is the OPA-violation fast path — OPA fires, pattern matches, blocks immediately. For the other 36 allow cases when `use_semantic_fallback=True` is passed, Layer 2 LLM adds 1.6–2.8s. Pass `use_semantic_fallback=False` and the whole 50-prompt benchmark runs at median 73ms, p99 135ms — that's the OPA-only number. Both modes and their raw latencies are in the benchmark JSON in the repo — run it yourself with `scripts/benchmark/runtime_benchmark.py`.
 
 **"The Layer 2 LLM blocks — so it's not truly async."**
 Correct. Layer 2 blocks the API response when it runs. Default decorator behavior is OPA-only (`use_semantic_fallback=False` since v0.2.2). Layer 2 LLM is opt-in per request. If you want LLM coverage of ambiguous cases, pass `use_semantic_fallback=True` explicitly.
