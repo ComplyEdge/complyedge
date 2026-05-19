@@ -24,17 +24,20 @@ When Article 5(1)(c) fires on a social-scoring prompt:
   "allowed": false,
   "violations": [{
     "rule_id": "rego-art5-1c-001",
-    "rule_description": "Regulation (EU) 2024/1689, Article 5(1)(c)",
+    "rule_description": "Regulation (EU) 2024/1689, Article 5(1)(c): Prohibits AI systems that evaluate or classify natural persons based on their social behaviour or personal characteristics, with the social score leading to detrimental or unfavourable treatment.",
     "severity": "critical",
-    "reason": "Text describes social scoring of natural persons by public authorities"
+    "confidence": 1.0,
+    "text_excerpt": "We use social credit scoring to evaluate loan applicants in the EU"
   }],
   "bundle_version": "opa-rego-v1",
   "engine_path": "opa",
+  "latency_ms": 53,
+  "opa_latency_ms": 48.77,
   "audit_logged": true
 }
 ```
 
-When OPA detects a violation it returns immediately: 38–96ms (median 58ms, n=14) on our 50-prompt benchmark. Pass `use_semantic_fallback=False` to skip Layer 2 entirely — the full 50-prompt run then comes in at median 73ms, p99 135ms. Default SDK decorator uses `use_semantic_fallback=True`, which adds 2–5s LLM evaluation for cases OPA does not block.
+When OPA detects a violation it returns immediately: 38–96ms (median 58ms, n=14) on our 50-prompt benchmark. Pass `use_semantic_fallback=False` to skip Layer 2 entirely — the full 50-prompt run then comes in at median 73ms, p99 135ms. Default SDK behavior is OPA-only (`use_semantic_fallback=False` on the decorator and `check()`). Pass `use_semantic_fallback=True` per-request to enable LLM Layer 2 for ambiguous cases.
 
 The corpus is curated, not adversarial: 19 Rego policies + 53 YAML rules across 4 jurisdictions. The benchmark runner and prompt YAMLs are in the repo — reproducible with any API key. What this is not: a model, a risk scorer, or a substitute for legal review. It evaluates rules.
 
@@ -65,7 +68,7 @@ Yes — the engine is Apache 2.0 for exactly that. The value is the curated corp
 Honest split: 38–96ms (median 58ms, n=14) is the OPA-violation fast path — OPA fires, pattern matches, blocks immediately. For the other 36 allow cases with default settings (`use_semantic_fallback=True`), Layer 2 LLM adds 1.6–2.8s. Pass `use_semantic_fallback=False` and the whole 50-prompt benchmark runs at median 73ms, p99 135ms — that's the OPA-only number. Both modes and their raw latencies are in the benchmark JSON in the repo — run it yourself with `scripts/benchmark/runtime_benchmark.py`.
 
 **"The Layer 2 LLM blocks — so it's not truly async."**
-Correct. Layer 2 blocks the API response when it runs. The decorator hardcodes `use_semantic_fallback=True`; to get the fast-path-only behavior pass `use_semantic_fallback=False` to the low-level `check()` call. If you only need OPA enforcement with no LLM, that's the path.
+Correct. Layer 2 blocks the API response when it runs. Default decorator behavior is OPA-only (`use_semantic_fallback=False` since v0.2.2). Layer 2 LLM is opt-in per request. If you want LLM coverage of ambiguous cases, pass `use_semantic_fallback=True` explicitly.
 
 **"What about US regulations?"**
 US corpus exists: HIPAA, SOX, COPPA, TCPA, BIPA — use `jurisdiction="US"`. 2026 focus is EU AI Act because the enforcement timeline is hard and imminent. US expansion follows.
