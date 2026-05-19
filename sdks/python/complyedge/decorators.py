@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 # Note: Models and clients are defined in __init__.py
 def _import_models():
     """Import models after module initialization to avoid circular imports."""
-    from . import ComplianceResult, ComplyEdge
-    return ComplianceResult, ComplyEdge
+    from . import ComplianceResult, ComplyEdge, ComplianceError
+    return ComplianceResult, ComplyEdge, ComplianceError
 
 logger = logging.getLogger(__name__)
 
@@ -75,27 +75,30 @@ class ComplianceConfig:
         self.max_retries = max_retries
 
 
-def default_violation_handler(result: "ComplianceResult", context: str) -> str:
+def default_violation_handler(result: "ComplianceResult", context: str) -> None:
     """
     Default handler for compliance violations.
-    
-    Provides conservative blocking behavior with informative error messages.
-    Enterprise customers can override this with custom violation handling.
-    
+
+    Raises ComplianceError so the caller can catch and handle the block explicitly.
+    Enterprise customers can override this with a custom violation handler that
+    returns a value instead of raising (e.g., to return a safe fallback response).
+
     Args:
         result: ComplianceResult containing violation details
         context: Either "input" or "output" indicating where violation occurred
-        
-    Returns:
-        String message explaining the compliance violation
+
+    Raises:
+        ComplianceError: Always raised to block the request.
     """
+    from . import ComplianceError as _ComplianceError
     violation_count = len(result.violations) if result.violations else 0
     regulations = ", ".join(result.evaluated_rules) if result.evaluated_rules else "compliance policies"
-    
-    return (
+    raise _ComplianceError(
         f"Request blocked due to compliance violation in {context}. "
         f"Found {violation_count} violation(s) against {regulations}. "
-        f"Event ID: {result.event_id}"
+        f"Event ID: {result.event_id}",
+        violations=result.violations,
+        event_id=result.event_id,
     )
 
 
@@ -149,7 +152,9 @@ def compliance_check(
         input: Whether to check function input parameters for compliance
         output: Whether to check function return value for compliance
         api_key_env: Environment variable name containing ComplyEdge API key
-        enabled_env: Environment variable name for enabling/disabling compliance
+        enabled_env: Environment variable name for opt-out (defaults to enabled when
+            COMPLYEDGE_API_KEY is set; set COMPLYEDGE_ENABLED=false to disable without
+            removing the key, e.g., in CI)
         agent_id: Default agent identifier for compliance tracking
         jurisdiction: Default regulatory jurisdiction
         config: ComplianceConfig object (overrides individual parameters)
@@ -171,7 +176,7 @@ def compliance_check(
                 check_output = config.check_output
                 api_key = config.api_key or os.getenv(api_key_env)
                 enabled = (config.enable_condition() if config.enable_condition 
-                          else os.getenv(enabled_env, "false").lower() == "true")
+                          else os.getenv(enabled_env, "true").lower() == "true")
                 handler = config.violation_handler or violation_handler or default_violation_handler
                 agent = config.agent_id
                 juris = config.jurisdiction
@@ -180,7 +185,7 @@ def compliance_check(
                 check_input = input
                 check_output = output
                 api_key = os.getenv(api_key_env)
-                enabled = os.getenv(enabled_env, "false").lower() == "true"
+                enabled = os.getenv(enabled_env, "true").lower() == "true"
                 handler = violation_handler or default_violation_handler
                 agent = agent_id
                 juris = jurisdiction
@@ -201,7 +206,7 @@ def compliance_check(
             
             # Initialize ComplyEdge client with configuration
             # Import classes dynamically to avoid circular import
-            ComplianceResult, ComplyEdge = _import_models()
+            ComplianceResult, ComplyEdge, ComplianceError = _import_models()
             
             ce = ComplyEdge(
                 api_key=api_key,
@@ -238,6 +243,7 @@ def compliance_check(
                             }
                         )
                         
+                        _input_violation = None
                         try:
                             result = ce.check(combined_input)
                             if not result.safe:
@@ -251,7 +257,7 @@ def compliance_check(
                                         "regulations": result.evaluated_rules
                                     }
                                 )
-                                return handler(result, "input")
+                                _input_violation = result
                         except Exception as e:
                             logger.error(
                                 "Input compliance check failed - proceeding with caution",
@@ -262,6 +268,8 @@ def compliance_check(
                                 }
                             )
                             # Conservative approach: allow function to proceed but log the failure
+                        if _input_violation is not None:
+                            return handler(_input_violation, "input")
                 
                 # Execute the original function
                 logger.debug(
@@ -288,6 +296,7 @@ def compliance_check(
                         }
                     )
                     
+                    _output_violation = None
                     try:
                         result = ce.check(response)
                         if not result.safe:
@@ -301,7 +310,7 @@ def compliance_check(
                                     "regulations": result.evaluated_rules
                                 }
                             )
-                            return handler(result, "output")
+                            _output_violation = result
                     except Exception as e:
                         logger.error(
                             "Output compliance check failed - returning original response",
@@ -312,6 +321,8 @@ def compliance_check(
                             }
                         )
                         # Conservative approach: return original response but log the failure
+                    if _output_violation is not None:
+                        return handler(_output_violation, "output")
                 
                 logger.debug(
                     "Function execution completed with compliance checks",

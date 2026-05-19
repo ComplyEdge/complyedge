@@ -27,6 +27,8 @@ def my_agent(prompt):
 
 Three lines. Every AI input and output evaluated against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations blocked before they reach the user — with article citation, rule ID, and timestamp on every decision.
 
+Set `COMPLYEDGE_API_KEY` to your key. The decorator activates by default; to disable without removing the key (e.g., in CI), set `COMPLYEDGE_ENABLED=false`.
+
 ## Without a decorator
 
 ```python
