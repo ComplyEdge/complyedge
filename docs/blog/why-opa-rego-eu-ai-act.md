@@ -38,7 +38,7 @@ That asymmetry is the architectural decision. Everything else — the specific r
 
 [Open Policy Agent](https://www.openpolicyagent.org/) is a CNCF graduated project used by Netflix, Google, and others for runtime policy enforcement. Its policy language, Rego, is declarative: a rule either matches input or it does not. There is no temperature parameter.
 
-We wrote 19 Rego policies covering EU AI Act Article 5 (prohibited practices), Article 50 (transparency obligations), and the GPAI provider chapter (Articles 51–55). Each policy is a single file. The audit-critical structure is three fields — a violation condition, a stable rule ID, and a verbatim legal citation — plus regex pattern helpers, severity, and remediation guidance:
+We wrote 19 Rego policies covering EU AI Act Article 5 (prohibited practices), Article 50 (transparency obligations), and the GPAI provider chapter (Articles 51, 53, and 55). Each policy is a single file. The audit-critical structure is three fields — a violation condition, a stable rule ID, and a verbatim legal citation — plus regex pattern helpers, severity, and remediation guidance:
 
 ```rego
 # Article 5(1)(c): Social scoring by public authorities
