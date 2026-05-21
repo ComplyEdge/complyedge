@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "complyedge"
-version = "0.2.3"
+version = "0.2.4"
 description = "Python SDK for ComplyEdge Compliance API — runtime EU AI Act enforcement for AI agents"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -37,9 +37,9 @@ complyedge = "complyedge.cli:main"
 
 [project.urls]
 Homepage = "https://complyedge.io"
-Repository = "https://github.com/complyedge/complyedge-platform"
+Repository = "https://github.com/ComplyEdge/complyedge"
 Documentation = "https://complyedge.io/docs"
-Issues = "https://github.com/complyedge/complyedge-platform/issues"
+Issues = "https://github.com/ComplyEdge/complyedge/issues"
 
 [project.optional-dependencies]
 agents = ["openai-agents>=0.2.7"]

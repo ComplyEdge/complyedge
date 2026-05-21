@@ -97,8 +97,7 @@ description: "Detect prohibited practice X under Article Y"
 severity: critical
 conditions:
   - type: regex
-    field: text
-    pattern: "prohibited pattern"
+    value: "prohibited pattern"
     description: "Matches prohibited practice X"
 source:
   regulation: "EU AI Act"
