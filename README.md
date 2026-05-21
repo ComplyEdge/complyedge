@@ -80,7 +80,7 @@ tests/                Rule validation tests
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 36 YAML + 19 Rego | EU AI Act Articles 4–27, 50, 53, GPAI, GDPR |
+| **EU** | 36 YAML + 19 Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR |
 | **US** | 13 YAML | HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA |
 | **Global** | 1 YAML | PCI DSS |
 | **Universal** | 3 YAML | PII detection, prompt injection (direct + indirect) |
@@ -110,7 +110,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 **Layer 1 — Deterministic (hot path, <100ms p99):** 19 OPA/Rego policies + TrustLint regex engine fire on every request. Binary pass/block. Legal citation attached to every decision. No LLM on the hot path.
 
-**Layer 2 — Interpretive (async, never blocks):** Clauses requiring legal judgment are queued for LLM analysis in background. The LLM never makes a blocking decision — it surfaces evidence for humans to decide.
+**Layer 2 — Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
 
 Security products protect AI from bad actors. **ComplyEdge protects companies from their own AI's legal violations during normal operations.**
 
