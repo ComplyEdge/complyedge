@@ -37,7 +37,7 @@ When Article 5(1)(c) fires on a social-scoring prompt:
 }
 ```
 
-When OPA detects a violation it returns immediately: 38–96ms (median 58ms, n=14) on our 50-prompt benchmark. Pass `use_semantic_fallback=False` to skip Layer 2 entirely — the full 50-prompt run then comes in at median 73ms, p99 118ms. Default SDK behavior is OPA-only (`use_semantic_fallback=False` on the decorator and `check()`). Pass `use_semantic_fallback=True` per-request to enable LLM Layer 2 for ambiguous cases.
+When OPA detects a violation it returns immediately: 38–100ms (median 62ms, n=14) on our 50-prompt benchmark. Pass `use_semantic_fallback=False` to skip Layer 2 entirely — the full 50-prompt run then comes in at median 73ms, p99 118ms. Default SDK behavior is OPA-only (`use_semantic_fallback=False` on the decorator and `check()`). Pass `use_semantic_fallback=True` per-request to enable LLM Layer 2 for ambiguous cases.
 
 The corpus is curated, not adversarial: 19 Rego policies + 53 YAML rules across 4 jurisdictions. The benchmark runner and prompt YAMLs are in the repo — reproducible with any API key. What this is not: a model, a risk scorer, or a substitute for legal review. It evaluates rules.
 
@@ -65,7 +65,7 @@ Article 5 has been law since February 2, 2025. GPAI enforcement starts August 2,
 Yes — the engine is Apache 2.0 for exactly that. The value is the curated corpus + citation chain + immutable audit log, not the matcher. Same relationship as Snyk vs writing your own vuln scanner.
 
 **"Your benchmark shows 855ms median / 2.7s p99, not 100ms."**
-Honest split: 38–96ms (median 58ms, n=14) is the OPA-violation fast path — OPA fires, pattern matches, blocks immediately. For the other 36 allow cases when `use_semantic_fallback=True` is passed, Layer 2 LLM adds 1.6–2.8s. Pass `use_semantic_fallback=False` and the whole 50-prompt benchmark runs at median 73ms, p99 118ms — that's the OPA-only number. Both modes and their raw latencies are in the benchmark JSON in the repo — run it yourself with `scripts/benchmark/runtime_benchmark.py`.
+Honest split: 38–100ms (median 62ms, n=14) is the OPA-violation fast path — OPA fires, pattern matches, blocks immediately. For the other 36 allow cases when `use_semantic_fallback=True` is passed, Layer 2 LLM adds 1.6–2.8s. Pass `use_semantic_fallback=False` and the whole 50-prompt benchmark runs at median 73ms, p99 118ms — that's the OPA-only number. Both modes and their raw latencies are in the benchmark JSON in the repo — run it yourself with `scripts/benchmark/runtime_benchmark.py`.
 
 **"The Layer 2 LLM blocks — so it's not truly async."**
 Correct. Layer 2 blocks the API response when it runs. Default decorator behavior is OPA-only (`use_semantic_fallback=False` since v0.2.2). Layer 2 LLM is opt-in per request. If you want LLM coverage of ambiguous cases, pass `use_semantic_fallback=True` explicitly.
