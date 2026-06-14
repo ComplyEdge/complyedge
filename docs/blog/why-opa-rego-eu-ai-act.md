@@ -70,13 +70,13 @@ This is honestly slow. We do not pretend otherwise. The two-layer design is a tr
 - For the rules that can be expressed deterministically, you get a sub-100ms enforcement path with a legal citation.
 - For the rules that cannot be — the ambiguous, the contextual, the multilingual — you get an interpretive layer that is slower but extensible.
 
-The default is OPA-only. The user opts in to Layer 2 per-request via a single flag (`use_semantic_fallback=True`). If they want the fast deterministic path only, they get it at median 73ms across the full corpus. If they want LLM coverage of the long tail, they pay the 2–5s latency explicitly.
+The default is OPA-only. The user opts in to Layer 2 per-request via a single flag (`use_semantic_fallback=True`). On the OPA path, blocked prompts resolve in 38–100ms (median 62ms, n=14 in our benchmark). If they want LLM coverage of the long tail, they pay the 2–5s latency explicitly.
 
 ## What the benchmark shows
 
 We maintain a 50-prompt benchmark corpus that runs against the live API. The prompts cover six categories: Article 5 prohibitions, Article 50 transparency, GPAI obligations, US compliance (SOX, HIPAA, BIPA), edge cases, and safe-harbor prompts that should pass.
 
-The latest run (May 18, 2026), Layer 1 OPA-only path (`use_semantic_fallback=False`):
+The latest committed run (May 18, 2026) is a hybrid run — OPA evaluates first, Layer 2 (`use_semantic_fallback=True`) handles what OPA doesn't catch. The split below shows what each layer resolved; the "Layer 1 (OPA)" column is what the deterministic path blocks on its own:
 
 | Category | Layer 1 (OPA) | Needs Layer 2 | Notes |
 |---|---|---|---|
@@ -84,7 +84,7 @@ The latest run (May 18, 2026), Layer 1 OPA-only path (`use_semantic_fallback=Fal
 | Article 50 | 4/8 | 4/8 | Same — pattern coverage grows with community PRs |
 | GPAI | 4/5 | 1/5 | |
 | Safe harbor | 10/10 ✓ | — | Zero false positives on the OPA path |
-| Edge cases | 5/7 | 2/7 | |
+| Edge cases | 4/7 | 2/7 | one prompt excluded (transport error in this run) |
 | US corpus (SOX, HIPAA, BIPA…) | 0/10 OPA | 10/10 | US statutes require `use_semantic_fallback=True` — contextual enough that deterministic Rego patterns don't cover them |
 
 Layer 1 correctly allows all ten safe-harbor prompts. For EU obligations, OPA catches the unambiguous canonical phrasings immediately with a legal citation — the remaining cases fall to Layer 2 LLM. **US statute enforcement requires `use_semantic_fallback=True`** — those pattern spaces (PHI disclosure, material non-public information, biometric data collection) are contextual enough that an LLM is the right evaluator.
