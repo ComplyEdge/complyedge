@@ -33,7 +33,7 @@ Every Rego rule file must declare a `rule_id` constant that is traceable from th
 | `rego-art52-1a-001` | Article 52(1)(a) — high-risk system requirements, first rule |
 | `rego-gpai-51-1-001` | Article 51(1) — GPAI model obligations, first rule |
 
-**Why this matters:** A buyer's lawyer skimming a directory listing of 50 rule files can immediately see which articles are covered, which have multiple sub-rules, and which are missing. If the IDs are opaque (e.g., `rule_047`), that assessment is impossible without opening every file.
+**Why this matters:** A compliance reviewer skimming a directory listing of 50 rule files can immediately see which articles are covered, which have multiple sub-rules, and which are missing. If the IDs are opaque (e.g., `rule_047`), that assessment is impossible without opening every file.
 
 ---
 
@@ -100,7 +100,7 @@ The `condition` — what the rule actually checks — is the most important fiel
 
 | | Condition | Problem |
 |-|-----------|---------|
-| **BAD** | "Checks if text contains social scoring language" | What is "social scoring language"? This is a keyword heuristic, not a legal standard. A buyer's lawyer would ask: "language according to whom?" |
+| **BAD** | "Checks if text contains social scoring language" | What is "social scoring language"? This is a keyword heuristic, not a legal standard. A compliance reviewer would ask: "language according to whom?" |
 | **GOOD** | "Detects whether AI system output derives a score from behavioral, social, or personal characteristics of a natural person that causes detrimental treatment in a social context unrelated to the context in which the data was generated" | Maps directly to Article 5(1)(c). Every clause has a legal source. A lawyer reading this knows exactly what the code checks. |
 
 | | Condition | Problem |
@@ -268,7 +268,7 @@ That assessment is driven by:
 3. **Coverage structure:** The rule ID scheme reveals which articles are covered and which are not — no hiding behind an opaque numbering system.
 4. **Test rigor:** Every rule has pass/fail/jurisdiction tests. The tests themselves are readable.
 5. **Approval trail:** Git history shows named human review on every rule merge.
-6. **Separation of concerns:** Deterministic rules (Rego/OPA) vs. semantic rules (LLM) are explicitly labeled. The buyer knows which rules are reproducible and which depend on an LLM.
+6. **Separation of concerns:** Deterministic rules (Rego/OPA) vs. semantic rules (LLM) are explicitly labeled. Reviewers know which rules are reproducible and which depend on an LLM.
 
 ### 6.2 What Fails the Quality Bar
 
