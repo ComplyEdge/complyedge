@@ -36,5 +36,4 @@ COMPLYEDGE_API_KEY=<your-key> pytest tests/acceptance/ -v
 ## Source of truth
 
 The claims tested here come from:
-- [HN Show HN post](../../docs/blog/hn-show-hn-draft.md)
 - [Launch blog post](../../docs/blog/why-opa-rego-eu-ai-act.md)
