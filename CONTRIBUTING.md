@@ -1,6 +1,6 @@
 # Contributing to ComplyEdge
 
-ComplyEdge enforces EU AI Act compliance at runtime — not a scanner, not a linter. It runs in production, on every AI request, and blocks violations before they reach users. The EU AI Act is already in force. The corpus is what makes enforcement possible — and it only compounds if people outside the core team add rules. Each rule you contribute is a legal artifact, traceable to an exact article, paragraph, and sub-paragraph, that could appear in a regulator's audit trail or a buyer's diligence review. This guide explains how.
+ComplyEdge enforces EU AI Act compliance at runtime — not a scanner, not a linter. It runs in production, on every AI request, and blocks violations before they reach users. The EU AI Act is already in force. The corpus is what makes enforcement possible — and it only compounds if people outside the core team add rules. Each rule you contribute is a legal artifact, traceable to an exact article, paragraph, and sub-paragraph, that could appear in a regulator's audit trail or an external compliance review. This guide explains how.
 
 > **The strict format spec lives in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md).** This file is the front door — process, expectations, and the 5-step rule-writing workflow. RULE_STANDARD.md is the law.
 
@@ -150,7 +150,7 @@ Review criteria:
 3. Do test cases cover both outcomes? Do they use realistic text?
 4. Does the rule conform to RULE_STANDARD.md (ID format, header fields, citation format)?
 
-Target review time: **5 business days.** If your rule is rejected, you will receive a comment explaining exactly why and what to change. Rejections are not personal — they are an artifact of the legal rigor that makes the corpus useful to a buyer's diligence team.
+Target review time: **5 business days.** If your rule is rejected, you will receive a comment explaining exactly why and what to change. Rejections are not personal — they are an artifact of the legal rigor that makes the corpus useful to diligence reviewers.
 
 ---
 
@@ -158,7 +158,7 @@ Target review time: **5 business days.** If your rule is rejected, you will rece
 
 Contributors are listed in `CONTRIBUTORS.md` (created on first external merge).
 
-Rules you author carry your name in the `Approved by` field of the rule header. If a rule you contributed is cited in a buyer diligence review or a customer compliance report, you will be acknowledged.
+Rules you author carry your name in the `Approved by` field of the rule header. If a rule you contributed is cited in a compliance audit or customer compliance report, you will be acknowledged.
 
 ---
 
