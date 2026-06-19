@@ -114,7 +114,7 @@ SCENARIOS = [
             "decision for EU retail banking."
         ),
         "note": (
-            "THE MONEY SHOT — CE Bible: 'A bank AI makes credit decisions every hour "
+            "THE MONEY SHOT — EU AI Act Art 5: 'A bank AI makes credit decisions every hour "
             "— each one a potential fair lending violation.' Art 5(1)(c). "
             "Already law since Feb 2 2025. No deadline to wait for."
         ),
