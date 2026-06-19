@@ -259,7 +259,7 @@ Aggregators must still include a header comment that lists which rules they aggr
 
 ### 6.1 The 30-Minute Test
 
-The target: **a compliance lawyer at Check Point, Proofpoint, or CrowdStrike reads this document and 3 sample rules, and in 30 minutes concludes: "this corpus would take 18 months to replicate, not 3."**
+The target: **a compliance lawyer reviewing this document and 3 sample rules concludes in 30 minutes: "this corpus would take 18 months to replicate, not 3."**
 
 That assessment is driven by:
 
