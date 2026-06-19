@@ -236,7 +236,7 @@ Authorized by: Leo Celis on 2026-05-16
 Approved by: Leo Celis on 2026-05-16 (via §5.5 agent-delegated review)
 ```
 
-This format is honest for DD: an acquirer's lawyer asking "did you personally read the legal text?" gets the truthful answer "the agent read it, quoted it verbatim in the commit, and I verified the quotes match the OJ; I accept accountability for the result." The audit trail records exactly who did what.
+This format is honest for due diligence: a compliance reviewer asking "did you personally read the legal text?" gets the truthful answer "the agent read it, quoted it verbatim in the commit, and I verified the quotes match the OJ; I accept accountability for the result." The audit trail records exactly who did what.
 
 **Agent-delegated review is appropriate for:** retroactive sign-offs on pre-standard rules; bulk reviews where mechanical thoroughness exceeds human bandwidth.
 
@@ -294,7 +294,7 @@ The ComplyEdge rule structure follows the operationalization hierarchy from ETSI
 | **Evidence** | Test cases + OPA evaluation output |
 | **Conformity Statement** | The `result` object returned by OPA |
 
-This alignment is intentional. Buyers familiar with EU conformity assessment standards will recognize the structure immediately.
+This alignment is intentional. Reviewers familiar with EU conformity assessment standards will recognize the structure immediately.
 
 ---
 
