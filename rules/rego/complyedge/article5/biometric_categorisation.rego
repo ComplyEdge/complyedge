@@ -10,8 +10,8 @@
 # Penalty: up to €35M or 7% of global revenue
 # Condition type: deterministic
 # Enforcement layer: layer1
-# Status: approved
-# Approved by: Leo Celis on 2026-05-10
+# Status: pending re-approval (RULE_STANDARD §5, card 195 / OjYUbBqr)
+# Approved by: Leo Celis on 2026-05-10 (carve-out exceptions added by agent 2026-06-05 — pending Leo re-sign-off per RULE_STANDARD §5; engine behaviour is forward-compatible: the exception only fires when the caller asserts the matching input fields, which today's `/v1/check` does not yet plumb through — see follow-up card)
 
 package complyedge.article5.biometric_categorisation
 
@@ -22,6 +22,24 @@ default violation := false
 violation if {
 	input.jurisdiction == "EU"
 	biometric_pattern_match
+	not law_enforcement_exception
+	not dataset_operation_exception
+}
+
+# Article 5(1)(g) OJ carve-out (card 195): the prohibition does NOT cover
+# categorizing of biometric data in the area of law enforcement when the
+# caller asserts a lawful basis. Both `use_case` and `lawful_basis` must
+# be present in the input for the exception to fire.
+law_enforcement_exception if {
+	input.use_case == "law_enforcement"
+	input.lawful_basis == true
+}
+
+# Article 5(1)(g) OJ carve-out (card 195): dataset *labelling* and
+# *filtering* of lawfully acquired biometric datasets is excluded — that
+# is data preparation, not categorisation of natural persons.
+dataset_operation_exception if {
+	input.dataset_operation in {"labelling", "filtering"}
 }
 
 biometric_pattern_match if {
@@ -41,7 +59,7 @@ biometric_pattern_match if {
 
 rule_id := "rego-art5-1g-001"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(g): Prohibits biometric categorisation systems that categorise natural persons based on their biometric data to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation."
+citation := "Regulation (EU) 2024/1689, Article 5(1)(g): Prohibits biometric categorisation systems that categorise natural persons based on their biometric data to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation. Exception per OJ text: this prohibition does not cover labelling or filtering of lawfully acquired biometric datasets, or categorizing of biometric data in the area of law enforcement (subject to a lawful basis)."
 
 severity := "critical"
 

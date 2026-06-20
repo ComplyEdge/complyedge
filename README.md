@@ -146,6 +146,9 @@ Apache License 2.0 — see [LICENSE](LICENSE).
 ## Links
 
 - **Website**: [complyedge.io](https://complyedge.io)
+- **Blog**: [complyedge.io/blog/](https://complyedge.io/blog/)
+- **GPAI Compliance Benchmark**: [complyedge.io/blog/gpai-compliance-benchmark.html](https://complyedge.io/blog/gpai-compliance-benchmark.html)
+- **Why OPA/Rego for EU AI Act**: [complyedge.io/blog/why-opa-rego-eu-ai-act.html](https://complyedge.io/blog/why-opa-rego-eu-ai-act.html)
 - **PyPI**: [pypi.org/project/complyedge](https://pypi.org/project/complyedge/)
 - **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 - **Rule Schema**: [rules/schemas/rule-schema.json](rules/schemas/rule-schema.json)
