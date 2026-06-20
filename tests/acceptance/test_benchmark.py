@@ -75,24 +75,26 @@ class TestBenchmarkIntegrity:
         rate = benchmark["aggregate"]["false_positive_rate_safe_harbor"]
         assert rate == 0.0, f"False-positive rate on safe harbor should be 0.0, got {rate}"
 
-    def test_aggregate_latency_p50_under_80ms(self, results):
-        # Claim: OPA fast-path hits land in 38–100ms (median 62ms, n=14) — blog OPA-only subset
-        opa_latencies = [
-            r["api_latency_ms"] for r in results
-            if r.get("engine_path") == "opa" and r.get("api_latency_ms") is not None
+    def test_opa_fast_path_latency_median_under_100ms(self, results):
+        # Claim: true OPA fast-path blocks land in 38–100ms (median 62ms, n=14)
+        blocked_opa = [
+            r for r in results
+            if r.get("engine_path") == "opa" and r.get("actual") == "block"
         ]
-        assert len(opa_latencies) >= 14, f"Expected ≥14 OPA-path latency samples, got {len(opa_latencies)}"
-        p50 = statistics.median(opa_latencies)
-        assert p50 <= 100, f"OPA-path median API latency should be ≤100ms, got {p50}ms"
+        latencies = [r["api_latency_ms"] for r in blocked_opa if r.get("api_latency_ms") is not None]
+        assert len(latencies) == 14, f"Expected 14 OPA fast-path blocks, got {len(latencies)}"
+        p50 = statistics.median(latencies)
+        assert p50 <= 100, f"OPA fast-path median API latency should be ≤100ms, got {p50}ms"
 
-    def test_aggregate_latency_p99_under_150ms(self, results):
-        opa_latencies = [
-            r["api_latency_ms"] for r in results
-            if r.get("engine_path") == "opa" and r.get("api_latency_ms") is not None
+    def test_opa_fast_path_latency_p99_under_150ms(self, results):
+        blocked_opa = [
+            r for r in results
+            if r.get("engine_path") == "opa" and r.get("actual") == "block"
         ]
-        assert len(opa_latencies) >= 14
-        p99 = statistics.quantiles(opa_latencies, n=100)[98]
-        assert p99 <= 150, f"OPA-path p99 API latency should be ≤150ms, got {p99}ms"
+        latencies = [r["api_latency_ms"] for r in blocked_opa if r.get("api_latency_ms") is not None]
+        assert len(latencies) == 14
+        p99 = statistics.quantiles(latencies, n=100)[98]
+        assert p99 <= 150, f"OPA fast-path p99 API latency should be ≤150ms, got {p99}ms"
 
 
 class TestSafeHarbor:
@@ -134,39 +136,42 @@ class TestCategoryPassRates:
       Edge cases  | 4/7   — One prompt transport error in hybrid run
       US corpus   | 0/10  — All require use_semantic_fallback=True
 
-    Layer 1 counts only prompts where engine_path == "opa".
+    Layer 1 = prompts in category correctly handled on the OPA path, over category size.
+    Example: Article 5 → 5/10 (5 on OPA path, all passed; 5 routed to Layer 2).
     """
 
     @staticmethod
-    def _opa_passed(results, category: str) -> tuple[int, int]:
-        rows = [r for r in results if r["category"] == category and r.get("engine_path") == "opa"]
-        passed = sum(1 for r in rows if r["passed"])
-        return passed, len(rows)
+    def _layer1_passed(results, category: str) -> tuple[int, int]:
+        cat_rows = [r for r in results if r["category"] == category]
+        opa_pass = sum(
+            1 for r in cat_rows if r.get("engine_path") == "opa" and r["passed"]
+        )
+        return opa_pass, len(cat_rows)
 
     def test_article5_layer1_pass_rate(self, results):
-        passed, total = self._opa_passed(results, "article5")
-        assert total == 10, f"Expected 10 Article 5 prompts on OPA path, found {total}"
+        passed, total = self._layer1_passed(results, "article5")
+        assert total == 10, f"Expected 10 Article 5 prompts, found {total}"
         assert passed == 5, f"Expected Article 5 Layer 1 pass = 5/10, got {passed}/10"
 
     def test_article50_layer1_pass_rate(self, results):
-        passed, total = self._opa_passed(results, "article50")
-        assert total == 8, f"Expected 8 Article 50 prompts on OPA path, found {total}"
+        passed, total = self._layer1_passed(results, "article50")
+        assert total == 8, f"Expected 8 Article 50 prompts, found {total}"
         assert passed == 4, f"Expected Article 50 Layer 1 pass = 4/8, got {passed}/8"
 
     def test_gpai_layer1_pass_rate(self, results):
-        passed, total = self._opa_passed(results, "gpai")
-        assert total == 5, f"Expected 5 GPAI prompts on OPA path, found {total}"
+        passed, total = self._layer1_passed(results, "gpai")
+        assert total == 5, f"Expected 5 GPAI prompts, found {total}"
         assert passed == 4, f"Expected GPAI Layer 1 pass = 4/5, got {passed}/4"
 
     def test_edge_layer1_pass_rate(self, results):
-        passed, total = self._opa_passed(results, "edge")
-        assert total == 7, f"Expected 7 edge prompts on OPA path, found {total}"
+        passed, total = self._layer1_passed(results, "edge")
+        assert total == 7, f"Expected 7 edge prompts, found {total}"
         assert passed == 4, f"Expected edge Layer 1 pass = 4/7, got {passed}/7"
 
     def test_us_corpus_layer1_pass_rate(self, results):
-        passed, total = self._opa_passed(results, "us_corpus")
-        assert total == 0, f"Expected 0 US corpus prompts on OPA path, found {total}"
-        assert passed == 0, f"Expected US corpus Layer 1 pass = 0/0, got {passed}"
+        passed, total = self._layer1_passed(results, "us_corpus")
+        assert total == 10, f"Expected 10 US corpus prompts, found {total}"
+        assert passed == 0, f"Expected US corpus Layer 1 pass = 0/10, got {passed}/10"
 
 
 class TestUsCorpus:
