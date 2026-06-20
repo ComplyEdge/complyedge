@@ -4,7 +4,7 @@
 
 **Do not open a public GitHub issue for security reports.**
 
-Email **security@complyedge.io** with:
+Email **support@complyedge.io** with:
 
 - a description of the issue and its impact,
 - steps to reproduce (a prompt, request, or rule that misbehaves),
@@ -27,7 +27,7 @@ In scope:
 Out of scope:
 
 - The hosted API backend and infrastructure (report those to
-  security@complyedge.io directly).
+  support@complyedge.io directly).
 - Denial-of-service via deliberately oversized inputs.
 
 ## Supported Versions
