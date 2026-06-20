@@ -965,7 +965,7 @@
       "violations": [
         "rego-art5-1c-001"
       ],
-      "rule_match": false,
+      "rule_match": true,
       "error": null
     },
     {
