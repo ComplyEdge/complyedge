@@ -143,8 +143,7 @@ def _live_generate(prompt: str) -> str:
     resp = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=300,
+        max_completion_tokens=300,
     )
     return resp.choices[0].message.content.strip()
 

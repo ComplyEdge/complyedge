@@ -117,6 +117,68 @@ test_vulnerability_allows_normal_text if {
 	}
 }
 
+# Article 5(1)(b) social-situation axis tests (card 194 — agent-added 2026-06-06).
+# Covers refugees, migrants, asylum-seekers, displaced people, the homeless,
+# the undocumented — across the four verbs in the new pattern.
+
+test_vulnerability_blocks_exploiting_refugees if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "AI to exploit refugees with predatory housing offers",
+	}
+}
+
+test_vulnerability_blocks_targeting_migrants if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Campaign to target migrant workers with high-interest payday loans",
+	}
+}
+
+test_vulnerability_blocks_predatory_homeless if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Predatory pricing aimed at homeless individuals seeking shelter",
+	}
+}
+
+test_vulnerability_blocks_manipulat_asylum_seekers if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "AI to manipulate asylum seekers into unfavorable agreements",
+	}
+}
+
+test_vulnerability_blocks_exploiting_undocumented if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Tool to exploit undocumented immigrants in labour negotiations",
+	}
+}
+
+test_vulnerability_blocks_targeting_displaced if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Target displaced families with deceptive subscription offers",
+	}
+}
+
+test_vulnerability_existing_age_patterns_still_fire if {
+	# Regression guard: the original age / disability patterns must keep
+	# matching after the social-situation axis was added.
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Exploit elderly users with aggressive upselling",
+	}
+}
+
+test_vulnerability_social_situation_axis_allows_non_eu if {
+	not vulnerability_exploitation.violation with input as {
+		"jurisdiction": "US",
+		"text": "AI to exploit refugees with predatory housing offers",
+	}
+}
+
 # ============================================================
 # Biometric Categorisation — Article 5(1)(g)
 # ============================================================
@@ -146,6 +208,54 @@ test_biometric_allows_normal_text if {
 	not biometric_categorisation.violation with input as {
 		"jurisdiction": "EU",
 		"text": "Biometric authentication for secure login using fingerprint",
+	}
+}
+
+# Article 5(1)(g) OJ carve-out tests (card 195 — agent-added 2026-06-05).
+# The base prohibition still fires when no exception flags are set; the
+# exception only kicks in when the caller asserts the matching input
+# fields.
+
+test_biometric_law_enforcement_exception_no_violation if {
+	not biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+	}
+}
+
+test_biometric_law_enforcement_without_lawful_basis_still_violates if {
+	# LE use case alone is NOT sufficient — `lawful_basis: true` is required.
+	biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+	}
+}
+
+test_biometric_dataset_labelling_exception_no_violation if {
+	not biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation across our lawfully acquired image corpus",
+		"dataset_operation": "labelling",
+	}
+}
+
+test_biometric_dataset_filtering_exception_no_violation if {
+	not biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Use biometric categorisation to infer race for dataset cleaning",
+		"dataset_operation": "filtering",
+	}
+}
+
+test_biometric_base_prohibition_still_fires_when_no_exception_set if {
+	# Regression guard: existing prohibition path must keep working when
+	# the new optional input fields are absent.
+	biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Use biometric categorisation to infer political opinions of users",
 	}
 }
 

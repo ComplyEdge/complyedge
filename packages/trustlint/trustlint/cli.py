@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import Optional
@@ -9,7 +10,7 @@ from typing import Optional
 import click
 
 from trustlint import __version__
-from trustlint.engine import TrustLintEngine, LintResult
+from trustlint.engine import TrustLintEngine, LintResult, Violation
 
 
 # ANSI colors
@@ -27,6 +28,54 @@ SEVERITY_COLORS = {
     "medium": YELLOW,
     "low": DIM,
 }
+
+# Ordering used by --severity-threshold (card 225): a threshold of `T`
+# means exit 1 when any violation has severity at-or-above `T`. Default
+# is `high` because that matches today's `LintResult.has_critical` semantics
+# (which fires on critical OR high). Lowering to `medium` or `low` makes
+# the gate stricter; raising to `critical` makes it permissive of `high`s.
+SEVERITY_ORDER = {"critical": 3, "high": 2, "medium": 1, "low": 0}
+
+
+def _meets_threshold(severity: str, threshold: str) -> bool:
+    """Return True if `severity` is at-or-above `threshold`.
+
+    Unknown severities are treated as below all thresholds (don't trigger
+    exit 1) so a malformed rule can never escalate the gate by accident.
+    """
+    s = SEVERITY_ORDER.get(severity)
+    t = SEVERITY_ORDER.get(threshold)
+    if s is None or t is None:
+        return False
+    return s >= t
+
+
+def _violation_to_dict(v: Violation) -> dict:
+    return {
+        "rule_id": v.rule_id,
+        "title": v.title,
+        "severity": v.severity,
+        "jurisdiction": v.jurisdiction,
+        "description": v.description,
+        "citation": v.citation,
+        "pattern_matched": v.pattern_matched,
+        "remediation": v.remediation,
+    }
+
+
+def _emit_json(result: LintResult, file_path: Optional[str]) -> None:
+    """Emit machine-parseable JSON for `trustlint check --json` (card 225)."""
+    summary = {sev: 0 for sev in ("critical", "high", "medium", "low")}
+    for v in result.violations:
+        if v.severity in summary:
+            summary[v.severity] += 1
+    payload = {
+        "file": file_path,
+        "rules_evaluated": result.rules_evaluated,
+        "violations": [_violation_to_dict(v) for v in result.violations],
+        "summary": summary,
+    }
+    click.echo(json.dumps(payload))
 
 
 def _print_result(result: LintResult, verbose: bool = False) -> None:
@@ -77,9 +126,34 @@ def cli(ctx: click.Context, rules_dir: Optional[str]) -> None:
 @click.option("--text", "-t", help="Text string to check (instead of a file)")
 @click.option("--jurisdiction", "-j", help="Filter rules by jurisdiction (EU, US, GLOBAL)")
 @click.option("--verbose", "-v", is_flag=True, help="Show citations and remediation")
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Emit machine-parseable JSON instead of the human-readable report (card 225).",
+)
+@click.option(
+    "--severity-threshold",
+    type=click.Choice(["critical", "high", "medium", "low"], case_sensitive=False),
+    default="high",
+    show_default=True,
+    help=(
+        "Minimum severity that causes the command to exit 1. Below this, "
+        "violations are still reported but the exit code stays 0. Default "
+        "'high' preserves the prior behaviour (LintResult.has_critical "
+        "fires on critical OR high). Card 225."
+    ),
+)
 @click.pass_context
-def check(ctx: click.Context, target: Optional[str], text: Optional[str],
-          jurisdiction: Optional[str], verbose: bool) -> None:
+def check(
+    ctx: click.Context,
+    target: Optional[str],
+    text: Optional[str],
+    jurisdiction: Optional[str],
+    verbose: bool,
+    json_output: bool,
+    severity_threshold: str,
+) -> None:
     """Check text or file for compliance violations.
 
     Examples:
@@ -89,6 +163,8 @@ def check(ctx: click.Context, target: Optional[str], text: Optional[str],
       trustlint check prompt.txt
 
       trustlint check --text "social credit score" --jurisdiction EU
+
+      trustlint check prompt.txt --json --severity-threshold critical
     """
     engine = TrustLintEngine(rules_dir=ctx.obj.get("rules_dir"))
 
@@ -111,9 +187,14 @@ def check(ctx: click.Context, target: Optional[str], text: Optional[str],
         sys.exit(2)
 
     result = engine.check(input_text, jurisdiction=jurisdiction)
-    _print_result(result, verbose=verbose)
 
-    if result.has_critical:
+    if json_output:
+        _emit_json(result, file_path=target)
+    else:
+        _print_result(result, verbose=verbose)
+
+    threshold = severity_threshold.lower()
+    if any(_meets_threshold(v.severity, threshold) for v in result.violations):
         sys.exit(1)
 
 
