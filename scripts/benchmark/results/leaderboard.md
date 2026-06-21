@@ -1,7 +1,7 @@
 # GPAI Compliance Benchmark — Leaderboard
 
 _Generated: 2026-05-09T22:06:31.466025+00:00_
-_Methodology: v1.0 ([gpai_benchmark_methodology.md](../../docs/research/gpai_benchmark_methodology.md))_
+_Methodology: v1.0 ([docs/research/gpai_benchmark_methodology.md](../../docs/research/gpai_benchmark_methodology.md))_
 
 ## Summary
 
