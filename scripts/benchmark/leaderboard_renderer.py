@@ -4,7 +4,8 @@ Reads benchmark_runner JSON output and produces a Markdown leaderboard.
 
 Usage:
     python scripts/benchmark/leaderboard_renderer.py \
-        --input scripts/benchmark/results/benchmark_latest.json
+        --input scripts/benchmark/results/benchmark_latest.json \
+        --markdown scripts/benchmark/results/leaderboard.md
 """
 
 from __future__ import annotations
@@ -12,8 +13,6 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-
-LIMITLESS_CE = Path("limitless/docs/research/ventures/complyedge")
 
 OBLIGATION_LABELS = {
     "art_50_2_content_disclosure": "Art 50(2) Disclosure",
@@ -31,32 +30,15 @@ def cell(score_obj: dict) -> str:
     return str(score_obj["score"])
 
 
-def _limitless_ce_root(repo_root: Path) -> Path | None:
-    candidate = repo_root.parent.parent / LIMITLESS_CE
-    return candidate if candidate.is_dir() else None
-
-
-def _default_markdown_path(repo_root: Path) -> Path:
-    limitless_root = _limitless_ce_root(repo_root)
-    if limitless_root:
-        return limitless_root / "benchmark/leaderboard.md"
-    return repo_root / "scripts/benchmark/results/leaderboard.md"
-
-
-def _methodology_href(output_path: Path) -> str:
-    if "limitless" in output_path.parts:
-        return "../gpai_benchmark_methodology.md"
-    return "../../docs/research/gpai_benchmark_methodology.md"
-
-
-def render_markdown(data: dict, output_path: Path) -> str:
+def render_markdown(data: dict) -> str:
     lines: list[str] = []
     lines.append("# GPAI Compliance Benchmark — Leaderboard")
     lines.append("")
     lines.append(f"_Generated: {data['generated_at']}_")
     lines.append(
         f"_Methodology: v{data['methodology_version']} "
-        f"([gpai_benchmark_methodology.md]({_methodology_href(output_path)}))_"
+        f"([docs/research/gpai_benchmark_methodology.md]"
+        f"(../../docs/research/gpai_benchmark_methodology.md))_"
     )
     lines.append("")
 
@@ -142,14 +124,14 @@ def main() -> None:
     parser.add_argument(
         "--markdown",
         type=Path,
-        default=_default_markdown_path(repo_root),
+        default=repo_root / "scripts/benchmark/results/leaderboard.md",
     )
     args = parser.parse_args()
 
     with args.input.open() as f:
         data = json.load(f)
 
-    markdown = render_markdown(data, args.markdown)
+    markdown = render_markdown(data)
     args.markdown.parent.mkdir(parents=True, exist_ok=True)
     args.markdown.write_text(markdown)
     print(f"Rendered {len(data['scored_providers'])} providers to {args.markdown}")

@@ -4,7 +4,7 @@ This directory holds the YAML rule corpus for **prompt-security / IPI detection*
 
 ## Methodology
 
-- Canonical IPI methodology: `limitless/docs/research/ventures/complyedge/ipi-conformity-assessment.md`. Read that before authoring a new rule in this directory.
+The conformity-assessment methodology, the four IPI sub-categories CE tests, and the Layer-1-vs-Layer-2 division of responsibility are documented in **[`docs/security-compliance/ipi-conformity-assessment.md`](../../../../docs/security-compliance/ipi-conformity-assessment.md)**. Read that before authoring a new rule in this directory.
 
 ## Naming convention
 
