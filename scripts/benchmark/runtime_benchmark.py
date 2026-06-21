@@ -19,7 +19,7 @@ Usage:
 Outputs:
     - Terminal: per-category color-coded summary
     - JSON: scripts/benchmark/results/runtime_benchmark_latest.json
-    - Badge: limitless/docs/research/ventures/complyedge/benchmark/runtime_badge.md
+    - Badge: scripts/benchmark/results/runtime_badge.md (or limitless/…/benchmark/ in monorepo)
 
 Constraints (see runtime_benchmark_intent.yaml):
     C1 targets live API via HTTP only.
@@ -53,14 +53,17 @@ import httpx
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-WORKSPACE_ROOT = REPO_ROOT.parent.parent
 PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 LATEST_JSON = RESULTS_DIR / "runtime_benchmark_latest.json"
-BADGE_MD = (
-    WORKSPACE_ROOT
-    / "limitless/docs/research/ventures/complyedge/benchmark/runtime_badge.md"
-)
+LIMITLESS_CE = Path("limitless/docs/research/ventures/complyedge")
+
+
+def _badge_path(repo_root: Path) -> Path:
+    limitless_root = repo_root.parent.parent / LIMITLESS_CE
+    if limitless_root.is_dir():
+        return limitless_root / "benchmark/runtime_badge.md"
+    return RESULTS_DIR / "runtime_badge.md"
 
 CATEGORY_FILES = {
     "article5": "article5.yaml",
@@ -385,8 +388,9 @@ def write_badge(summary: dict[str, Any]) -> None:
     rate = summary["aggregate"]["detection_rate_blocked_categories"]
     color = "brightgreen" if rate >= 85 else ("yellow" if rate >= 70 else "red")
     badge_url = f"https://img.shields.io/badge/detection-{rate}%25-{color}"
-    BADGE_MD.parent.mkdir(parents=True, exist_ok=True)
-    BADGE_MD.write_text(
+    badge_path = _badge_path(REPO_ROOT)
+    badge_path.parent.mkdir(parents=True, exist_ok=True)
+    badge_path.write_text(
         f"![Detection Rate]({badge_url})\n\n"
         f"_GPAI Runtime Benchmark · {summary['aggregate']['total_prompts']} prompts · "
         f"{summary['timestamp']}_\n"
