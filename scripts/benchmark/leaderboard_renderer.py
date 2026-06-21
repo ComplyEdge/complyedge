@@ -5,7 +5,7 @@ Reads benchmark_runner JSON output and produces a Markdown leaderboard.
 Usage:
     python scripts/benchmark/leaderboard_renderer.py \
         --input scripts/benchmark/results/benchmark_latest.json \
-        --markdown scripts/benchmark/results/leaderboard.md
+        --markdown limitless/docs/research/ventures/complyedge/benchmark/leaderboard.md
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ def render_markdown(data: dict) -> str:
     lines.append("")
     lines.append(f"_Generated: {data['generated_at']}_")
     lines.append(f"_Methodology: v{data['methodology_version']} "
-                 f"([docs/research/gpai_benchmark_methodology.md](../../docs/research/gpai_benchmark_methodology.md))_")
+                 f"([gpai_benchmark_methodology.md](../gpai_benchmark_methodology.md))_")
     lines.append("")
 
     s = data["summary"]
@@ -110,6 +110,14 @@ def render_markdown(data: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _default_markdown_path(repo_root: Path) -> Path:
+    workspace_root = repo_root.parent.parent
+    return (
+        workspace_root
+        / "limitless/docs/research/ventures/complyedge/benchmark/leaderboard.md"
+    )
+
+
 def main() -> None:
     repo_root = Path(__file__).resolve().parent.parent.parent
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
@@ -121,7 +129,7 @@ def main() -> None:
     parser.add_argument(
         "--markdown",
         type=Path,
-        default=repo_root / "scripts/benchmark/results/leaderboard.md",
+        default=_default_markdown_path(repo_root),
     )
     args = parser.parse_args()
 
