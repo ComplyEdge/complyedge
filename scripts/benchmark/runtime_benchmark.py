@@ -5,7 +5,7 @@ GPAI Runtime Detection Benchmark
 
 Hits the live CE /v1/check API with 50 standardized prompts across 6
 categories. Reports detection rate, false-positive rate, p50/p95/p99
-latency. Demo centerpiece for acquisition conversations.
+latency.
 
 Sister tool to scripts/benchmark/benchmark_runner.py (which audits provider
 documentation completeness). This one audits CE engine performance.
