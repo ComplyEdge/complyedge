@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 # Note: Models and clients are defined in __init__.py
 def _import_models():
     """Import models after module initialization to avoid circular imports."""
-    from . import ComplianceResult, ComplyEdge, ComplianceError
+    from . import ComplianceError, ComplianceResult, ComplyEdge
     return ComplianceResult, ComplyEdge, ComplianceError
 
 logger = logging.getLogger(__name__)

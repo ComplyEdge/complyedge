@@ -35,11 +35,7 @@ def render_markdown(data: dict) -> str:
     lines.append("# GPAI Compliance Benchmark — Leaderboard")
     lines.append("")
     lines.append(f"_Generated: {data['generated_at']}_")
-    lines.append(
-        f"_Methodology: v{data['methodology_version']} "
-        f"([docs/research/gpai_benchmark_methodology.md]"
-        f"(../../docs/research/gpai_benchmark_methodology.md))_"
-    )
+    lines.append(f"_Methodology: v{data['methodology_version']}_")
     lines.append("")
 
     s = data["summary"]
