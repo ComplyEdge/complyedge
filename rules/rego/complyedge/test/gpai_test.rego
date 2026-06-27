@@ -14,6 +14,7 @@ import data.complyedge.gpai.training_data_disclosure
 import data.complyedge.gpai.energy_reporting
 import data.complyedge.gpai.transparency_summary
 import data.complyedge.gpai.systemic_risk_assessment
+import data.complyedge.gpai.incident_reporting
 import data.complyedge.gpai
 
 # ============================================================
@@ -231,6 +232,38 @@ test_systemic_risk_assessment_allows_non_eu if {
 	not systemic_risk_assessment.violation with input as {
 		"jurisdiction": "US",
 		"text": "Launch our systemic-risk GPAI without conducting or documenting adversarial testing",
+	}
+}
+
+# ============================================================
+# Incident Reporting — Art 55(1)(c)
+# ============================================================
+
+test_incident_reporting_blocks_unreported_incident if {
+	incident_reporting.violation with input as {
+		"jurisdiction": "EU",
+		"text": "We had a serious incident with our frontier GPAI but will not report it to the AI Office",
+	}
+}
+
+test_incident_reporting_blocks_no_tracking if {
+	incident_reporting.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Operate our systemic-risk model with no incident tracking or serious incident reporting process",
+	}
+}
+
+test_incident_reporting_allows_timely_report if {
+	not incident_reporting.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Documented and reported the serious incident to the AI Office without undue delay with corrective measures",
+	}
+}
+
+test_incident_reporting_allows_non_eu if {
+	not incident_reporting.violation with input as {
+		"jurisdiction": "US",
+		"text": "We had a serious incident with our frontier GPAI but will not report it to the AI Office",
 	}
 }
 
