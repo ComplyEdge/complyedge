@@ -12,6 +12,7 @@ import data.complyedge.gpai.systemic_risk
 import data.complyedge.gpai.downstream_obligations
 import data.complyedge.gpai.training_data_disclosure
 import data.complyedge.gpai.energy_reporting
+import data.complyedge.gpai.transparency_summary
 import data.complyedge.gpai
 
 # ============================================================
@@ -165,6 +166,38 @@ test_energy_reporting_allows_non_eu if {
 	not energy_reporting.violation with input as {
 		"jurisdiction": "US",
 		"text": "Deploy our GPAI model with no energy consumption reporting or computational resources documented",
+	}
+}
+
+# ============================================================
+# Transparency Summary — Art 52 notification procedure
+# ============================================================
+
+test_transparency_summary_blocks_no_ai_office_notification if {
+	transparency_summary.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Release the frontier GPAI API publicly without notifying the AI Office within two weeks",
+	}
+}
+
+test_transparency_summary_blocks_skipped_art52 if {
+	transparency_summary.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Skip Article 52 Commission notification after crossing the 10^25 FLOPs threshold",
+	}
+}
+
+test_transparency_summary_allows_timely_notification if {
+	not transparency_summary.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Notified the Commission within two weeks of meeting the Article 51 threshold",
+	}
+}
+
+test_transparency_summary_allows_non_eu if {
+	not transparency_summary.violation with input as {
+		"jurisdiction": "US",
+		"text": "Release the frontier GPAI API publicly without notifying the AI Office within two weeks",
 	}
 }
 
