@@ -17,6 +17,7 @@ import data.complyedge.gpai.systemic_risk_assessment
 import data.complyedge.gpai.incident_reporting
 import data.complyedge.gpai.cybersecurity_measures
 import data.complyedge.gpai.provider_cooperation
+import data.complyedge.gpai.systemic_risk_mitigation
 import data.complyedge.gpai
 
 # ============================================================
@@ -330,6 +331,38 @@ test_provider_cooperation_allows_non_eu if {
 	not provider_cooperation.violation with input as {
 		"jurisdiction": "US",
 		"text": "GPAI provider will refuse to cooperate with the AI Office and deny model access upon authority request",
+	}
+}
+
+# ============================================================
+# Systemic Risk Mitigation — Article 55(1)(b)
+# ============================================================
+
+test_systemic_risk_mitigation_blocks_unmitigated if {
+	systemic_risk_mitigation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Launch frontier GPAI with unmitigated systemic risk and no Union-level assessment",
+	}
+}
+
+test_systemic_risk_mitigation_blocks_skipped if {
+	systemic_risk_mitigation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Skip systemic risk mitigation before placing systemic-risk model on market",
+	}
+}
+
+test_systemic_risk_mitigation_allows_mitigated if {
+	not systemic_risk_mitigation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Union-level systemic risk assessed and mitigated for systemic-risk GPAI deployment",
+	}
+}
+
+test_systemic_risk_mitigation_allows_non_eu if {
+	not systemic_risk_mitigation.violation with input as {
+		"jurisdiction": "US",
+		"text": "Launch frontier GPAI with unmitigated systemic risk and no Union-level assessment",
 	}
 }
 
