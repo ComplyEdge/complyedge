@@ -10,6 +10,7 @@ import data.complyedge.gpai.copyright_transparency
 import data.complyedge.gpai.technical_documentation
 import data.complyedge.gpai.systemic_risk
 import data.complyedge.gpai.downstream_obligations
+import data.complyedge.gpai.training_data_disclosure
 import data.complyedge.gpai
 
 # ============================================================
@@ -99,6 +100,38 @@ test_downstream_obligations_allows_normal_text if {
 	not downstream_obligations.violation with input as {
 		"jurisdiction": "EU",
 		"text": "Full integration guide and API documentation provided to all partners",
+	}
+}
+
+# ============================================================
+# Training Data Disclosure — Article 53(1)(d)
+# ============================================================
+
+test_training_data_disclosure_blocks_unpublished_summary if {
+	training_data_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Release our foundation model in the EU without publishing a training data summary",
+	}
+}
+
+test_training_data_disclosure_blocks_withheld_sources if {
+	training_data_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "We will withhold training corpus disclosure details from the public",
+	}
+}
+
+test_training_data_disclosure_allows_published_summary if {
+	not training_data_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Published a sufficiently detailed training content summary using the AI Office template",
+	}
+}
+
+test_training_data_disclosure_allows_non_eu if {
+	not training_data_disclosure.violation with input as {
+		"jurisdiction": "US",
+		"text": "Release our foundation model in the EU without publishing a training data summary",
 	}
 }
 
