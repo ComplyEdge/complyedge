@@ -17,6 +17,7 @@
 #   - article5.emotion_recognition (Art 5(1)(f)) — approved by Leo Celis 2026-05-16 (agent review)
 #   - article5.predictive_policing (Art 5(1)(d)) — approved by Leo Celis 2026-05-16 (agent review)
 #   - article5.realtime_biometric (Art 5(1)(h)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - article5.biometric_exceptions (Art 5(1)(e)) — approved by Leo Celis 2026-06-27 (agent review)
 
 package complyedge.article5
 
@@ -29,6 +30,7 @@ import data.complyedge.article5.biometric_categorisation
 import data.complyedge.article5.emotion_recognition
 import data.complyedge.article5.predictive_policing
 import data.complyedge.article5.realtime_biometric
+import data.complyedge.article5.biometric_exceptions
 
 # True if ANY Article 5 sub-rule is violated
 default violation := false
@@ -40,6 +42,7 @@ violation if biometric_categorisation.violation
 violation if emotion_recognition.violation
 violation if predictive_policing.violation
 violation if realtime_biometric.violation
+violation if biometric_exceptions.violation
 
 # Collect all triggered violations into an array
 violations contains v if {
@@ -77,6 +80,11 @@ violations contains v if {
 	v := realtime_biometric.result
 }
 
+violations contains v if {
+	biometric_exceptions.violation
+	v := biometric_exceptions.result
+}
+
 # Summary result for the OPA client
 result := {
 	"violation": violation,
@@ -89,5 +97,6 @@ result := {
 		emotion_recognition.rule_id,
 		predictive_policing.rule_id,
 		realtime_biometric.rule_id,
+		biometric_exceptions.rule_id,
 	],
 }
