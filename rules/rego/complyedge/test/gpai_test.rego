@@ -15,6 +15,7 @@ import data.complyedge.gpai.energy_reporting
 import data.complyedge.gpai.transparency_summary
 import data.complyedge.gpai.systemic_risk_assessment
 import data.complyedge.gpai.incident_reporting
+import data.complyedge.gpai.cybersecurity_measures
 import data.complyedge.gpai
 
 # ============================================================
@@ -264,6 +265,38 @@ test_incident_reporting_allows_non_eu if {
 	not incident_reporting.violation with input as {
 		"jurisdiction": "US",
 		"text": "We had a serious incident with our frontier GPAI but will not report it to the AI Office",
+	}
+}
+
+# ============================================================
+# Cybersecurity Measures — Art 55(1)(d)
+# ============================================================
+
+test_cybersecurity_measures_blocks_no_protection if {
+	cybersecurity_measures.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Deploy our systemic-risk GPAI with no cybersecurity protection for model weights or physical infrastructure",
+	}
+}
+
+test_cybersecurity_measures_blocks_skipped_hardening if {
+	cybersecurity_measures.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Skip cybersecurity measures and leave the frontier model infrastructure unprotected",
+	}
+}
+
+test_cybersecurity_measures_allows_adequate_protection if {
+	not cybersecurity_measures.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Adequate cybersecurity protection implemented for the systemic-risk model and physical infrastructure",
+	}
+}
+
+test_cybersecurity_measures_allows_non_eu if {
+	not cybersecurity_measures.violation with input as {
+		"jurisdiction": "US",
+		"text": "Deploy our systemic-risk GPAI with no cybersecurity protection for model weights or physical infrastructure",
 	}
 }
 
