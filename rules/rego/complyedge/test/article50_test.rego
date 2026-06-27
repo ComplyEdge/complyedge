@@ -11,6 +11,7 @@ import data.complyedge.article50.chatbot_disclosure
 import data.complyedge.article50.deepfake_disclosure
 import data.complyedge.article50.emotion_recognition_disclosure
 import data.complyedge.article50.deepfake_audio
+import data.complyedge.article50.provider_transparency_tools
 import data.complyedge.article50
 
 # ============================================================
@@ -148,6 +149,38 @@ test_deepfake_audio_allows_non_eu if {
 	not deepfake_audio.violation with input as {
 		"jurisdiction": "US",
 		"text": "Clone the CEO voice for the earnings call audio without any disclosure or audio watermark",
+	}
+}
+
+# ============================================================
+# Provider Transparency Tools — Article 50(5)
+# ============================================================
+
+test_provider_transparency_tools_blocks_delayed_disclosure if {
+	provider_transparency_tools.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Hide AI chatbot disclosure until after the first interaction so users feel it is human",
+	}
+}
+
+test_provider_transparency_tools_blocks_no_detection_tools if {
+	provider_transparency_tools.violation with input as {
+		"jurisdiction": "EU",
+		"text": "GPAI provider ships synthetic content without detection tools or marking solutions available at first exposure",
+	}
+}
+
+test_provider_transparency_tools_allows_first_exposure if {
+	not provider_transparency_tools.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Clear distinguishable AI transparency notice at first interaction with accessible detection methods for marked content",
+	}
+}
+
+test_provider_transparency_tools_allows_non_eu if {
+	not provider_transparency_tools.violation with input as {
+		"jurisdiction": "US",
+		"text": "Hide AI chatbot disclosure until after the first interaction so users feel it is human",
 	}
 }
 

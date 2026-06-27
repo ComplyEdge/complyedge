@@ -16,6 +16,7 @@
 #   - article50.deepfake_disclosure (Art 50(4)) — approved by Leo Celis 2026-05-16 (agent review)
 #   - article50.emotion_recognition_disclosure (Art 50(3)) — approved Leo Celis 2026-06-27
 #   - article50.deepfake_audio (Art 50(4)) — approved Leo Celis 2026-06-27
+#   - article50.provider_transparency_tools (Art 50(5)) — approved Leo Celis 2026-06-27
 
 package complyedge.article50
 
@@ -27,6 +28,7 @@ import data.complyedge.article50.chatbot_disclosure
 import data.complyedge.article50.deepfake_disclosure
 import data.complyedge.article50.emotion_recognition_disclosure
 import data.complyedge.article50.deepfake_audio
+import data.complyedge.article50.provider_transparency_tools
 
 # True if ANY Article 50 sub-rule is violated
 default violation := false
@@ -37,6 +39,7 @@ violation if chatbot_disclosure.violation
 violation if deepfake_disclosure.violation
 violation if emotion_recognition_disclosure.violation
 violation if deepfake_audio.violation
+violation if provider_transparency_tools.violation
 
 # Collect all triggered violations into an array
 violations contains v if {
@@ -69,6 +72,11 @@ violations contains v if {
 	v := deepfake_audio.result
 }
 
+violations contains v if {
+	provider_transparency_tools.violation
+	v := provider_transparency_tools.result
+}
+
 # Summary result for the OPA client
 result := {
 	"violation": violation,
@@ -80,5 +88,6 @@ result := {
 		deepfake_disclosure.rule_id,
 		emotion_recognition_disclosure.rule_id,
 		deepfake_audio.rule_id,
+		provider_transparency_tools.rule_id,
 	],
 }
