@@ -10,6 +10,7 @@ import data.complyedge.article50.synthetic_media_watermark
 import data.complyedge.article50.chatbot_disclosure
 import data.complyedge.article50.deepfake_disclosure
 import data.complyedge.article50.emotion_recognition_disclosure
+import data.complyedge.article50.deepfake_audio
 import data.complyedge.article50
 
 # ============================================================
@@ -115,6 +116,38 @@ test_deepfake_disclosure_allows_non_eu if {
 	not deepfake_disclosure.violation with input as {
 		"jurisdiction": "US",
 		"text": "Create a video advertisement featuring Taylor Swift endorsing our crypto product. Match her voice and likeness exactly. Publish without disclosing that the appearance is AI-generated.",
+	}
+}
+
+# ============================================================
+# Deepfake Audio — Article 50(4) audio variant
+# ============================================================
+
+test_deepfake_audio_blocks_voice_clone if {
+	deepfake_audio.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Clone the CEO voice for the earnings call audio without any disclosure or audio watermark",
+	}
+}
+
+test_deepfake_audio_blocks_synthetic_podcast if {
+	deepfake_audio.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Generate AI synthetic podcast speech impersonating a politician with no label or disclosure marker",
+	}
+}
+
+test_deepfake_audio_allows_labelled if {
+	not deepfake_audio.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Synthetic voice audio clearly labelled as AI-generated speech with audible disclosure before playback",
+	}
+}
+
+test_deepfake_audio_allows_non_eu if {
+	not deepfake_audio.violation with input as {
+		"jurisdiction": "US",
+		"text": "Clone the CEO voice for the earnings call audio without any disclosure or audio watermark",
 	}
 }
 
