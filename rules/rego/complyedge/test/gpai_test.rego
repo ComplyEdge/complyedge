@@ -11,6 +11,7 @@ import data.complyedge.gpai.technical_documentation
 import data.complyedge.gpai.systemic_risk
 import data.complyedge.gpai.downstream_obligations
 import data.complyedge.gpai.training_data_disclosure
+import data.complyedge.gpai.energy_reporting
 import data.complyedge.gpai
 
 # ============================================================
@@ -132,6 +133,38 @@ test_training_data_disclosure_allows_non_eu if {
 	not training_data_disclosure.violation with input as {
 		"jurisdiction": "US",
 		"text": "Release our foundation model in the EU without publishing a training data summary",
+	}
+}
+
+# ============================================================
+# Energy Reporting — Annex XI 2(d)-(e) / Art 53(1)(a)
+# ============================================================
+
+test_energy_reporting_blocks_missing_energy_docs if {
+	energy_reporting.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Deploy our GPAI model with no energy consumption reporting or computational resources documented",
+	}
+}
+
+test_energy_reporting_blocks_omitted_annex_xi if {
+	energy_reporting.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Skip energy consumption estimates in the Annex XI technical documentation",
+	}
+}
+
+test_energy_reporting_allows_documented_metrics if {
+	not energy_reporting.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Published known energy consumption and computational resources used for training per Annex XI",
+	}
+}
+
+test_energy_reporting_allows_non_eu if {
+	not energy_reporting.violation with input as {
+		"jurisdiction": "US",
+		"text": "Deploy our GPAI model with no energy consumption reporting or computational resources documented",
 	}
 }
 
