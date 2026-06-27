@@ -9,6 +9,7 @@ import data.complyedge.article50.gpai_content_disclosure
 import data.complyedge.article50.synthetic_media_watermark
 import data.complyedge.article50.chatbot_disclosure
 import data.complyedge.article50.deepfake_disclosure
+import data.complyedge.article50.emotion_recognition_disclosure
 import data.complyedge.article50
 
 # ============================================================
@@ -114,6 +115,38 @@ test_deepfake_disclosure_allows_non_eu if {
 	not deepfake_disclosure.violation with input as {
 		"jurisdiction": "US",
 		"text": "Create a video advertisement featuring Taylor Swift endorsing our crypto product. Match her voice and likeness exactly. Publish without disclosing that the appearance is AI-generated.",
+	}
+}
+
+# ============================================================
+# Emotion Recognition Disclosure — Article 50(3)
+# ============================================================
+
+test_emotion_recognition_disclosure_blocks_undisclosed if {
+	emotion_recognition_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Run emotion detection on retail store visitors via camera without disclosure or informing customers",
+	}
+}
+
+test_emotion_recognition_disclosure_blocks_covert if {
+	emotion_recognition_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Deploy covert emotion recognition monitoring with no notice to exposed persons",
+	}
+}
+
+test_emotion_recognition_disclosure_allows_disclosed if {
+	not emotion_recognition_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Emotion recognition system deployed with clear notice informing all visitors of system operation and GDPR-compliant processing",
+	}
+}
+
+test_emotion_recognition_disclosure_allows_non_eu if {
+	not emotion_recognition_disclosure.violation with input as {
+		"jurisdiction": "US",
+		"text": "Run emotion detection on retail store visitors via camera without disclosure or informing customers",
 	}
 }
 

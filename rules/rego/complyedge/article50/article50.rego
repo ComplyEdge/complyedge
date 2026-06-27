@@ -14,6 +14,7 @@
 #   - article50.gpai_content_disclosure (Art 50(2)) — approved by Leo Celis 2026-05-16 (agent review)
 #   - article50.synthetic_media_watermark (Art 50(2)) — approved by Leo Celis 2026-05-16 (agent review)
 #   - article50.deepfake_disclosure (Art 50(4)) — approved by Leo Celis 2026-05-16 (agent review)
+#   - article50.emotion_recognition_disclosure (Art 50(3)) — approved Leo Celis 2026-06-27
 
 package complyedge.article50
 
@@ -23,6 +24,7 @@ import data.complyedge.article50.gpai_content_disclosure
 import data.complyedge.article50.synthetic_media_watermark
 import data.complyedge.article50.chatbot_disclosure
 import data.complyedge.article50.deepfake_disclosure
+import data.complyedge.article50.emotion_recognition_disclosure
 
 # True if ANY Article 50 sub-rule is violated
 default violation := false
@@ -31,6 +33,7 @@ violation if gpai_content_disclosure.violation
 violation if synthetic_media_watermark.violation
 violation if chatbot_disclosure.violation
 violation if deepfake_disclosure.violation
+violation if emotion_recognition_disclosure.violation
 
 # Collect all triggered violations into an array
 violations contains v if {
@@ -53,6 +56,11 @@ violations contains v if {
 	v := deepfake_disclosure.result
 }
 
+violations contains v if {
+	emotion_recognition_disclosure.violation
+	v := emotion_recognition_disclosure.result
+}
+
 # Summary result for the OPA client
 result := {
 	"violation": violation,
@@ -62,5 +70,6 @@ result := {
 		synthetic_media_watermark.rule_id,
 		chatbot_disclosure.rule_id,
 		deepfake_disclosure.rule_id,
+		emotion_recognition_disclosure.rule_id,
 	],
 }
