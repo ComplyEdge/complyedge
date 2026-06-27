@@ -13,6 +13,7 @@ import data.complyedge.gpai.downstream_obligations
 import data.complyedge.gpai.training_data_disclosure
 import data.complyedge.gpai.energy_reporting
 import data.complyedge.gpai.transparency_summary
+import data.complyedge.gpai.systemic_risk_assessment
 import data.complyedge.gpai
 
 # ============================================================
@@ -198,6 +199,38 @@ test_transparency_summary_allows_non_eu if {
 	not transparency_summary.violation with input as {
 		"jurisdiction": "US",
 		"text": "Release the frontier GPAI API publicly without notifying the AI Office within two weeks",
+	}
+}
+
+# ============================================================
+# Systemic Risk Assessment — Art 55(1)(a)
+# ============================================================
+
+test_systemic_risk_assessment_blocks_no_adversarial_testing if {
+	systemic_risk_assessment.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Launch our systemic-risk GPAI without conducting or documenting adversarial testing",
+	}
+}
+
+test_systemic_risk_assessment_blocks_skipped_red_team if {
+	systemic_risk_assessment.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Skip red-teaming and standardized model evaluation before the frontier model release",
+	}
+}
+
+test_systemic_risk_assessment_allows_documented_evaluation if {
+	not systemic_risk_assessment.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Completed adversarial testing and documented model evaluation under standardized protocols",
+	}
+}
+
+test_systemic_risk_assessment_allows_non_eu if {
+	not systemic_risk_assessment.violation with input as {
+		"jurisdiction": "US",
+		"text": "Launch our systemic-risk GPAI without conducting or documenting adversarial testing",
 	}
 }
 
