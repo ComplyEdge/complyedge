@@ -20,6 +20,7 @@
 #   - gpai.transparency_summary (Art 52 notification procedure) — approved by Leo Celis 2026-06-27 (agent review)
 #   - gpai.systemic_risk_assessment (Art 55(1)(a)) — approved by Leo Celis 2026-06-27 (agent review)
 #   - gpai.incident_reporting (Art 55(1)(c)) — approved by Leo Celis 2026-06-27 (agent review)
+#   - gpai.cybersecurity_measures (Art 55(1)(d)) — approved by Leo Celis 2026-06-27 (agent review)
 
 package complyedge.gpai
 
@@ -35,6 +36,7 @@ import data.complyedge.gpai.energy_reporting
 import data.complyedge.gpai.transparency_summary
 import data.complyedge.gpai.systemic_risk_assessment
 import data.complyedge.gpai.incident_reporting
+import data.complyedge.gpai.cybersecurity_measures
 
 # True if ANY GPAI sub-rule is violated
 default violation := false
@@ -49,6 +51,7 @@ violation if energy_reporting.violation
 violation if transparency_summary.violation
 violation if systemic_risk_assessment.violation
 violation if incident_reporting.violation
+violation if cybersecurity_measures.violation
 
 # Collect all triggered violations into an array
 violations contains v if {
@@ -101,6 +104,11 @@ violations contains v if {
 	v := incident_reporting.result
 }
 
+violations contains v if {
+	cybersecurity_measures.violation
+	v := cybersecurity_measures.result
+}
+
 # Summary result for the OPA client
 result := {
 	"violation": violation,
@@ -116,5 +124,6 @@ result := {
 		transparency_summary.rule_id,
 		systemic_risk_assessment.rule_id,
 		incident_reporting.rule_id,
+		cybersecurity_measures.rule_id,
 	],
 }
