@@ -19,6 +19,7 @@
 #   - gpai.energy_reporting (Annex XI 2(d)-(e) / Art 53(1)(a)) — approved by Leo Celis 2026-06-27 (agent review)
 #   - gpai.transparency_summary (Art 52 notification procedure) — approved by Leo Celis 2026-06-27 (agent review)
 #   - gpai.systemic_risk_assessment (Art 55(1)(a)) — approved by Leo Celis 2026-06-27 (agent review)
+#   - gpai.incident_reporting (Art 55(1)(c)) — approved by Leo Celis 2026-06-27 (agent review)
 
 package complyedge.gpai
 
@@ -33,6 +34,7 @@ import data.complyedge.gpai.training_data_disclosure
 import data.complyedge.gpai.energy_reporting
 import data.complyedge.gpai.transparency_summary
 import data.complyedge.gpai.systemic_risk_assessment
+import data.complyedge.gpai.incident_reporting
 
 # True if ANY GPAI sub-rule is violated
 default violation := false
@@ -46,6 +48,7 @@ violation if training_data_disclosure.violation
 violation if energy_reporting.violation
 violation if transparency_summary.violation
 violation if systemic_risk_assessment.violation
+violation if incident_reporting.violation
 
 # Collect all triggered violations into an array
 violations contains v if {
@@ -93,6 +96,11 @@ violations contains v if {
 	v := systemic_risk_assessment.result
 }
 
+violations contains v if {
+	incident_reporting.violation
+	v := incident_reporting.result
+}
+
 # Summary result for the OPA client
 result := {
 	"violation": violation,
@@ -107,5 +115,6 @@ result := {
 		energy_reporting.rule_id,
 		transparency_summary.rule_id,
 		systemic_risk_assessment.rule_id,
+		incident_reporting.rule_id,
 	],
 }
