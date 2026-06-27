@@ -22,6 +22,7 @@
 #   - gpai.incident_reporting (Art 55(1)(c)) — approved by Leo Celis 2026-06-27 (agent review)
 #   - gpai.cybersecurity_measures (Art 55(1)(d)) — approved by Leo Celis 2026-06-27 (agent review)
 #   - gpai.provider_cooperation (Art 53(3)) — approved Leo Celis 2026-06-27
+#   - gpai.systemic_risk_mitigation (Art 55(1)(b)) — approved Leo Celis 2026-06-27
 
 package complyedge.gpai
 
@@ -39,6 +40,7 @@ import data.complyedge.gpai.systemic_risk_assessment
 import data.complyedge.gpai.incident_reporting
 import data.complyedge.gpai.cybersecurity_measures
 import data.complyedge.gpai.provider_cooperation
+import data.complyedge.gpai.systemic_risk_mitigation
 
 # True if ANY GPAI sub-rule is violated
 default violation := false
@@ -55,6 +57,7 @@ violation if systemic_risk_assessment.violation
 violation if incident_reporting.violation
 violation if cybersecurity_measures.violation
 violation if provider_cooperation.violation
+violation if systemic_risk_mitigation.violation
 
 # Collect all triggered violations into an array
 violations contains v if {
@@ -117,6 +120,11 @@ violations contains v if {
 	v := provider_cooperation.result
 }
 
+violations contains v if {
+	systemic_risk_mitigation.violation
+	v := systemic_risk_mitigation.result
+}
+
 # Summary result for the OPA client
 result := {
 	"violation": violation,
@@ -134,5 +142,6 @@ result := {
 		incident_reporting.rule_id,
 		cybersecurity_measures.rule_id,
 		provider_cooperation.rule_id,
+		systemic_risk_mitigation.rule_id,
 	],
 }

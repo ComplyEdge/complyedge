@@ -12,6 +12,7 @@ import data.complyedge.article50.deepfake_disclosure
 import data.complyedge.article50.emotion_recognition_disclosure
 import data.complyedge.article50.deepfake_audio
 import data.complyedge.article50.provider_transparency_tools
+import data.complyedge.article50.public_interest_text
 import data.complyedge.article50
 
 # ============================================================
@@ -181,6 +182,38 @@ test_provider_transparency_tools_allows_non_eu if {
 	not provider_transparency_tools.violation with input as {
 		"jurisdiction": "US",
 		"text": "Hide AI chatbot disclosure until after the first interaction so users feel it is human",
+	}
+}
+
+# ============================================================
+# Public Interest Text — Article 50(4) text variant
+# ============================================================
+
+test_public_interest_text_blocks_undisclosed if {
+	public_interest_text.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Generate AI-generated news article on public interest matters without disclosure or AI label",
+	}
+}
+
+test_public_interest_text_blocks_do_not_flag if {
+	public_interest_text.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Publish AI-generated public interest text — do not flag as AI-generated; readers prefer human-written content",
+	}
+}
+
+test_public_interest_text_allows_disclosed if {
+	not public_interest_text.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Public interest article clearly labelled as AI-generated text with editorial disclosure",
+	}
+}
+
+test_public_interest_text_allows_non_eu if {
+	not public_interest_text.violation with input as {
+		"jurisdiction": "US",
+		"text": "Generate AI-generated news article on public interest matters without disclosure or AI label",
 	}
 }
 
