@@ -16,6 +16,7 @@ import data.complyedge.gpai.transparency_summary
 import data.complyedge.gpai.systemic_risk_assessment
 import data.complyedge.gpai.incident_reporting
 import data.complyedge.gpai.cybersecurity_measures
+import data.complyedge.gpai.provider_cooperation
 import data.complyedge.gpai
 
 # ============================================================
@@ -297,6 +298,38 @@ test_cybersecurity_measures_allows_non_eu if {
 	not cybersecurity_measures.violation with input as {
 		"jurisdiction": "US",
 		"text": "Deploy our systemic-risk GPAI with no cybersecurity protection for model weights or physical infrastructure",
+	}
+}
+
+# ============================================================
+# Provider Cooperation — Article 53(3)
+# ============================================================
+
+test_provider_cooperation_blocks_refusal if {
+	provider_cooperation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "GPAI provider will refuse to cooperate with the AI Office and deny model access upon authority request",
+	}
+}
+
+test_provider_cooperation_blocks_withheld_docs if {
+	provider_cooperation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Withhold technical documentation from the Commission and block competent authority investigation",
+	}
+}
+
+test_provider_cooperation_allows_cooperation if {
+	not provider_cooperation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "GPAI provider cooperates with the AI Office providing documentation and model access upon request",
+	}
+}
+
+test_provider_cooperation_allows_non_eu if {
+	not provider_cooperation.violation with input as {
+		"jurisdiction": "US",
+		"text": "GPAI provider will refuse to cooperate with the AI Office and deny model access upon authority request",
 	}
 }
 
