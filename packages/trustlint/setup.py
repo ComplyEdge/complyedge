@@ -8,6 +8,11 @@ setup(
     name="trustlint",
     version="2.0.0",
     packages=find_packages(),
+    # Ship the ComplyEdge rule corpus inside the wheel so `pip install
+    # trustlint` is a self-contained linter. trustlint/rules/ is populated at
+    # build time from the canonical rules/regulations/ corpus (deploy-pip.sh).
+    include_package_data=True,
+    package_data={"trustlint": ["rules/**/*.yaml", "rules/**/*.yml"]},
     python_requires=">=3.9",
     install_requires=[
         "click>=8.0",

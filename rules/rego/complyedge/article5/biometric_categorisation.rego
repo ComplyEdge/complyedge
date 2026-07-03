@@ -10,8 +10,8 @@
 # Penalty: up to €35M or 7% of global revenue
 # Condition type: deterministic
 # Enforcement layer: layer1
-# Status: pending re-approval (RULE_STANDARD §5, card 195 / OjYUbBqr)
-# Approved by: Leo Celis on 2026-05-10 (carve-out exceptions added by agent 2026-06-05 — pending Leo re-sign-off per RULE_STANDARD §5; engine behaviour is forward-compatible: the exception only fires when the caller asserts the matching input fields, which today's `/v1/check` does not yet plumb through — see follow-up card)
+# Status: approved
+# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5; carve-outs + `/v1/check` plumbing, card 195 / OjYUbBqr)
 
 package complyedge.article5.biometric_categorisation
 

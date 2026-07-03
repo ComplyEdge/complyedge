@@ -78,7 +78,7 @@ Both cite the same legal article and differ only in engine. Map between them via
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
 packages/trustlint/   Offline regex linter (TrustLint) — no API key, for CI/CD
 rules/regulations/    53 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
-rules/rego/           24 OPA/Rego policies (EU AI Act Articles 5, 6, 50, GPAI)
+rules/rego/           19 OPA/Rego policies (EU AI Act Article 5, 50, GPAI)
 rules/schemas/        Rule validation schema
 examples/             Usage examples (decorators, OpenAI Agents)
 scripts/benchmark/    Runtime benchmark (runner + prompt YAMLs + committed results)
@@ -87,11 +87,11 @@ tests/                Rule validation + acceptance tests
 
 ## Rules
 
-53 YAML rules + 24 OPA/Rego policies across 4 jurisdictions:
+53 YAML rules + 19 OPA/Rego policies across 4 jurisdictions:
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 36 YAML + 24 Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR |
+| **EU** | 36 YAML + 19 Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR |
 | **US** | 13 YAML | HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA |
 | **Global** | 1 YAML | PCI DSS |
 | **Universal** | 3 YAML | PII detection, prompt injection (direct + indirect) |
@@ -119,7 +119,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1 — Deterministic (hot path):** 24 OPA/Rego policies evaluate every request. Blocked prompts return with a legal citation in tens of milliseconds — 38–100ms (median 62ms) across the OPA-blocked prompts in our benchmark. Binary pass/block, no LLM on the hot path. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1 — Deterministic (hot path):** 19 OPA/Rego policies evaluate every request. Blocked prompts return with a legal citation in tens of milliseconds — 38–100ms (median 62ms) across the OPA-blocked prompts in our benchmark. Binary pass/block, no LLM on the hot path. (TrustLint applies the same regex corpus offline for CI use.)
 
 **Layer 2 — Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
 
