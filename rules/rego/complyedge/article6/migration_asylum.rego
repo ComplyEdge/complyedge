@@ -9,8 +9,8 @@
 # Penalty: up to €15M or 3% global revenue (Article 101)
 # Condition type: deterministic (regex)
 # Enforcement layer: layer1
-# Status: agent review — pending Leo sign-off (RULE_STANDARD §5, card 197)
-# Approved by: (TBD)
+# Status: approved
+# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5; card 197 / WGlhJpPN)
 
 package complyedge.article6.migration_asylum
 

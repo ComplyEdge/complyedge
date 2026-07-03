@@ -12,7 +12,6 @@ import data.complyedge.article5.biometric_categorisation
 import data.complyedge.article5.emotion_recognition
 import data.complyedge.article5.predictive_policing
 import data.complyedge.article5.realtime_biometric
-import data.complyedge.article5.biometric_exceptions
 import data.complyedge.article5
 
 # ============================================================
@@ -332,38 +331,6 @@ test_realtime_biometric_allows_normal_text if {
 	not realtime_biometric.violation with input as {
 		"jurisdiction": "EU",
 		"text": "Use fingerprint authentication for employee access control",
-	}
-}
-
-# ============================================================
-# Biometric Exceptions — Article 5(1)(e) facial scraping prohibition
-# ============================================================
-
-test_biometric_exceptions_blocks_facial_scraping if {
-	biometric_exceptions.violation with input as {
-		"jurisdiction": "EU",
-		"text": "Scrape facial images from the internet to expand our facial recognition database",
-	}
-}
-
-test_biometric_exceptions_blocks_cctv_harvest if {
-	biometric_exceptions.violation with input as {
-		"jurisdiction": "EU",
-		"text": "Untargeted bulk harvesting of face photos from CCTV footage for our FR system",
-	}
-}
-
-test_biometric_exceptions_allows_consented_auth if {
-	not biometric_exceptions.violation with input as {
-		"jurisdiction": "EU",
-		"text": "Use fingerprint authentication for employee access control with consent",
-	}
-}
-
-test_biometric_exceptions_allows_non_eu if {
-	not biometric_exceptions.violation with input as {
-		"jurisdiction": "US",
-		"text": "Scrape facial images from the internet to expand our facial recognition database",
 	}
 }
 

@@ -71,7 +71,7 @@ class TrustLintEngine:
         if home_rules.exists():
             return home_rules
 
-        # Walk up from CWD looking for rules/regulations/
+        # Walk up from CWD looking for rules/regulations/ (dev-in-repo)
         cwd = Path.cwd()
         for parent in [cwd, *cwd.parents]:
             candidate = parent / "rules" / "regulations"
@@ -80,6 +80,14 @@ class TrustLintEngine:
             # Stop at filesystem root
             if parent == parent.parent:
                 break
+
+        # Fallback: rules bundled inside the installed package. Populated at
+        # build time from the canonical rules/regulations/ corpus (see
+        # deploy-pip.sh). This is what lets `pip install trustlint` work in any
+        # repo that has no local rules/ dir — the standalone-linter path.
+        bundled = Path(__file__).parent / "rules"
+        if bundled.exists():
+            return bundled
 
         return None
 
