@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -337,7 +338,15 @@ def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> 
         return
 
     api_url = "https://api.complyedge.io/v1/check"
-    payload = json.dumps({"text": input_text, "jurisdiction": "EU", "direction": "output"}).encode()
+    agent_id = os.environ.get("COMPLYEDGE_AGENT_ID", "trustlint-cli")
+    payload = json.dumps(
+        {
+            "text": input_text,
+            "agent_id": agent_id,
+            "jurisdiction": "EU",
+            "direction": "output",
+        }
+    ).encode()
 
     try:
         req = Request(api_url, data=payload, headers={
