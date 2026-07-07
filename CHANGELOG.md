@@ -13,7 +13,7 @@ packages and version independently.
 - Runtime EU AI Act enforcement via the `@compliance_check` decorator and the
   `/v1/check` API, returning OPA/Rego rule IDs (e.g. `rego-art5-1c-001`),
   legal citations, and an immutable audit record per decision.
-- Corpus: 19 OPA/Rego policies (Article 5, Article 50, GPAI) + 53 YAML rules
+- Corpus: 28 OPA/Rego policies (Article 5, Article 6, Article 50, GPAI) + 53 YAML rules
   across EU, US, global, and universal jurisdictions.
 
 ### [0.2.2]

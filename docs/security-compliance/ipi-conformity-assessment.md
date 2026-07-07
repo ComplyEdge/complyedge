@@ -2,7 +2,7 @@
 
 **Audience:** EU AI Act conformity-assessment teams; ComplyEdge rule authors; CE customers building production AI systems; external auditors and compliance counsel.
 
-**Status:** Methodology v1.0 — published with the initial IPI rule category (Trello card `FSukgI1w`, 2026-05-15). Corpus expansion (rules 3-10+) and Layer 2 behavioral clause ship in follow-up cards.
+**Status:** Methodology v1.0 — published with the initial IPI rule category (2026-05-15). Corpus expansion (rules 3-10+) and the Layer 2 behavioral clause ship in follow-up releases.
 
 ---
 
@@ -12,7 +12,7 @@ The EU AI Act, Article 15 ("accuracy, robustness and cybersecurity"), requires t
 
 Two 2026 events have reset that interpretation:
 
-1. **The Anthropic Mythos incident** (early-2026 disclosure): Claude autonomously completed 32-step network attack simulations and surfaced thousands of critical-infrastructure vulnerabilities. The incident demonstrated that an AI agent embedded in a tool-use loop, when fed adversarial content via the tools it invokes, will execute on that content with the same authority as the operator's original instructions.
+1. **A 2026 frontier-model autonomy disclosure**: a leading AI lab reported that its model, embedded in a tool-use loop, autonomously executed multi-step network-attack simulations and surfaced critical-infrastructure vulnerabilities. The incident demonstrated that an AI agent embedded in a tool-use loop, when fed adversarial content via the tools it invokes, will execute on that content with the same authority as the operator's original instructions.
 2. **Google Security Blog, Apr 29 2026**: flagged Indirect Prompt Injection (IPI) as the top anticipated attack vector for adversarial AI exploitation through end-2026. IPI is now the leading edge of "robustness" testing for LLM-backed systems.
 
 Following these, the EU AI Act conformity-assessment community has converged on the view that **IPI-resistance testing is a required component of Article 15 evidence** — not an optional add-on. A conformity-assessment report that does not include IPI screening is not currently treated as genuine evidence of robustness against adversarial input.
@@ -27,7 +27,7 @@ This document is the operationalisation of that requirement: how CE tests IPI re
 
 ## 2. The four IPI sub-categories CE tests against
 
-CE rule authors organise prompt-security rules under `rules/regulations/universal/prompt_security/` into four sub-categories, mapped to the dominant adversarial-input vectors observed in the public IPI research corpus (OWASP LLM Top 10 — LLM01; Google IPI Benchmark; Anthropic Project Glasswing disclosures).
+CE rule authors organise prompt-security rules under `rules/regulations/universal/prompt_security/` into four sub-categories, mapped to the dominant adversarial-input vectors observed in the public IPI research corpus (OWASP LLM Top 10 — LLM01; Google IPI Benchmark; public AI-lab red-team disclosures).
 
 ### 2.1 Direct prompt injection
 
@@ -42,7 +42,7 @@ The user's input contains an explicit attempt to override, ignore, or replace th
 
 ### 2.2 Indirect prompt injection
 
-Adversarial instructions are placed in **untrusted content the model retrieves** — fetched documents, tool outputs, web pages, RAG-indexed corpora — and the model executes them as if they were from the user. This is the Mythos failure mode. Includes:
+Adversarial instructions are placed in **untrusted content the model retrieves** — fetched documents, tool outputs, web pages, RAG-indexed corpora — and the model executes them as if they were from the user. This is the tool-mediated IPI failure mode. Includes:
 
 - Separator hijack: adversarial content embeds delimiters meant to terminate the "user input" region and start a fake "new instructions" region (`===END_USER_INPUT===\n\nNEW INSTRUCTIONS:`, `</user>\n<system>` and many variants).
 - Hidden instructions in retrieved markdown/HTML (zero-width chars, off-screen text, white-on-white).
@@ -110,7 +110,7 @@ A conformity-assessment-grade IPI verdict requires BOTH layers green. Layer 1 al
 
 ## 5. Corpus expansion roadmap
 
-Initial release (Trello card `FSukgI1w`, 2026-05-15) ships **2 conservative starter rules** under `rules/regulations/universal/prompt_security/`:
+Initial release (2026-05-15) ships **2 conservative starter rules** under `rules/regulations/universal/prompt_security/`:
 
 - `direct_injection_instruction_override.yaml` — covers 2.1 instruction-override phrasing.
 - `indirect_injection_separator_hijack.yaml` — covers 2.2 separator-hijack patterns.
@@ -129,9 +129,9 @@ Each rule must conform to `rules/RULE_STANDARD.md` for Rego rules (when added) a
 ## 6. Sources
 
 - Google Security Blog, 2026-04-29 — IPI named top adversarial vector through end-2026.
-- EU AI Act Newsletter #101, 2026-05-04 — Mythos incident debrief, conformity-assessment implications.
+- EU AI Act Newsletter #101, 2026-05-04 — model-autonomy incident debrief, conformity-assessment implications.
 - OWASP LLM Top 10 — LLM01: Prompt Injection (https://owasp.org/www-project-top-10-for-large-language-model-applications/).
-- Anthropic Project Glasswing disclosures — public red-team write-ups (2026 cohort).
+- Public AI-lab red-team disclosures — 2026 cohort write-ups.
 
 ---
 

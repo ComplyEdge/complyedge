@@ -11,7 +11,7 @@
 # Condition type: deterministic (regex)
 # Enforcement layer: layer1
 # Status: approved
-# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5; card 197 / WGlhJpPN)
+# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5)
 
 package complyedge.article6.law_enforcement
 
