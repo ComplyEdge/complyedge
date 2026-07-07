@@ -5,7 +5,7 @@
 
 Runtime compliance enforcement for AI agents. Not a scanner — runs in production, on every request.
 
-**Article 5 is already law.** GPAI fines start August 2, 2026. Your AI is either compliant right now, or it isn't.
+**Article 5 is already law.** GPAI fines start August 2, 2026 — and Article 50 transparency binds deployers the same day. If you run a chatbot or publish AI-generated content, that clock is yours, not just your model provider's. Your AI is either compliant right now, or it isn't.
 
 > What does your compliance tool tell a regulator when it blocks a request? A probability score?
 >
