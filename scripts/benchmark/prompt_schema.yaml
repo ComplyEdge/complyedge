@@ -11,7 +11,7 @@ required:
 properties:
   category:
     type: string
-    enum: ["article5", "article50", "gpai", "safe_harbor", "us_corpus", "edge"]
+    enum: ["article5", "article50", "gpai", "safe_harbor", "us_corpus", "edge", "prompt_security"]
   description:
     type: string
   prompts:

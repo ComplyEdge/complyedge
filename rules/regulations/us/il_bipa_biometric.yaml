@@ -24,22 +24,10 @@ conditions:
     Do NOT flag biometric data collection that has obtained proper informed
     written consent.
   model: gpt-4
-- type: input_sensitivity
-  sensitivity_type: biometric
-  patterns:
-  - fingerprint
-  - retina scan
-  - iris scan
-  - voiceprint
-  - face geometry
-  - facial recognition
-  - palm scan
-  - hand geometry
-  - biometric data
-  - biometric identifier
-  - faceprint
-  confidence_threshold: 0.8
-  context_required: true
+# Context-gated biometric keyword detection (fingerprint, iris scan, etc.)
+# requires Layer 2 evaluation — bare keywords must not fire this critical
+# block-action rule standalone. Layer 1 coverage is the consent-violation
+# regex below; broader context lives in the semantic condition above.
 - type: regex
   value: >-
     (collect\w*\s+(?:biometric|fingerprint|retina|iris|voiceprint|face\s+geometry|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:without|lacking)\s+(?:consent|written\s+release|authorization|notice)|(?:biometric|fingerprint|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:collected|captured|obtained|stored)\s+(?:without|lacking)\s+(?:consent|written\s+consent|written\s+release|notification)|(?:sell|trade|lease|profit\s+from)\w*\s+(?:biometric|fingerprint|facial)\s+(?:data|identifier|information)|no\s+(?:biometric\s+)?(?:consent|written\s+release|retention\s+policy|destruction\s+policy)|fail(?:ing|ure|ed)?\s+to\s+(?:inform|notify|obtain\s+consent|provide\s+notice)\s+(?:about|before|for|regarding)\s+biometric|(?:scan|capture|record)\w*\s+(?:face|fingerprint|iris|retina|voice)\s+(?:without|lacking)\s+(?:consent|permission|notice))
@@ -93,7 +81,7 @@ remediation:
     specific purpose and retention period in writing; (3) obtain a written
     release from the individual. Develop and publish a written retention and
     destruction policy. Never sell, lease, or trade biometric data.
-version: 1.0.0
+version: 1.1.0
 tags:
 - bipa
 - illinois

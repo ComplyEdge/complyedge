@@ -1,0 +1,57 @@
+id: EU_AI_ACT_ART50_SYNTHETIC_MEDIA_WATERMARK_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires synthetic audio, image, or video content to be watermarked and
+  disclosed as artificially generated or manipulated. Article 50(2) of the
+  EU AI Act. This rule detects references to generating synthetic media
+  without the required watermark/disclosure pipeline.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or
+    facilitates the generation or delivery of synthetic audio, image,
+    or video content WITHOUT the watermarking and disclosure required
+    by Article 50(2) of the EU AI Act. Flag cases where a pipeline
+    generates synthetic media but omits watermarking.
+  model: gpt-4
+- type: regex
+  value: (generate|produce|create|render|synthesi[sz]e)\s+(synthetic|ai[- ]?generated|deepfake|ai[- ]?made)?\s*(image|video|audio|voice|speech|face|photo|picture)\s+(without|with\s+no|skip(ping)?\s+(the\s+)?|bypass(ing)?\s+(the\s+)?|no)\s+(watermark|disclosure|marker|c2pa|provenance)|(image|video|audio|voice)\s+(without|with\s+no|no)\s+(ai[- ]?)?(watermark|disclosure|marker)|disable\s+(the\s+)?(watermark|disclosure|marker|c2pa)|strip\s+(the\s+)?(watermark|c2pa|provenance)
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 50(2)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 50(2): Providers of AI systems,
+    including general purpose AI systems, generating synthetic audio,
+    image, video or text content, shall ensure that the outputs of the
+    AI system are marked in a machine-readable format and detectable as
+    artificially generated or manipulated.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 50(2) requires synthetic media (audio,
+    image, video) to be marked in a machine-readable format and detectable
+    as artificially generated. Do not produce or distribute synthetic
+    media without the required watermark/disclosure. Penalties: up to
+    €15M or 3% of global revenue.
+  suggestion: >-
+    Enable your watermarking pipeline (C2PA, SynthID, or equivalent)
+    before generating synthetic media. Do not strip or bypass existing
+    watermarks. For audio, embed a perceptible or imperceptible tag
+    identifying AI origin.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-50
+- transparency
+- synthetic-media
+- watermark
+- deepfake
+tier: enterprise

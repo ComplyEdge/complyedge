@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import yaml
 
@@ -20,6 +21,11 @@ class Violation:
     citation: str
     pattern_matched: str
     remediation: str
+    # Sanctions/transition support: temporal state of the rule at evaluation
+    # time and customer-facing guidance when the rule is in a wind-down window
+    # or gated on a conditional carve-out. `active` = ordinary in-force rule.
+    temporal_state: str = "active"  # active | wind_down | pending_condition
+    transition_guidance: Optional[str] = None
 
 
 @dataclass
@@ -50,6 +56,48 @@ class Rule:
     remediation_message: str
     regex_patterns: list[dict]  # [{pattern, description, flags}]
     tier: str = "community"  # community | developer | enterprise
+    # Dynamic-state sanctions fields (OFAC/EU transition rules). Absent on
+    # ordinary static rules — the engine treats those as always-in-force.
+    effective_window: Optional[dict] = None  # {starts, ends?, superseded_by?}
+    conditional_on: Optional[list] = None  # [{parameter, operator, value, rationale}]
+    supersedes: Optional[list] = None
+
+
+def _parse_date(value: Any) -> Optional[date]:
+    """Parse an ISO 'YYYY-MM-DD' date; return None on anything unparseable."""
+    if not value:
+        return None
+    if isinstance(value, date):
+        return value
+    try:
+        y, m, d = str(value).split("-")
+        return date(int(y), int(m), int(d))
+    except Exception:
+        return None
+
+
+def _compare(actual: Any, op: str, expected: Any) -> bool:
+    """Evaluate a conditional_on comparison. Unknown ops / type errors → False."""
+    try:
+        if op == "==":
+            return actual == expected
+        if op == "!=":
+            return actual != expected
+        if op == "in":
+            return actual in expected
+        if op == "not_in":
+            return actual not in expected
+        if op == ">":
+            return actual > expected
+        if op == "<":
+            return actual < expected
+        if op == ">=":
+            return actual >= expected
+        if op == "<=":
+            return actual <= expected
+    except Exception:
+        return False
+    return False
 
 
 class TrustLintEngine:
@@ -180,10 +228,83 @@ class TrustLintEngine:
             remediation_message=remediation_msg,
             regex_patterns=patterns,
             tier=(data.get("tier") or "community"),
+            effective_window=data.get("effective_window"),
+            conditional_on=data.get("conditional_on"),
+            supersedes=data.get("supersedes"),
         )
 
-    def check(self, text: str, jurisdiction: Optional[str] = None) -> LintResult:
+    @staticmethod
+    def _evaluate_temporal_state(
+        rule: "Rule", as_of: date, context: dict
+    ) -> tuple[bool, str, Optional[str]]:
+        """Decide whether a (possibly dynamic-state) rule applies as of a date.
+
+        Returns (applies, temporal_state, transition_guidance). Ordinary static
+        rules (no effective_window / conditional_on) are always active and apply
+        — this keeps behaviour identical for the existing corpus.
+        """
+        state = "active"
+        guidance: Optional[str] = None
+
+        # 1. Conditional carve-outs (e.g., an Iran sanction that survives only
+        #    for IRGC-affiliated counterparties). The rule applies only when
+        #    every condition holds for the transaction context.
+        for cond in (rule.conditional_on or []):
+            param = cond.get("parameter")
+            op = cond.get("operator", "==")
+            expected = cond.get("value")
+            rationale = cond.get("rationale", "")
+            if param in context:
+                if not _compare(context[param], op, expected):
+                    # A carve-out condition is false → the prohibition no longer
+                    # applies to this counterparty/transaction.
+                    return (False, "carved_out",
+                            f"Permitted under carve-out: {rationale}".strip())
+            else:
+                # Cannot confirm the carve-out → conservatively keep the rule in
+                # force and flag the missing parameter for verification.
+                state = "pending_condition"
+                guidance = (
+                    f"Applies pending verification of '{param}' ({op} "
+                    f"{expected}): {rationale}"
+                ).strip()
+
+        # 2. Effective window — General License wind-down / expiry / supersession.
+        win = rule.effective_window or {}
+        starts = _parse_date(win.get("starts"))
+        ends = _parse_date(win.get("ends"))
+        superseded_by = win.get("superseded_by")
+        if starts and as_of < starts:
+            return (False, "not_yet_effective",
+                    f"Not yet in force; takes effect {starts.isoformat()}.")
+        if ends and as_of > ends:
+            g = f"Expired {ends.isoformat()}."
+            if superseded_by:
+                g += f" Superseded by {superseded_by}."
+            return (False, "expired", g)
+        if ends and (starts is None or starts <= as_of) and as_of <= ends:
+            # Still in force, but a scheduled lift/supersession is dated — return
+            # a forward-looking transition notice alongside the (blocking) verdict.
+            g = f"In force; prohibition scheduled to lift on {ends.isoformat()}."
+            if superseded_by:
+                g += f" Superseded by {superseded_by} thereafter."
+            return (True, "wind_down", g)
+
+        return (True, state, guidance)
+
+    def check(
+        self,
+        text: str,
+        jurisdiction: Optional[str] = None,
+        as_of: Optional[date] = None,
+        context: Optional[dict] = None,
+    ) -> LintResult:
+        """Run Tier-1 checks. ``as_of`` + ``context`` drive dynamic-state
+        (sanctions transition) evaluation: a matched rule may be carved out,
+        expired, or in a wind-down window and carry transition guidance."""
         result = LintResult(text=text)
+        as_of = as_of or date.today()
+        context = context or {}
         applicable = self.rules
         if jurisdiction:
             applicable = [r for r in self.rules if r.jurisdiction.upper() == jurisdiction.upper()]
@@ -195,6 +316,11 @@ class TrustLintEngine:
                 if compiled is None:
                     continue  # skip patterns that failed to compile at load time
                 if compiled.search(text):
+                    applies, state, guidance = self._evaluate_temporal_state(
+                        rule, as_of, context
+                    )
+                    if not applies:
+                        break  # carved out / not in force as of `as_of`
                     result.violations.append(Violation(
                         rule_id=rule.id,
                         title=rule.title,
@@ -204,6 +330,8 @@ class TrustLintEngine:
                         citation=rule.citation,
                         pattern_matched=pat_info.get("description", pat_info["pattern"][:60]),
                         remediation=rule.remediation_message,
+                        temporal_state=state,
+                        transition_guidance=guidance,
                     ))
                     break  # One match per rule is enough
 

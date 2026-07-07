@@ -65,9 +65,10 @@ CATEGORY_FILES = {
     "safe_harbor": "safe_harbor.yaml",
     "us_corpus": "us_corpus.yaml",
     "edge": "edge_cases.yaml",
+    "prompt_security": "prompt_security.yaml",
 }
 
-BLOCKED_CATEGORIES = {"article5", "article50", "gpai", "us_corpus"}
+BLOCKED_CATEGORIES = {"article5", "article50", "gpai", "us_corpus", "prompt_security"}
 
 
 class C:

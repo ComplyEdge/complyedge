@@ -11,7 +11,7 @@
 # Condition type: deterministic
 # Enforcement layer: layer1
 # Status: approved
-# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5; carve-outs + `/v1/check` plumbing)
+# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5; carve-outs + `/v1/check` plumbing, card 195 / OjYUbBqr)
 
 package complyedge.article5.biometric_categorisation
 
@@ -26,7 +26,7 @@ violation if {
 	not dataset_operation_exception
 }
 
-# Article 5(1)(g) OJ carve-out: the prohibition does NOT cover
+# Article 5(1)(g) OJ carve-out (card 195): the prohibition does NOT cover
 # categorizing of biometric data in the area of law enforcement when the
 # caller asserts a lawful basis. Both `use_case` and `lawful_basis` must
 # be present in the input for the exception to fire.
@@ -35,7 +35,7 @@ law_enforcement_exception if {
 	input.lawful_basis == true
 }
 
-# Article 5(1)(g) OJ carve-out: dataset *labelling* and
+# Article 5(1)(g) OJ carve-out (card 195): dataset *labelling* and
 # *filtering* of lawfully acquired biometric datasets is excluded — that
 # is data preparation, not categorisation of natural persons.
 dataset_operation_exception if {

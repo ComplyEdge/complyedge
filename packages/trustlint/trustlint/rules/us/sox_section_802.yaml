@@ -1,0 +1,77 @@
+id: SOX_SECTION_802_001
+jurisdiction: US
+effective_date: '2002-07-30'
+description: >-
+  Prohibits knowingly altering, destroying, mutilating, concealing, covering
+  up, falsifying, or making false entries in records or documents with intent
+  to impede, obstruct, or influence a federal investigation or bankruptcy
+  case. Sarbanes-Oxley Act Section 802, codified at 18 U.S.C. §1519.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    knowingly altering, destroying, mutilating, concealing, covering up,
+    falsifying, or making false entries in any record, document, or tangible
+    object with the intent to impede, obstruct, or influence the investigation
+    or proper administration of any matter within the jurisdiction of any
+    department or agency of the United States or any case filed under
+    title 11 (bankruptcy), in violation of 18 U.S.C. §1519. This includes
+    document destruction during or in contemplation of investigations,
+    backdating records, deleting emails or files relevant to investigations,
+    and instructing others to destroy records. Do NOT flag routine document
+    retention policies, lawful destruction outside any investigation context,
+    or compliance with valid legal hold releases.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:destroy|delete|shred|wipe|purge|erase)\w*\s+(?:document|record|email|file|evidence|data)\s+(?:before|during|to\s+(?:avoid|hide|prevent|impede|obstruct))\s+(?:investigation|audit|subpoena|discovery|litigation)|(?:alter|modify|change|backdate|falsif\w*)\s+(?:document|record|entry|log|ledger|book)\s+(?:to\s+(?:hide|conceal|mislead|obstruct|impede)|after\s+(?:investigation|subpoena|inquiry))|(?:conceal|hide|cover\s+up)\w*\s+(?:document|record|evidence|information)\s+from\s+(?:investigator|auditor|regulator|SEC|DOJ|FBI|federal\s+agency)|(?:instruct|tell|order)\w*\s+(?:to\s+)?(?:destroy|delete|shred|wipe|hide)\s+(?:document|record|file|email|evidence)|(?:obstruction|obstruct)\s+(?:of\s+)?(?:justice|federal\s+investigation|agency\s+proceeding)|(?:document|record|email)\s+(?:destruction|deletion|shredding)\s+(?:in\s+(?:anticipation|contemplation)\s+of|to\s+(?:obstruct|impede|avoid))|(?:false\s+entry|falsif\w*)\s+(?:in|to)\s+(?:record|book|ledger|document)\s+(?:to|in\s+order\s+to)\s+(?:mislead|deceive|obstruct))
+  flags: i
+severity: critical
+category: financial
+source:
+  regulation: Sarbanes-Oxley Act
+  article: Section 802 (18 U.S.C. §1519)
+  url: https://www.law.cornell.edu/uscode/text/18/1519
+  last_updated: '2002-07-30'
+  citation: >-
+    18 U.S.C. §1519: Whoever knowingly alters, destroys, mutilates, conceals,
+    covers up, falsifies, or makes a false entry in any record, document, or
+    tangible object with the intent to impede, obstruct, or influence the
+    investigation or proper administration of any matter within the
+    jurisdiction of any department or agency of the United States or any case
+    filed under title 11, or in relation to or contemplation of any such
+    matter or case, shall be fined under this title, imprisoned not more than
+    20 years, or both. (Added Pub. L. 107-204, title VIII, §802(a),
+    July 30, 2002, 116 Stat. 800.)
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      Criminal penalties: fines under Title 18 and imprisonment up to
+      20 years (per 18 U.S.C. §1519). SEC may also pursue civil enforcement
+      and bar offending individuals from serving as officers or directors.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — Sarbanes-Oxley Section 802 (18 U.S.C. §1519) makes it a federal
+    felony, punishable by up to 20 years imprisonment, to knowingly alter,
+    destroy, conceal, or falsify records with intent to impede a federal
+    investigation or bankruptcy case. This applies even before any
+    investigation begins if destruction is in contemplation of one.
+  suggestion: >-
+    Preserve all records that may be relevant to any actual or anticipated
+    federal investigation, audit, or bankruptcy proceeding. Issue and follow
+    a documented legal hold. Suspend routine destruction schedules for
+    affected records. Consult legal counsel before any document disposition
+    when an investigation is foreseeable. Never instruct others to destroy
+    records.
+version: 1.0.0
+tags:
+- sox
+- section-802
+- document-destruction
+- obstruction
+- record-retention
+- legal-hold
+tier: enterprise

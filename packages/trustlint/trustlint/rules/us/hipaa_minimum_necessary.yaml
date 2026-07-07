@@ -1,0 +1,116 @@
+id: HIPAA_MINIMUM_NECESSARY_001
+jurisdiction: US
+effective_date: '2003-04-14'
+description: >-
+  Requires covered entities and business associates to make reasonable
+  efforts to limit uses, disclosures, and requests of protected health
+  information (PHI) to the minimum necessary to accomplish the intended
+  purpose. HIPAA Privacy Rule, 45 CFR §164.502(b).
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    using, disclosing, or requesting protected health information (PHI) in
+    excess of the minimum necessary to accomplish the intended purpose, in
+    violation of 45 CFR §164.502(b). The minimum necessary standard requires
+    covered entities and business associates to limit PHI to what is
+    reasonably necessary. Detect: (1) bulk PHI disclosures when only specific
+    fields are needed, (2) requesting full medical records when only a summary
+    is required, (3) sharing PHI with personnel who do not need it for their
+    role, (4) blanket access to entire records sets when targeted access
+    suffices. Do NOT flag treatment-related disclosures between providers,
+    disclosures to the patient, disclosures pursuant to a valid authorization,
+    disclosures required by law, or disclosures to the Secretary — these are
+    statutory exceptions.
+  model: gpt-4
+- type: input_sensitivity
+  sensitivity_type: phi
+  patterns:
+  - medical record
+  - patient record
+  - health record
+  - diagnosis
+  - prescription
+  - treatment history
+  - clinical notes
+  - lab results
+  - protected health information
+  - PHI
+  confidence_threshold: 0.75
+  context_required: true
+- type: regex
+  value: >-
+    ((?:share|disclose|send|transmit|provide|grant\s+access\s+to)\w*\s+(?:entire|full|complete|all)\s+(?:medical|patient|health|clinical)\s+record|(?:bulk|mass|wholesale)\s+(?:PHI|patient\s+data|medical\s+record|health\s+information)\s+(?:disclosure|transfer|sharing|export)|(?:request|requesting)\s+(?:entire|full|complete|all)\s+(?:medical|patient|health)\s+record\s+(?:when|where|but)\s+(?:only|just|merely)|(?:no|without)\s+(?:minimum\s+necessary|need[\-\s]to[\-\s]know|role[\-\s]based)\s+(?:assessment|review|determination|access\s+control)|(?:everyone|all\s+staff|entire\s+team|all\s+employees)\s+(?:has|have|with)\s+(?:access\s+to|can\s+access)\s+(?:PHI|patient\s+record|medical\s+record|health\s+information)|(?:over[\-\s]disclos\w*|excessive\s+disclosure)\s+(?:of\s+)?(?:PHI|protected\s+health\s+information|patient\s+data)|(?:share|disclose)\w*\s+(?:more\s+PHI|more\s+health\s+information)\s+than\s+(?:necessary|required|needed))
+  flags: i
+severity: high
+category: healthcare
+source:
+  regulation: HIPAA Privacy Rule
+  article: 45 CFR §164.502(b)
+  url: https://www.law.cornell.edu/cfr/text/45/164.502
+  last_updated: '2024-04-26'
+  citation: >-
+    45 CFR §164.502(b)(1) Minimum necessary applies: When using or disclosing
+    protected health information or when requesting protected health
+    information from another covered entity or business associate, a covered
+    entity or business associate must make reasonable efforts to limit
+    protected health information to the minimum necessary to accomplish the
+    intended purpose of the use, disclosure, or request. §164.502(b)(2)
+    Minimum necessary does not apply. This requirement does not apply to:
+    (i) Disclosures to or requests by a health care provider for treatment;
+    (ii) Uses or disclosures made to the individual; (iii) Uses or disclosures
+    made pursuant to an authorization under §164.508; (iv) Disclosures made
+    to the Secretary in accordance with subpart C of part 160 of this
+    subchapter; (v) Uses or disclosures that are required by law; (vi) Uses
+    or disclosures that are required for compliance with applicable
+    requirements of this subchapter.
+exceptions:
+- condition: Treatment disclosures
+  description: >-
+    Disclosures to or requests by a health care provider for treatment
+    purposes (45 CFR §164.502(b)(2)(i))
+- condition: Disclosure to individual
+  description: >-
+    Uses or disclosures made to the individual who is the subject of the PHI
+    (45 CFR §164.502(b)(2)(ii))
+- condition: Pursuant to authorization
+  description: >-
+    Uses or disclosures made pursuant to a valid authorization under
+    §164.508 (45 CFR §164.502(b)(2)(iii))
+- condition: Required by law
+  description: >-
+    Uses or disclosures required by law, or required for compliance with
+    HIPAA (45 CFR §164.502(b)(2)(v)-(vi))
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      Civil monetary penalties from $100 to $50,000 per violation (up to
+      $1.5 million annually for identical violations) based on culpability
+      tier. Criminal penalties up to $250,000 and 10 years imprisonment for
+      knowing violations with intent to sell or use PHI for personal gain.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — HIPAA Privacy Rule 45 CFR §164.502(b) requires covered entities
+    and business associates to limit PHI uses, disclosures, and requests to
+    the minimum necessary. Bulk or excessive PHI disclosures violate the
+    minimum necessary standard. Penalties: up to $50,000 per violation and
+    $1.5M annually.
+  suggestion: >-
+    Limit the PHI shared, requested, or used to only the data fields strictly
+    necessary for the specific purpose. Implement role-based access controls,
+    apply data minimisation policies, and use de-identified data where
+    possible. For routine disclosures, develop and implement policies that
+    limit the PHI to the minimum necessary. Document the basis for each
+    disclosure.
+version: 1.0.0
+tags:
+- hipaa
+- minimum-necessary
+- phi
+- privacy-rule
+- healthcare
+- data-minimization
+tier: enterprise

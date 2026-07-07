@@ -1,0 +1,65 @@
+id: EU_AI_ACT_ART15_ACCURACY_ROBUSTNESS_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires high-risk AI systems to achieve appropriate levels of accuracy,
+  robustness, and cybersecurity throughout their lifecycle, with resilience
+  against errors, faults, adversarial manipulation, and model poisoning.
+  Article 15.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    placing a high-risk AI system on the market without achieving appropriate
+    levels of accuracy, robustness, and cybersecurity as required by EU AI Act
+    Article 15. High-risk AI systems must: achieve accuracy levels declared in
+    instructions for use, be resilient to errors, faults, and inconsistencies
+    in the environment, be robust against unauthorized third-party manipulation
+    including adversarial attacks, and have cybersecurity protections
+    proportionate to risks including model poisoning, adversarial examples,
+    confidentiality attacks, and model flaws.
+  model: gpt-4
+- type: regex
+  value: >-
+    (without\s+(?:accuracy|robustness|cybersecurity)\s+(?:testing|validation|assessment)|no\s+(?:adversarial|robustness|accuracy)\s+(?:testing|assessment|evaluation)|vulnerable\s+to\s+(?:adversarial|model\s+poisoning|manipulation|attack)|no\s+(?:cybersecurity|security)\s+(?:protection|measure|assessment)|accuracy\s+(?:not\s+)?(?:declared|documented|tested|validated)|adversarial\s+(?:attack|manipulation)\s+(?:not\s+)?(?:tested|assessed|mitigated)|model\s+poisoning\s+(?:not\s+)?(?:addressed|mitigated|tested)|deploy(?:ing)?\s+without\s+(?:accuracy|robustness|security)\s+(?:testing|validation)|no\s+resilience\s+(?:against|to)\s+(?:errors|faults|attacks))
+  flags: i
+severity: high
+category: security
+source:
+  regulation: EU AI Act
+  article: Article 15
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 15: High-risk AI systems shall be
+    designed and developed in such a way that they achieve an appropriate level
+    of accuracy, robustness, and cybersecurity, and that they perform
+    consistently in those respects throughout their lifecycle. High-risk AI
+    systems shall be resilient against attempts by unauthorised third parties
+    to alter their use, outputs or performance by exploiting system
+    vulnerabilities.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 15 requires high-risk AI systems to achieve
+    appropriate accuracy, robustness, and cybersecurity levels, with resilience
+    against adversarial attacks and model poisoning. Penalties: up to EUR 15M
+    or 3% of global revenue.
+  suggestion: >-
+    Ensure the AI system achieves documented accuracy levels, is tested for
+    resilience against adversarial attacks and model poisoning, and has
+    cybersecurity measures proportionate to identified risks.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-15
+- high-risk
+- accuracy
+- robustness
+- cybersecurity
+tier: enterprise

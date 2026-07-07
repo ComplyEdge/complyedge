@@ -7,6 +7,8 @@
 
 **v1.1 changes (2026-05-16):** §5 — added commit-message approval channel for direct-to-main commits; added agent-delegated review attribution for retroactive sign-offs; clarified that aggregator files are out of scope.
 
+**Related methodology:** the prompt-security / Indirect Prompt Injection (IPI) rules under `rules/regulations/universal/prompt_security/` are authored and conformity-assessed per [`docs/security-compliance/ipi-conformity-assessment.md`](../docs/security-compliance/ipi-conformity-assessment.md) — the EU AI Act Article 15 (robustness / cybersecurity) methodology for IPI resistance.
+
 ---
 
 ## 1. Rule ID Format
