@@ -4,26 +4,18 @@ effective_date: '1996-08-21'
 description: Proactively detects protected health information in user inputs before
   processing
 detection_scope: user_input
+# Layer 1 (deterministic regex) conditions. Context-gated PHI keyword
+# detection and multi-signal correlation (medical term + age + name) require
+# Layer 2 evaluation — bare condition/medication keywords must not fire
+# standalone (see exceptions: general health education is out of scope).
+# The personal-context regex below plus the self-contextual provider pattern
+# are the standalone-safe Layer 1 subset.
 conditions:
-- type: input_sensitivity
-  sensitivity_type: phi
-  patterns:
-  - (?i)\b(diabetes|cancer|depression|anxiety|covid|hiv|aids|bipolar)\b
-  - (?i)\b(insulin|metformin|prozac|xanax|chemotherapy|radiation)\b
-  - (?i)\b(surgery|operation|biopsy|MRI|CT scan|blood test)\b
-  - (?i)\b(doctor|physician|hospital|clinic|emergency room)\b.*\b(said|told|prescribed|diagnosed)\b
-  confidence_threshold: 0.8
-  context_required: true
 - type: regex
   value: (?i)\b(my (condition|diagnosis|medication|treatment|symptoms?))\b
   flags: i
-- type: multi_pattern_risk
-  patterns:
-  - medical_term
-  - age_indicator
-  - name
-  threshold: 2
-  window_size: 200
+- type: regex
+  value: (?i)\b(doctor|physician|hospital|clinic|emergency room)\b.*\b(said|told|prescribed|diagnosed)\b
 severity: high
 category: healthcare
 source:
@@ -49,7 +41,7 @@ remediation:
   - 'Seek general guidance: ''What should I discuss with my doctor about...'''
   allow_override: false
   require_explicit_consent: true
-version: 1.0.0
+version: 1.1.0
 tags:
 - hipaa
 - phi

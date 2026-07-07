@@ -4,25 +4,20 @@ effective_date: '2025-01-01'
 description: Detects personally identifiable information in user inputs to prevent
   inadvertent disclosure
 detection_scope: user_input
+# Layer 1 (deterministic regex) conditions. Multi-signal correlation
+# (co-occurring name/address/phone/email) requires Layer 2 evaluation and is
+# intentionally not expressed here — the Layer 1 engine only supports regex.
 conditions:
-- type: input_sensitivity
-  sensitivity_type: pii
-  patterns:
-  - \b\d{3}-\d{2}-\d{4}\b
-  - \b\d{3}\s?\d{2}\s?\d{4}\b
-  - \b4[0-9]{12}(?:[0-9]{3})?\b
-  - \b5[1-5][0-9]{14}\b
-  - \b3[47][0-9]{13}\b
-  confidence_threshold: 0.9
-  context_required: false
-- type: multi_pattern_risk
-  patterns:
-  - name
-  - address
-  - phone_number
-  - email
-  threshold: 3
-  window_size: 300
+- type: regex
+  value: \b\d{3}-\d{2}-\d{4}\b
+- type: regex
+  value: \b\d{3}\s?\d{2}\s?\d{4}\b
+- type: regex
+  value: \b4[0-9]{12}(?:[0-9]{3})?\b
+- type: regex
+  value: \b5[1-5][0-9]{14}\b
+- type: regex
+  value: \b3[47][0-9]{13}\b
 severity: high
 category: input_protection
 source:
@@ -40,7 +35,7 @@ remediation:
   - Reference 'my card ending in XXXX' instead of full numbers
   allow_override: true
   require_explicit_consent: true
-version: 1.0.0
+version: 1.1.0
 tags:
 - pii
 - proactive

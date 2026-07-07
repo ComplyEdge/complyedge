@@ -1,5 +1,6 @@
 include index.ts
 include README.md
+include LICENSE
 # Rule corpus is copied into trustlint/rules/ at build time (deploy-pip.sh)
 # from the canonical rules/regulations/ corpus, then shipped in the wheel.
 recursive-include trustlint/rules *.yaml *.yml

@@ -1,0 +1,39 @@
+{
+  "benchmark": "layer1_latency",
+  "kind": "local_reproducible_microbenchmark",
+  "generated_at": "2026-07-07T13:47:39.415881+00:00",
+  "iterations": 500,
+  "note": "Local reproducible microbenchmark of the deterministic hot path (OPA/Rego bundle + TrustLint regex, no LLM). Prod latency is tracked per request via opa_latency_ms -> CloudWatch.",
+  "opa": {
+    "opa_version": "Version: 1.15.1",
+    "opa_per_request_sequential_ms": {
+      "n": 500,
+      "p50": 1.535,
+      "p95": 2.689,
+      "p99": 3.677,
+      "mean": 1.699,
+      "max": 18.572
+    },
+    "opa_single_package_ms": {
+      "n": 2000,
+      "p50": 0.382,
+      "p95": 0.704,
+      "p99": 1.176,
+      "mean": 0.425,
+      "max": 16.998
+    }
+  },
+  "trustlint": {
+    "rules_loaded": 64,
+    "trustlint_regex_ms": {
+      "n": 500,
+      "p50": 0.292,
+      "p95": 0.298,
+      "p99": 0.332,
+      "mean": 0.292,
+      "max": 0.348
+    }
+  },
+  "layer1_hotpath_p99_ms_parallel": 1.508,
+  "under_100ms_p99": true
+}
