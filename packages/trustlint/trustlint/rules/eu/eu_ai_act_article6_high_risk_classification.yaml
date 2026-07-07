@@ -1,0 +1,61 @@
+id: EU_AI_ACT_ART6_HIGH_RISK_CLASSIFICATION_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires classification assessment and documentation before deploying AI systems
+  listed in Annex III or used as safety components of Annex I products. AI systems
+  performing profiling of natural persons are always high-risk. Article 6.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    deploying an AI system that falls under EU AI Act Annex III use cases
+    (biometrics, critical infrastructure, education, employment, essential
+    services, law enforcement, migration, democratic processes) or is used as a
+    safety component of an Annex I product, without completing the required
+    high-risk classification assessment and documentation. Also detect AI systems
+    that perform profiling of natural persons, which are always classified as
+    high-risk. This is required under EU AI Act Article 6.
+  model: gpt-4
+- type: regex
+  value: >-
+    (high[\-\s]risk\s+ai\s+system|annex\s+III\s+(?:use\s+case|categor)|safety\s+component\s+(?:of|for)\s+(?:a\s+)?product|classification\s+(?:as\s+)?high[\-\s]risk|profiling\s+(?:of\s+)?natural\s+persons|conformity\s+assessment\s+(?:not\s+)?(?:completed|required|performed)|without\s+(?:high[\-\s]risk\s+)?classification|bypass(?:ing)?\s+(?:high[\-\s]risk|classification)|skip(?:ping)?\s+(?:conformity|classification)\s+assessment|deploy(?:ing)?\s+(?:without|before)\s+(?:classification|assessment))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 6
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 6: AI systems referred to in Annex III
+    shall be considered to be high-risk. An AI system referred to in Annex III
+    shall always be considered to be high-risk where the AI system performs
+    profiling of natural persons. A provider who considers that an AI system
+    referred to in Annex III is not high-risk shall document its assessment
+    before that system is placed on the market or put into service.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 6 requires high-risk classification assessment
+    before deploying AI systems in Annex III areas or as safety components of
+    Annex I products. AI systems performing profiling are always high-risk.
+    Penalties: up to EUR 15M or 3% of global revenue.
+  suggestion: >-
+    Complete the high-risk classification assessment per Article 6. Document
+    whether the AI system falls under Annex III use cases. If it performs
+    profiling of natural persons, it is automatically high-risk.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-6
+- high-risk
+- classification
+- annex-iii
+tier: enterprise

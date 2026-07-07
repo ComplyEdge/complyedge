@@ -3,7 +3,7 @@ OFFLINE — Validates static claims about the rule corpus and SDK defaults.
 No API key required.
 
 Claims verified:
-  - "28 Rego policies covering EU AI Act Article 5, Article 6, Article 50, and GPAI"
+  - "19 Rego policies covering EU AI Act Article 5, Article 50, and GPAI"
   - "53 YAML regulation definitions spanning EU, US, global, and universal rules"
   - "EU covers Articles 4–27, 50, 53, GPAI, GDPR"
   - "US covers HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA"
@@ -29,17 +29,17 @@ from conftest import REPO_ROOT, RULES_REGO_DIR, RULES_REGULATIONS_DIR, SDK_DIR
 # ---------------------------------------------------------------------------
 
 class TestRegoCorpus:
-    """Validates the 28 production Rego policies mentioned in the launch post."""
+    """Validates the 19 production Rego policies mentioned in the launch post."""
 
     @pytest.fixture(scope="class")
     def prod_rego_files(self) -> list[Path]:
         all_rego = list(RULES_REGO_DIR.rglob("*.rego"))
         return [f for f in all_rego if "test" not in f.parts]
 
-    def test_exactly_28_production_rego_policies(self, prod_rego_files):
-        # Claim: "We wrote 28 Rego policies"
-        assert len(prod_rego_files) == 28, (
-            f"Expected 28 production .rego files, found {len(prod_rego_files)}: "
+    def test_exactly_19_production_rego_policies(self, prod_rego_files):
+        # Claim: "We wrote 19 Rego policies"
+        assert len(prod_rego_files) == 19, (
+            f"Expected 19 production .rego files, found {len(prod_rego_files)}: "
             f"{sorted(str(f.relative_to(REPO_ROOT)) for f in prod_rego_files)}"
         )
 
@@ -71,7 +71,7 @@ class TestRegoCorpus:
         # Structural claim: each leaf policy cites the specific article.
         # Aggregator files (article5.rego, article50.rego, gpai.rego) combine
         # sub-rules and are explicitly exempt per RULE_STANDARD.md §5.6.
-        AGGREGATOR_NAMES = {"article5.rego", "article6.rego", "article50.rego", "gpai.rego"}
+        AGGREGATOR_NAMES = {"article5.rego", "article50.rego", "gpai.rego"}
         leaf_files = [f for f in prod_rego_files if f.name not in AGGREGATOR_NAMES]
         missing = []
         for f in leaf_files:
@@ -103,10 +103,11 @@ class TestYamlCorpus:
             RULES_REGULATIONS_DIR.rglob("*.yml")
         )
 
-    def test_exactly_53_yaml_regulations(self, yaml_files):
-        # Claim: "53 YAML regulation definitions"
-        assert len(yaml_files) == 53, (
-            f"Expected 53 YAML regulation files, found {len(yaml_files)}"
+    def test_exactly_64_yaml_regulations(self, yaml_files):
+        # Claim: "64 YAML regulation definitions" (53 → +8 IPI prompt-security
+        # rules → +2 OFAC sanctions transition rules, both 2026-07-05).
+        assert len(yaml_files) == 64, (
+            f"Expected 64 YAML regulation files, found {len(yaml_files)}"
         )
 
     def test_yaml_covers_eu_regulations(self, yaml_files):

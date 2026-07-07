@@ -1,0 +1,49 @@
+id: PROMPT_SECURITY_TOOL_CALL_HIJACK_001
+jurisdiction: GLOBAL
+effective_date: '2026-07-05'
+description: >-
+  Detects tool/function-call hijacking: injected instructions that direct an
+  agent to invoke tools for the attacker (forward secrets, send data to an
+  external address, run commands). EU AI Act Article 15. OWASP LLM01 / LLM07.
+title: Injection — tool / function-call hijacking
+detection_scope: all
+conditions:
+- type: regex
+  value: >-
+    (?i)(?:\b(?:forward|send|post|transmit|exfiltrate|leak|upload|email)\b[^.!?\n]{0,90}?\b(?:system\s+prompt|credentials?|api\s+keys?|secrets?|conversation|chat\s+history|password|the\s+above)\b[^.!?\n]{0,90}?\bto\s+(?:https?://|\S+@)|(?:make|issue|perform|execute)\s+an?\s+(?:http|https|get|post|curl|fetch)\s+request\s+to\s+https?://|(?:call|invoke|use|execute)\s+(?:the\s+)?\w+\s+(?:tool|function|api)\s+(?:to\s+(?:send|forward|exfiltrate|leak|delete|transfer)|with\s+(?:my|the\s+user'?s)\s+(?:credentials?|secrets?)))
+  flags: i
+severity: critical
+category: security
+source:
+  regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
+  article: Regulation (EU) 2024/1689, Article 15
+  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  citation: >-
+    OWASP LLM Top 10 — LLM01 (Prompt Injection) / LLM07 (Insecure Plugin/Tool
+    handling). Injection that hijacks agent tool calls to exfiltrate data or act
+    on the attacker's behalf is the highest-impact IPI outcome; Article 15
+    cybersecurity requires resistance.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛑 Blocked — this content attempts to hijack the agent's tools/functions to
+    exfiltrate data or act for a third party.
+  suggestion: >-
+    Never let untrusted content trigger tool calls that send data externally.
+    Gate tool invocation behind explicit human confirmation for high-risk actions.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- prompt_injection
+- ipi
+- tool_hijack
+- agent_security
+- data_exfiltration
+- article_15
+- owasp_llm01
+- owasp_llm07
+- security
+tier: community

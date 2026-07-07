@@ -1,0 +1,64 @@
+id: EU_AI_ACT_ART50_DEEPFAKE_DISCLOSURE_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires deployers of AI systems generating deepfake image, audio, or
+  video content to disclose that the content has been artificially
+  generated or manipulated. Article 50(4) of the EU AI Act. Narrow
+  exceptions apply for art, satire, and law enforcement.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or
+    facilitates the creation or distribution of a deepfake (AI-generated
+    video, image, or audio depicting a real person saying or doing
+    something they did not) WITHOUT the disclosure required by Article
+    50(4) of the EU AI Act. Flag deepfake workflows that skip or hide
+    the required labelling of the content as artificially generated.
+  model: gpt-4
+- type: regex
+  value: (deepfake|face[- ]?swap|face[- ]?synth|voice[- ]?clone|voice[- ]?synth|lip[- ]?sync(ed)?|impersonat(e|ion)\s+(video|audio|clip)|ai[- ]?generated\s+(video|clip)\s+of\s+(him|her|them|\w+))[^\n]{0,100}(without|with\s+no|no|skip(ping)?\s+(the\s+)?|bypass(ing)?\s+(the\s+)?|hide|hid(ing|den))\s+(disclosure|disclaim(er)?|label|marker|notice|watermark|\"ai[- ]?generated\"|\"deepfake\")|undisclosed\s+(deepfake|face[- ]?swap|voice[- ]?clone)|(generate|produce|create|make)\s+(a\s+)?deepfake\s+(of|that)
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 50(4)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 50(4): Deployers of an AI system
+    that generates or manipulates image, audio or video content
+    constituting a deep fake, shall disclose that the content has been
+    artificially generated or manipulated. This obligation shall not
+    apply where the use is authorised by law to detect, prevent,
+    investigate or prosecute criminal offences. Where the content forms
+    part of an evidently artistic, creative, satirical, fictional or
+    analogous work or programme, the transparency obligations set out
+    in this paragraph are limited to disclosure of the existence of
+    such generated or manipulated content in an appropriate manner
+    that does not hamper the display or enjoyment of the work.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 50(4) requires deepfake content to be
+    disclosed as artificially generated or manipulated. Creating or
+    distributing a deepfake without the required disclosure is prohibited
+    for most use cases. Narrow exceptions apply for law enforcement and
+    clearly artistic/satirical works (with disclosure still required).
+    Penalties: up to €15M or 3% of global revenue.
+  suggestion: >-
+    Add a visible and machine-readable disclosure to the deepfake content
+    stating it was artificially generated or manipulated. If the use case
+    is artistic/satirical, the disclosure can be less prominent but must
+    still exist.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-50
+- transparency
+- deepfake
+- synthetic-media
+tier: enterprise

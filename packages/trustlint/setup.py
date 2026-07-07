@@ -6,7 +6,7 @@ long_desc = (this_dir / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="trustlint",
-    version="2.0.0",
+    version="2.0.1",
     packages=find_packages(),
     # Ship the ComplyEdge rule corpus inside the wheel so `pip install
     # trustlint` is a self-contained linter. trustlint/rules/ is populated at

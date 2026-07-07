@@ -19,14 +19,10 @@ conditions:
 - type: regex
   value: (biometric[- ]?categori[sz]|facial[- ]?classif.*race|biometric.*infer.*(race|religion|politic|sexual|belief|union)|emotion[- ]?recognition.*categori)
   flags: i
-- type: input_sensitivity
-  sensitivity_type: biometric
-  patterns:
-  - biometric.*classification
-  - facial.*recognition.*categoriz
-  - biometric.*profiling
-  confidence_threshold: 0.85
-  context_required: true
+# Context-gated biometric patterns (biometric.*classification, etc.) require
+# Layer 2 evaluation — they must not fire this critical block-action rule
+# standalone. Layer 1 coverage is the categorisation regex above; broader
+# context lives in the semantic condition.
 severity: critical
 category: prohibited_practice
 source:
@@ -57,7 +53,7 @@ remediation:
     Remove any biometric categorisation that infers protected characteristics.
     If biometric processing is required, ensure it does not deduce race,
     religion, political views, sex life, or other prohibited categories.
-version: 1.0.0
+version: 1.1.0
 tags:
 - eu-ai-act
 - article-5

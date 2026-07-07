@@ -1,0 +1,78 @@
+id: GDPR_DPIA_001
+jurisdiction: EU
+effective_date: '2018-05-25'
+description: >-
+  Requires controllers to carry out a data protection impact assessment prior
+  to processing that is likely to result in a high risk to the rights and
+  freedoms of natural persons, particularly for automated decision-making,
+  large-scale processing of special categories, or systematic monitoring.
+  GDPR Article 35.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    processing personal data in a manner likely to result in high risk to the
+    rights and freedoms of natural persons without first conducting a data
+    protection impact assessment (DPIA) as required by GDPR Article 35. A
+    DPIA is required in particular for: (a) systematic and extensive
+    evaluation of personal aspects based on automated processing, including
+    profiling, on which decisions are based that produce legal effects;
+    (b) processing on a large scale of special categories of data or criminal
+    conviction data; (c) systematic monitoring of a publicly accessible area
+    on a large scale. The assessment must include a description of processing
+    operations, necessity and proportionality assessment, risk assessment, and
+    measures to address risks.
+  model: gpt-4
+- type: regex
+  value: >-
+    (without\s+(?:data\s+protection\s+)?impact\s+assessment|no\s+(?:DPIA|data\s+protection\s+impact\s+assessment)|skip(?:ping)?\s+(?:DPIA|impact\s+assessment)|(?:automated|profiling)\s+(?:decision|processing)\s+(?:without|lacking)\s+(?:DPIA|impact\s+assessment)|large[\-\s]scale\s+(?:processing|monitoring)\s+(?:without|lacking)\s+(?:DPIA|assessment)|high[\-\s]risk\s+processing\s+(?:without|lacking)\s+(?:DPIA|impact\s+assessment)|fail(?:ing|ure)?\s+to\s+(?:conduct|perform|carry\s+out)\s+(?:a\s+)?(?:DPIA|impact\s+assessment)|systematic\s+monitoring\s+(?:without|lacking)\s+(?:DPIA|assessment))
+  flags: i
+severity: high
+category: privacy
+source:
+  regulation: GDPR
+  article: Article 35
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  last_updated: '2016-04-27'
+  citation: >-
+    Regulation (EU) 2016/679, Article 35(1): Where a type of processing in
+    particular using new technologies, and taking into account the nature,
+    scope, context and purposes of the processing, is likely to result in a
+    high risk to the rights and freedoms of natural persons, the controller
+    shall, prior to the processing, carry out an assessment of the impact of
+    the envisaged processing operations on the protection of personal data.
+    Article 35(3): A data protection impact assessment shall in particular be
+    required in the case of: (a) a systematic and extensive evaluation of
+    personal aspects relating to natural persons which is based on automated
+    processing, including profiling, and on which decisions are based that
+    produce legal effects; (b) processing on a large scale of special
+    categories of data; (c) a systematic monitoring of a publicly accessible
+    area on a large scale.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 10,000,000 or 2% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — GDPR Article 35 requires a data protection impact assessment
+    (DPIA) before processing that is likely to result in high risk to rights
+    and freedoms. This includes automated profiling, large-scale special
+    category data, and systematic monitoring. Penalties: up to EUR 10M or
+    2% of global revenue.
+  suggestion: >-
+    Conduct a DPIA before proceeding with the processing. The assessment
+    must include: systematic description of processing operations, assessment
+    of necessity and proportionality, assessment of risks to data subjects,
+    and measures to address those risks including safeguards and security
+    mechanisms. Seek the DPO's advice where designated.
+version: 1.0.0
+tags:
+- gdpr
+- article-35
+- dpia
+- impact-assessment
+- automated-processing
+- profiling
+tier: enterprise

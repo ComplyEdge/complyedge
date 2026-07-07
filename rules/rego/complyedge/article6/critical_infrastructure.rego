@@ -10,7 +10,7 @@
 # Condition type: deterministic (regex)
 # Enforcement layer: layer1
 # Status: approved
-# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5)
+# Approved by: Leo Celis on 2026-07-03 (via agent review per RULE_STANDARD §5.5; card 197 / WGlhJpPN)
 
 package complyedge.article6.critical_infrastructure
 

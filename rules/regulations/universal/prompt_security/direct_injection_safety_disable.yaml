@@ -1,0 +1,47 @@
+id: PROMPT_SECURITY_DIRECT_INJECTION_SAFETY_DISABLE_001
+jurisdiction: GLOBAL
+effective_date: '2026-07-05'
+description: >-
+  Detects direct prompt injection that asks the assistant to disable or bypass
+  its safety filters, content policy, or guardrails. EU AI Act Article 15
+  robustness Layer-1 catch. OWASP LLM01.
+title: Direct prompt injection — disable safety controls
+detection_scope: user_input
+conditions:
+- type: regex
+  value: >-
+    (?i)\b(?:disable|turn\s+off|deactivate|switch\s+off|remove|bypass|circumvent|ignore)\s+(?:your\s+|all\s+|any\s+|the\s+|every\s+)*(?:safety\s+(?:filters?|guidelines?|guardrails?|protocols?|checks?)|content\s+(?:policy|policies|filters?|moderation)|(?:ethical|moral)\s+(?:guidelines?|constraints?)|guardrails?|restrictions?|safeguards?)\b
+  flags: i
+severity: high
+category: security
+source:
+  regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
+  article: Regulation (EU) 2024/1689, Article 15
+  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  citation: >-
+    OWASP LLM Top 10 — LLM01: Prompt Injection. Article 15 requires high-risk AI
+    systems to be robust against adversarial input; instructions to disable
+    safety filters directly attack that robustness control.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛡️ Prompt injection detected — an attempt to disable the assistant's safety
+    filters or content policy. Blocked.
+  suggestion: >-
+    Safety controls cannot be disabled by request. If a legitimate output is
+    being over-blocked, describe the specific goal instead.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- prompt_injection
+- ipi
+- direct_injection
+- safety_bypass
+- article_15
+- robustness
+- owasp_llm01
+- security
+tier: community

@@ -1,0 +1,60 @@
+id: EU_AI_ACT_GPAI_COPYRIGHT_TRANSPARENCY_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires providers of general-purpose AI models to put in place a policy
+  to comply with Union copyright law and to make publicly available a
+  sufficiently detailed summary of the training data used, following a
+  template provided by the AI Office. Article 53(1)(c) of the EU AI Act
+  mandates copyright transparency for GPAI training data.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes training, fine-tuning,
+    or building a general-purpose AI model on copyrighted material without
+    providing the required disclosure, summary, or transparency about the
+    training data as required by Article 53(1)(c) of the EU AI Act.
+  model: gpt-4
+- type: regex
+  value: (train|fine[\-\s]?tun|retrain)\w*\s+(on|with|using)\s+(copyrighted|proprietary|licensed)\s+(data|content|material|works|text|corpus)\s+(without|lacking|no)\s+(disclosure|summary|transparency|documentation|permission)
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 53(1)(c)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 53(1)(c): Providers of
+    general-purpose AI models shall put in place a policy to comply with
+    Union law on copyright and related rights, and in particular to
+    identify and comply with, including through state of the art
+    technologies, a reservation of rights expressed pursuant to Article
+    4(3) of Directive (EU) 2019/790; and make publicly available a
+    sufficiently detailed summary about the content used for training of
+    the general-purpose AI model, according to a template provided by the
+    AI Office.
+remediation:
+  action: warn
+  timing: proactive
+  message: >-
+    WARNING — EU AI Act Article 53(1)(c) requires GPAI model providers to
+    disclose a sufficiently detailed summary of training data and comply
+    with EU copyright law. Training on copyrighted data without transparency
+    may result in penalties of up to EUR 15M or 3% of global annual revenue.
+  suggestion: >-
+    Publish a detailed summary of training data content following the AI
+    Office template. Implement a copyright compliance policy that respects
+    opt-out rights under the EU Copyright Directive. Document all
+    copyrighted works used in training and maintain an audit trail.
+version: 1.0.0
+tags:
+- eu-ai-act
+- gpai
+- article-53
+- copyright
+- training-data
+- transparency
+tier: enterprise

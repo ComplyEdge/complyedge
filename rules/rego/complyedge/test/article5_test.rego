@@ -117,7 +117,7 @@ test_vulnerability_allows_normal_text if {
 	}
 }
 
-# Article 5(1)(b) social-situation axis tests (agent-added 2026-06-06).
+# Article 5(1)(b) social-situation axis tests (card 194 — agent-added 2026-06-06).
 # Covers refugees, migrants, asylum-seekers, displaced people, the homeless,
 # the undocumented — across the four verbs in the new pattern.
 
@@ -211,7 +211,7 @@ test_biometric_allows_normal_text if {
 	}
 }
 
-# Article 5(1)(g) OJ carve-out tests (agent-added 2026-06-05).
+# Article 5(1)(g) OJ carve-out tests (card 195 — agent-added 2026-06-05).
 # The base prohibition still fires when no exception flags are set; the
 # exception only kicks in when the caller asserts the matching input
 # fields.

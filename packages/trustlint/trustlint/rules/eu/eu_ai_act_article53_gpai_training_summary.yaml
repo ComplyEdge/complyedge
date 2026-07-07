@@ -1,0 +1,110 @@
+id: EU_AI_ACT_ART53_GPAI_TRAINING_SUMMARY_001
+jurisdiction: EU
+effective_date: '2025-08-02'
+description: >-
+  Requires providers of general-purpose AI (GPAI) models to draw up and make
+  publicly available a sufficiently detailed summary about the content used
+  for training of the model, according to a template provided by the AI
+  Office. EU AI Act Article 53(1)(d).
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    placing a general-purpose AI (GPAI) model on the EU market without
+    drawing up and making publicly available a sufficiently detailed summary
+    about the content used for training the model, in violation of Article
+    53(1)(d) of the EU AI Act (Regulation (EU) 2024/1689). The summary must
+    follow the template provided by the AI Office. Detect: (1) releasing or
+    deploying a GPAI model in the EU without publishing a training data
+    summary, (2) publishing only a vague or token disclosure that is not
+    "sufficiently detailed", (3) refusing to disclose training data sources,
+    (4) failing to keep technical documentation per Annex XI. Note the open-
+    source exemption: paragraph 2 exempts free and open-source GPAI models
+    from points (a) and (b), but the publicly-available training summary
+    requirement in point (d) applies to all providers — including open-source
+    — and the exemption does not apply to GPAI models with systemic risk.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:no|without|missing)\s+(?:training\s+data\s+summary|training\s+content\s+summary|GPAI\s+training\s+disclosure|publicly\s+available\s+summary)|(?:GPAI|general[\-\s]purpose\s+AI|foundation\s+model|LLM)\s+(?:released|deployed|launched|placed\s+on\s+market)\s+(?:without|lacking)\s+(?:training\s+(?:data|content)\s+(?:summary|disclosure)|public\s+disclosure)|(?:refus|hid\w*|conceal\w*|withhold\w*)\s+(?:training\s+data|training\s+content|training\s+sources|training\s+corpus)\s+(?:disclosure|information|details)|(?:training\s+data|training\s+content|training\s+corpus)\s+(?:summary|disclosure)\s+(?:not\s+published|undisclosed|hidden|conceal\w*)|(?:no|without)\s+(?:Annex\s+XI|technical\s+documentation)\s+(?:for|of)\s+(?:GPAI|general[\-\s]purpose\s+AI|foundation\s+model)|(?:provide|provider)\w*\s+(?:GPAI|general[\-\s]purpose\s+AI)\s+(?:without|lacking)\s+(?:Article\s+53|Art\.?\s+53|training\s+summary|public\s+disclosure))
+  flags: i
+severity: high
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 53(1)(d)
+  url: https://artificialintelligenceact.eu/article/53/
+  last_updated: '2024-06-13'
+  citation: >-
+    Regulation (EU) 2024/1689 (EU AI Act), Article 53(1): Providers of
+    general-purpose AI models shall: (a) draw up and keep up-to-date the
+    technical documentation of the model, including its training and testing
+    process and the results of its evaluation, which shall contain, at a
+    minimum, the information set out in Annex XI for the purpose of providing
+    it, upon request, to the AI Office and the national competent authorities;
+    (b) draw up, keep up-to-date and make available information and
+    documentation to providers of AI systems who intend to integrate the
+    general-purpose AI model into their AI systems. Without prejudice to the
+    need to observe and protect intellectual property rights and confidential
+    business information or trade secrets in accordance with Union and
+    national law, the information and documentation shall: (i) enable
+    providers of AI systems to have a good understanding of the capabilities
+    and limitations of the general-purpose AI model and to comply with their
+    obligations pursuant to this Regulation; and (ii) contain, at a minimum,
+    the elements set out in Annex XII; (c) put in place a policy to comply
+    with Union law on copyright and related rights, and in particular to
+    identify and comply with, including through state-of-the-art technologies,
+    a reservation of rights expressed pursuant to Article 4(3) of Directive
+    (EU) 2019/790; (d) draw up and make publicly available a sufficiently
+    detailed summary about the content used for training of the
+    general-purpose AI model, according to a template provided by the AI
+    Office. Article 53(2): The obligations set out in paragraph 1, points (a)
+    and (b), shall not apply to providers of AI models that are released
+    under a free and open-source licence that allows for the access, usage,
+    modification, and distribution of the model, and whose parameters,
+    including the weights, the information on the model architecture, and
+    the information on model usage, are made publicly available. This
+    exception shall not apply to general-purpose AI models with systemic
+    risks.
+exceptions:
+- condition: Free and open-source licence (limited)
+  description: >-
+    Article 53(2): Obligations in points (a) and (b) do not apply to GPAI
+    models released under a free and open-source licence with publicly
+    available parameters/weights/architecture. Note: the publicly available
+    training summary requirement in point (d) applies even to open-source
+    providers, and the open-source exemption does not apply to GPAI models
+    with systemic risk.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      Up to EUR 15,000,000 or 3% of total worldwide annual turnover,
+      whichever is higher (Article 101 — Fines for Providers of
+      General-Purpose AI Models)
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 53(1)(d) requires GPAI providers to make
+    publicly available a sufficiently detailed summary of training content
+    using the AI Office template. Penalties: up to EUR 15M or 3% of global
+    turnover (Article 101).
+  suggestion: >-
+    Before placing the GPAI model on the EU market: (1) maintain technical
+    documentation per Annex XI, (2) provide downstream-integrator
+    documentation per Annex XII, (3) implement a Union copyright compliance
+    policy honouring Article 4(3) of Directive (EU) 2019/790 reservations,
+    and (4) publish a sufficiently detailed training-content summary using
+    the AI Office template. Open-source providers are still bound by point
+    (d) and by all obligations if the model has systemic risk.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-53
+- gpai
+- general-purpose-ai
+- training-data
+- transparency
+- foundation-model
+tier: enterprise

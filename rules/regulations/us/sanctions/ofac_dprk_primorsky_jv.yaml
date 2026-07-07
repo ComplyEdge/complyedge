@@ -1,0 +1,52 @@
+id: SANCTIONS_OFAC_DPRK_PRIMORSKY_JV_001
+jurisdiction: US
+effective_date: '2026-01-01'
+description: >-
+  OFAC DPRK secondary-sanctions nexus for Russia–North Korea joint ventures
+  (Primorsky Krai / Rason). A dated regime running through 2030; dealings that
+  touch the JV nexus are prohibited within the window. Demonstrates a
+  forward-dated effective_window sanctions primitive.
+title: OFAC DPRK — Primorsky Krai JV secondary-sanctions nexus
+detection_scope: all
+category: sanctions
+conditions:
+- type: regex
+  value: >-
+    (?i)\b(North\s+Korea|DPRK|Primorsky\s+Krai|Rason(?:\s+(?:SEZ|zone))?|(?:joint\s+venture|JV)\b[^.!?\n]{0,60}?\b(?:North\s+Korea|DPRK|Pyongyang))\b
+  flags: i
+severity: high
+effective_window:
+  starts: '2026-01-01'
+  ends: '2030-12-31'
+source:
+  regulation: OFAC (US Treasury) North Korea sanctions — secondary sanctions
+  article: 31 CFR Part 510 / Executive Order 13810
+  url: https://ofac.treasury.gov/sanctions-programs-and-country-information/north-korea-sanctions
+  citation: >-
+    OFAC administers DPRK sanctions under 31 CFR Part 510 and EO 13810,
+    including secondary sanctions on those facilitating DPRK trade. This rule
+    models the Russia–DPRK Primorsky Krai JV nexus as a forward-dated regime
+    prohibited through the window end date.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛑 OFAC DPRK secondary-sanctions nexus (Russia–North Korea Primorsky Krai
+    JV). Prohibited within the effective window; see transition guidance for the
+    window end date.
+  suggestion: >-
+    Screen counterparties for DPRK secondary-sanctions exposure. The prohibition
+    applies through the window end date.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- sanctions
+- ofac
+- dprk
+- north_korea
+- secondary_sanctions
+- effective_window
+- transition_rule
+tier: enterprise

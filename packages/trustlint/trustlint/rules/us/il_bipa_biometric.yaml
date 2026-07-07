@@ -1,0 +1,104 @@
+id: IL_BIPA_BIOMETRIC_001
+jurisdiction: US
+effective_date: '2008-10-03'
+description: >-
+  Prohibits private entities from collecting, capturing, or otherwise
+  obtaining biometric identifiers or biometric information without first
+  obtaining informed written consent. Requires written retention and
+  destruction policies. Illinois Biometric Information Privacy Act (BIPA),
+  740 ILCS 14/15.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    collecting, capturing, purchasing, or otherwise obtaining a person's
+    biometric identifiers or biometric information without first: (1) informing
+    the subject in writing that biometric data is being collected or stored;
+    (2) informing the subject of the specific purpose and length of term for
+    which the data is being used; and (3) receiving a written release from
+    the subject — as required by the Illinois Biometric Information Privacy
+    Act (740 ILCS 14/15). Biometric identifiers include retina or iris scans,
+    fingerprints, voiceprints, scans of hand or face geometry. Also detect
+    selling, leasing, trading, or profiting from biometric data.
+    Do NOT flag biometric data collection that has obtained proper informed
+    written consent.
+  model: gpt-4
+- type: input_sensitivity
+  sensitivity_type: biometric
+  patterns:
+  - fingerprint
+  - retina scan
+  - iris scan
+  - voiceprint
+  - face geometry
+  - facial recognition
+  - palm scan
+  - hand geometry
+  - biometric data
+  - biometric identifier
+  - faceprint
+  confidence_threshold: 0.8
+  context_required: true
+- type: regex
+  value: >-
+    (collect\w*\s+(?:biometric|fingerprint|retina|iris|voiceprint|face\s+geometry|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:without|lacking)\s+(?:consent|written\s+release|authorization|notice)|(?:biometric|fingerprint|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:collected|captured|obtained|stored)\s+(?:without|lacking)\s+(?:consent|written\s+consent|written\s+release|notification)|(?:sell|trade|lease|profit\s+from)\w*\s+(?:biometric|fingerprint|facial)\s+(?:data|identifier|information)|no\s+(?:biometric\s+)?(?:consent|written\s+release|retention\s+policy|destruction\s+policy)|fail(?:ing|ure|ed)?\s+to\s+(?:inform|notify|obtain\s+consent|provide\s+notice)\s+(?:about|before|for|regarding)\s+biometric|(?:scan|capture|record)\w*\s+(?:face|fingerprint|iris|retina|voice)\s+(?:without|lacking)\s+(?:consent|permission|notice))
+  flags: i
+severity: critical
+category: privacy
+source:
+  regulation: Illinois BIPA
+  article: 740 ILCS 14/15
+  url: https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57
+  last_updated: '2024-02-09'
+  citation: >-
+    740 ILCS 14/15(a): A private entity in possession of biometric identifiers
+    or biometric information must develop a written policy, made available to
+    the public, establishing a retention schedule and guidelines for
+    permanently destroying biometric identifiers and biometric information
+    when the initial purpose for collecting or obtaining such identifiers or
+    information has been satisfied or within 3 years of the individual's last
+    interaction with the private entity, whichever occurs first. 740 ILCS
+    14/15(b): No private entity may collect, capture, purchase, receive
+    through trade, or otherwise obtain a person's or a customer's biometric
+    identifier or biometric information, unless it first: (1) informs the
+    subject or the subject's legally authorized representative in writing
+    that a biometric identifier or biometric information is being collected
+    or stored; (2) informs the subject or the subject's legally authorized
+    representative in writing of the specific purpose and length of term for
+    which a biometric identifier or biometric information is being collected,
+    stored, and used; and (3) receives a written release executed by the
+    subject of the biometric identifier or biometric information or the
+    subject's legally authorized representative. 740 ILCS 14/15(c): No
+    private entity in possession of a biometric identifier or biometric
+    information may sell, lease, trade, or otherwise profit from a person's
+    or a customer's biometric identifier or biometric information.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      $1,000 per negligent violation, $5,000 per intentional or reckless
+      violation, plus attorney's fees and costs. Per-scan accrual established
+      by Illinois Supreme Court in Cothron v. White Castle (2023).
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — The Illinois Biometric Information Privacy Act (740 ILCS 14/15)
+    requires informed written consent before collecting any biometric
+    identifiers or information. Selling or profiting from biometric data is
+    prohibited. Penalties: $1,000-$5,000 per violation with per-scan accrual.
+  suggestion: >-
+    Before collecting any biometric data: (1) provide written notice that
+    biometric identifiers are being collected or stored; (2) state the
+    specific purpose and retention period in writing; (3) obtain a written
+    release from the individual. Develop and publish a written retention and
+    destruction policy. Never sell, lease, or trade biometric data.
+version: 1.0.0
+tags:
+- bipa
+- illinois
+- biometric
+- fingerprint
+- facial-recognition
+- written-consent
+tier: enterprise
