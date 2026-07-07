@@ -4,24 +4,21 @@ effective_date: '2004-12-15'
 description: Proactively detects payment card information in user inputs to prevent
   PCI DSS violations
 detection_scope: user_input
+# Layer 1 (deterministic regex) conditions. Multi-signal correlation
+# (card number co-occurring with name/address) requires Layer 2 evaluation
+# and is intentionally not expressed here.
 conditions:
-- type: input_sensitivity
-  sensitivity_type: financial
-  patterns:
-  - \b4[0-9]{12}(?:[0-9]{3})?\b
-  - \b5[1-5][0-9]{14}\b
-  - \b3[47][0-9]{13}\b
-  - \b6(?:011|5[0-9]{2})[0-9]{12}\b
-  - (?i)\b(credit card|debit card|card number|cvv|cvc|expir)\b
-  confidence_threshold: 0.95
-  context_required: false
-- type: multi_pattern_risk
-  patterns:
-  - credit_card
-  - name
-  - address
-  threshold: 2
-  window_size: 100
+- type: regex
+  value: \b4[0-9]{12}(?:[0-9]{3})?\b
+- type: regex
+  value: \b5[1-5][0-9]{14}\b
+- type: regex
+  value: \b3[47][0-9]{13}\b
+- type: regex
+  value: \b6(?:011|5[0-9]{2})[0-9]{12}\b
+- type: regex
+  value: \b(credit card|debit card|card number|cvv|cvc|expir)\b
+  flags: i
 - type: regex
   value: (?i)\b(my card|my credit|my debit|card.*\d{4})\b
   flags: i
@@ -48,7 +45,7 @@ remediation:
   - Contact customer service through our verified payment channels
   allow_override: false
   require_explicit_consent: false
-version: 1.0.0
+version: 1.1.0
 tags:
 - pci_dss
 - payment

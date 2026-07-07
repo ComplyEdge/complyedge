@@ -4,24 +4,17 @@ effective_date: '1998-04-21'
 description: Detects when children under 13 are sharing personal information requiring
   parental consent
 detection_scope: user_input
+# Layer 1 (deterministic regex) conditions. Multi-signal correlation
+# (age indicator co-occurring with email/name/address) requires Layer 2
+# evaluation and is intentionally not expressed here.
 conditions:
-- type: input_sensitivity
-  sensitivity_type: child_data
-  patterns:
-  - (?i)\b(i'?m|i am) (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)
+- type: regex
+  value: (?i)\b(i'?m|i am) (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)
     (years? old|yr|yrs)\b
-  - (?i)\b(age|born in) (199[5-9]|20[0-1][0-9])\b
-  - (?i)\b(elementary|middle school|grade [1-8])\b
-  confidence_threshold: 0.9
-  context_required: false
-- type: multi_pattern_risk
-  patterns:
-  - age_indicator
-  - email
-  - name
-  - address
-  threshold: 2
-  window_size: 150
+- type: regex
+  value: (?i)\b(age|born in) (199[5-9]|20[0-1][0-9])\b
+- type: regex
+  value: (?i)\b(elementary|middle school|grade [1-8])\b
 - type: regex
   value: (?i)\b(my (school|teacher|mom|dad|parent))\b
   flags: i
@@ -45,7 +38,7 @@ remediation:
   - Visit our educational resources designed for young users
   allow_override: false
   require_explicit_consent: true
-version: 1.0.0
+version: 1.1.0
 tags:
 - coppa
 - children

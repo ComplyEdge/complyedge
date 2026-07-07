@@ -24,21 +24,10 @@ conditions:
     disclosures required by law, or disclosures to the Secretary — these are
     statutory exceptions.
   model: gpt-4
-- type: input_sensitivity
-  sensitivity_type: phi
-  patterns:
-  - medical record
-  - patient record
-  - health record
-  - diagnosis
-  - prescription
-  - treatment history
-  - clinical notes
-  - lab results
-  - protected health information
-  - PHI
-  confidence_threshold: 0.75
-  context_required: true
+# Context-gated PHI keyword detection (medical record, diagnosis, etc.)
+# requires Layer 2 evaluation — bare keywords must not fire this block-action
+# rule standalone. Layer 1 coverage is the excessive-disclosure regex below;
+# broader context lives in the semantic condition above.
 - type: regex
   value: >-
     ((?:share|disclose|send|transmit|provide|grant\s+access\s+to)\w*\s+(?:entire|full|complete|all)\s+(?:medical|patient|health|clinical)\s+record|(?:bulk|mass|wholesale)\s+(?:PHI|patient\s+data|medical\s+record|health\s+information)\s+(?:disclosure|transfer|sharing|export)|(?:request|requesting)\s+(?:entire|full|complete|all)\s+(?:medical|patient|health)\s+record\s+(?:when|where|but)\s+(?:only|just|merely)|(?:no|without)\s+(?:minimum\s+necessary|need[\-\s]to[\-\s]know|role[\-\s]based)\s+(?:assessment|review|determination|access\s+control)|(?:everyone|all\s+staff|entire\s+team|all\s+employees)\s+(?:has|have|with)\s+(?:access\s+to|can\s+access)\s+(?:PHI|patient\s+record|medical\s+record|health\s+information)|(?:over[\-\s]disclos\w*|excessive\s+disclosure)\s+(?:of\s+)?(?:PHI|protected\s+health\s+information|patient\s+data)|(?:share|disclose)\w*\s+(?:more\s+PHI|more\s+health\s+information)\s+than\s+(?:necessary|required|needed))
@@ -105,7 +94,7 @@ remediation:
     possible. For routine disclosures, develop and implement policies that
     limit the PHI to the minimum necessary. Document the basis for each
     disclosure.
-version: 1.0.0
+version: 1.1.0
 tags:
 - hipaa
 - minimum-necessary
