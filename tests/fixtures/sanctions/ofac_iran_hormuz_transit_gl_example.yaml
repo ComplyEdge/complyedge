@@ -1,0 +1,102 @@
+id: OFAC_IRAN_HORMUZ_TRANSIT_GL_EXAMPLE_001
+jurisdiction: GLOBAL
+effective_date: '2026-05-15'
+description: >-
+  EXAMPLE FIXTURE — hypothetical OFAC General License authorising Hormuz strait
+  transit-fee payments to specified Iranian banks, narrowly carved-out to
+  exclude IRGC-affiliated counterparties and nuclear-program entities. This
+  rule is a structural example of the sanctions-transition schema fields
+  (effective_window, supersedes, conditional_on) and is NOT a live OFAC
+  authority. Real OFAC content is loaded from the corpus by separate workflow.
+title: Hypothetical OFAC Iran Hormuz Transit GL (example fixture)
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates a
+    transit-fee payment to an Iranian banking counterparty for Hormuz strait
+    passage. Distinguish: (a) payments to non-IRGC, non-nuclear-program
+    counterparties during the authorised window (PERMITTED), (b) payments to
+    IRGC-designated or nuclear-program counterparties (PROHIBITED regardless
+    of GL), and (c) payments outside the authorised window or after the GL
+    expiry (PROHIBITED).
+  model: gpt-4
+severity: medium
+category: sanctions
+source:
+  regulation: OFAC General License (example)
+  article: 31 CFR §560 (example fixture, not a live citation)
+  url: https://ofac.treasury.gov/
+  last_updated: '2026-05-15'
+  citation: >-
+    EXAMPLE FIXTURE. Real General Licenses are published under 31 CFR by
+    OFAC and have specific authorisation numbers (e.g., "Iran GL 8C"). This
+    rule exists only to exercise the sanctions-transition schema fields.
+exceptions:
+- condition: IRGC-affiliated counterparty
+  description: >-
+    Payment routes through an entity designated under Executive Order 13224 or
+    13599 — falls outside the General License regardless of payment purpose.
+- condition: Nuclear-program counterparty
+  description: >-
+    Payment touches a counterparty on the JCPOA nuclear-program retain list —
+    auto-retain pattern, not eligible for any General License authorisation.
+remediation:
+  action: warn
+  timing: proactive
+  message: >-
+    🛳️ Hormuz transit-fee payment detected during the authorised General License
+    window. Confirm the counterparty is NOT IRGC-affiliated and NOT on the
+    nuclear-program retain list before releasing funds.
+  suggestion: >-
+    Verify the recipient's OFAC SDN status via the live OFAC search API; if
+    designated under EO 13224 / 13599, the payment is PROHIBITED.
+  allow_override: true
+  require_explicit_consent: true
+version: 1.0.0
+tags:
+- sanctions
+- ofac
+- iran
+- general_license
+- example_fixture
+- schema_demo
+tier: enterprise
+effective_window:
+  starts: '2026-05-15'
+  ends: '2026-11-15'
+  superseded_by: OFAC_IRAN_HORMUZ_TRANSIT_GL_EXAMPLE_002
+supersedes:
+- rule_id: OFAC_IRAN_HORMUZ_TRANSIT_PROHIBITION_2024
+  effective_replacement: '2026-05-15'
+  notes: >-
+    Narrows the blanket Hormuz transit-payment prohibition to permit payments
+    to non-IRGC, non-nuclear-program counterparties during the six-month
+    window. Pre-GL rule remains in force for all other counterparty types.
+conditional_on:
+- parameter: counterparty_irgc_status
+  operator: '=='
+  value: not_designated
+  rationale: >-
+    Hormuz transit fees are permitted under this hypothetical GL ONLY when
+    the counterparty is not designated under Executive Order 13224 (Specially
+    Designated Global Terrorist) or 13599 (Iranian banking sector blocking
+    rule). IRGC-linked counterparties remain prohibited regardless of the GL.
+- parameter: counterparty_nuclear_program_status
+  operator: '=='
+  value: clear
+  rationale: >-
+    Nuclear-program entities (per the JCPOA retain list) are auto-retained
+    and never eligible for OFAC General License authorisation. This carve-out
+    enforces the auto-retain pattern for sanctions screening
+    Q2 entries.
+- parameter: payment_date_iso
+  operator: in
+  value:
+  - '2026-05-15'
+  - '2026-11-15'
+  rationale: >-
+    GL is time-bounded; payments outside the [starts, ends] window of the
+    effective_window field fall back to the superseded prohibition rule.
+    Dates are quoted as strings so YAML parses them as ISO-8601 strings, not
+    datetime objects (which the schema's 'value' union does not accept).
