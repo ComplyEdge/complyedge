@@ -4,7 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "complyedge"
-version = "0.2.4"
+# Version is single-sourced from complyedge/__init__.py.__version__ (see
+# [tool.setuptools.dynamic]). pyproject 0.2.4 vs __init__ 0.2.3 once shipped
+# a wheel whose User-Agent header disagreed with its own PyPI version.
+dynamic = ["version"]
 description = "Python SDK for ComplyEdge Compliance API — runtime EU AI Act enforcement for AI agents"
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -53,3 +56,6 @@ dev = [
 
 [tool.setuptools.packages.find]
 include = ["complyedge*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "complyedge.__version__"}

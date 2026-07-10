@@ -1,12 +1,22 @@
+import re
 from setuptools import setup, find_packages
 from pathlib import Path
 
 this_dir = Path(__file__).parent
 long_desc = (this_dir / "README.md").read_text(encoding="utf-8")
 
+# Single source of truth for the version: trustlint/__init__.py.__version__.
+# (setup.py 2.0.2 vs __init__ 2.0.1 vs a test asserting 2.0.0 was three
+# different versions of one package — the CLI and the wheel must agree.)
+_version = re.search(
+    r'^__version__\s*=\s*"([^"]+)"',
+    (this_dir / "trustlint" / "__init__.py").read_text(encoding="utf-8"),
+    re.M,
+).group(1)
+
 setup(
     name="trustlint",
-    version="2.0.1",
+    version=_version,
     license="Apache-2.0",
     packages=find_packages(),
     # Ship the ComplyEdge rule corpus inside the wheel so `pip install
