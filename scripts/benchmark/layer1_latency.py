@@ -152,7 +152,12 @@ def bench_trustlint(iterations: int) -> dict:
         from trustlint.engine import TrustLintEngine  # type: ignore
     except Exception as e:  # pragma: no cover
         return {"error": f"trustlint engine import failed: {e}"}
-    eng = TrustLintEngine()
+    # Force the live dev corpus. TrustLintEngine's default resolution checks
+    # ~/.trustlint/rules/ FIRST — if that's ever been populated (e.g. by a
+    # `trustlint` CLI bootstrap, see leocelis/ivd's check.sh), it silently
+    # shadows this repo's rules/regulations/ with a possibly-stale public
+    # release snapshot, understating rules_loaded and skewing the benchmark.
+    eng = TrustLintEngine(rules_dir=str(REPO / "rules" / "regulations"))
     text = SAMPLE_INPUT["input"]["text"]
     for _ in range(20):
         eng.check(text)
