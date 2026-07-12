@@ -33,7 +33,7 @@ SEVERITY_COLORS = {
 # Public OSS repo — releases ship rules/regulations/ in the tarball (ADA #875).
 RULES_RELEASE_REPO = "ComplyEdge/complyedge"
 
-# Ordering used by --severity-threshold (card 225): a threshold of `T`
+# Ordering used by --severity-threshold: a threshold of `T`
 # means exit 1 when any violation has severity at-or-above `T`. Default
 # is `high` because that matches today's `LintResult.has_critical` semantics
 # (which fires on critical OR high). Lowering to `medium` or `low` makes
@@ -68,7 +68,7 @@ def _violation_to_dict(v: Violation) -> dict:
 
 
 def _emit_json(result: LintResult, file_path: Optional[str]) -> None:
-    """Emit machine-parseable JSON for `trustlint check --json` (card 225)."""
+    """Emit machine-parseable JSON for `trustlint check --json`."""
     summary = {sev: 0 for sev in ("critical", "high", "medium", "low")}
     for v in result.violations:
         if v.severity in summary:
@@ -134,7 +134,7 @@ def cli(ctx: click.Context, rules_dir: Optional[str]) -> None:
     "--json",
     "json_output",
     is_flag=True,
-    help="Emit machine-parseable JSON instead of the human-readable report (card 225).",
+    help="Emit machine-parseable JSON instead of the human-readable report.",
 )
 @click.option(
     "--severity-threshold",
@@ -145,7 +145,7 @@ def cli(ctx: click.Context, rules_dir: Optional[str]) -> None:
         "Minimum severity that causes the command to exit 1. Below this, "
         "violations are still reported but the exit code stays 0. Default "
         "'high' preserves the prior behaviour (LintResult.has_critical "
-        "fires on critical OR high). Card 225."
+        "fires on critical OR high)."
     ),
 )
 @click.pass_context

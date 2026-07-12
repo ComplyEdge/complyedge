@@ -7,7 +7,7 @@
 # other rules' violation results — it has no legal condition of its own. Exempt
 # from §5 approval headers. Correctness derives from the sub-rules, each of
 # which is individually subject to §5 sign-off (approved Leo Celis 2026-07-03
-# per card 197 / WGlhJpPN — see sub-rule headers).
+# — see sub-rule headers).
 #
 # Imported rules (each individually subject to §5 sign-off):
 #   - article6.biometric_identification  (Annex III §1)

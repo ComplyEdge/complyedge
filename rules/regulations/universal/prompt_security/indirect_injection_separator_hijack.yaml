@@ -4,7 +4,7 @@ effective_date: '2026-05-15'
 description: >-
   Detects indirect prompt injection via separator-hijack patterns — content
   embedding delimiters that purport to end the user-input region and start
-  fake new-instructions. Mythos-class IPI shape. EU AI Act Article 15
+  fake new-instructions. Tool-mediated IPI shape. EU AI Act Article 15
   Layer-1 catch. Source: OWASP LLM01.
 title: Indirect prompt injection — separator hijack
 detection_scope: all
@@ -59,7 +59,7 @@ source:
     OWASP LLM Top 10 — LLM01: Prompt Injection (Indirect variant). EU AI
     Act Article 15 requires resilience against adversarial-input vectors;
     separator hijack is the canonical IPI shape for RAG / tool-using
-    deployments per the Anthropic Mythos incident debrief (EU AI Act
+    deployments per the 2026 model-autonomy incident debrief (EU AI Act
     Newsletter #101, 2026-05-04). Layer 1 catches the literal pattern;
     Layer 2 confirms before blocking to preserve legitimate-formatting
     false-positive guard.
@@ -89,7 +89,7 @@ tags:
 - article_15
 - robustness
 - owasp_llm01
-- mythos_pattern
+- tool_mediated_ipi_pattern
 - security
 - starter_rule
 tier: community
