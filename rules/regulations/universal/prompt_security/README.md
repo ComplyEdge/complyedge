@@ -32,14 +32,14 @@ Where `{subcategory}` is one of:
 
 ## Coverage roadmap
 
-The card-level definition of done (Trello `FSukgI1w`) calls for ≥10 deterministic IPI rules. The two rules above are the **starter set** that exercises the category structure end-to-end. The remaining 8+ rules are tracked on a follow-up card; the prioritised sequence is in §5 of the methodology doc.
+The methodology's definition of done calls for ≥10 deterministic IPI rules. The two rules above are the **starter set** that exercises the category structure end-to-end. The remaining 8+ rules are tracked for a follow-up release; the prioritised sequence is in §5 of the methodology doc.
 
 ## Authoring guidance
 
 - **Conservative regex first.** A false positive in this category fires on legitimate user content that mentions injection concepts (security researchers, prompt-engineering tutorials, internal red-team communications). Tighten regex with `\b` boundaries, require multi-token phrases, prefer semantic LLM confirmation for borderline cases.
 - **Confidence-weighted severity.** A high-confidence direct injection (`severity: critical`, `action: block`) is reasonable; a probabilistic indirect-injection signal should fall back to `severity: medium`, `action: warn`, `allow_override: true` so legitimate retrieved content that happens to contain the pattern isn't auto-blocked.
 - **Pair Layer 1 regex with Layer 2 LLM check.** Every IPI rule should declare BOTH a `regex` condition (deterministic catch) AND a `semantic` condition (LLM-confirmation prompt). The Layer 1 regex is the fast-path filter; the Layer 2 LLM is the false-positive guard.
-- **Cite the source corpus.** When a rule's pattern is derived from OWASP LLM01, the Google IPI Benchmark, or an Anthropic disclosure, name the source in the `source.url` / `source.citation` field. This is the diligence trail.
+- **Cite the source corpus.** When a rule's pattern is derived from OWASP LLM01, the Google IPI Benchmark, or a public AI-lab disclosure, name the source in the `source.url` / `source.citation` field. This is the diligence trail.
 
 ## Out-of-scope for this directory
 

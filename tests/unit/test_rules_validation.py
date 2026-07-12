@@ -239,7 +239,7 @@ class TestRulesValidation:
 
 
 class TestSanctionsTransitionFields:
-    """Schema-extension tests for the sanctions-transition fields added on card S5ZUTtIr.
+    """Schema-extension tests for the sanctions-transition fields.
 
     Validates the three additive fields (effective_window, supersedes,
     conditional_on) accept well-formed values and reject malformed ones.
