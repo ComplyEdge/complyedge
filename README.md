@@ -119,7 +119,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1 — Deterministic (hot path, <100ms p99):** 51 leaf OPA/Rego policies (+ 5 package aggregators) evaluate every request. Blocked prompts return with a legal citation — 38–100ms (median 62ms) across the OPA-blocked prompts in our benchmark. Binary pass/block, no LLM on the hot path. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1 — Deterministic (hot path):** 51 leaf OPA/Rego policies (+ 5 package aggregators) evaluate every request. Blocked prompts return with a legal citation — warm OPA-path responses land in **110–218ms** against the live API (median 135ms, n=15); a cold-start tail runs higher (full-run p50 ~786ms). Binary pass/block, no LLM on the hot path. Numbers reproduce from `scripts/benchmark/results/runtime_benchmark_latest.json`. (TrustLint applies the same regex corpus offline for CI use.)
 
 **Layer 2 — Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
 
