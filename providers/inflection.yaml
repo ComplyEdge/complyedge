@@ -2,7 +2,7 @@ provider_id: inflection
 provider_name: Inflection AI
 model_class: closed_api
 systemic_risk_threshold: false
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -22,7 +22,7 @@ obligations:
       no provider-side machine-readable marking documented.
     evidence:
     - url: https://inflection.ai/privacy-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Combined Terms of Service / Privacy Policy / Cookie Policy
@@ -31,7 +31,9 @@ obligations:
         representing Outputs as human-generated and from deploying
         subliminal, manipulative, or deceptive techniques.
 
-      sha256: 0c523bfa77b33ffbb0927bd491b1458f4e80c911eedc7c658beb7b368bb196dd
+      sha256: 874ea76d566601d6d1ae93a6820b784dd671e917731c3a7737851a6b9686cc2f
+      wayback_url: https://web.archive.org/web/20260610032248/https://inflection.ai/privacy-policy
+      archived_date: '2026-07-10'
   art_51_model_classification:
     score: 0
     rationale: >-
@@ -66,7 +68,7 @@ obligations:
       OpenAI/Anthropic/Mistral level.
     evidence:
     - url: https://inflection.ai/blog
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Blog index listing Inflection-1, Inflection-2, and
@@ -121,7 +123,7 @@ obligations:
       prohibitions, supplemented by GDPR-grade privacy infrastructure.
     evidence:
     - url: https://inflection.ai/privacy-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Combined ToS/Privacy/Cookie page. Terms of Service Section 3

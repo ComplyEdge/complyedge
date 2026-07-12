@@ -252,8 +252,8 @@ test_aggregator_collects_violation_into_violations_array if {
 	}
 }
 
-test_aggregator_rules_evaluated_lists_all_eight if {
-	count(article6.result.rules_evaluated) == 8 with input as {
+test_aggregator_rules_evaluated_lists_all_eleven if {
+	count(article6.result.rules_evaluated) == 11 with input as {
 		"jurisdiction": "EU",
 		"text": "harmless text",
 	}

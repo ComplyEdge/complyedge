@@ -2,7 +2,7 @@ provider_id: stability_ai
 provider_name: Stability AI
 model_class: open_weights
 systemic_risk_threshold: false
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -30,7 +30,7 @@ obligations:
       / video output.
     evidence:
     - url: https://stability.ai/use-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Acceptable Use Policy (effective 2025-07-31) Section "We
@@ -42,7 +42,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509195545/https://stability.ai/use-policy
       archived_date: '2026-05-09'
     - url: https://stability.ai/news-updates/stability-ais-annual-integrity-transparency-report
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: transparency_report
       summary: >-
         Annual Integrity Transparency Report (Sept 17, 2025)
@@ -88,7 +88,7 @@ obligations:
       enumeration of computational resources or energy consumption.
     evidence:
     - url: https://huggingface.co/stabilityai/stable-diffusion-3.5-large
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Hugging Face model card for Stable Diffusion 3.5 Large
@@ -102,7 +102,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509195723/https://huggingface.co/stabilityai/stable-diffusion-3.5-large
       archived_date: '2026-05-09'
     - url: https://stability.ai/news-updates/introducing-stable-diffusion-3-5
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Stable Diffusion 3.5 product announcement (October 22, 2024)
@@ -134,7 +134,7 @@ obligations:
       partnerships, but below structured Annex IX summary level.
     evidence:
     - url: https://stability.ai/news-updates/universal-music-group-and-stability-ai-announce-strategic-alliance
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Universal Music Group strategic alliance announcement (Oct
@@ -146,7 +146,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509195906/https://stability.ai/news-updates/universal-music-group-and-stability-ai-announce-strategic-alliance
       archived_date: '2026-05-09'
     - url: https://stability.ai/news-updates/warner-music-group-and-stability-ai-join-forces-to-build-next-gen-tools
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Warner Music Group collaboration announcement (Nov 19, 2025)
@@ -186,7 +186,7 @@ obligations:
       compliance certifications and published transparency reporting.
     evidence:
     - url: https://stability.ai/use-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Acceptable Use Policy (effective 2025-07-31) explicitly
@@ -202,7 +202,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509195545/https://stability.ai/use-policy
       archived_date: '2026-05-09'
     - url: https://stability.ai/license
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Stability AI License page documenting tiered licensing
@@ -216,7 +216,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509200110/https://stability.ai/license
       archived_date: '2026-05-09'
     - url: https://stability.ai/news-updates/stability-ai-joins-the-tech-coalition
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Tech Coalition membership announcement (Feb 11, 2026)
@@ -228,7 +228,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509200137/https://stability.ai/news-updates/stability-ai-joins-the-tech-coalition
       archived_date: '2026-05-09'
     - url: https://stability.ai/news-updates/stability-ai-achieves-soc-2-type-ii-and-soc-3-compliance
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         SOC 2 Type II and SOC 3 compliance attestation announcement

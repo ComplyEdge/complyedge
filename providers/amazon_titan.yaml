@@ -2,7 +2,7 @@ provider_id: amazon_titan
 provider_name: Amazon (Titan / Nova)
 model_class: closed_api
 systemic_risk_threshold: false
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -32,7 +32,7 @@ obligations:
       specification on a public URL).
     evidence:
     - url: https://aws.amazon.com/ai/responsible-ai/policy/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         AWS Responsible AI Policy (last updated 2025-01-13)
@@ -86,7 +86,7 @@ obligations:
       structured technical disclosure.
     evidence:
     - url: https://aws.amazon.com/ai/generative-ai/nova/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Amazon Nova product page describing the Nova model family
@@ -100,7 +100,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509180925/https://aws.amazon.com/nova/
       archived_date: '2026-05-09'
     - url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Amazon Bedrock "Models at a glance" page enumerating all
@@ -163,7 +163,7 @@ obligations:
       do. Below Stability/Inflection tier-3.
     evidence:
     - url: https://aws.amazon.com/ai/responsible-ai/policy/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         AWS Responsible AI Policy (last updated 2025-01-13)
@@ -179,7 +179,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509180850/https://aws.amazon.com/ai/responsible-ai/policy/
       archived_date: '2026-05-09'
     - url: https://aws.amazon.com/aup/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         AWS Acceptable Use Policy (last updated 2021-07-01)

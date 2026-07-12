@@ -2,7 +2,7 @@ provider_id: meta
 provider_name: Meta (Llama)
 model_class: open_weights
 systemic_risk_threshold: true
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -23,7 +23,7 @@ obligations:
       work.
     evidence:
     - url: https://ai.meta.com/responsible-ai/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Connect 2024 responsible-AI page documenting visible and
@@ -31,7 +31,9 @@ obligations:
         membership of the C2PA steering committee for content
         provenance standards.
 
-      sha256: ec7b7a52617296b26cf268932515b417323e8934afcb8c6089065af9dbc92c08
+      sha256: f9b4e1097745d6b6f1966069ee5f3b43fb892f56b5948575cfd9b2b88d1462da
+      wayback_url: https://web.archive.org/web/20260710235305/https://ai.meta.com/blog/responsible-ai-connect-2024/
+      archived_date: '2026-07-10'
   art_51_model_classification:
     score: 2
     rationale: >-
@@ -51,7 +53,7 @@ obligations:
       systemic-risk classification language of Annex XIII.
     evidence:
     - url: https://ai.meta.com/static-resource/Meta_Advanced-AI-Scaling-Framework-v2
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: other
       summary: >-
         Meta's Advanced AI Scaling Framework v2 (44-page PDF, the
@@ -60,15 +62,19 @@ obligations:
         Biological, and Loss of Control domains, with governance,
         implementation, and per-model evaluation processes.
       sha256: d87aa9bf00456ec747e80b84216f9f2ffc427c1e98541f8b3c8f7f52c13c7b6a
+      wayback_url: https://web.archive.org/web/20260710235335/https://ai.meta.com/static-resource/Meta_Advanced-AI-Scaling-Framework-v2
+      archived_date: '2026-07-10'
     - url: https://ai.meta.com/responsible-ai/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Documents per-model risk evaluations for Llama 3.x including
         CBRNE, violent crime, CSAM, and privacy risk areas, with
         additional vision-input red-teaming for Llama 3.2.
 
-      sha256: 2780b2059e63021d8046fa7c5c350c15f2323d75b8be6ecb5d08d997c8e36625
+      sha256: 6f3c99f7ad835e861f4282d000a9e99f0fa87b67cdb7669bf7b4e9e8daafff44
+      wayback_url: https://web.archive.org/web/20260710235305/https://ai.meta.com/blog/responsible-ai-connect-2024/
+      archived_date: '2026-07-10'
   art_52_53_1_a_b_technical_documentation:
     score: 3
     rationale: >-
@@ -84,24 +90,28 @@ obligations:
       and Google.
     evidence:
     - url: https://www.llama.com/docs/model-cards-and-prompt-formats/llama4/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Llama 4 model card on llama.com documenting Scout and Maverick
         variants with active/total parameters, expert mixture
         architecture, multimodal capabilities, supported languages,
         context lengths, and prompt-format specifications.
-      sha256: aab2bdb1586513b79661b9ad44b4d27b23d13548ff15a71ed857e45121e027df
+      sha256: cf9b2c218af0421614ea20fe27411df3f996794c198e45e0cb225c83a10093f2
+      wayback_url: https://web.archive.org/web/20260710235410/https://developer.meta.com/ai/docs/model-cards-and-prompt-formats/llama4/
+      archived_date: '2026-07-10'
     - url: https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Llama 4 model card on the official meta-llama GitHub
         organisation linked from llama.com, providing full technical
         specifications.
-      sha256: 3aeafffd3126e1d7246571e93bca965f158278c5843f691fe6722e8aa407567a
+      sha256: a42addfbad8810cb27d451640a6be9e856df8844611e8b29ea033e6b01db5349
+      wayback_url: https://web.archive.org/web/20260710235440/https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md
+      archived_date: '2026-07-10'
     - url: https://ai.meta.com/research/publications/the-llama-3-herd-of-models/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: paper
       summary: >-
         "The Llama 3 Herd of Models" research publication on AI at
@@ -109,7 +119,9 @@ obligations:
         framework, and capability assessments across the Llama 3
         family.
 
-      sha256: 498824f680b669fd39e18b64389562918f9e91a8dcd9b4d64b8843992998976c
+      sha256: 42d2d2cfbad5d3f50527848846ba83449c20167d85ce91ed6d589e66e0f3da4c
+      wayback_url: https://web.archive.org/web/20260710235509/https://ai.meta.com/research/publications/the-llama-3-herd-of-models/
+      archived_date: '2026-07-10'
   art_53_1_c_copyright_transparency:
     score: 2
     rationale: >-
@@ -130,7 +142,7 @@ obligations:
       summary is not.
     evidence:
     - url: https://developers.facebook.com/docs/sharing/bot/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Meta Web Crawlers documentation describing the
@@ -139,17 +151,21 @@ obligations:
         with explicit robots.txt User-agent opt-out syntax and
         statement that Meta favours industry-standard robots.txt
         over non-standard NoAI tags.
-      sha256: ab858841dfcab3c8bf38043a616cf17bc1a8b88b94ce61c467927dfbf37afd87
+      sha256: 6c800f82ac7a0a33fc622492fded757ed527932cc2f0bf522e201e51c21ba8a5
+      wayback_url: https://web.archive.org/web/20260709035201/https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers
+      archived_date: '2026-07-10'
     - url: https://www.facebook.com/privacy/genai/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Privacy Center generative-AI hub describing Meta's training
         data sourcing approach and linking to the model-training
         dialog covering the deletion-respecting policy.
-      sha256: 104a7f3fcdcadd601c203e851dc0144c3cde472073838e1d33bbd725c404a18c
+      sha256: 31b19537e6ff22e14babbaf9a81ddf871864493ee30ba6b25b06dcdd73d546ea
+      wayback_url: https://web.archive.org/web/20260710235657/https://www.facebook.com/privacy/genai/
+      archived_date: '2026-07-10'
     - url: https://www.facebook.com/privacy/dialog/how-generative-ai-models-work/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Privacy Center dialog stating training inputs come from
@@ -157,7 +173,9 @@ obligations:
         products and services" and that "once it's deleted, it won't
         be used for future training".
 
-      sha256: 8c3a3564ae96f1647d0f75747f737a3a9c2968bfe8dbcb2df3ca7437b5256aee
+      sha256: 57326707b72d1cf07e9b73e44b272309cc646c39b9e7d3c2695fe9dd863e5feb
+      wayback_url: https://web.archive.org/web/20260710235722/https://www.facebook.com/privacy/dialog/how-generative-ai-models-work/
+      archived_date: '2026-07-10'
   art_53_1_d_e_downstream_obligations:
     score: 3
     rationale: >-
@@ -174,31 +192,37 @@ obligations:
       awareness. Comparable depth to Anthropic and Google.
     evidence:
     - url: https://www.llama.com/llama4/use-policy/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Llama 4 Acceptable Use Policy enumerating prohibited downstream
         uses (illegal activity, weapons/CBRNE, deception, failure to
         disclose AI use) plus EU-specific rights restriction for
         multimodal models.
-      sha256: 09c6912b5c353a71687c5cc9b1a2a80af9156c3da7907c8291f743471df8e7df
+      sha256: d204da77d0fb2128e5f8b04d2936091e35eb6af6018d9354c42f97bbbbe4ab99
+      wayback_url: https://web.archive.org/web/20260710235840/https://developer.meta.com/ai/llama4/use-policy/
+      archived_date: '2026-07-10'
     - url: https://www.llama.com/llama4/license/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Llama 4 Community License Agreement (effective April 5, 2025)
         with attribution, naming, and 700M-MAU commercial-licensing
         provisions. Section 1.b.iv incorporates the AUP by reference.
-      sha256: 18391a432c188df1b89c4a0ae03c24d459412e345e9fed29f416b74dcf3ad460
+      sha256: 5fb2c3a34dc4e2ce42665d4bd60acc44fe97d2364ac9fc42a474a1e4d3026d4e
+      wayback_url: https://web.archive.org/web/20260710235914/https://developer.meta.com/ai/llama4/license/
+      archived_date: '2026-07-10'
     - url: https://www.llama.com/llama-protections/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Llama Protections overview documenting Llama Guard 4, Prompt
         Guard 2, Code Shield, and LlamaFirewall as system-level
         safeguards available to downstream deployers.
 
-      sha256: ed6175404d886aae325fdb3d089c7f1ec71b71ef455cecbe18ab0ca97fdb617e
+      sha256: 3e4060ff6660ca1bc31a8ad66377bcee953ebc6dd1b9e075d342638e3318ec09
+      wayback_url: https://web.archive.org/web/20260710235948/https://developer.meta.com/ai/llama-protections/
+      archived_date: '2026-07-10'
   art_55_systemic_risk:
     score: 3
     rationale: >-
@@ -218,7 +242,7 @@ obligations:
       Working Group, AI Alliance, CrowdStrike (SOC evaluations).
     evidence:
     - url: https://ai.meta.com/static-resource/Meta_Advanced-AI-Scaling-Framework-v2
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: other
       summary: >-
         Advanced AI Scaling Framework v2 (Meta's Frontier AI
@@ -226,16 +250,20 @@ obligations:
         processes, and implementation methodology for systemic-risk
         management across three risk domains.
       sha256: d87aa9bf00456ec747e80b84216f9f2ffc427c1e98541f8b3c8f7f52c13c7b6a
+      wayback_url: https://web.archive.org/web/20260710235335/https://ai.meta.com/static-resource/Meta_Advanced-AI-Scaling-Framework-v2
+      archived_date: '2026-07-10'
     - url: https://www.llama.com/llama-protections/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Llama Protections page documenting CyberSec Eval 4 with
         AutoPatchBench and CyberSOCEval suites, partnerships with
         MLCommons and CrowdStrike for systemic-risk evaluation.
-      sha256: e1ea9216885d32ed217f430f454260669ca212e91246740c19cfe0e72c22a6a8
+      sha256: 65aafe2118e464aa58c59f53438b938f9e72be51ad61de62ca9f6849e92c5f11
+      wayback_url: https://web.archive.org/web/20260710235948/https://developer.meta.com/ai/llama-protections/
+      archived_date: '2026-07-10'
     - url: https://github.com/meta-llama/PurpleLlama
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Purple Llama umbrella project (4.2k stars) housing CyberSec
@@ -243,12 +271,16 @@ obligations:
         LlamaFirewall as systemic-risk evaluation and mitigation
         tooling. Linked from official llama.com Llama Protections
         page.
-      sha256: 66034eac925b248d6917f416087826363bb8c405814242dd2aab094802fa2237
+      sha256: b9be848e6615963a4fe9f08b5e7e996e31c81ae213b82f24e910afc2690f5b0b
+      wayback_url: https://web.archive.org/web/20260711000055/https://github.com/meta-llama/PurpleLlama
+      archived_date: '2026-07-10'
     - url: https://ai.meta.com/responsible-ai/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Documents CBRNE, violent-crime, CSAM, and privacy risk
         evaluations for Llama 3.x with vision-input red-teaming
         extensions.
-      sha256: 252e2f799fe35b0755a14eedf42cef1a6b16a4900525c90c24f31b6572270858
+      sha256: a08e0509b6df654f6eee97492610d3397b4361d640a1a0dccb9609a4718f231b
+      wayback_url: https://web.archive.org/web/20260710235305/https://ai.meta.com/blog/responsible-ai-connect-2024/
+      archived_date: '2026-07-10'

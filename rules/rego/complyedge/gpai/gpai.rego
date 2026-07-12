@@ -17,6 +17,7 @@ import data.complyedge.gpai.downstream_obligations
 import data.complyedge.gpai.incident_reporting
 import data.complyedge.gpai.model_classification
 import data.complyedge.gpai.model_evaluation
+import data.complyedge.gpai.open_source_exemption
 import data.complyedge.gpai.risk_mitigation
 import data.complyedge.gpai.sr_designation
 import data.complyedge.gpai.systemic_risk
@@ -31,6 +32,7 @@ violation if downstream_obligations.violation
 violation if incident_reporting.violation
 violation if model_classification.violation
 violation if model_evaluation.violation
+violation if open_source_exemption.violation
 violation if risk_mitigation.violation
 violation if sr_designation.violation
 violation if systemic_risk.violation
@@ -68,6 +70,11 @@ violations contains v if {
 }
 
 violations contains v if {
+	open_source_exemption.violation
+	v := open_source_exemption.result
+}
+
+violations contains v if {
 	risk_mitigation.violation
 	v := risk_mitigation.result
 }
@@ -102,6 +109,7 @@ result := {
 		incident_reporting.rule_id,
 		model_classification.rule_id,
 		model_evaluation.rule_id,
+		open_source_exemption.rule_id,
 		risk_mitigation.rule_id,
 		sr_designation.rule_id,
 		systemic_risk.rule_id,
