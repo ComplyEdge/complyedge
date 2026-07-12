@@ -36,11 +36,22 @@ class TestRegoCorpus:
         all_rego = list(RULES_REGO_DIR.rglob("*.rego"))
         return [f for f in all_rego if "test" not in f.parts]
 
-    def test_exactly_19_production_rego_policies(self, prod_rego_files):
-        # Claim: "We wrote 19 Rego policies"
-        assert len(prod_rego_files) == 19, (
-            f"Expected 19 production .rego files, found {len(prod_rego_files)}: "
-            f"{sorted(str(f.relative_to(REPO_ROOT)) for f in prod_rego_files)}"
+    def test_production_rego_leaf_count_meets_moat(self, prod_rego_files):
+        # M3.3-T3: public claim is leaf-basis (≥50). Aggregators are not leaves.
+        AGGREGATOR_NAMES = {
+            "article5.rego",
+            "article50.rego",
+            "article6.rego",
+            "gpai.rego",
+            "highrisk.rego",
+        }
+        leaves = [f for f in prod_rego_files if f.name not in AGGREGATOR_NAMES]
+        assert len(prod_rego_files) == 56, (
+            f"Expected 56 production .rego files (51 leaf + 5 aggregators), "
+            f"found {len(prod_rego_files)}"
+        )
+        assert len(leaves) >= 50, (
+            f"Expected ≥50 leaf Rego policies, found {len(leaves)}"
         )
 
     def test_rego_covers_article5(self, prod_rego_files):
@@ -71,7 +82,13 @@ class TestRegoCorpus:
         # Structural claim: each leaf policy cites the specific article.
         # Aggregator files (article5.rego, article50.rego, gpai.rego) combine
         # sub-rules and are explicitly exempt per RULE_STANDARD.md §5.6.
-        AGGREGATOR_NAMES = {"article5.rego", "article50.rego", "gpai.rego"}
+        AGGREGATOR_NAMES = {
+            "article5.rego",
+            "article50.rego",
+            "article6.rego",
+            "gpai.rego",
+            "highrisk.rego",
+        }
         leaf_files = [f for f in prod_rego_files if f.name not in AGGREGATOR_NAMES]
         missing = []
         for f in leaf_files:

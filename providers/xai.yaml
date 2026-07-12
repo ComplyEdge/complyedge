@@ -2,7 +2,7 @@ provider_id: xai
 provider_name: xAI (Grok)
 model_class: closed_api
 systemic_risk_threshold: true
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -24,16 +24,18 @@ obligations:
       xAI offloads the obligation to deployers.
     evidence:
     - url: https://x.ai/legal/acceptable-use-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Acceptable Use Policy (effective January 2, 2025) places
         AI-disclosure obligation on the deployer ("You should be
         transparent and disclose your use of AI assistance") with no
         provider-side machine-readable marking commitment.
-      sha256: 94363ae4e6ca4deddbe21db8d09941fe8c83f7086344c0c1a48688b884856576
+      sha256: 9b028086271db345bbb40e9050e62150016ae061dd693404e8476f1b3a0770c5
+      wayback_url: http://web.archive.org/web/20260708180712/https://x.ai/legal/acceptable-use-policy
+      archived_date: '2026-07-10'
     - url: https://docs.x.ai/developers/models/grok-4.3
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Grok 4.3 model documentation enumerates capabilities (function
@@ -59,7 +61,7 @@ obligations:
       almost-certainly systemic-risk model.
     evidence:
     - url: https://x.ai/news/grok-4
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Grok 4 announcement (July 9, 2025) documenting training on
@@ -69,7 +71,9 @@ obligations:
         GPQA, 100% AIME'25), but containing no GPAI / systemic-risk
         classification statement.
 
-      sha256: 998213b141b06d07efce470ef1915bc23c31855956e0120b912e0c60f2d642fb
+      sha256: bccef98c0c6966ed649920027ae4301b9b2a4b234a8ab7b601ebf7e86c17844b
+      wayback_url: http://web.archive.org/web/20260708184615/https://x.ai/news/grok-4
+      archived_date: '2026-07-10'
   art_52_53_1_a_b_technical_documentation:
     score: 1
     rationale: >-
@@ -87,7 +91,7 @@ obligations:
       short of EU AI Act Article 53(1)(a-b) Annex requirements.
     evidence:
     - url: https://docs.x.ai/developers/models/grok-4.3
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Grok 4.3 documentation page covering 1M context window,
@@ -99,7 +103,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509180132/https://docs.x.ai/developers/models/grok-4.3
       archived_date: '2026-05-09'
     - url: https://x.ai/news/grok-4
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Grok 4 announcement publishing benchmark results across
@@ -107,9 +111,11 @@ obligations:
         2025, AIME'25, ARC-AGI-2, Vending-Bench with comparative
         figures vs Claude Opus 4, Gemini 2.5 Pro, o3 — but providing
         no FLOPs disclosure or structured technical documentation.
-      sha256: 45e01e809a14d272b0fdf03397892a0da0a8aba2d5062d06ad13e576441d507a
+      sha256: f44c177a8a9707a614a0494370a06f7f8f9f6b4475578f656b87d794912698a7
+      wayback_url: http://web.archive.org/web/20260708184615/https://x.ai/news/grok-4
+      archived_date: '2026-07-10'
     - url: https://docs.x.ai/docs/overview
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Developer overview cataloguing Grok 4.3 (text), Voice API,
@@ -137,7 +143,7 @@ obligations:
       acknowledgement without structured Article 53(1)(c) disclosure.
     evidence:
     - url: https://x.ai/legal/privacy-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Privacy Policy (effective April 4, 2026) section 2
@@ -146,7 +152,9 @@ obligations:
         structured Annex IX summary, dataset-level inventory, or
         rightsholder opt-out crawler identifier.
 
-      sha256: 3d41dbf7fc7a843e335373d7f7326909ad1619010ff06d99b9c4e43bcb4dab28
+      sha256: 520cae2ae43ae70ddafbe74daf314eb9ef559be564db2dfc8a7cc6f0fdf699dd
+      wayback_url: http://web.archive.org/web/20260710115428/https://x.ai/legal/privacy-policy
+      archived_date: '2026-07-10'
   art_53_1_d_e_downstream_obligations:
     score: 1
     rationale: >-
@@ -167,7 +175,7 @@ obligations:
       is materially weaker than peer providers.
     evidence:
     - url: https://x.ai/legal/acceptable-use-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Acceptable Use Policy enumerating prohibited content
@@ -175,16 +183,20 @@ obligations:
         pornography, regulated-industry violations, fraud, espionage,
         harm-to-life, bioweapons, property destruction, safeguard
         circumvention, undisclosed AI use).
-      sha256: d3364897053dca428906afc1317408341d808275a6d264c8ea33a75f5d289aad
+      sha256: 63f5a119d8c8c33eb2b3cf76da8146a81236c8db80ef8e21b81d9ba05c021ed1
+      wayback_url: http://web.archive.org/web/20260708180712/https://x.ai/legal/acceptable-use-policy
+      archived_date: '2026-07-10'
     - url: https://x.ai/legal
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Legal policies index linking Consumer Terms of Service,
         Enterprise Terms of Service, Acceptable Use Policy, Privacy
         Policy, Europe Privacy Policy Addendum, and Cookie Policy.
 
-      sha256: 5b9313846924ce2faaee355ebaed9c970799afcf92d40bb7a204013167dc5d92
+      sha256: baf163d26a8f99555c646dd3103dc8ae3e9ffd08b4f9d938c1522050332c04eb
+      wayback_url: http://web.archive.org/web/20260708181158/https://x.ai/legal
+      archived_date: '2026-07-10'
   art_55_systemic_risk:
     score: 0
     rationale: >-

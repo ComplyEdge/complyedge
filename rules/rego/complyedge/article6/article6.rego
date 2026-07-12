@@ -14,7 +14,10 @@
 #   - article6.critical_infrastructure   (§2)
 #   - article6.education_vocational      (§3)
 #   - article6.employment_workers        (§4)
-#   - article6.essential_services        (§5)
+#   - article6.essential_services        (§5 composite)
+#   - article6.annex3_5b_creditworthiness (§5(b))
+#   - article6.annex3_5c_insurance       (§5(c))
+#   - article6.art6_3_procedural_derogation (Art 6(3) carve-out misuse)
 #   - article6.law_enforcement           (§6)
 #   - article6.migration_asylum          (§7)
 #   - article6.justice_democracy         (§8)
@@ -23,6 +26,9 @@ package complyedge.article6
 
 import rego.v1
 
+import data.complyedge.article6.annex3_5b_creditworthiness
+import data.complyedge.article6.annex3_5c_insurance
+import data.complyedge.article6.art6_3_procedural_derogation
 import data.complyedge.article6.biometric_identification
 import data.complyedge.article6.critical_infrastructure
 import data.complyedge.article6.education_vocational
@@ -34,6 +40,9 @@ import data.complyedge.article6.justice_democracy
 
 default violation := false
 
+violation if annex3_5b_creditworthiness.violation
+violation if annex3_5c_insurance.violation
+violation if art6_3_procedural_derogation.violation
 violation if biometric_identification.violation
 violation if critical_infrastructure.violation
 violation if education_vocational.violation
@@ -42,6 +51,21 @@ violation if essential_services.violation
 violation if law_enforcement.violation
 violation if migration_asylum.violation
 violation if justice_democracy.violation
+
+violations contains v if {
+	annex3_5b_creditworthiness.violation
+	v := annex3_5b_creditworthiness.result
+}
+
+violations contains v if {
+	annex3_5c_insurance.violation
+	v := annex3_5c_insurance.result
+}
+
+violations contains v if {
+	art6_3_procedural_derogation.violation
+	v := art6_3_procedural_derogation.result
+}
 
 violations contains v if {
 	biometric_identification.violation
@@ -87,6 +111,9 @@ result := {
 	"violation": violation,
 	"violations": violations,
 	"rules_evaluated": [
+		annex3_5b_creditworthiness.rule_id,
+		annex3_5c_insurance.rule_id,
+		art6_3_procedural_derogation.rule_id,
 		biometric_identification.rule_id,
 		critical_infrastructure.rule_id,
 		education_vocational.rule_id,

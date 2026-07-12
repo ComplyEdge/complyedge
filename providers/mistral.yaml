@@ -2,7 +2,7 @@ provider_id: mistral
 provider_name: Mistral AI
 model_class: open_weights
 systemic_risk_threshold: false
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -22,7 +22,7 @@ obligations:
       evidenced for Mistral's text or multimodal outputs.
     evidence:
     - url: https://docs.mistral.ai/capabilities/guardrailing/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Moderation & Guardrailing documentation describing the
@@ -53,7 +53,7 @@ obligations:
       parameters).
     evidence:
     - url: https://legal.mistral.ai/ai-governance/models
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         AI Compliance Hub model index listing 28+ Mistral models
@@ -66,7 +66,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509200420/https://legal.mistral.ai/ai-governance/models
       archived_date: '2026-05-09'
     - url: https://legal.mistral.ai/ai-governance/models/mistral-large-3
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Mistral Large 3.0 governance page classifying both Base Model
@@ -94,7 +94,7 @@ obligations:
       compares favourably to Anthropic and Google.
     evidence:
     - url: https://docs.mistral.ai/getting-started/models/models_overview/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Models Overview documenting all featured, frontier, specialist,
@@ -104,7 +104,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260508021036/https://docs.mistral.ai/models/overview
       archived_date: '2026-05-09'
     - url: https://docs.mistral.ai/models/model-cards/mistral-large-3-25-12
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Mistral Large 3 model card (version 25.12, mistral-large-2512)
@@ -115,7 +115,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260508021011/https://docs.mistral.ai/models/model-cards/mistral-large-3-25-12
       archived_date: '2026-05-09'
     - url: https://legal.cms.mistral.ai/assets/1e37fffd-7ea5-469b-822f-05dcfbb43623
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: other
       summary: >-
         Downloadable technical-documentation bundle (ZIP) for Mistral
@@ -125,7 +125,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260428023059/https://legal.cms.mistral.ai/assets/1e37fffd-7ea5-469b-822f-05dcfbb43623
       archived_date: '2026-05-09'
     - url: https://mistral.ai/news/mistral-large-2407
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         "Large Enough" announcement for Mistral Large 2 documenting
@@ -157,7 +157,7 @@ obligations:
       party rightsholders' web content.
     evidence:
     - url: https://legal.mistral.ai/terms/privacy-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Privacy Policy section 9 (US Users) listing training-data
@@ -186,7 +186,7 @@ obligations:
       and commercial customer with separate Data Processing Addendum.
     evidence:
     - url: https://legal.mistral.ai/terms/usage-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Usage Policy (effective March 24, 2026) enumerating prohibited
@@ -198,7 +198,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509201206/https://legal.mistral.ai/terms/usage-policy
       archived_date: '2026-05-09'
     - url: https://legal.mistral.ai/terms
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Legal Center index documenting tiered terms (EU consumer,
@@ -209,7 +209,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509201457/https://legal.mistral.ai/terms
       archived_date: '2026-05-09'
     - url: https://docs.mistral.ai/capabilities/guardrailing/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Moderation & Custom Guardrails documentation providing

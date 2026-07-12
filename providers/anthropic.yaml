@@ -2,7 +2,7 @@ provider_id: anthropic
 provider_name: Anthropic
 model_class: closed_api
 systemic_risk_threshold: true
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -16,7 +16,7 @@ obligations:
       has shipped.
     evidence:
     - url: https://docs.anthropic.com/en/api/messages
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Messages API reference contains no machine-readable disclosure
@@ -34,7 +34,7 @@ obligations:
       been confirmed, but self-classification is documented at policy level.
     evidence:
     - url: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Responsible Scaling Policy v1 introducing AI Safety Levels
@@ -43,7 +43,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509181220/https://www.anthropic.com/news/anthropics-responsible-scaling-policy
       archived_date: '2026-05-09'
     - url: https://www.anthropic.com/responsible-scaling-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         RSP page enumerating ASL-2 deployment standards including
@@ -61,14 +61,14 @@ obligations:
       is updated for each model version and includes red-teaming summaries.
     evidence:
     - url: https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: Claude 3 model card with training, evaluation, and limitation sections.
       sha256: a96214e5d495dec76f6120891233aa97a73386b35b065a6709840b07588ed118
       wayback_url: https://web.archive.org/web/20260507064530/https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf
       archived_date: '2026-05-09'
     - url: https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: Claude 3.5 Sonnet addendum extending the model card.
 
@@ -84,7 +84,7 @@ obligations:
       compliance procedures.
     evidence:
     - url: https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: other
       summary: >-
         Support article describing ClaudeBot user-agent and robots.txt
@@ -103,14 +103,14 @@ obligations:
       meet Annex XII expectations.
     evidence:
     - url: https://docs.anthropic.com/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: Anthropic developer documentation covering all API surfaces.
       sha256: 37f863526cc89a7ff3a83936dd2dfca43704c237f1ff016db6194811fd45b3eb
       wayback_url: https://web.archive.org/web/20260508162146/https://platform.claude.com/docs/en/home
       archived_date: '2026-05-09'
     - url: https://www.anthropic.com/legal/aup
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: Acceptable Use Policy enumerating prohibited downstream applications.
 
@@ -127,7 +127,7 @@ obligations:
       controls for model weights are described at ASL-3 standard.
     evidence:
     - url: https://www.anthropic.com/responsible-scaling-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: transparency_report
       summary: >-
         Responsible Scaling Policy hub page (last updated Apr 29 2026).
@@ -136,12 +136,16 @@ obligations:
         Risk Reports for deployed models. ASL-3 deployment and security
         safeguards documented including red-teaming, incident response, and
         weight-access controls.
-      sha256: bc763bb19f38556c06a22af9aeec8a5c45fe3a069a25b7aee52d47e6050f902d
+      sha256: d1ff33f59e71ab89328de40160fc7e9d3b6086af81dc808a00a43e0ffb0d623f
+      wayback_url: https://web.archive.org/web/20260710234024/https://www.anthropic.com/responsible-scaling-policy
+      archived_date: '2026-07-10'
     - url: https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Announcement of updated RSP — capability thresholds, ASL-3 security
         and deployment standards, external evaluation commitments with UK
         AISI and US AISI.
-      sha256: 03fa540cc4781cff01b7fba25268feebc3a9e334ab894d0587c67d04f15001ed
+      sha256: 509ffc0aa532c6cdad683dbd80075e393ec209cbd9c1682e8d56a52c1e51a561
+      wayback_url: https://web.archive.org/web/20260710234056/https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy
+      archived_date: '2026-07-10'

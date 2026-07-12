@@ -2,7 +2,7 @@ provider_id: google
 provider_name: Google (DeepMind)
 model_class: closed_api
 systemic_risk_threshold: true
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -21,7 +21,7 @@ obligations:
       programmatic.
     evidence:
     - url: https://deepmind.google/science/synthid/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Official SynthID page describing imperceptible watermarks
@@ -29,7 +29,9 @@ obligations:
         across Google's generative AI consumer products. Detector
         portal verifies provenance.
 
-      sha256: f0b7df11001f7ddbd6a1f02fe1519be94dec17b9f9aea2386944d64adb3b8421
+      sha256: 65c41313f8c35197fc94f35872ff7cff0b59f07a6daca817b82e0098aa97f3a1
+      wayback_url: http://web.archive.org/web/20251102203013/https://deepmind.google/science/synthid/
+      archived_date: '2026-07-10'
   art_51_model_classification:
     score: 2
     rationale: >-
@@ -47,16 +49,18 @@ obligations:
       taxonomy for the Act's compute-based threshold.
     evidence:
     - url: https://deepmind.google/discover/blog/updating-the-frontier-safety-framework/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         February 2025 FSF 2.0 announcement defining Critical
         Capability Levels (CCLs) and stating the Framework has been
         implemented for evaluating Gemini 2.0 — demonstrating per-model
         systemic-risk classification.
-      sha256: 2c4da45f96f2eee1c6ade5982c07ed25e91ee80dad4820d64c6402a27e14c880
+      sha256: 943cb244660d27001d6bfc487fc2cb9dbd66a1965bb38deafaedc3aeca72bac3
+      wayback_url: http://web.archive.org/web/20250928130215/https://deepmind.google/discover/blog/updating-the-frontier-safety-framework/
+      archived_date: '2026-07-10'
     - url: https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/updating-the-frontier-safety-framework/Frontier%20Safety%20Framework%202.0.pdf
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: other
       summary: >-
         Frontier Safety Framework 2.0 technical document (PDF)
@@ -64,15 +68,19 @@ obligations:
         deceptive-alignment risk domains with security and deployment
         mitigation tiers.
       sha256: 14a48e4ef052fba75b651ea23845c2e9557f5c638e2767656decc6410861aae3
+      wayback_url: https://web.archive.org/web/20260708220952/https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/updating-the-frontier-safety-framework/Frontier%20Safety%20Framework%202.0.pdf
+      archived_date: '2026-07-10'
     - url: https://deepmind.google/about/responsibility-safety/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Responsibility & Safety overview confirming FSF as Google's
         systemic-risk governance instrument and AGI Safety Council
         structure.
 
-      sha256: 38c2fb6d3f1eaf9eb87cca8e86e54a70a5fe698b47f862fb434abe6b42becafb
+      sha256: f5a5a8b2c34f449e41cf7603e23238101463af248467d886e2f17225a76a22ff
+      wayback_url: https://web.archive.org/web/20260708224011/https://deepmind.google/responsibility-and-safety/
+      archived_date: '2026-07-10'
   art_52_53_1_a_b_technical_documentation:
     score: 3
     rationale: >-
@@ -85,14 +93,16 @@ obligations:
       depth and cadence meet Annex XI expectations.
     evidence:
     - url: https://deepmind.google/technologies/gemini/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Gemini model family overview with linked technical reports
         and per-model FSF safety reports.
-      sha256: caad4e732ad4413bd0b049fcbeb20d948b355bdbc2ac634f18d002de34e5e163
+      sha256: 9f78b44d9b28ed8388d4e549d5d1764c51e3bb2c1eb712f381680f183b1210a6
+      wayback_url: https://web.archive.org/web/20260710234257/https://deepmind.google/models/gemini/
+      archived_date: '2026-07-10'
     - url: https://deepmind.google/models/evals-methodology/gemini-3-1-pro/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Per-model evaluation methodology page for Gemini 3.1 Pro
@@ -100,14 +110,18 @@ obligations:
         Exam, ARC-AGI-2, GPQA, SWE-Bench, MMMU-Pro, etc.) and scoring
         procedures.
       sha256: 5a0a36e6d25d587f5325fe70d185593a9270a46b340d9d97f8cf569360ab8b70
+      wayback_url: https://web.archive.org/web/20260708222552/https://storage.googleapis.com/deepmind-media/gemini/gemini_3-1_pro_model_evaluation.pdf
+      archived_date: '2026-07-10'
     - url: https://deepmind.google/models/fsf-reports/gemini-3-pro/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Frontier Safety Framework report for Gemini 3 Pro covering
         capability evaluations and mitigation status.
 
       sha256: 0b093ee5fc80e30fa5b46e6aa9a853c6dd3f308656e9c9a346724e108e620e46
+      wayback_url: https://web.archive.org/web/20260708215756/https://storage.googleapis.com/deepmind-media/gemini/gemini_3_pro_fsf_report.pdf
+      archived_date: '2026-07-10'
   art_53_1_c_copyright_transparency:
     score: 2
     rationale: >-
@@ -121,22 +135,26 @@ obligations:
       robots.txt — so score is 2 not 3.
     evidence:
     - url: https://blog.google/technology/ai/an-update-on-web-publisher-controls/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Official announcement (Sep 28, 2023) of Google-Extended as a
         robots.txt control for web publishers to opt content out of
         Gemini/Bard and Vertex AI generative training, separate from
         Googlebot search crawling.
-      sha256: 3ec0c7fcaf2af2a12d126837809b7cfdb26fa8be21879cc335d05ab6afbe9305
+      sha256: a3a20b10c27d886ac32be362db9326b4d7a77667863f79e3d8b3b65049f251d3
+      wayback_url: https://web.archive.org/web/20260710234412/https://blog.google/innovation-and-ai/products/an-update-on-web-publisher-controls/
+      archived_date: '2026-07-10'
     - url: https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Official Google crawler documentation enumerating user-agents
         including Google-Extended, with verification procedures.
 
-      sha256: cbb19f40b42bc2acde7611a7751a6d5acfd449ae11be945f7aa3f4e1c79e7591
+      sha256: 702a43732f25f70d73c7d6d5bafb9219a007e6586da93e2591bb51b3f23dc688
+      wayback_url: https://web.archive.org/web/20260710234436/https://developers.google.com/crawling/docs/crawlers-fetchers/overview-google-crawlers
+      archived_date: '2026-07-10'
   art_53_1_d_e_downstream_obligations:
     score: 3
     rationale: >-
@@ -150,15 +168,17 @@ obligations:
       published (template pending across all providers).
     evidence:
     - url: https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Vertex AI generative model documentation enumerating all Gemini
         model variants with intended use, version naming patterns, and
         deprecation policy (publicly accessible without authentication).
-      sha256: 2bca68bca24c511ce8fe9c68dd8872ac71be8b1f27e4382075697253dd63951b
+      sha256: 5cc64756f29516a0473fd597a2d103da85ce69fa28aba47b1af7f767cf02c3ba
+      wayback_url: https://web.archive.org/web/20260710234503/https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/google-models
+      archived_date: '2026-07-10'
     - url: https://policies.google.com/terms/generative-ai/use-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Generative AI Prohibited Use Policy (last modified Dec 17,
@@ -166,7 +186,9 @@ obligations:
         across dangerous activities, security compromise, sexually
         explicit content, and misinformation categories.
 
-      sha256: 3a404f04b4139fd20fee3f4a45141f2c38922bf9469998b876989c58c8881f01
+      sha256: fcf98d923dc98d6f9b4fe974651869741abb0b7063482e2035a3d0c2aeab33a9
+      wayback_url: https://web.archive.org/web/20260710234531/https://policies.google.com/terms/generative-ai/use-policy
+      archived_date: '2026-07-10'
   art_55_systemic_risk:
     score: 3
     rationale: >-
@@ -180,18 +202,22 @@ obligations:
       to Anthropic's RSP in scope.
     evidence:
     - url: https://deepmind.google/about/responsibility-safety/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Frontier Safety Framework, AGI Safety Council, and
         partnerships with UK AI Security Institute documented as
         Google DeepMind's systemic-risk governance.
-      sha256: 38c2fb6d3f1eaf9eb87cca8e86e54a70a5fe698b47f862fb434abe6b42becafb
+      sha256: f5a5a8b2c34f449e41cf7603e23238101463af248467d886e2f17225a76a22ff
+      wayback_url: https://web.archive.org/web/20260708224011/https://deepmind.google/responsibility-and-safety/
+      archived_date: '2026-07-10'
     - url: https://deepmind.google/blog/deepening-our-partnership-with-the-uk-ai-security-institute/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         December 2025 announcement deepening external safety
         evaluation partnership with UK AISI for frontier model
         pre-deployment review.
-      sha256: 6a470c255254730f911260f8044092b657ae2670f407d1061b48fab6a9786ac3
+      sha256: e0d902c471e77fbb6e447ba9a5a1ace4dab993d0db27d40d3e78df6f5df23597
+      wayback_url: https://web.archive.org/web/20260708220051/https://deepmind.google/blog/deepening-our-partnership-with-the-uk-ai-security-institute/
+      archived_date: '2026-07-10'

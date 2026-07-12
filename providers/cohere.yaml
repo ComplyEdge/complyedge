@@ -2,7 +2,7 @@ provider_id: cohere
 provider_name: Cohere
 model_class: closed_api
 systemic_risk_threshold: false
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -27,7 +27,7 @@ obligations:
       models but does not fully satisfy Article 50(2).
     evidence:
     - url: https://docs.cohere.com/docs/usage-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Usage Policy (updated 2024-11-21) Customer Application
@@ -74,7 +74,7 @@ obligations:
       but does not yet reach Google/Meta/Mistral comprehensive level.
     evidence:
     - url: https://docs.cohere.com/docs/command-a
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Command A model documentation (model ID command-a-03-2025)
@@ -87,7 +87,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509181710/https://docs.cohere.com/docs/command-a
       archived_date: '2026-05-09'
     - url: https://docs.cohere.com/docs/responsible-use
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Command R / Command R+ Model Card documenting safety
@@ -144,7 +144,7 @@ obligations:
       strongest in the benchmark.
     evidence:
     - url: https://docs.cohere.com/docs/usage-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Comprehensive Usage Policy (updated 2024-11-21) with 11
@@ -160,7 +160,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509181632/https://docs.cohere.com/docs/usage-policy
       archived_date: '2026-05-09'
     - url: https://docs.cohere.com/docs/responsible-use
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Responsible-Use page providing per-model toxicity / bias
@@ -172,7 +172,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509181740/https://docs.cohere.com/docs/responsible-use
       archived_date: '2026-05-09'
     - url: https://cohere.com/terms-of-use
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Terms of Use establishing tiered legal framework

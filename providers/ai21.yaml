@@ -2,7 +2,7 @@ provider_id: ai21
 provider_name: AI21 Labs
 model_class: open_weights
 systemic_risk_threshold: false
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 
 obligations:
@@ -25,7 +25,7 @@ obligations:
       text-only models but does not fully satisfy Article 50(2).
     evidence:
     - url: https://www.ai21.com/terms-policies/acceptable-use/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Acceptable Use Guidelines (last updated 2025-07-29) Section
@@ -74,7 +74,7 @@ obligations:
       template summary.
     evidence:
     - url: https://huggingface.co/ai21labs/AI21-Jamba2-Mini
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Hugging Face model card for AI21-Jamba2-Mini (52B total /
@@ -88,7 +88,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509180516/https://huggingface.co/ai21labs/AI21-Jamba2-Mini
       archived_date: '2026-05-09'
     - url: https://www.ai21.com/blog/introducing-jamba2/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Jamba2 launch announcement (Jan 8, 2026) documenting model
@@ -101,7 +101,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509180542/https://www.ai21.com/blog/introducing-jamba2/
       archived_date: '2026-05-09'
     - url: https://www.ai21.com/jamba/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Jamba product page enumerating the open Jamba model family
@@ -151,7 +151,7 @@ obligations:
       Mistral score of 3.
     evidence:
     - url: https://www.ai21.com/terms-policies/acceptable-use/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Acceptable Use Guidelines (last updated 2025-07-29)
@@ -166,7 +166,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509180446/https://www.ai21.com/terms-policies/acceptable-use/
       archived_date: '2026-05-09'
     - url: https://www.ai21.com/terms-of-use/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Website Terms of Service (last updated 2024-11-19) with
@@ -178,7 +178,7 @@ obligations:
       wayback_url: https://web.archive.org/web/20260509180654/https://www.ai21.com/terms-of-service/
       archived_date: '2026-05-09'
     - url: https://www.ai21.com/terms-policies/privacy-policy/
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Privacy Policy (last updated 2025-07-29) covering customer-

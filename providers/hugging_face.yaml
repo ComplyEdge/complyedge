@@ -2,7 +2,7 @@ provider_id: hugging_face
 provider_name: Hugging Face (first-party models — SmolLM3 / SmolLM family)
 model_class: open_weights
 systemic_risk_threshold: false
-last_updated: '2026-05-09'
+last_updated: '2026-07-10'
 verification_status: needs_review
 _scoring_note: >-
   Hugging Face Inc. operates a model hub (hosting third-party models) AND
@@ -26,7 +26,7 @@ obligations:
       technical/machine-readable.
     evidence:
     - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         SmolLM3-3B model card Limitations section: "the generated
@@ -34,7 +34,9 @@ obligations:
         consistent, or free from biases present in the training
         data... should be used as assistive tools rather than
         definitive sources of information."
-      sha256: 29bb0263d87bb1145dc827cd4e9c8d0722e60a1791593a550c0c7116cca15bd7
+      sha256: 3795be384c9a5c3e9f9790a98c9746625c5f847c8501b2f6d091924198adc93e
+      wayback_url: https://web.archive.org/web/20260710234640/https://huggingface.co/HuggingFaceTB/SmolLM3-3B
+      archived_date: '2026-07-10'
   art_51_model_classification:
     score: 0
     rationale: >-
@@ -46,13 +48,15 @@ obligations:
       engaged. systemic_risk_threshold = false.
     evidence:
     - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Model card confirms 3B parameters, 11.2T pretraining tokens,
         384 H100 GPUs × 24 days — well below 1e25 FLOPs Art 51
         threshold.
-      sha256: 044099610e17329e6e2a23146a61357d5acd2156bf95baf82945ce20396cd2f6
+      sha256: 7c237c4cfa050f77a2f7e6c8e48db81b9287e4d56a3723de2f81c29bbd8033b1
+      wayback_url: https://web.archive.org/web/20260710234640/https://huggingface.co/HuggingFaceTB/SmolLM3-3B
+      archived_date: '2026-07-10'
   art_52_53_1_a_b_technical_documentation:
     score: 3
     rationale: >-
@@ -70,7 +74,7 @@ obligations:
       comprehensive regulator-grade technical documentation.
     evidence:
     - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Full Training section with architecture (transformer decoder,
@@ -78,25 +82,31 @@ obligations:
         FineMath, etc.), hyperparameters (lr 2e-4, AdamW, WSD
         scheduler), hardware (384 H100s × 24 days), and links to
         intermediate checkpoints (SmolLM3-3B-checkpoints).
-      sha256: e8415b25ecf7df9cd0bfadbe8ee482aa994e190e42a5f008b1805cc491f5bc76
+      sha256: 4e73d8463aca0b3c0e29ce4505fb9b41d73f5ae1df88512124ec128acb7d31b1
+      wayback_url: https://web.archive.org/web/20260710234640/https://huggingface.co/HuggingFaceTB/SmolLM3-3B
+      archived_date: '2026-07-10'
     - url: https://huggingface.co/blog/smollm3
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Engineering blueprint blog (July 8 2025) with pretraining
         recipe, ablations on GQA/NoPE/intra-doc masking, mid-training
         long-context extension methodology, SFT and APO post-training
         details, model-merging recipe.
-      sha256: 8c364f7348d4025dbbce854664a4609b45f410382c418b7faeedba9830c77e98
+      sha256: a542ec47153085ee2c955bcf9e764dde7e43e77bf03bceb45e86e48a8ecbe5fc
+      wayback_url: https://web.archive.org/web/20260710234805/https://huggingface.co/blog/smollm3
+      archived_date: '2026-07-10'
     - url: https://huggingface.co/docs/hub/model-cards
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
         Hugging Face Hub model-cards documentation — platform-wide
         standard mandating technical disclosure (model details,
         intended use, training data, evaluation, limitations) for
         all models on the Hub.
-      sha256: 9cc0d300022351be2c307496514d38b9f3f4664ab3c7f12b9935c292ea66d7b6
+      sha256: fb3e196a3bf73fa3da262223d8d6344aeb3ba7fa15675044c9ace00175def34a
+      wayback_url: https://web.archive.org/web/20260710234838/https://huggingface.co/docs/hub/model-cards
+      archived_date: '2026-07-10'
   art_53_1_c_copyright_transparency:
     score: 3
     rationale: >-
@@ -115,24 +125,28 @@ obligations:
       3 = full template-compliant disclosure.
     evidence:
     - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         Model card "EU Summary of Public Content" section: "The EU AI
         Act requires all GPAI models to provide a Public Summary of
         Training Content according to a given template" — links to
         EC template and to the dedicated transparency Space.
-      sha256: fb52c5b9471eab9ed58dcf57d69e8cb97ca03946962165e0c1aa3c9fa50596e2
+      sha256: 87ac9a7eafaf780f77a04508e4317142f67643a2a74ea32cec87e63722c616a6
+      wayback_url: https://web.archive.org/web/20260710234640/https://huggingface.co/HuggingFaceTB/SmolLM3-3B
+      archived_date: '2026-07-10'
     - url: https://huggingface.co/spaces/hfmlsoc/smollm3-eu-data-transparency
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: transparency_report
       summary: >-
         Dedicated Hugging Face Space publishing the full Art 53(1)(c)
         public summary of training content for SmolLM3, structured to
         the European Commission template.
-      sha256: 09e56640cf8093bd4d8329aebbb76b206ccee56592826abf88f2188466ffccd7
+      sha256: 844f099197e2b81d66242f3f4d8cf1ae43bdecbf64f19c379e77491f2b3783f7
+      wayback_url: https://web.archive.org/web/20260710234918/https://huggingface.co/spaces/hfmlsoc/smollm3-eu-data-transparency
+      archived_date: '2026-07-10'
     - url: https://huggingface.co/blog/smollm3
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: blog
       summary: >-
         Blog details data mixture per training stage with exact
@@ -140,7 +154,9 @@ obligations:
         DCLM, FineWeb2, Stack v2, FineMath3+); Stage 2 introduces
         Stack-Edu, FineMath4+, MegaMath; Stage 3 upsamples math/code
         plus OpenMathReasoning.
-      sha256: 089737c5a656a6349de60c7f009a209de401abf17fea9570c5b54f6a33dc5dee
+      sha256: a5a9ec37dfc0e4aa231b00326597f76a5ec36f3757223b4a948d49c420ff801a
+      wayback_url: https://web.archive.org/web/20260710234805/https://huggingface.co/blog/smollm3
+      archived_date: '2026-07-10'
   art_53_1_d_e_downstream_obligations:
     score: 2
     rationale: >-
@@ -159,16 +175,18 @@ obligations:
       no EU-AI-Act-aligned downstream notice. Score 2.
     evidence:
     - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: model_card
       summary: >-
         License section: Apache 2.0. Deployment instructions for
         vLLM, SGLang, llama.cpp, ONNX, MLX, MLC, ExecuTorch.
         Limitations section warns downstream users to verify
         outputs.
-      sha256: 84d2f0b27b6d599a30020974c60d99e17d92ac8e6c08a2d3a28a5975c00ac01a
+      sha256: f54df89196565c011f527726a29246e599cc71b9e2d62173db5eeed716e0ae71
+      wayback_url: https://web.archive.org/web/20260710234640/https://huggingface.co/HuggingFaceTB/SmolLM3-3B
+      archived_date: '2026-07-10'
     - url: https://huggingface.co/content-policy
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Hugging Face Content Policy (effective April 10 2025).
@@ -176,9 +194,11 @@ obligations:
         or malicious, harmful or abusive, privacy/IP violations,
         platform abuse. DSA-compliant out-of-court dispute
         settlement process.
-      sha256: 0ec08b97619a442f515fd7a033af7c385553d38ac040a690a4bc3c189cbcbb9c
+      sha256: 3563faa05ea6e4dbf4fc4c8d48d90aa9055d0abcd0c04c1b13f3e2c71778cd38
+      wayback_url: https://web.archive.org/web/20260710235017/https://huggingface.co/content-policy
+      archived_date: '2026-07-10'
     - url: https://huggingface.co/terms-of-service
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Terms of Service (effective Sep 15 2022). Open-source
@@ -186,14 +206,18 @@ obligations:
         of a reasonable and customary license (such as an open
         source license) such Content is intended to remain under
         the terms of such license." DMCA process and IP rules.
-      sha256: 1e29583d06ff83c161086094479b139deeff86b8b75f39849304a180eabf944c
+      sha256: 808d086465910d94f6ef960cab77416809086b247558f579f9e9e2721d968d5e
+      wayback_url: https://web.archive.org/web/20260710235044/https://huggingface.co/terms-of-service
+      archived_date: '2026-07-10'
     - url: https://huggingface.co/code-of-conduct
-      verified_date: '2026-05-09'
+      verified_date: '2026-07-10'
       doc_type: terms_of_service
       summary: >-
         Hugging Face Code of Conduct establishing community
         behavioral standards referenced from the Content Policy.
-      sha256: ab7429ecb28975894f584992aafd9447d12df0ec468d3495aa7042bfcbc065bf
+      sha256: a9d077581e1119d6e71cb23f4a2a54cf2a6da7613bca3c300e22cf5649b42adf
+      wayback_url: https://web.archive.org/web/20260710235109/https://huggingface.co/code-of-conduct
+      archived_date: '2026-07-10'
   art_55_systemic_risk:
     score: 0
     rationale: >-
