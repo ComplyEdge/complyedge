@@ -2,7 +2,7 @@
 """Layer-1 (deterministic hot-path) latency microbenchmark.
 
 Substantiates the public "<100ms p99 (Layer 1)" claim with a reproducible
-artifact (PR-AP06). Layer 1 is the deterministic path: the OPA/Rego policy
+artifact. Layer 1 is the deterministic path: the OPA/Rego policy
 bundle plus the TrustLint regex engine, with NO LLM. This benchmark measures
 both in isolation, mirroring the production query path from
 ``services/api/opa_client.py`` (OPA runs as a long-lived server — the same

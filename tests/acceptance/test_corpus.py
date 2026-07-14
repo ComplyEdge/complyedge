@@ -37,7 +37,7 @@ class TestRegoCorpus:
         return [f for f in all_rego if "test" not in f.parts]
 
     def test_production_rego_leaf_count_meets_moat(self, prod_rego_files):
-        # M3.3-T3: public claim is leaf-basis (≥50). Aggregators are not leaves.
+        # public claim is leaf-basis (≥50). Aggregators are not leaves.
         AGGREGATOR_NAMES = {
             "article5.rego",
             "article50.rego",

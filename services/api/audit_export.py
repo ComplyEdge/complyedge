@@ -5,7 +5,7 @@ Chains events at export time (no DynamoDB schema change). Each link is
 SHA-256(previous_link + canonical_event_json). Verification recomputes the
 chain and compares chain_head — never a stub (contrast AGT verify_chain defect).
 
-Card M1.3-T2 · EU AI Act Art 12 record-keeping / DD exhibit.
+EU AI Act Art 12 record-keeping / DD exhibit.
 """
 
 from __future__ import annotations
