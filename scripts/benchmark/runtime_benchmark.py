@@ -115,6 +115,7 @@ async def check_one(
     api_key: str,
     prompt: dict[str, Any],
     timeout_s: float,
+    semantic_fallback: bool = True,
 ) -> dict[str, Any]:
     """Send one prompt to /v1/check and score."""
     payload = {
@@ -122,7 +123,10 @@ async def check_one(
         "agent_id": "runtime-benchmark",
         "jurisdiction": prompt["jurisdiction"],
         "direction": prompt.get("direction", "output"),
-        "use_semantic_fallback": True,
+        # Default True mirrors the canonical hybrid run. --no-semantic-fallback
+        # runs the DEFAULT customer mode (OPA-only), where OPA passes do not
+        # route to the Layer 2 LLM — use it to measure OPA-only pass latency.
+        "use_semantic_fallback": semantic_fallback,
     }
     started = datetime.now(timezone.utc)
     try:
@@ -200,6 +204,7 @@ async def run_benchmark(
     prompts: list[dict[str, Any]],
     concurrency: int,
     timeout_s: float,
+    semantic_fallback: bool = True,
 ) -> list[dict[str, Any]]:
     """Run all prompts with bounded concurrency."""
     sem = asyncio.Semaphore(concurrency)
@@ -207,7 +212,7 @@ async def run_benchmark(
     async with httpx.AsyncClient() as client:
         async def bounded(p):
             async with sem:
-                return await check_one(client, base_url, api_key, p, timeout_s)
+                return await check_one(client, base_url, api_key, p, timeout_s, semantic_fallback)
 
         return await asyncio.gather(*(bounded(p) for p in prompts))
 
@@ -403,6 +408,9 @@ def main() -> int:
                    help="Filter to one category")
     p.add_argument("--concurrency", type=int, default=5, help="Parallel requests")
     p.add_argument("--timeout-s", type=float, default=30.0, help="Per-request timeout")
+    p.add_argument("--no-semantic-fallback", dest="semantic_fallback", action="store_false",
+                   help="Run the DEFAULT OPA-only mode (no Layer 2 LLM). Use a non-default "
+                        "--output path so the canonical hybrid artifact is not overwritten.")
     args = p.parse_args()
 
     if not args.api_key:
@@ -420,8 +428,10 @@ def main() -> int:
     print(f"{C.DIM}Loaded {len(prompts)} prompts (corpus sha={sha}){C.END}")
     print(f"{C.DIM}Hitting {args.base_url} with concurrency={args.concurrency}...{C.END}\n")
 
+    mode = "hybrid (semantic fallback ON)" if args.semantic_fallback else "OPA-only (default customer mode)"
+    print(f"{C.DIM}Mode: {mode}{C.END}")
     results = asyncio.run(run_benchmark(
-        args.base_url, args.api_key, prompts, args.concurrency, args.timeout_s
+        args.base_url, args.api_key, prompts, args.concurrency, args.timeout_s, args.semantic_fallback
     ))
 
     summary = aggregate(results)
