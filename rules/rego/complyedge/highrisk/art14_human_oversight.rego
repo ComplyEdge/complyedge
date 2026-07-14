@@ -5,7 +5,7 @@
 # Condition type: deterministic
 # Enforcement layer: layer1
 # Status: approved
-# Approved by: Leo Celis on 2026-07-09 (agent authoring, card M3.3-T2)
+# Approved by: Leo Celis on 2026-07-09 (agent authoring)
 
 package complyedge.highrisk.art14_human_oversight
 

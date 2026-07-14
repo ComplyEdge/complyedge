@@ -13,7 +13,7 @@
 # Condition type: deterministic
 # Enforcement layer: layer1
 # Status: approved
-# Approved by: Leo Celis on 2026-07-11 (via agent review per RULE_STANDARD §5.1; card M3.3-T3)
+# Approved by: Leo Celis on 2026-07-11 (via agent review per RULE_STANDARD §5.1)
 
 package complyedge.article50.emotion_permitted_context_notice
 

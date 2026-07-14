@@ -1,4 +1,4 @@
-# ComplyEdge — highrisk new-rule tests (card M3.3-T2)
+# ComplyEdge — highrisk new-rule tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.highrisk_m33_test

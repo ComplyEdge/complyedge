@@ -1,4 +1,4 @@
-# ComplyEdge — M3.3-T3 leaf tests (5 remaining backlog leaves)
+# ComplyEdge — additional leaf tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.m33_t3_test

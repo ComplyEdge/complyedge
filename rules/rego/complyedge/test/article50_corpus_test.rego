@@ -1,4 +1,4 @@
-# ComplyEdge — article50 new-rule tests (card M3.3-T2)
+# ComplyEdge — article50 new-rule tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.article50_m33_test
