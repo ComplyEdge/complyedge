@@ -1,4 +1,4 @@
-# ComplyEdge — leaf tests (5 remaining backlog leaves)
+# ComplyEdge — additional leaf tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.corpus_leaf_test
