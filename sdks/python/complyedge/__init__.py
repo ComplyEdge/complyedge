@@ -39,9 +39,10 @@ Advanced Usage (Full Interface):
 """
 
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 from tenacity import (
@@ -88,7 +89,7 @@ class ComplianceViolation:
     severity: SeverityLevel
     reason: str
     confidence: float
-    text_excerpt: Optional[str] = None
+    text_excerpt: str | None = None
 
 
 @dataclass
@@ -97,10 +98,10 @@ class ComplianceResult:
 
     event_id: str
     allowed: bool
-    violations: List[ComplianceViolation]
+    violations: list[ComplianceViolation]
     latency_ms: int
     bundle_version: str
-    evaluated_rules: List[str]
+    evaluated_rules: list[str]
 
     @property
     def safe(self) -> bool:
@@ -118,7 +119,7 @@ class ComplianceResult:
         return len(self.violations)
 
     @property
-    def reason(self) -> Optional[str]:
+    def reason(self) -> str | None:
         """Human-readable reason for the decision."""
         if self.allowed:
             return None
@@ -133,8 +134,8 @@ class ComplianceError(Exception):
     def __init__(
         self,
         message: str,
-        violations: Optional[List[ComplianceViolation]] = None,
-        event_id: Optional[str] = None,
+        violations: list[ComplianceViolation] | None = None,
+        event_id: str | None = None,
     ):
         super().__init__(message)
         self.violations = violations or []
@@ -166,8 +167,8 @@ class ComplyEdge:
         self,
         api_key: str,
         agent_id: str = "default",
-        jurisdiction: Optional[str] = None,
-        base_url: str = DEFAULT_BASE_URL,
+        jurisdiction: str | None = None,
+        base_url: str | None = DEFAULT_BASE_URL,
     ):
         """
         Initialize ComplyEdge client.
@@ -181,7 +182,9 @@ class ComplyEdge:
         self.api_key = api_key
         self.agent_id = agent_id
         self.jurisdiction = jurisdiction
-        self.base_url = (base_url or DEFAULT_BASE_URL or "https://api.complyedge.io").rstrip("/")
+        self.base_url = (
+            base_url or DEFAULT_BASE_URL or "https://api.complyedge.io"
+        ).rstrip("/")
 
         self._client = httpx.Client(
             base_url=self.base_url,
@@ -217,8 +220,8 @@ class ComplyEdge:
     def check(
         self,
         text: str,
-        agent_id: Optional[str] = None,
-        jurisdiction: Optional[str] = None,
+        agent_id: str | None = None,
+        jurisdiction: str | None = None,
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -238,7 +241,7 @@ class ComplyEdge:
             else:
                 print(f"Blocked: {result.reason}")
         """
-        request_data = {
+        request_data: dict[str, Any] = {
             "text": text,
             "jurisdiction": jurisdiction or self.jurisdiction or "EU",
             "agent_id": agent_id or self.agent_id,
@@ -289,10 +292,10 @@ class ComplyEdge:
     def assess_pre_deployment(
         self,
         system_prompt: str,
-        model_config: Optional[Dict[str, Any]] = None,
-        agent_pipeline: Optional[Dict[str, Any]] = None,
+        model_config: dict[str, Any] | None = None,
+        agent_pipeline: dict[str, Any] | None = None,
         jurisdiction: str = "EU",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Assess an AI system configuration against EU AI Act requirements
         BEFORE deployment.
@@ -315,7 +318,7 @@ class ComplyEdge:
             )
             print(f"Risk: {result['risk_tier']}, Score: {result['compliance_score']}")
         """
-        request_data = {
+        request_data: dict[str, Any] = {
             "system_prompt": system_prompt,
             "jurisdiction": jurisdiction,
         }
@@ -357,8 +360,8 @@ def is_safe(
     text: str,
     api_key: str,
     agent_id: str = "default",
-    jurisdiction: Optional[str] = None,
-    base_url: str = DEFAULT_BASE_URL,
+    jurisdiction: str | None = None,
+    base_url: str | None = DEFAULT_BASE_URL,
 ) -> bool:
     """
     Global convenience function to check if text is safe.
@@ -392,8 +395,8 @@ def check(
     text: str,
     api_key: str,
     agent_id: str = "default",
-    jurisdiction: Optional[str] = None,
-    base_url: str = DEFAULT_BASE_URL,
+    jurisdiction: str | None = None,
+    base_url: str | None = DEFAULT_BASE_URL,
 ) -> ComplianceResult:
     """
     Global convenience function to check text compliance.
@@ -475,7 +478,7 @@ class ComplyEdgeClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = DEFAULT_BASE_URL,
+        base_url: str | None = DEFAULT_BASE_URL,
         timeout: int = 300,
         max_retries: int = 3,
         verify_ssl: bool = True,
@@ -491,7 +494,9 @@ class ComplyEdgeClient:
             verify_ssl: Whether to verify SSL certificates
         """
         self.api_key = api_key
-        self.base_url = (base_url or DEFAULT_BASE_URL or "https://api.complyedge.io").rstrip("/")
+        self.base_url = (
+            base_url or DEFAULT_BASE_URL or "https://api.complyedge.io"
+        ).rstrip("/")
 
         self.client = httpx.Client(
             base_url=self.base_url,
@@ -524,9 +529,9 @@ class ComplyEdgeClient:
         self,
         text: str,
         agent_id: str,
-        jurisdiction: Optional[str] = None,
+        jurisdiction: str | None = None,
         direction: DirectionType = DirectionType.OUTPUT,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
     ) -> ComplianceResult:
@@ -552,11 +557,13 @@ class ComplyEdgeClient:
                            (when raise_on_violation=True)
         """
         try:
-            request_data = {
+            request_data: dict[str, Any] = {
                 "text": text,
                 "jurisdiction": jurisdiction or "EU",
                 "agent_id": agent_id,
-                "direction": direction.value if hasattr(direction, "value") else str(direction),
+                "direction": direction.value
+                if hasattr(direction, "value")
+                else str(direction),
                 "use_semantic_fallback": use_semantic_fallback,
             }
             if context:
@@ -612,7 +619,7 @@ class ComplyEdgeClient:
         except httpx.RequestError as e:
             raise ComplianceError(f"Request failed: {str(e)}")
 
-    def get_rules_info(self) -> Dict[str, Any]:
+    def get_rules_info(self) -> dict[str, Any]:
         """Get information about the current rule bundle."""
         try:
             response = self.client.get("/v1/rules/info")
@@ -622,7 +629,7 @@ class ComplyEdgeClient:
         except httpx.HTTPStatusError as e:
             raise ComplianceError(f"Failed to get rules info: {e}")
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get compliance metrics for your tenant."""
         try:
             response = self.client.get("/v1/metrics")
@@ -656,14 +663,16 @@ class AsyncComplyEdgeClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = DEFAULT_BASE_URL,
+        base_url: str | None = DEFAULT_BASE_URL,
         timeout: int = 300,
         max_retries: int = 3,
         verify_ssl: bool = True,
     ):
         """Initialize the async ComplyEdge client."""
         self.api_key = api_key
-        self.base_url = (base_url or DEFAULT_BASE_URL or "https://api.complyedge.io").rstrip("/")
+        self.base_url = (
+            base_url or DEFAULT_BASE_URL or "https://api.complyedge.io"
+        ).rstrip("/")
 
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
@@ -696,19 +705,21 @@ class AsyncComplyEdgeClient:
         self,
         text: str,
         agent_id: str,
-        jurisdiction: Optional[str] = None,
+        jurisdiction: str | None = None,
         direction: DirectionType = DirectionType.OUTPUT,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
     ) -> ComplianceResult:
         """Async version of check_compliance."""
         try:
-            request_data = {
+            request_data: dict[str, Any] = {
                 "text": text,
                 "jurisdiction": jurisdiction or "EU",
                 "agent_id": agent_id,
-                "direction": direction.value if hasattr(direction, "value") else str(direction),
+                "direction": direction.value
+                if hasattr(direction, "value")
+                else str(direction),
                 "use_semantic_fallback": use_semantic_fallback,
             }
             if context:
@@ -764,7 +775,7 @@ class AsyncComplyEdgeClient:
         except httpx.RequestError as e:
             raise ComplianceError(f"Request failed: {str(e)}")
 
-    async def get_rules_info(self) -> Dict[str, Any]:
+    async def get_rules_info(self) -> dict[str, Any]:
         """Get information about the current rule bundle."""
         try:
             response = await self.client.get("/v1/rules/info")
@@ -774,7 +785,7 @@ class AsyncComplyEdgeClient:
         except httpx.HTTPStatusError as e:
             raise ComplianceError(f"Failed to get rules info: {e}")
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get compliance metrics for your tenant."""
         try:
             response = await self.client.get("/v1/metrics")
@@ -791,7 +802,7 @@ class AsyncComplyEdgeClient:
 
 
 def check_compliance(
-    text: str, agent_id: str, api_key: str, jurisdiction: Optional[str] = None, **kwargs
+    text: str, agent_id: str, api_key: str, jurisdiction: str | None = None, **kwargs
 ) -> ComplianceResult:
     """
     Quick compliance check without creating a client instance.
@@ -819,22 +830,29 @@ def check_compliance(
 # =============================================================================
 
 
-def get_api_key() -> Optional[str]:
+def get_api_key() -> str | None:
     """Get API key from environment variables."""
     return os.environ.get("COMPLYEDGE_API_KEY")
 
 
 # Convenience instance with environment configuration
-if get_api_key():
-    default_client = ComplyEdge(api_key=get_api_key())
+default_client: ComplyEdge | None
+safe: Callable[[str], bool] | None
+# Conditionally bound below; reassigned to the decorator import at module end.
+compliance_check: Any
+
+_env_api_key = get_api_key()
+if _env_api_key:
+    default_client = ComplyEdge(api_key=_env_api_key)
+    _env_client = default_client
 
     def safe(text: str) -> bool:
         """Check if text is safe using environment-configured client."""
-        return default_client.is_safe(text)
+        return _env_client.is_safe(text)
 
     def compliance_check(text: str) -> ComplianceResult:
         """Check compliance using environment-configured client."""
-        return default_client.check(text)
+        return _env_client.check(text)
 
 else:
     default_client = None
@@ -859,7 +877,7 @@ __all__ = [
     "DirectionType",
     # Decorator interface
     "compliance_check",
-    "ComplianceConfig", 
+    "ComplianceConfig",
     "default_violation_handler",
     # Backward compatibility
     "check_compliance",

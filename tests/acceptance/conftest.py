@@ -29,15 +29,16 @@ def mock_openai_globally():
     """No-op: acceptance tests run against real files and the live API, not mocks."""
     yield
 
+
 # ---------------------------------------------------------------------------
 # Path helpers
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).parent.parent.parent
 
-RULES_REGO_DIR       = REPO_ROOT / "rules" / "rego" / "complyedge"
+RULES_REGO_DIR = REPO_ROOT / "rules" / "rego" / "complyedge"
 RULES_REGULATIONS_DIR = REPO_ROOT / "rules" / "regulations"
-SDK_DIR              = REPO_ROOT / "sdks" / "python" / "complyedge"
+SDK_DIR = REPO_ROOT / "sdks" / "python" / "complyedge"
 BENCHMARK_RESULTS_DIR = REPO_ROOT / "scripts" / "benchmark" / "results"
 
 # ---------------------------------------------------------------------------

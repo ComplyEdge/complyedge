@@ -19,14 +19,12 @@ Claims verified:
 """
 from __future__ import annotations
 
-import os
-
 import pytest
+from complyedge import ComplianceError
 
 # conftest.py prepends sdks/python to sys.path so this always imports
 # the local SDK source, not any system-installed copy.
 from complyedge.decorators import compliance_check
-from complyedge import ComplianceError
 
 SAFE_INPUT = "Hello, I am an AI assistant. How can I help you today?"
 VIOLATION_INPUT = (
@@ -38,6 +36,7 @@ VIOLATION_INPUT = (
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_agent(text_to_return: str = "ok"):
     """Factory: returns a decorated agent function that echoes its input."""
@@ -53,6 +52,7 @@ def _make_agent(text_to_return: str = "ok"):
 # Offline tests — no API key needed
 # ---------------------------------------------------------------------------
 
+
 class TestDecoratorFailOpen:
     """Decorator must fail-open when it cannot check compliance."""
 
@@ -63,9 +63,9 @@ class TestDecoratorFailOpen:
 
         agent = _make_agent("result-value")
         result = agent(VIOLATION_INPUT)
-        assert result == "result-value", (
-            "Decorator with COMPLYEDGE_ENABLED=false should pass through without blocking"
-        )
+        assert (
+            result == "result-value"
+        ), "Decorator with COMPLYEDGE_ENABLED=false should pass through without blocking"
 
     def test_fail_open_when_no_api_key(self, monkeypatch):
         # Claim: "No API key → fail open"
@@ -74,14 +74,15 @@ class TestDecoratorFailOpen:
 
         agent = _make_agent("result-value")
         result = agent(VIOLATION_INPUT)
-        assert result == "result-value", (
-            "Decorator with no API key should pass through without blocking"
-        )
+        assert (
+            result == "result-value"
+        ), "Decorator with no API key should pass through without blocking"
 
 
 # ---------------------------------------------------------------------------
 # Live tests — require COMPLYEDGE_API_KEY
 # ---------------------------------------------------------------------------
+
 
 class TestDecoratorLive:
     """End-to-end decorator behaviour against the real API."""
@@ -102,9 +103,9 @@ class TestDecoratorLive:
             return "safe-result"
 
         result = agent(SAFE_INPUT)
-        assert result == "safe-result", (
-            "Decorated function should return its result for a safe input"
-        )
+        assert (
+            result == "safe-result"
+        ), "Decorated function should return its result for a safe input"
 
     def test_violation_raises_compliance_error(self, api_base_url, monkeypatch):
         # Claim: "@compliance_check raises ComplianceError on violation"
@@ -129,9 +130,9 @@ class TestDecoratorLive:
             agent(VIOLATION_INPUT)
 
         error_text = str(exc_info.value)
-        assert "rego-art5-1c-001" in error_text, (
-            f"ComplianceError should cite the rule_id; got: {error_text[:200]}"
-        )
+        assert (
+            "rego-art5-1c-001" in error_text
+        ), f"ComplianceError should cite the rule_id; got: {error_text[:200]}"
 
     def test_enabled_by_default_with_only_api_key_set(self, api_base_url, monkeypatch):
         # Claim: "decorator is enabled by default when COMPLYEDGE_API_KEY is set"

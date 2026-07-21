@@ -14,7 +14,6 @@ import json
 import sys
 import webbrowser
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -45,8 +44,9 @@ def _save_config(config: dict) -> None:
     CONFIG_FILE.chmod(0o600)  # Owner-only read/write
 
 
-def _get_api_key() -> Optional[str]:
+def _get_api_key() -> str | None:
     import os
+
     key = os.getenv("COMPLYEDGE_API_KEY")
     if key:
         return key
@@ -68,10 +68,16 @@ def cli() -> None:
 
 
 @cli.command()
-@click.option("--api-key", prompt="API Key", hide_input=True,
-              help="Your ComplyEdge API key (or paste when prompted)")
-@click.option("--base-url", default=None, help="API base URL (default: https://api.complyedge.io)")
-def login(api_key: str, base_url: Optional[str]) -> None:
+@click.option(
+    "--api-key",
+    prompt="API Key",
+    hide_input=True,
+    help="Your ComplyEdge API key (or paste when prompted)",
+)
+@click.option(
+    "--base-url", default=None, help="API base URL (default: https://api.complyedge.io)"
+)
+def login(api_key: str, base_url: str | None) -> None:
     """Authenticate and store your API key locally.
 
     Your API key is stored in ~/.complyedge/config.json (owner-only permissions).
@@ -94,17 +100,29 @@ def signup() -> None:
     webbrowser.open(url)
 
 
-def _create_client(api_key: str, base_url: Optional[str] = None):
+def _create_client(api_key: str, base_url: str | None = None):
     from complyedge import ComplyEdge
-    return ComplyEdge(api_key=api_key, base_url=base_url) if base_url else ComplyEdge(api_key=api_key)
+
+    return (
+        ComplyEdge(api_key=api_key, base_url=base_url)
+        if base_url
+        else ComplyEdge(api_key=api_key)
+    )
 
 
 @cli.command()
 @click.argument("target", required=False)
 @click.option("--text", "-t", help="Text string to scan")
-@click.option("--jurisdiction", "-j", default="EU", help="Jurisdiction (EU, US, GLOBAL) — defaults to EU")
+@click.option(
+    "--jurisdiction",
+    "-j",
+    default="EU",
+    help="Jurisdiction (EU, US, GLOBAL) — defaults to EU",
+)
 @click.option("--verbose", "-v", is_flag=True, help="Show full violation details")
-def scan(target: Optional[str], text: Optional[str], jurisdiction: str, verbose: bool) -> None:
+def scan(
+    target: str | None, text: str | None, jurisdiction: str, verbose: bool
+) -> None:
     """Run a compliance check via the ComplyEdge API.
 
     Examples:
@@ -117,7 +135,10 @@ def scan(target: Optional[str], text: Optional[str], jurisdiction: str, verbose:
     """
     api_key = _get_api_key()
     if not api_key:
-        click.echo(f"{RED}No API key found. Run 'complyedge login' or set COMPLYEDGE_API_KEY.{RESET}", err=True)
+        click.echo(
+            f"{RED}No API key found. Run 'complyedge login' or set COMPLYEDGE_API_KEY.{RESET}",
+            err=True,
+        )
         sys.exit(2)
 
     # Resolve input text
@@ -149,20 +170,28 @@ def scan(target: Optional[str], text: Optional[str], jurisdiction: str, verbose:
     # Display results
     if result.safe:
         click.echo(f"\n{GREEN}{BOLD}COMPLIANT{RESET} — no violations detected")
-        click.echo(f"{DIM}Jurisdiction: {jurisdiction} | Event: {result.event_id}{RESET}")
+        click.echo(
+            f"{DIM}Jurisdiction: {jurisdiction} | Event: {result.event_id}{RESET}"
+        )
         sys.exit(0)
     else:
         click.echo(f"\n{BOLD}Compliance Violations Found{RESET}")
         click.echo(f"{'─' * 50}")
         for v in result.violations:
             severity_color = RED if v.severity in ("critical", "high") else YELLOW
-            click.echo(f"\n{severity_color}{BOLD}[{v.severity.upper()}]{RESET} {v.rule_id}")
+            click.echo(
+                f"\n{severity_color}{BOLD}[{v.severity.upper()}]{RESET} {v.rule_id}"
+            )
             click.echo(f"  {v.rule_description}")
             if verbose and v.reason:
                 click.echo(f"  {CYAN}Reason: {v.reason}{RESET}")
         click.echo(f"\n{'─' * 50}")
-        critical = sum(1 for v in result.violations if v.severity in ("critical", "high"))
-        click.echo(f"{RED}{critical} critical/high{RESET} violations | Event: {result.event_id}")
+        critical = sum(
+            1 for v in result.violations if v.severity in ("critical", "high")
+        )
+        click.echo(
+            f"{RED}{critical} critical/high{RESET} violations | Event: {result.event_id}"
+        )
         sys.exit(1)
 
 
@@ -175,14 +204,20 @@ def status() -> None:
 
     api_key = _get_api_key()
     config = _load_config()
-    base_url = config.get("base_url") or os.getenv("COMPLYEDGE_API_URL") or "https://api.complyedge.io"
+    base_url = (
+        config.get("base_url")
+        or os.getenv("COMPLYEDGE_API_URL")
+        or "https://api.complyedge.io"
+    )
 
     click.echo(f"\n{BOLD}ComplyEdge v{__version__}{RESET}")
     click.echo(f"{'─' * 40}")
 
     if api_key:
         click.echo(f"API Key:  {_mask_key(api_key)}")
-        source = "env" if os.getenv("COMPLYEDGE_API_KEY") else "~/.complyedge/config.json"
+        source = (
+            "env" if os.getenv("COMPLYEDGE_API_KEY") else "~/.complyedge/config.json"
+        )
         click.echo(f"Source:   {source}")
     else:
         click.echo(f"{YELLOW}API Key:  not configured{RESET}")
@@ -202,13 +237,24 @@ def status() -> None:
 
 
 @cli.command("pre-deploy")
-@click.option("--file", "-f", "config_file", required=True,
-              help="Path to YAML or JSON agent configuration file")
-@click.option("--api-key", envvar="COMPLYEDGE_API_KEY", default=None,
-              help="API key (or set COMPLYEDGE_API_KEY)")
+@click.option(
+    "--file",
+    "-f",
+    "config_file",
+    required=True,
+    help="Path to YAML or JSON agent configuration file",
+)
+@click.option(
+    "--api-key",
+    envvar="COMPLYEDGE_API_KEY",
+    default=None,
+    help="API key (or set COMPLYEDGE_API_KEY)",
+)
 @click.option("--jurisdiction", "-j", default="EU", help="Jurisdiction (default: EU)")
 @click.option("--verbose", "-v", is_flag=True, help="Show full violation details")
-def pre_deploy(config_file: str, api_key: Optional[str], jurisdiction: str, verbose: bool) -> None:
+def pre_deploy(
+    config_file: str, api_key: str | None, jurisdiction: str, verbose: bool
+) -> None:
     """Assess an AI system configuration BEFORE deployment.
 
     Reads a YAML or JSON agent config and evaluates it against EU AI Act requirements.
@@ -221,7 +267,10 @@ def pre_deploy(config_file: str, api_key: Optional[str], jurisdiction: str, verb
     """
     api_key = api_key or _get_api_key()
     if not api_key:
-        click.echo(f"{RED}No API key found. Run 'complyedge login' or set COMPLYEDGE_API_KEY.{RESET}", err=True)
+        click.echo(
+            f"{RED}No API key found. Run 'complyedge login' or set COMPLYEDGE_API_KEY.{RESET}",
+            err=True,
+        )
         sys.exit(2)
 
     path = Path(config_file)
@@ -234,6 +283,7 @@ def pre_deploy(config_file: str, api_key: Optional[str], jurisdiction: str, verb
     try:
         if path.suffix in (".yaml", ".yml"):
             import yaml
+
             config_data = yaml.safe_load(raw)
         else:
             config_data = json.loads(raw)
@@ -274,7 +324,10 @@ def pre_deploy(config_file: str, api_key: Optional[str], jurisdiction: str, verb
     deadline = result.get("estimated_deadline", "")
 
     tier_colors = {
-        "minimal": GREEN, "limited": CYAN, "high": YELLOW, "unacceptable": RED,
+        "minimal": GREEN,
+        "limited": CYAN,
+        "high": YELLOW,
+        "unacceptable": RED,
     }
     tier_color = tier_colors.get(risk_tier, RED)
 
@@ -289,7 +342,9 @@ def pre_deploy(config_file: str, api_key: Optional[str], jurisdiction: str, verb
     if violations:
         click.echo(f"\n{BOLD}Violations ({len(violations)}){RESET}")
         for v in violations:
-            click.echo(f"\n  {RED}{BOLD}[{v.get('article', '')}]{RESET} {v.get('rule_id', '')}")
+            click.echo(
+                f"\n  {RED}{BOLD}[{v.get('article', '')}]{RESET} {v.get('rule_id', '')}"
+            )
             click.echo(f"  {v.get('description', '')}")
             if verbose:
                 click.echo(f"  {CYAN}Action: {v.get('required_action', '')}{RESET}")
@@ -327,6 +382,7 @@ def rules_info() -> None:
 
     try:
         import httpx
+
         url = (base_url or "https://api.complyedge.io").rstrip("/")
         resp = httpx.get(
             f"{url}/v1/rules/info",

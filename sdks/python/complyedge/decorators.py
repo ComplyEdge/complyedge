@@ -8,7 +8,8 @@ in AI agent functions, supporting both input and output validation.
 import functools
 import logging
 import os
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 # Resolve default base URL from environment
 _DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
@@ -16,12 +17,15 @@ _DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
 if TYPE_CHECKING:
     from . import ComplianceResult
 
+
 # Import from existing SDK components
 # Note: Models and clients are defined in __init__.py
 def _import_models():
     """Import models after module initialization to avoid circular imports."""
     from . import ComplianceError, ComplianceResult, ComplyEdge
+
     return ComplianceResult, ComplyEdge, ComplianceError
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,28 +33,28 @@ logger = logging.getLogger(__name__)
 class ComplianceConfig:
     """
     Configuration object for compliance decorator.
-    
+
     Provides enterprise-grade configuration for complex compliance scenarios
-    including custom violation handlers, conditional enablement, and 
+    including custom violation handlers, conditional enablement, and
     multi-jurisdiction support.
     """
-    
+
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         check_input: bool = True,
         check_output: bool = True,
-        enable_condition: Optional[Callable[[], bool]] = None,
-        violation_handler: Optional[Callable[["ComplianceResult", str], Any]] = None,
+        enable_condition: Callable[[], bool] | None = None,
+        violation_handler: Callable[["ComplianceResult", str], Any] | None = None,
         agent_id: str = "default",
-        jurisdiction: Optional[str] = None,
-        base_url: str = _DEFAULT_BASE_URL,
+        jurisdiction: str | None = None,
+        base_url: str | None = _DEFAULT_BASE_URL,
         timeout: int = 300,
-        max_retries: int = 3
+        max_retries: int = 3,
     ):
         """
         Initialize compliance configuration.
-        
+
         Args:
             api_key: ComplyEdge API key (overrides environment variables)
             check_input: Whether to check function input parameters
@@ -91,8 +95,13 @@ def default_violation_handler(result: "ComplianceResult", context: str) -> None:
         ComplianceError: Always raised to block the request.
     """
     from . import ComplianceError as _ComplianceError
+
     violation_count = len(result.violations) if result.violations else 0
-    regulations = ", ".join(result.evaluated_rules) if result.evaluated_rules else "compliance policies"
+    regulations = (
+        ", ".join(result.evaluated_rules)
+        if result.evaluated_rules
+        else "compliance policies"
+    )
     raise _ComplianceError(
         f"Request blocked due to compliance violation in {context}. "
         f"Found {violation_count} violation(s) against {regulations}. "
@@ -108,25 +117,25 @@ def compliance_check(
     api_key_env: str = "COMPLYEDGE_API_KEY",
     enabled_env: str = "COMPLYEDGE_ENABLED",
     agent_id: str = "default",
-    jurisdiction: Optional[str] = None,
-    config: Optional[ComplianceConfig] = None,
-    violation_handler: Optional[Callable[["ComplianceResult", str], Any]] = None,
-    base_url: str = _DEFAULT_BASE_URL
+    jurisdiction: str | None = None,
+    config: ComplianceConfig | None = None,
+    violation_handler: Callable[["ComplianceResult", str], Any] | None = None,
+    base_url: str | None = _DEFAULT_BASE_URL,
 ):
     """
     Decorator for automatic ComplyEdge compliance checking.
-    
+
     Provides clean, Pythonic integration of compliance checking into any
     AI agent function. Supports both simple parameter-based configuration
     and complex configuration object patterns.
-    
+
     Usage Patterns:
-    
+
         # Simple usage
         @compliance_check(input=True, output=True)
         def my_agent_function(user_input: str) -> str:
             return process_input(user_input)
-        
+
         # Environment-based configuration
         @compliance_check(
             api_key_env="CUSTOM_API_KEY_VAR",
@@ -134,7 +143,7 @@ def compliance_check(
         )
         def my_function(text: str) -> str:
             return text.upper()
-        
+
         # Configuration object pattern
         config = ComplianceConfig(
             api_key=os.getenv("COMPLYEDGE_API_KEY"),
@@ -143,11 +152,11 @@ def compliance_check(
             enable_condition=lambda: os.getenv("COMPLIANCE_MODE") == "strict",
             violation_handler=custom_violation_handler
         )
-        
+
         @compliance_check(config=config)
         def enterprise_function(data: str) -> str:
             return process_enterprise_data(data)
-    
+
     Args:
         input: Whether to check function input parameters for compliance
         output: Whether to check function return value for compliance
@@ -160,13 +169,14 @@ def compliance_check(
         config: ComplianceConfig object (overrides individual parameters)
         violation_handler: Custom function to handle compliance violations
         base_url: ComplyEdge API base URL
-        
+
     Returns:
         Decorated function with automatic compliance checking
-        
+
     Raises:
         No exceptions - uses graceful degradation on configuration errors
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -175,9 +185,16 @@ def compliance_check(
                 check_input = config.check_input
                 check_output = config.check_output
                 api_key = config.api_key or os.getenv(api_key_env)
-                enabled = (config.enable_condition() if config.enable_condition 
-                          else os.getenv(enabled_env, "true").lower() == "true")
-                handler = config.violation_handler or violation_handler or default_violation_handler
+                enabled = (
+                    config.enable_condition()
+                    if config.enable_condition
+                    else os.getenv(enabled_env, "true").lower() == "true"
+                )
+                handler = (
+                    config.violation_handler
+                    or violation_handler
+                    or default_violation_handler
+                )
                 agent = config.agent_id
                 juris = config.jurisdiction
                 api_base_url = config.base_url
@@ -190,7 +207,7 @@ def compliance_check(
                 agent = agent_id
                 juris = jurisdiction
                 api_base_url = base_url
-            
+
             # Graceful degradation: proceed without compliance if disabled or misconfigured
             if not enabled or not api_key:
                 logger.warning(
@@ -199,50 +216,50 @@ def compliance_check(
                         "enabled": enabled,
                         "api_key_present": bool(api_key),
                         "function_name": func.__name__,
-                        "agent_id": agent
-                    }
+                        "agent_id": agent,
+                    },
                 )
                 return func(*args, **kwargs)
-            
+
             # Initialize ComplyEdge client with configuration
             # Import classes dynamically to avoid circular import
             ComplianceResult, ComplyEdge, ComplianceError = _import_models()
-            
+
             ce = ComplyEdge(
                 api_key=api_key,
                 agent_id=agent,
                 jurisdiction=juris,
-                base_url=api_base_url
+                base_url=api_base_url,
             )
-            
+
             try:
                 # Input compliance checking
                 if check_input and args:
                     # Extract string arguments for compliance checking
                     input_texts = []
-                    for i, arg in enumerate(args):
+                    for _i, arg in enumerate(args):
                         if isinstance(arg, str) and arg.strip():
                             input_texts.append(arg)
-                    
+
                     # Add string keyword arguments
-                    for key, value in kwargs.items():
+                    for _key, value in kwargs.items():
                         if isinstance(value, str) and value.strip():
                             input_texts.append(value)
-                    
+
                     if input_texts:
                         # Combine all text inputs for comprehensive checking
                         combined_input = " ".join(input_texts)
-                        
+
                         logger.debug(
                             "Performing input compliance check",
                             extra={
                                 "function_name": func.__name__,
                                 "agent_id": agent,
                                 "input_length": len(combined_input),
-                                "jurisdiction": juris
-                            }
+                                "jurisdiction": juris,
+                            },
                         )
-                        
+
                         _input_violation = None
                         try:
                             result = ce.check(combined_input)
@@ -253,9 +270,11 @@ def compliance_check(
                                         "function_name": func.__name__,
                                         "agent_id": agent,
                                         "event_id": result.event_id,
-                                        "violation_count": len(result.violations) if result.violations else 0,
-                                        "regulations": result.evaluated_rules
-                                    }
+                                        "violation_count": len(result.violations)
+                                        if result.violations
+                                        else 0,
+                                        "regulations": result.evaluated_rules,
+                                    },
                                 )
                                 _input_violation = result
                         except Exception as e:
@@ -264,13 +283,13 @@ def compliance_check(
                                 extra={
                                     "function_name": func.__name__,
                                     "agent_id": agent,
-                                    "error": str(e)
-                                }
+                                    "error": str(e),
+                                },
                             )
                             # Conservative approach: allow function to proceed but log the failure
                         if _input_violation is not None:
                             return handler(_input_violation, "input")
-                
+
                 # Execute the original function
                 logger.debug(
                     "Executing function with compliance protection",
@@ -278,12 +297,12 @@ def compliance_check(
                         "function_name": func.__name__,
                         "agent_id": agent,
                         "input_checked": check_input,
-                        "output_will_check": check_output
-                    }
+                        "output_will_check": check_output,
+                    },
                 )
-                
+
                 response = func(*args, **kwargs)
-                
+
                 # Output compliance checking
                 if check_output and isinstance(response, str) and response.strip():
                     logger.debug(
@@ -292,10 +311,10 @@ def compliance_check(
                             "function_name": func.__name__,
                             "agent_id": agent,
                             "output_length": len(response),
-                            "jurisdiction": juris
-                        }
+                            "jurisdiction": juris,
+                        },
                     )
-                    
+
                     _output_violation = None
                     try:
                         result = ce.check(response)
@@ -306,9 +325,11 @@ def compliance_check(
                                     "function_name": func.__name__,
                                     "agent_id": agent,
                                     "event_id": result.event_id,
-                                    "violation_count": len(result.violations) if result.violations else 0,
-                                    "regulations": result.evaluated_rules
-                                }
+                                    "violation_count": len(result.violations)
+                                    if result.violations
+                                    else 0,
+                                    "regulations": result.evaluated_rules,
+                                },
                             )
                             _output_violation = result
                     except Exception as e:
@@ -317,30 +338,31 @@ def compliance_check(
                             extra={
                                 "function_name": func.__name__,
                                 "agent_id": agent,
-                                "error": str(e)
-                            }
+                                "error": str(e),
+                            },
                         )
                         # Conservative approach: return original response but log the failure
                     if _output_violation is not None:
                         return handler(_output_violation, "output")
-                
+
                 logger.debug(
                     "Function execution completed with compliance checks",
                     extra={
                         "function_name": func.__name__,
                         "agent_id": agent,
-                        "compliance_passed": True
-                    }
+                        "compliance_passed": True,
+                    },
                 )
-                
+
                 return response
-                
+
             finally:
                 # Ensure client cleanup
                 try:
                     ce.close()
                 except Exception:
                     pass  # Ignore cleanup errors
-        
+
         return wrapper
+
     return decorator

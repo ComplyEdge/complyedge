@@ -22,7 +22,8 @@ Usage:
 
 import logging
 import os
-from typing import Any, Callable, List, Union
+from collections.abc import Callable
+from typing import Any
 
 from . import ComplyEdge
 
@@ -41,6 +42,7 @@ def _create_input_guardrail(guardrail_function: Callable, name: str):
     """
     try:
         from agents import InputGuardrail
+
         return InputGuardrail(guardrail_function, name=name)
     except ImportError:
         return guardrail_function
@@ -54,6 +56,7 @@ def _create_output_guardrail(guardrail_function: Callable, name: str):
     """
     try:
         from agents import OutputGuardrail
+
         return OutputGuardrail(guardrail_function, name=name)
     except ImportError:
         return guardrail_function
@@ -61,7 +64,7 @@ def _create_output_guardrail(guardrail_function: Callable, name: str):
 
 def create_compliance_guardrail(
     api_key: str,
-    rules: Union[str, List[str]] = "eu-ai-act/article-5",
+    rules: str | list[str] = "eu-ai-act/article-5",
     base_url: str = _DEFAULT_BASE_URL,
     direction: str = "input",
 ) -> Callable:
@@ -98,12 +101,11 @@ def create_compliance_guardrail(
     rules_list = [rules] if isinstance(rules, str) else rules
     rules_label = ", ".join(rules_list)
 
-    def compliance_guardrail(
-        ctx: Any, agent: Any, input_data: Union[str, list]
-    ) -> Any:
-        text_to_check = input_data
+    def compliance_guardrail(ctx: Any, agent: Any, input_data: str | list) -> Any:
         if isinstance(input_data, list):
             text_to_check = " ".join(str(item) for item in input_data)
+        else:
+            text_to_check = input_data
 
         try:
             result = ce.check(text_to_check)
@@ -116,20 +118,23 @@ def create_compliance_guardrail(
             }
 
             if not result.safe:
-                output_info.update({
-                    "compliance_status": "BLOCKED",
-                    "reason": f"Compliance violation detected ({rules_label})",
-                    "violations": [
-                        {
-                            "rule_id": v.rule_id,
-                            "severity": v.severity.value,
-                            "confidence": v.confidence,
-                        }
-                        for v in result.violations
-                    ],
-                })
+                output_info.update(
+                    {
+                        "compliance_status": "BLOCKED",
+                        "reason": f"Compliance violation detected ({rules_label})",
+                        "violations": [
+                            {
+                                "rule_id": v.rule_id,
+                                "severity": v.severity.value,
+                                "confidence": v.confidence,
+                            }
+                            for v in result.violations
+                        ],
+                    }
+                )
                 try:
                     from agents import GuardrailFunctionOutput
+
                     return GuardrailFunctionOutput(
                         output_info=output_info,
                         tripwire_triggered=True,
@@ -140,6 +145,7 @@ def create_compliance_guardrail(
             output_info["compliance_status"] = "SAFE"
             try:
                 from agents import GuardrailFunctionOutput
+
                 return GuardrailFunctionOutput(
                     output_info=output_info,
                     tripwire_triggered=False,
@@ -153,6 +159,7 @@ def create_compliance_guardrail(
             logger.error(f"Compliance guardrail error: {str(e)}")
             try:
                 from agents import GuardrailFunctionOutput
+
                 return GuardrailFunctionOutput(
                     output_info={
                         "compliance_status": "ERROR_BLOCKED",

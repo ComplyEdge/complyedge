@@ -14,16 +14,30 @@ from __future__ import annotations
 
 import json
 import statistics
-from pathlib import Path
 
 import pytest
-
 from conftest import BENCHMARK_RESULTS_DIR
 
 BENCHMARK_FILE = BENCHMARK_RESULTS_DIR / "runtime_benchmark_latest.json"
 
-EXPECTED_CATEGORIES = {"article5", "article50", "gpai", "safe_harbor", "edge", "us_corpus"}
-REQUIRED_FIELDS = {"id", "category", "expected", "actual", "passed", "api_latency_ms", "violations", "engine_path"}
+EXPECTED_CATEGORIES = {
+    "article5",
+    "article50",
+    "gpai",
+    "safe_harbor",
+    "edge",
+    "us_corpus",
+}
+REQUIRED_FIELDS = {
+    "id",
+    "category",
+    "expected",
+    "actual",
+    "passed",
+    "api_latency_ms",
+    "violations",
+    "engine_path",
+}
 
 
 @pytest.fixture(scope="module")
@@ -51,14 +65,16 @@ class TestBenchmarkIntegrity:
 
     def test_benchmark_has_50_results(self, results):
         # Claim: "50-prompt benchmark corpus"
-        assert len(results) == 50, f"Expected 50 benchmark results, found {len(results)}"
+        assert (
+            len(results) == 50
+        ), f"Expected 50 benchmark results, found {len(results)}"
 
     def test_benchmark_has_6_categories(self, results):
         # Claim: "6 categories"
         found = {r["category"] for r in results}
-        assert found == EXPECTED_CATEGORIES, (
-            f"Expected categories {EXPECTED_CATEGORIES}, found {found}"
-        )
+        assert (
+            found == EXPECTED_CATEGORIES
+        ), f"Expected categories {EXPECTED_CATEGORIES}, found {found}"
 
     def test_every_result_has_required_fields(self, results):
         # Structural: every result must carry the fields the API contract guarantees
@@ -67,35 +83,53 @@ class TestBenchmarkIntegrity:
             absent = REQUIRED_FIELDS - set(r.keys())
             if absent:
                 missing.append(f"{r['id']}: missing {absent}")
-        assert missing == [], f"Results with missing fields:\n" + "\n".join(missing)
+        assert missing == [], "Results with missing fields:\n" + "\n".join(missing)
 
     def test_aggregate_false_positive_rate_is_zero(self, benchmark):
         # Claim: "10/10 safe-harbor prompts returned 0 violations"
         # The aggregate block tracks this explicitly.
         rate = benchmark["aggregate"]["false_positive_rate_safe_harbor"]
-        assert rate == 0.0, f"False-positive rate on safe harbor should be 0.0, got {rate}"
+        assert (
+            rate == 0.0
+        ), f"False-positive rate on safe harbor should be 0.0, got {rate}"
 
     def test_opa_fast_path_latency_median_under_200ms(self, results):
         # Claim: true OPA fast-path blocks stay sub-200ms median.
         # 2026-05-18: n=14, p50=62ms. 2026-07-11: n=15, p50=135ms (warm prod).
         blocked_opa = [
-            r for r in results
+            r
+            for r in results
             if r.get("engine_path") == "opa" and r.get("actual") == "block"
         ]
-        latencies = [r["api_latency_ms"] for r in blocked_opa if r.get("api_latency_ms") is not None]
-        assert len(latencies) == 15, f"Expected 15 OPA fast-path blocks, got {len(latencies)}"
+        latencies = [
+            r["api_latency_ms"]
+            for r in blocked_opa
+            if r.get("api_latency_ms") is not None
+        ]
+        assert (
+            len(latencies) == 15
+        ), f"Expected 15 OPA fast-path blocks, got {len(latencies)}"
         p50 = statistics.median(latencies)
-        assert p50 <= 200, f"OPA fast-path median API latency should be ≤200ms, got {p50}ms"
+        assert (
+            p50 <= 200
+        ), f"OPA fast-path median API latency should be ≤200ms, got {p50}ms"
 
     def test_opa_fast_path_latency_p99_under_250ms(self, results):
         blocked_opa = [
-            r for r in results
+            r
+            for r in results
             if r.get("engine_path") == "opa" and r.get("actual") == "block"
         ]
-        latencies = [r["api_latency_ms"] for r in blocked_opa if r.get("api_latency_ms") is not None]
+        latencies = [
+            r["api_latency_ms"]
+            for r in blocked_opa
+            if r.get("api_latency_ms") is not None
+        ]
         assert len(latencies) == 15
         p99 = statistics.quantiles(latencies, n=100)[98]
-        assert p99 <= 250, f"OPA fast-path p99 API latency should be ≤250ms, got {p99}ms"
+        assert (
+            p99 <= 250
+        ), f"OPA fast-path p99 API latency should be ≤250ms, got {p99}ms"
 
 
 class TestSafeHarbor:
@@ -106,18 +140,16 @@ class TestSafeHarbor:
         return [r for r in results if r["category"] == "safe_harbor"]
 
     def test_exactly_10_safe_harbor_prompts(self, safe_harbor_results):
-        assert len(safe_harbor_results) == 10, (
-            f"Expected 10 safe-harbor prompts, found {len(safe_harbor_results)}"
-        )
+        assert (
+            len(safe_harbor_results) == 10
+        ), f"Expected 10 safe-harbor prompts, found {len(safe_harbor_results)}"
 
     def test_zero_false_positives_in_safe_harbor(self, safe_harbor_results):
         # Claim: "10/10 safe-harbor prompts returned 0 violations"
-        with_violations = [
-            r["id"] for r in safe_harbor_results if r.get("violations")
-        ]
-        assert with_violations == [], (
-            f"Safe-harbor prompts incorrectly flagged: {with_violations}"
-        )
+        with_violations = [r["id"] for r in safe_harbor_results if r.get("violations")]
+        assert (
+            with_violations == []
+        ), f"Safe-harbor prompts incorrectly flagged: {with_violations}"
 
     def test_all_safe_harbor_allowed(self, safe_harbor_results):
         # Claim: safe-harbor = allow decision
@@ -183,16 +215,16 @@ class TestUsCorpus:
         return [r for r in results if r["category"] == "us_corpus"]
 
     def test_exactly_10_us_corpus_prompts(self, us_results):
-        assert len(us_results) == 10, (
-            f"Expected 10 US corpus prompts, found {len(us_results)}"
-        )
+        assert (
+            len(us_results) == 10
+        ), f"Expected 10 US corpus prompts, found {len(us_results)}"
 
     def test_us_corpus_all_handled_by_hybrid(self, us_results):
         # Blog: US corpus requires Layer 2 (use_semantic_fallback=True)
         non_hybrid = [r["id"] for r in us_results if r.get("engine_path") != "hybrid"]
-        assert non_hybrid == [], (
-            f"US corpus prompts NOT handled by hybrid/Layer 2: {non_hybrid}"
-        )
+        assert (
+            non_hybrid == []
+        ), f"US corpus prompts NOT handled by hybrid/Layer 2: {non_hybrid}"
 
     def test_us_corpus_end_to_end_pass(self, us_results):
         failed = [r["id"] for r in us_results if not r["passed"]]

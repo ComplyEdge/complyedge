@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -138,7 +138,7 @@ def run(providers_dir: Path, schema_path: Path, output_path: Path) -> dict[str, 
     scored.sort(key=lambda r: r["aggregate_score"], reverse=True)
 
     output = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "methodology_version": "1.0",
         "scored_providers": scored,
         "pending_providers": sorted(pending),

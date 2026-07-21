@@ -36,7 +36,7 @@ import subprocess
 import sys
 import time
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -101,7 +101,17 @@ def bench_opa(iterations: int) -> dict:
     addr = f"127.0.0.1:{port}"
     base_url = f"http://{addr}"
     proc = subprocess.Popen(
-        [opa, "run", "--server", "--addr", addr, "--log-level", "error", "--bundle", str(BUNDLE)],
+        [
+            opa,
+            "run",
+            "--server",
+            "--addr",
+            addr,
+            "--log-level",
+            "error",
+            "--bundle",
+            str(BUNDLE),
+        ],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
     )
@@ -110,7 +120,9 @@ def bench_opa(iterations: int) -> dict:
         deadline = time.monotonic() + 15
         while time.monotonic() < deadline:
             try:
-                with urllib.request.urlopen(f"{base_url}/health", timeout=0.2) as r:  # noqa: S310
+                with urllib.request.urlopen(
+                    f"{base_url}/health", timeout=0.2
+                ) as r:  # noqa: S310
                     if r.status == 200:
                         break
             except Exception:
@@ -134,7 +146,9 @@ def bench_opa(iterations: int) -> dict:
                 single_ms.append((time.perf_counter() - ts) * 1000)
             seq_ms.append((time.perf_counter() - t0) * 1000)
         return {
-            "opa_version": subprocess.run([opa, "version"], capture_output=True, text=True).stdout.split("\n")[0],
+            "opa_version": subprocess.run(
+                [opa, "version"], capture_output=True, text=True
+            ).stdout.split("\n")[0],
             "opa_per_request_sequential_ms": _summary(seq_ms),
             "opa_single_package_ms": _summary(single_ms),
         }
@@ -166,7 +180,10 @@ def bench_trustlint(iterations: int) -> dict:
         t0 = time.perf_counter()
         eng.check(text)
         ms.append((time.perf_counter() - t0) * 1000)
-    return {"rules_loaded": len(getattr(eng, "rules", []) or []), "trustlint_regex_ms": _summary(ms)}
+    return {
+        "rules_loaded": len(getattr(eng, "rules", []) or []),
+        "trustlint_regex_ms": _summary(ms),
+    }
 
 
 def main() -> None:
@@ -187,7 +204,7 @@ def main() -> None:
     out = {
         "benchmark": "layer1_latency",
         "kind": "local_reproducible_microbenchmark",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "iterations": args.iterations,
         "note": (
             "Local reproducible microbenchmark of the deterministic hot path "

@@ -20,13 +20,12 @@ import tomllib
 from pathlib import Path
 
 import pytest
-
 from conftest import REPO_ROOT, RULES_REGO_DIR, RULES_REGULATIONS_DIR, SDK_DIR
-
 
 # ---------------------------------------------------------------------------
 # Rego corpus
 # ---------------------------------------------------------------------------
+
 
 class TestRegoCorpus:
     """Validates the 19 production Rego policies mentioned in the launch post."""
@@ -44,15 +43,17 @@ class TestRegoCorpus:
             "article6.rego",
             "gpai.rego",
             "highrisk.rego",
+            "prompt_security.rego",
         }
         leaves = [f for f in prod_rego_files if f.name not in AGGREGATOR_NAMES]
-        assert len(prod_rego_files) == 56, (
-            f"Expected 56 production .rego files (51 leaf + 5 aggregators), "
+        # 63 leaf + 6 aggregators (article5/50/6, gpai, highrisk, prompt_security)
+        assert len(prod_rego_files) == 69, (
+            f"Expected 69 production .rego files (63 leaf + 6 aggregators), "
             f"found {len(prod_rego_files)}"
         )
-        assert len(leaves) >= 50, (
-            f"Expected ≥50 leaf Rego policies, found {len(leaves)}"
-        )
+        assert (
+            len(leaves) >= 50
+        ), f"Expected ≥50 leaf Rego policies, found {len(leaves)}"
 
     def test_rego_covers_article5(self, prod_rego_files):
         # Claim: "covering EU AI Act Article 5"
@@ -88,6 +89,7 @@ class TestRegoCorpus:
             "article6.rego",
             "gpai.rego",
             "highrisk.rego",
+            "prompt_security.rego",
         }
         leaf_files = [f for f in prod_rego_files if f.name not in AGGREGATOR_NAMES]
         missing = []
@@ -111,6 +113,7 @@ class TestRegoCorpus:
 # YAML regulations
 # ---------------------------------------------------------------------------
 
+
 class TestYamlCorpus:
     """Validates the 53 YAML regulation definitions mentioned in the launch post."""
 
@@ -123,9 +126,9 @@ class TestYamlCorpus:
     def test_exactly_64_yaml_regulations(self, yaml_files):
         # Claim: "64 YAML regulation definitions" (53 → +8 IPI prompt-security
         # rules → +2 OFAC sanctions transition rules, both 2026-07-05).
-        assert len(yaml_files) == 64, (
-            f"Expected 64 YAML regulation files, found {len(yaml_files)}"
-        )
+        assert (
+            len(yaml_files) == 64
+        ), f"Expected 64 YAML regulation files, found {len(yaml_files)}"
 
     def test_yaml_covers_eu_regulations(self, yaml_files):
         eu = [f for f in yaml_files if "eu" in f.parts]
@@ -148,6 +151,7 @@ class TestYamlCorpus:
 # EU regulation specifics
 # ---------------------------------------------------------------------------
 
+
 class TestEuRegulationCoverage:
     """
     HN claim: "EU covers Articles 4–27, 50, 53, GPAI, GDPR"
@@ -163,29 +167,30 @@ class TestEuRegulationCoverage:
         return any(f.name.startswith(prefix) for f in files)
 
     def test_eu_covers_gdpr(self, eu_files):
-        assert self._has_prefix(eu_files, "gdpr_"), (
-            "No GDPR YAML found in rules/regulations/eu/ — HN claims 'EU covers … GDPR'"
-        )
+        assert self._has_prefix(
+            eu_files, "gdpr_"
+        ), "No GDPR YAML found in rules/regulations/eu/ — HN claims 'EU covers … GDPR'"
 
     def test_eu_covers_article50(self, eu_files):
-        assert self._has_prefix(eu_files, "eu_ai_act_article50"), (
-            "No Article 50 YAML found — HN claims 'EU covers … 50'"
-        )
+        assert self._has_prefix(
+            eu_files, "eu_ai_act_article50"
+        ), "No Article 50 YAML found — HN claims 'EU covers … 50'"
 
     def test_eu_covers_article53(self, eu_files):
-        assert self._has_prefix(eu_files, "eu_ai_act_article53"), (
-            "No Article 53 YAML found — HN claims 'EU covers … 53'"
-        )
+        assert self._has_prefix(
+            eu_files, "eu_ai_act_article53"
+        ), "No Article 53 YAML found — HN claims 'EU covers … 53'"
 
     def test_eu_covers_gpai(self, eu_files):
-        assert self._has_prefix(eu_files, "eu_ai_act_gpai"), (
-            "No GPAI YAML found — HN claims 'EU covers … GPAI'"
-        )
+        assert self._has_prefix(
+            eu_files, "eu_ai_act_gpai"
+        ), "No GPAI YAML found — HN claims 'EU covers … GPAI'"
 
 
 # ---------------------------------------------------------------------------
 # US regulation specifics
 # ---------------------------------------------------------------------------
+
 
 class TestUsRegulationCoverage:
     """
@@ -234,6 +239,7 @@ class TestUsRegulationCoverage:
 # Global / Universal regulation specifics
 # ---------------------------------------------------------------------------
 
+
 class TestGlobalUniversalCoverage:
     """
     HN claim: "Plus PCI DSS and prompt injection detection"
@@ -246,14 +252,15 @@ class TestGlobalUniversalCoverage:
     def test_universal_covers_prompt_injection(self):
         prompt_sec = RULES_REGULATIONS_DIR / "universal" / "prompt_security"
         yamls = list(prompt_sec.glob("*.yaml")) if prompt_sec.exists() else []
-        assert yamls, (
-            "No prompt injection YAML found in rules/regulations/universal/prompt_security/"
-        )
+        assert (
+            yamls
+        ), "No prompt injection YAML found in rules/regulations/universal/prompt_security/"
 
 
 # ---------------------------------------------------------------------------
 # Benchmark corpus YAMLs in repo
 # ---------------------------------------------------------------------------
+
 
 class TestBenchmarkCorpusFiles:
     """
@@ -273,21 +280,22 @@ class TestBenchmarkCorpusFiles:
     }
 
     def test_benchmark_prompts_directory_exists(self):
-        assert self.BENCHMARK_PROMPTS_DIR.exists(), (
-            f"Benchmark prompts directory not found: {self.BENCHMARK_PROMPTS_DIR}"
-        )
+        assert (
+            self.BENCHMARK_PROMPTS_DIR.exists()
+        ), f"Benchmark prompts directory not found: {self.BENCHMARK_PROMPTS_DIR}"
 
     def test_benchmark_prompt_yamls_present(self):
         existing = {f.name for f in self.BENCHMARK_PROMPTS_DIR.glob("*.yaml")}
         missing = self.EXPECTED_PROMPT_FILES - existing
-        assert not missing, (
-            f"Benchmark prompt YAMLs missing from {self.BENCHMARK_PROMPTS_DIR}: {missing}"
-        )
+        assert (
+            not missing
+        ), f"Benchmark prompt YAMLs missing from {self.BENCHMARK_PROMPTS_DIR}: {missing}"
 
 
 # ---------------------------------------------------------------------------
 # Apache 2.0 open-source license
 # ---------------------------------------------------------------------------
+
 
 class TestLicense:
     """
@@ -301,13 +309,16 @@ class TestLicense:
 
     def test_license_is_apache_2(self):
         content = (REPO_ROOT / "LICENSE").read_text()
-        assert "Apache License" in content, "LICENSE file does not mention Apache License"
+        assert (
+            "Apache License" in content
+        ), "LICENSE file does not mention Apache License"
         assert "Version 2.0" in content, "LICENSE file does not specify Version 2.0"
 
 
 # ---------------------------------------------------------------------------
 # SDK defaults
 # ---------------------------------------------------------------------------
+
 
 class TestSdkDefaults:
     """Validates the SDK source matches the documented default behaviour."""
@@ -328,9 +339,9 @@ class TestSdkDefaults:
     def test_use_semantic_fallback_default_in_payload(self, init_source):
         # Claim: "Default SDK behaviour is OPA-only"
         # L246 in __init__.py — the default payload dict passed to the API
-        assert '"use_semantic_fallback": False' in init_source, (
-            'SDK payload default "use_semantic_fallback": False not found in __init__.py'
-        )
+        assert (
+            '"use_semantic_fallback": False' in init_source
+        ), 'SDK payload default "use_semantic_fallback": False not found in __init__.py'
 
     def test_use_semantic_fallback_default_in_sync_client(self, init_source):
         # L530 — ComplyEdgeClient.check_compliance parameter default
@@ -343,16 +354,16 @@ class TestSdkDefaults:
     def test_sdk_version_matches_pyproject(self, init_source, pyproject):
         # Sanity: published version matches what the source reports
         pyproject_ver = pyproject["project"]["version"]
-        assert f'__version__ = "{pyproject_ver}"' in init_source, (
-            f"__version__ in __init__.py does not match pyproject.toml ({pyproject_ver})"
-        )
+        assert (
+            f'__version__ = "{pyproject_ver}"' in init_source
+        ), f"__version__ in __init__.py does not match pyproject.toml ({pyproject_ver})"
 
     def test_decorator_enabled_by_default(self, decorator_source):
         # Claim: "@compliance_check decorator is enabled-by-default when API key is set"
         # The default value for the `enabled_env` env var lookup should be "true"
-        assert 'os.getenv' in decorator_source, (
-            "decorators.py does not reference os.getenv for enabled_env"
-        )
-        assert '"true"' in decorator_source, (
-            'Decorator enabled_env default is not "true" — decorator is not enabled-by-default'
-        )
+        assert (
+            "os.getenv" in decorator_source
+        ), "decorators.py does not reference os.getenv for enabled_env"
+        assert (
+            '"true"' in decorator_source
+        ), 'Decorator enabled_env default is not "true" — decorator is not enabled-by-default'
