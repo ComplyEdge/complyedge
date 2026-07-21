@@ -11,6 +11,25 @@ Runtime compliance enforcement for AI agents. Not a scanner — runs in producti
 >
 > ComplyEdge says: **Article 5(1)(a), rule `rego-art5-1a-001`, timestamp, input hash.** One is an audit trail. One is a guess.
 
+## Live enforcement seals
+
+Not a static badge. These seals reflect live `/v1/check` traffic from public OSS projects
+embedding ComplyEdge — they change as real enforcement happens.
+
+[![IVD Framework — runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
+[![Horizon — runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
+
+| Project | Live trust page |
+|---------|-----------------|
+| **IVD Framework** | [trust.complyedge.io/ivd](https://trust.complyedge.io/ivd) |
+| **Horizon** | [trust.complyedge.io/horizon](https://trust.complyedge.io/horizon) |
+
+Each trust page is generated from that project's real audit trail — enforcement status, check
+volume, and the EU AI Act articles enforced at runtime. (GitHub proxies and caches images, so the
+seal above can lag; the trust page is always current.)
+
+Embed one on your own project: [Enforcement Seal docs](https://complyedge.io/docs/trust-badge.html).
+
 ## Quick Start
 
 ```bash

@@ -101,7 +101,9 @@ def render_markdown(data: dict) -> str:
     lines.append("")
     lines.append("| Score | Label | Standard |")
     lines.append("| --- | --- | --- |")
-    lines.append("| 0 | No evidence | Provider does not address the obligation publicly. |")
+    lines.append(
+        "| 0 | No evidence | Provider does not address the obligation publicly. |"
+    )
     lines.append("| 1 | Partial | Mentioned without verifiable detail. |")
     lines.append("| 2 | Adequate | Specific, sourced documentation exists. |")
     lines.append("| 3 | Exceeds | Machine-readable, regularly updated, audited. |")

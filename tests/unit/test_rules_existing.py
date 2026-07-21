@@ -4,9 +4,10 @@ Unit tests for existing rule functionality and compliance detection.
 Tests that focus on the actual rule detection logic and business functionality.
 """
 
-import pytest
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any
+
+import pytest
 import yaml
 
 
@@ -14,7 +15,7 @@ class TestRulesExisting:
     """Test existing rule functionality and detection capabilities."""
 
     @pytest.fixture
-    def eu_ai_act_rules(self) -> List[Dict[str, Any]]:
+    def eu_ai_act_rules(self) -> list[dict[str, Any]]:
         """Load EU AI Act rules for testing."""
         rules_dir = Path(__file__).parent.parent.parent / "rules" / "regulations"
         eu_rules = []
@@ -23,7 +24,7 @@ class TestRulesExisting:
             pytest.skip("Rules directory not found")
 
         for rule_file in rules_dir.rglob("*article5*.yaml"):
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
                 if rule_data:
                     eu_rules.append(rule_data)
@@ -31,7 +32,7 @@ class TestRulesExisting:
         return eu_rules
 
     @pytest.fixture
-    def sample_rule_files(self) -> List[Path]:
+    def sample_rule_files(self) -> list[Path]:
         """Get a sample of rule files for testing."""
         rules_dir = Path(__file__).parent.parent.parent / "rules" / "regulations"
 
@@ -52,12 +53,14 @@ class TestRulesExisting:
         for rule in eu_ai_act_rules:
             assert "id" in rule, "EU AI Act rule missing ID"
             assert "jurisdiction" in rule, "EU AI Act rule missing jurisdiction"
-            assert rule["jurisdiction"] == "EU", "EU AI Act rules should be EU jurisdiction"
+            assert (
+                rule["jurisdiction"] == "EU"
+            ), "EU AI Act rules should be EU jurisdiction"
 
     def test_rules_have_valid_structure(self, sample_rule_files):
         """Test that rules have the basic required structure."""
         for rule_file in sample_rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             # Check required top-level fields
@@ -82,7 +85,7 @@ class TestRulesExisting:
         proactive_count = 0
 
         for rule_file in sample_rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             remediation = rule_data.get("remediation", {})
@@ -110,7 +113,7 @@ class TestRulesExisting:
     def test_rule_conditions_are_actionable(self, sample_rule_files):
         """Test that rule conditions contain actionable detection logic."""
         for rule_file in sample_rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             conditions = rule_data["conditions"]
@@ -151,7 +154,7 @@ class TestRulesExisting:
         eu_rules = []
 
         for rule_file in sample_rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             if rule_data.get("jurisdiction") == "EU":
@@ -162,7 +165,7 @@ class TestRulesExisting:
     def test_remediation_messages_exist(self, sample_rule_files):
         """Test that all rules have meaningful remediation messages."""
         for rule_file in sample_rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             remediation = rule_data["remediation"]
@@ -183,7 +186,7 @@ class TestRulesExisting:
         proactive_rules_tested = 0
 
         for rule_file in sample_rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             remediation = rule_data.get("remediation", {})
@@ -215,7 +218,7 @@ class TestRulesExisting:
     def test_rule_source_citations_exist(self, sample_rule_files):
         """Test that rules have proper regulatory source citations."""
         for rule_file in sample_rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             assert "source" in rule_data, f"Missing source citation in {rule_file}"

@@ -39,9 +39,9 @@ def violation_response(live_session, api_base_url):
             "context": {"system_type": "financial_services"},
         },
     )
-    assert resp.status_code == 200, (
-        f"Expected 200, got {resp.status_code}: {resp.text[:300]}"
-    )
+    assert (
+        resp.status_code == 200
+    ), f"Expected 200, got {resp.status_code}: {resp.text[:300]}"
     return resp.json()
 
 
@@ -57,9 +57,9 @@ def safe_response(live_session, api_base_url):
             "context": {"system_type": "customer_support"},
         },
     )
-    assert resp.status_code == 200, (
-        f"Expected 200, got {resp.status_code}: {resp.text[:300]}"
-    )
+    assert (
+        resp.status_code == 200
+    ), f"Expected 200, got {resp.status_code}: {resp.text[:300]}"
     return resp.json()
 
 
@@ -93,9 +93,9 @@ class TestTopLevelFields:
 
     def test_has_opa_latency_ms(self, violation_response):
         # Claim: "opa_latency_ms": 48.77 — separate OPA engine timing field
-        assert "opa_latency_ms" in violation_response, (
-            "Expected opa_latency_ms field in response (shown in HN post JSON sample)"
-        )
+        assert (
+            "opa_latency_ms" in violation_response
+        ), "Expected opa_latency_ms field in response (shown in HN post JSON sample)"
         assert violation_response["opa_latency_ms"] > 0
 
     def test_has_audit_logged_true(self, violation_response):
@@ -109,21 +109,23 @@ class TestViolationFields:
     @pytest.fixture(scope="class")
     def violation(self, violation_response):
         violations = violation_response.get("violations", [])
-        assert violations, "Expected at least one violation for the social-scoring prompt"
+        assert (
+            violations
+        ), "Expected at least one violation for the social-scoring prompt"
         return violations[0]
 
     def test_violation_rule_id(self, violation):
         # Claim: "rule_id": "rego-art5-1c-001"
-        assert violation.get("rule_id") == "rego-art5-1c-001", (
-            f"Expected rule_id=rego-art5-1c-001, got {violation.get('rule_id')}"
-        )
+        assert (
+            violation.get("rule_id") == "rego-art5-1c-001"
+        ), f"Expected rule_id=rego-art5-1c-001, got {violation.get('rule_id')}"
 
     def test_violation_rule_description_starts_with_citation(self, violation):
         # Claim: "rule_description": "Regulation (EU) 2024/1689, Article 5(1)(c)..."
         desc = violation.get("rule_description", "")
-        assert desc.startswith("Regulation (EU) 2024/1689, Article 5(1)(c)"), (
-            f"rule_description should start with the EU AI Act citation; got: {desc[:80]}"
-        )
+        assert desc.startswith(
+            "Regulation (EU) 2024/1689, Article 5(1)(c)"
+        ), f"rule_description should start with the EU AI Act citation; got: {desc[:80]}"
 
     def test_violation_severity_is_critical(self, violation):
         # Claim: "severity": "critical"
@@ -131,9 +133,9 @@ class TestViolationFields:
 
     def test_violation_confidence_is_1(self, violation):
         # Claim: "confidence": 1.0
-        assert violation.get("confidence") == 1.0, (
-            f"Expected confidence=1.0, got {violation.get('confidence')}"
-        )
+        assert (
+            violation.get("confidence") == 1.0
+        ), f"Expected confidence=1.0, got {violation.get('confidence')}"
 
     def test_violation_text_excerpt_is_present(self, violation):
         # Claim: "text_excerpt" is a non-empty string drawn from the input text
@@ -159,18 +161,18 @@ class TestHealthEndpoint:
 
     def test_health_returns_200_and_healthy(self, live_session, api_base_url):
         resp = live_session.get(f"{api_base_url}/health")
-        assert resp.status_code == 200, (
-            f"Expected 200 from /health, got {resp.status_code}: {resp.text[:200]}"
-        )
+        assert (
+            resp.status_code == 200
+        ), f"Expected 200 from /health, got {resp.status_code}: {resp.text[:200]}"
         assert resp.json().get("status") == "healthy"
 
     def test_health_reports_opa_service(self, live_session, api_base_url):
         # Blog: OPA daemon is the enforcement engine — /health must expose its status
         resp = live_session.get(f"{api_base_url}/health")
         services = resp.json().get("services", {})
-        assert "opa" in services, (
-            f"Expected 'opa' key in /health services; got: {list(services.keys())}"
-        )
+        assert (
+            "opa" in services
+        ), f"Expected 'opa' key in /health services; got: {list(services.keys())}"
 
 
 class TestEnforcementBehaviour:
@@ -178,18 +180,18 @@ class TestEnforcementBehaviour:
 
     def test_social_scoring_is_blocked(self, violation_response):
         # Claim: social-scoring prompt → allowed=False
-        assert violation_response["allowed"] is False, (
-            "Social-scoring prompt should be blocked (allowed=False)"
-        )
+        assert (
+            violation_response["allowed"] is False
+        ), "Social-scoring prompt should be blocked (allowed=False)"
 
     def test_safe_prompt_is_allowed(self, safe_response):
         # Claim: benign prompt → allowed=True
-        assert safe_response["allowed"] is True, (
-            "Safe prompt should be allowed (allowed=True)"
-        )
+        assert (
+            safe_response["allowed"] is True
+        ), "Safe prompt should be allowed (allowed=True)"
 
     def test_safe_prompt_has_no_violations(self, safe_response):
         # Claim: benign prompt → violations=[]
-        assert safe_response.get("violations") == [], (
-            f"Safe prompt should have no violations; got {safe_response.get('violations')}"
-        )
+        assert (
+            safe_response.get("violations") == []
+        ), f"Safe prompt should have no violations; got {safe_response.get('violations')}"

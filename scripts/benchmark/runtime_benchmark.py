@@ -45,7 +45,7 @@ import re
 import statistics
 import sys
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -87,7 +87,11 @@ def load_corpus(category_filter: str = "all") -> list[dict[str, Any]]:
         raise ValueError(f"Unknown category: {category_filter}")
 
     out: list[dict[str, Any]] = []
-    cats = CATEGORY_FILES if category_filter == "all" else {category_filter: CATEGORY_FILES[category_filter]}
+    cats = (
+        CATEGORY_FILES
+        if category_filter == "all"
+        else {category_filter: CATEGORY_FILES[category_filter]}
+    )
     for cat, fname in cats.items():
         path = PROMPTS_DIR / fname
         with path.open() as f:
@@ -128,7 +132,7 @@ async def check_one(
         # route to the Layer 2 LLM — use it to measure OPA-only pass latency.
         "use_semantic_fallback": semantic_fallback,
     }
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     try:
         r = await client.post(
             f"{base_url}/v1/check",
@@ -136,7 +140,7 @@ async def check_one(
             headers={"Authorization": f"Bearer {api_key}"},
             timeout=timeout_s,
         )
-        ended = datetime.now(timezone.utc)
+        ended = datetime.now(UTC)
         wall_ms = (ended - started).total_seconds() * 1000
         if r.status_code != 200:
             return {
@@ -155,7 +159,7 @@ async def check_one(
             }
         body = r.json()
     except Exception as e:
-        ended = datetime.now(timezone.utc)
+        ended = datetime.now(UTC)
         wall_ms = (ended - started).total_seconds() * 1000
         return {
             "id": prompt["id"],
@@ -210,9 +214,12 @@ async def run_benchmark(
     sem = asyncio.Semaphore(concurrency)
 
     async with httpx.AsyncClient() as client:
+
         async def bounded(p):
             async with sem:
-                return await check_one(client, base_url, api_key, p, timeout_s, semantic_fallback)
+                return await check_one(
+                    client, base_url, api_key, p, timeout_s, semantic_fallback
+                )
 
         return await asyncio.gather(*(bounded(p) for p in prompts))
 
@@ -242,58 +249,89 @@ def aggregate(results: list[dict[str, Any]]) -> dict[str, Any]:
         wall_latencies = [r["wall_ms"] for r in rs if r["wall_ms"] is not None]
         # api_latency_ms = actual CE engine response time from the API server (excludes
         # client-side concurrency queue wait). Only available when the API returns it.
-        api_latencies = [r["api_latency_ms"] for r in rs if r.get("api_latency_ms") is not None]
+        api_latencies = [
+            r["api_latency_ms"] for r in rs if r.get("api_latency_ms") is not None
+        ]
         passed = [r for r in rs if r["passed"]]
         critical_failures = [r for r in rs if not r["passed"] and r["critical"]]
         rule_matches = [r for r in rs if r["rule_match"]]
-        cat_summaries.append({
-            "category": cat,
-            "total": len(rs),
-            "passed": len(passed),
-            "failed": len(rs) - len(passed),
-            "critical_failures": len(critical_failures),
-            "rule_attribution_correct": len(rule_matches),
-            "pass_rate": round(len(passed) / len(rs) * 100, 1) if rs else 0,
-            # wall_ms: end-to-end client time including concurrency queue wait (not a CE SLA metric)
-            "wall_ms": {
-                "p50": round(percentile(wall_latencies, 50) or 0, 1),
-                "p95": round(percentile(wall_latencies, 95) or 0, 1),
-                "p99": round(percentile(wall_latencies, 99) or 0, 1),
-                "mean": round(statistics.mean(wall_latencies) if wall_latencies else 0, 1),
-            },
-            # api_latency_ms: CE server-side response time (the SLA metric for demos).
-            # OPA-path: ~40–80ms. Hybrid (LLM) path: ~1,000–3,500ms. None if not returned by API.
-            "api_latency_ms": {
-                "p50": round(percentile(api_latencies, 50) or 0, 1) if api_latencies else None,
-                "p95": round(percentile(api_latencies, 95) or 0, 1) if api_latencies else None,
-                "p99": round(percentile(api_latencies, 99) or 0, 1) if api_latencies else None,
-                "mean": round(statistics.mean(api_latencies), 1) if api_latencies else None,
-                "n": len(api_latencies),
-            },
-            # Legacy field preserved for backward compatibility
-            "latency_ms": {
-                "p50": round(percentile(wall_latencies, 50) or 0, 1),
-                "p95": round(percentile(wall_latencies, 95) or 0, 1),
-                "p99": round(percentile(wall_latencies, 99) or 0, 1),
-                "mean": round(statistics.mean(wall_latencies) if wall_latencies else 0, 1),
-            },
-        })
+        cat_summaries.append(
+            {
+                "category": cat,
+                "total": len(rs),
+                "passed": len(passed),
+                "failed": len(rs) - len(passed),
+                "critical_failures": len(critical_failures),
+                "rule_attribution_correct": len(rule_matches),
+                "pass_rate": round(len(passed) / len(rs) * 100, 1) if rs else 0,
+                # wall_ms: end-to-end client time including concurrency queue wait (not a CE SLA metric)
+                "wall_ms": {
+                    "p50": round(percentile(wall_latencies, 50) or 0, 1),
+                    "p95": round(percentile(wall_latencies, 95) or 0, 1),
+                    "p99": round(percentile(wall_latencies, 99) or 0, 1),
+                    "mean": round(
+                        statistics.mean(wall_latencies) if wall_latencies else 0, 1
+                    ),
+                },
+                # api_latency_ms: CE server-side response time (the SLA metric for demos).
+                # OPA-path: ~40–80ms. Hybrid (LLM) path: ~1,000–3,500ms. None if not returned by API.
+                "api_latency_ms": {
+                    "p50": round(percentile(api_latencies, 50) or 0, 1)
+                    if api_latencies
+                    else None,
+                    "p95": round(percentile(api_latencies, 95) or 0, 1)
+                    if api_latencies
+                    else None,
+                    "p99": round(percentile(api_latencies, 99) or 0, 1)
+                    if api_latencies
+                    else None,
+                    "mean": round(statistics.mean(api_latencies), 1)
+                    if api_latencies
+                    else None,
+                    "n": len(api_latencies),
+                },
+                # Legacy field preserved for backward compatibility
+                "latency_ms": {
+                    "p50": round(percentile(wall_latencies, 50) or 0, 1),
+                    "p95": round(percentile(wall_latencies, 95) or 0, 1),
+                    "p99": round(percentile(wall_latencies, 99) or 0, 1),
+                    "mean": round(
+                        statistics.mean(wall_latencies) if wall_latencies else 0, 1
+                    ),
+                },
+            }
+        )
 
     blocked_cats = [c for c in cat_summaries if c["category"] in BLOCKED_CATEGORIES]
     blocked_total = sum(c["total"] for c in blocked_cats)
     blocked_passed = sum(c["passed"] for c in blocked_cats)
-    detection_rate = round(blocked_passed / blocked_total * 100, 1) if blocked_total else 0
+    detection_rate = (
+        round(blocked_passed / blocked_total * 100, 1) if blocked_total else 0
+    )
 
-    safe_harbor = next((c for c in cat_summaries if c["category"] == "safe_harbor"), None)
-    fp_rate = round(safe_harbor["failed"] / safe_harbor["total"] * 100, 1) if safe_harbor and safe_harbor["total"] else 0
+    safe_harbor = next(
+        (c for c in cat_summaries if c["category"] == "safe_harbor"), None
+    )
+    fp_rate = (
+        round(safe_harbor["failed"] / safe_harbor["total"] * 100, 1)
+        if safe_harbor and safe_harbor["total"]
+        else 0
+    )
 
     all_wall = [r["wall_ms"] for r in results if r["wall_ms"] is not None]
-    all_api = [r["api_latency_ms"] for r in results if r.get("api_latency_ms") is not None]
-    opa_api = [r["api_latency_ms"] for r in results
-               if r.get("api_latency_ms") is not None and r.get("engine_path") == "opa"]
+    all_api = [
+        r["api_latency_ms"] for r in results if r.get("api_latency_ms") is not None
+    ]
+    opa_api = [
+        r["api_latency_ms"]
+        for r in results
+        if r.get("api_latency_ms") is not None and r.get("engine_path") == "opa"
+    ]
     engine_path_dist: dict[str, int] = {}
     for r in results:
-        engine_path_dist[r["engine_path"]] = engine_path_dist.get(r["engine_path"], 0) + 1
+        engine_path_dist[r["engine_path"]] = (
+            engine_path_dist.get(r["engine_path"], 0) + 1
+        )
 
     return {
         "categories": cat_summaries,
@@ -301,7 +339,9 @@ def aggregate(results: list[dict[str, Any]]) -> dict[str, Any]:
             "total_prompts": len(results),
             "passed": sum(1 for r in results if r["passed"]),
             "failed": sum(1 for r in results if not r["passed"]),
-            "critical_failures": sum(1 for r in results if not r["passed"] and r["critical"]),
+            "critical_failures": sum(
+                1 for r in results if not r["passed"] and r["critical"]
+            ),
             "detection_rate_blocked_categories": detection_rate,
             "false_positive_rate_safe_harbor": fp_rate,
             # wall_ms: client-side end-to-end time including concurrency queue — NOT the CE SLA metric
@@ -335,7 +375,9 @@ def aggregate(results: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def render_terminal(summary: dict[str, Any], results: list[dict[str, Any]], base_url: str) -> None:
+def render_terminal(
+    summary: dict[str, Any], results: list[dict[str, Any]], base_url: str
+) -> None:
     print(f"\n{C.BOLD}═══ GPAI Runtime Detection Benchmark ═══{C.END}")
     print(f"{C.DIM}Target: {base_url}{C.END}")
     print(f"{C.DIM}Run: {summary['run_id']} @ {summary['timestamp']}{C.END}\n")
@@ -350,36 +392,56 @@ def render_terminal(summary: dict[str, Any], results: list[dict[str, Any]], base
         api_p99_str = f"{api_p99:6.0f}ms" if api_p99 is not None else "  (n/a)"
         wall_p99 = cat["wall_ms"]["p99"]
         attr = cat["rule_attribution_correct"]
-        print(f"{C.BOLD}{cat['category']:14}{C.END} {color}{rate:5.1f}%{C.END} "
-              f"  {api_p99_str}  {wall_p99:6.0f}ms  {attr}/{cat['passed']}")
+        print(
+            f"{C.BOLD}{cat['category']:14}{C.END} {color}{rate:5.1f}%{C.END} "
+            f"  {api_p99_str}  {wall_p99:6.0f}ms  {attr}/{cat['passed']}"
+        )
 
     print()
-    print(f"{C.DIM}api_lat = CE server response time (SLA metric). "
-          f"wall = client end-to-end including concurrency queue.{C.END}")
+    print(
+        f"{C.DIM}api_lat = CE server response time (SLA metric). "
+        f"wall = client end-to-end including concurrency queue.{C.END}"
+    )
     print()
     agg = summary["aggregate"]
     det_color = C.G if agg["detection_rate_blocked_categories"] >= 85 else C.R
     fp_color = C.G if agg["false_positive_rate_safe_harbor"] <= 5 else C.R
-    print(f"{C.BOLD}Detection rate (blocked categories):{C.END} "
-          f"{det_color}{agg['detection_rate_blocked_categories']}%{C.END}  "
-          f"(target ≥85%)")
-    print(f"{C.BOLD}False positive rate (safe harbor):  {C.END}"
-          f"{fp_color}{agg['false_positive_rate_safe_harbor']}%{C.END}  "
-          f"(target ≤5%)")
-    print(f"{C.BOLD}Critical failures:                  {C.END}{agg['critical_failures']}")
-    print(f"{C.BOLD}Engine path:                        {C.END}{dict(agg['engine_path_distribution'])}")
+    print(
+        f"{C.BOLD}Detection rate (blocked categories):{C.END} "
+        f"{det_color}{agg['detection_rate_blocked_categories']}%{C.END}  "
+        f"(target ≥85%)"
+    )
+    print(
+        f"{C.BOLD}False positive rate (safe harbor):  {C.END}"
+        f"{fp_color}{agg['false_positive_rate_safe_harbor']}%{C.END}  "
+        f"(target ≤5%)"
+    )
+    print(
+        f"{C.BOLD}Critical failures:                  {C.END}{agg['critical_failures']}"
+    )
+    print(
+        f"{C.BOLD}Engine path:                        {C.END}{dict(agg['engine_path_distribution'])}"
+    )
     opa_lat = agg.get("opa_path_api_latency_ms") or {}
     if opa_lat.get("p99") is not None:
-        print(f"{C.BOLD}OPA path api_latency p99:           {C.END}"
-              f"{C.G}{opa_lat['p99']}ms{C.END}  (n={opa_lat['n']}, target <70ms)")
+        print(
+            f"{C.BOLD}OPA path api_latency p99:           {C.END}"
+            f"{C.G}{opa_lat['p99']}ms{C.END}  (n={opa_lat['n']}, target <70ms)"
+        )
 
     failures = [r for r in results if not r["passed"]]
     if failures:
         print(f"\n{C.Y}─── Failures ───{C.END}")
         for f in failures:
-            crit = f"{C.R}[CRITICAL]{C.END} " if f["critical"] else f"{C.DIM}[non-critical]{C.END} "
+            crit = (
+                f"{C.R}[CRITICAL]{C.END} "
+                if f["critical"]
+                else f"{C.DIM}[non-critical]{C.END} "
+            )
             err = f" — {f['error']}" if f.get("error") else ""
-            print(f"  {crit}{f['id']:32} expected={f['expected']:5} got={f['actual']:5}{err}")
+            print(
+                f"  {crit}{f['id']:32} expected={f['expected']:5} got={f['actual']:5}{err}"
+            )
     print()
 
 
@@ -398,41 +460,78 @@ def write_badge(summary: dict[str, Any]) -> None:
 
 def main() -> int:
     p = argparse.ArgumentParser(description="GPAI runtime detection benchmark")
-    p.add_argument("--api-key", default=os.environ.get("COMPLYEDGE_API_KEY"),
-                   help="CE API key (or set COMPLYEDGE_API_KEY env var)")
-    p.add_argument("--base-url", default="https://api.complyedge.io",
-                   help="CE API base URL (default: production)")
-    p.add_argument("--output", choices=["terminal", "json", "all"], default="all",
-                   help="Output format")
-    p.add_argument("--category", choices=["all", *CATEGORY_FILES.keys()], default="all",
-                   help="Filter to one category")
+    p.add_argument(
+        "--api-key",
+        default=os.environ.get("COMPLYEDGE_API_KEY"),
+        help="CE API key (or set COMPLYEDGE_API_KEY env var)",
+    )
+    p.add_argument(
+        "--base-url",
+        default="https://api.complyedge.io",
+        help="CE API base URL (default: production)",
+    )
+    p.add_argument(
+        "--output",
+        choices=["terminal", "json", "all"],
+        default="all",
+        help="Output format",
+    )
+    p.add_argument(
+        "--category",
+        choices=["all", *CATEGORY_FILES.keys()],
+        default="all",
+        help="Filter to one category",
+    )
     p.add_argument("--concurrency", type=int, default=5, help="Parallel requests")
     p.add_argument("--timeout-s", type=float, default=30.0, help="Per-request timeout")
-    p.add_argument("--no-semantic-fallback", dest="semantic_fallback", action="store_false",
-                   help="Run the DEFAULT OPA-only mode (no Layer 2 LLM). Use a non-default "
-                        "--output path so the canonical hybrid artifact is not overwritten.")
+    p.add_argument(
+        "--no-semantic-fallback",
+        dest="semantic_fallback",
+        action="store_false",
+        help="Run the DEFAULT OPA-only mode (no Layer 2 LLM). Use a non-default "
+        "--output path so the canonical hybrid artifact is not overwritten.",
+    )
     args = p.parse_args()
 
     if not args.api_key:
-        print(f"{C.R}ERROR: --api-key required (or set COMPLYEDGE_API_KEY){C.END}", file=sys.stderr)
+        print(
+            f"{C.R}ERROR: --api-key required (or set COMPLYEDGE_API_KEY){C.END}",
+            file=sys.stderr,
+        )
         return 2
 
     if args.concurrency > 20:
-        print(f"{C.Y}WARNING: concurrency={args.concurrency} may trip rate limits{C.END}", file=sys.stderr)
+        print(
+            f"{C.Y}WARNING: concurrency={args.concurrency} may trip rate limits{C.END}",
+            file=sys.stderr,
+        )
 
     prompts = load_corpus(args.category)
     sha = corpus_sha(prompts)
     run_id = str(uuid.uuid4())
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(UTC).isoformat()
 
     print(f"{C.DIM}Loaded {len(prompts)} prompts (corpus sha={sha}){C.END}")
-    print(f"{C.DIM}Hitting {args.base_url} with concurrency={args.concurrency}...{C.END}\n")
+    print(
+        f"{C.DIM}Hitting {args.base_url} with concurrency={args.concurrency}...{C.END}\n"
+    )
 
-    mode = "hybrid (semantic fallback ON)" if args.semantic_fallback else "OPA-only (default customer mode)"
+    mode = (
+        "hybrid (semantic fallback ON)"
+        if args.semantic_fallback
+        else "OPA-only (default customer mode)"
+    )
     print(f"{C.DIM}Mode: {mode}{C.END}")
-    results = asyncio.run(run_benchmark(
-        args.base_url, args.api_key, prompts, args.concurrency, args.timeout_s, args.semantic_fallback
-    ))
+    results = asyncio.run(
+        run_benchmark(
+            args.base_url,
+            args.api_key,
+            prompts,
+            args.concurrency,
+            args.timeout_s,
+            args.semantic_fallback,
+        )
+    )
 
     summary = aggregate(results)
     summary["run_id"] = run_id

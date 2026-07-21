@@ -5,10 +5,11 @@ Tests the rule validation system, schema compliance, and rule structure.
 """
 
 import json
+from pathlib import Path
+from typing import Any
+
 import pytest
 import yaml
-from pathlib import Path
-from typing import Dict, Any, List
 from jsonschema import Draft7Validator
 
 
@@ -16,7 +17,7 @@ class TestRulesValidation:
     """Test rule validation and schema compliance."""
 
     @pytest.fixture
-    def schema(self) -> Dict[str, Any]:
+    def schema(self) -> dict[str, Any]:
         """Load the master rule schema."""
         schema_path = (
             Path(__file__).parent.parent.parent
@@ -28,11 +29,11 @@ class TestRulesValidation:
         if not schema_path.exists():
             pytest.skip(f"Schema file not found: {schema_path}")
 
-        with open(schema_path, "r") as f:
+        with open(schema_path) as f:
             return json.load(f)
 
     @pytest.fixture
-    def rule_files(self) -> List[Path]:
+    def rule_files(self) -> list[Path]:
         """Find all rule files in the regulations directory."""
         rules_dir = Path(__file__).parent.parent.parent / "rules" / "regulations"
 
@@ -89,7 +90,7 @@ class TestRulesValidation:
         if not rule_file.exists():
             pytest.skip(f"Rule file not found: {rule_file}")
 
-        with open(rule_file, "r") as f:
+        with open(rule_file) as f:
             rule_data = yaml.safe_load(f)
 
         validator = Draft7Validator(schema)
@@ -109,7 +110,7 @@ class TestRulesValidation:
         required_fields = schema.get("required", [])
 
         for rule_file in rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             for field in required_fields:
@@ -128,7 +129,7 @@ class TestRulesValidation:
 
         jurisdictions_found = set()
         for rule_file in rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             jurisdiction = rule_data.get("jurisdiction")
@@ -148,7 +149,7 @@ class TestRulesValidation:
         proactive_rule_count = 0
 
         for rule_file in rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             remediation = rule_data.get("remediation", {})
@@ -189,7 +190,7 @@ class TestRulesValidation:
         rule_ids = []
 
         for rule_file in rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             rule_id = rule_data.get("id")
@@ -217,7 +218,7 @@ class TestRulesValidation:
         error_summary = []
 
         for rule_file in rule_files:
-            with open(rule_file, "r") as f:
+            with open(rule_file) as f:
                 rule_data = yaml.safe_load(f)
 
             errors = list(validator.iter_errors(rule_data))
@@ -246,18 +247,18 @@ class TestSanctionsTransitionFields:
     """
 
     @pytest.fixture
-    def schema(self) -> Dict[str, Any]:
+    def schema(self) -> dict[str, Any]:
         schema_path = (
             Path(__file__).parent.parent.parent
             / "rules"
             / "schemas"
             / "rule-schema.json"
         )
-        with open(schema_path, "r") as f:
+        with open(schema_path) as f:
             return json.load(f)
 
     @pytest.fixture
-    def minimal_valid_rule(self) -> Dict[str, Any]:
+    def minimal_valid_rule(self) -> dict[str, Any]:
         """Smallest rule that satisfies the schema's `required` fields."""
         return {
             "id": "FIXTURE_MIN_001",
@@ -283,16 +284,12 @@ class TestSanctionsTransitionFields:
         errors = list(Draft7Validator(schema).iter_errors(minimal_valid_rule))
         assert errors == [], errors
 
-    def test_effective_window_missing_starts_rejected(
-        self, schema, minimal_valid_rule
-    ):
+    def test_effective_window_missing_starts_rejected(self, schema, minimal_valid_rule):
         minimal_valid_rule["effective_window"] = {"ends": "2026-11-15"}
         errors = list(Draft7Validator(schema).iter_errors(minimal_valid_rule))
         assert errors, "effective_window without 'starts' should fail validation"
 
-    def test_effective_window_extra_property_rejected(
-        self, schema, minimal_valid_rule
-    ):
+    def test_effective_window_extra_property_rejected(self, schema, minimal_valid_rule):
         minimal_valid_rule["effective_window"] = {
             "starts": "2026-05-15",
             "ends": "2026-11-15",
@@ -351,9 +348,7 @@ class TestSanctionsTransitionFields:
         errors = list(Draft7Validator(schema).iter_errors(minimal_valid_rule))
         assert errors == [], errors
 
-    def test_conditional_on_invalid_operator_rejected(
-        self, schema, minimal_valid_rule
-    ):
+    def test_conditional_on_invalid_operator_rejected(self, schema, minimal_valid_rule):
         minimal_valid_rule["conditional_on"] = [
             {
                 "parameter": "counterparty_irgc_status",
@@ -405,7 +400,7 @@ class TestSanctionsTransitionFields:
             / "ofac_iran_hormuz_transit_gl_example.yaml"
         )
         assert fixture_path.exists(), f"Fixture missing: {fixture_path}"
-        with open(fixture_path, "r") as f:
+        with open(fixture_path) as f:
             rule_data = yaml.safe_load(f)
         errors = list(Draft7Validator(schema).iter_errors(rule_data))
         assert errors == [], errors

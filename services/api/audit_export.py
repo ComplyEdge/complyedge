@@ -13,31 +13,31 @@ from __future__ import annotations
 import hashlib
 import json
 from copy import deepcopy
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 CHAIN_ALGORITHM = "sha256-v1"
 GENESIS_HASH = ""
 
 
-def canonical_event_json(event: Dict[str, Any]) -> str:
+def canonical_event_json(event: dict[str, Any]) -> str:
     """Stable JSON for hashing — sorted keys, no whitespace."""
     payload = {k: v for k, v in event.items() if k != "chain_link"}
     return json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
 
 
-def _link_hash(previous_hash: str, event: Dict[str, Any]) -> str:
+def _link_hash(previous_hash: str, event: dict[str, Any]) -> str:
     material = previous_hash + canonical_event_json(event)
     return hashlib.sha256(material.encode("utf-8")).hexdigest()
 
 
-def _sort_events_chronologically(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _sort_events_chronologically(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(
         events,
         key=lambda e: (e.get("timestamp") or "", e.get("event_id") or ""),
     )
 
 
-def _compute_chain_head_in_order(events: List[Dict[str, Any]]) -> Optional[str]:
+def _compute_chain_head_in_order(events: list[dict[str, Any]]) -> str | None:
     """Walk events in export order; return None if any chain_link is invalid."""
     previous = GENESIS_HASH
     for event in events:
@@ -49,7 +49,7 @@ def _compute_chain_head_in_order(events: List[Dict[str, Any]]) -> Optional[str]:
     return previous
 
 
-def build_hash_chain(events: List[Dict[str, Any]]) -> Dict[str, Any]:
+def build_hash_chain(events: list[dict[str, Any]]) -> dict[str, Any]:
     """
     Build a tamper-evident hash chain over audit events.
 
@@ -58,7 +58,7 @@ def build_hash_chain(events: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     ordered = _sort_events_chronologically(events)
     previous = GENESIS_HASH
-    chained_events: List[Dict[str, Any]] = []
+    chained_events: list[dict[str, Any]] = []
 
     for event in ordered:
         clean = {k: v for k, v in event.items() if k != "chain_link"}
@@ -75,7 +75,7 @@ def build_hash_chain(events: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def verify_audit_export_chain(export: Dict[str, Any]) -> bool:
+def verify_audit_export_chain(export: dict[str, Any]) -> bool:
     """
     Verify tamper evidence on an audit export JSON envelope.
 

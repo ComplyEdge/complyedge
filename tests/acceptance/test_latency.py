@@ -18,8 +18,6 @@ import statistics
 import time
 
 import pytest
-import requests
-
 from conftest import BENCHMARK_RESULTS_DIR
 
 BENCHMARK_FILE = BENCHMARK_RESULTS_DIR / "runtime_benchmark_latest.json"
@@ -56,15 +54,15 @@ class TestOpaFastPath:
 
     def test_opa_fast_path_median_under_100ms(self, opa_fast_path_latencies):
         median = statistics.median(opa_fast_path_latencies)
-        assert median <= 100, (
-            f"OPA fast-path median should be ≤100ms; benchmark shows {median:.1f}ms"
-        )
+        assert (
+            median <= 100
+        ), f"OPA fast-path median should be ≤100ms; benchmark shows {median:.1f}ms"
 
     def test_opa_fast_path_max_under_150ms(self, opa_fast_path_latencies):
         maximum = max(opa_fast_path_latencies)
-        assert maximum <= 150, (
-            f"OPA fast-path max should be ≤150ms; benchmark shows {maximum:.1f}ms"
-        )
+        assert (
+            maximum <= 150
+        ), f"OPA fast-path max should be ≤150ms; benchmark shows {maximum:.1f}ms"
 
     def test_opa_fast_path_min_over_10ms(self, opa_fast_path_latencies):
         minimum = min(opa_fast_path_latencies)
@@ -93,12 +91,12 @@ class TestLiveLatency:
         resp = live_session.post(f"{api_base_url}/v1/check", json=payload)
         elapsed_ms = (time.monotonic() - t0) * 1000
 
-        assert resp.status_code == 200, (
-            f"Expected 200 from {api_base_url}/v1/check, got {resp.status_code}: {resp.text[:200]}"
-        )
+        assert (
+            resp.status_code == 200
+        ), f"Expected 200 from {api_base_url}/v1/check, got {resp.status_code}: {resp.text[:200]}"
         # Use server-reported latency if available, else fall back to wall-clock
         data = resp.json()
         server_ms = data.get("latency_ms", elapsed_ms)
-        assert server_ms < 150, (
-            f"Live OPA-only call took {server_ms:.0f}ms — expected <150ms"
-        )
+        assert (
+            server_ms < 150
+        ), f"Live OPA-only call took {server_ms:.0f}ms — expected <150ms"
