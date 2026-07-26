@@ -59,7 +59,28 @@ class IncompleteEvidenceError(RuntimeError):
     silently hollow one is worse than shipping none. If this fires, the write
     path is dropping evidence again — check for a second writer on the EVENT#
     keyspace before touching this module.
+
+    Carries the facts as ATTRIBUTES, not only inside the message string, so an
+    HTTP handler can compose its own response instead of forwarding ``str(e)``.
+    Passing exception text straight to a caller couples the API's response body
+    to this class's wording — a later edit here would silently change the API —
+    and it is the pattern that leaks internals when the exception is not one of
+    ours. ``record_count`` and ``contract_since`` are safe to state publicly;
+    ``examples`` names specific event ids and belongs in logs only.
     """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        record_count: int = 0,
+        contract_since: str = "",
+        examples: list[str] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.record_count = record_count
+        self.contract_since = contract_since
+        self.examples = examples or []
 
 
 def _missing_evidence(event: dict[str, Any]) -> list[str]:
@@ -99,7 +120,10 @@ def assess_evidence_completeness(events: list[dict[str, Any]]) -> dict[str, Any]
             f"{EVIDENCE_CONTRACT_SINCE} are missing Article 12 evidence fields. "
             "The audit write path is dropping evidence: check that nothing "
             "overwrites the audit item after it is persisted (incident AUD-001). "
-            f"First: {live_regressions[0]}"
+            f"First: {live_regressions[0]}",
+            record_count=len(live_regressions),
+            contract_since=EVIDENCE_CONTRACT_SINCE,
+            examples=live_regressions[:50],
         )
 
     summary: dict[str, Any] = {
