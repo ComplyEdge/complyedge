@@ -114,4 +114,7 @@ The MCP server uses the same engine as the REST API — deterministic OPA/Rego o
 
 ## Documentation
 
-See the [ComplyEdge Documentation](https://docs.complyedge.io) for complete guides.
+- [Quick start](https://www.complyedge.io/docs/quick-start.html)
+- [API reference](https://www.complyedge.io/docs/api-reference.html)
+- [Browser playground](https://www.complyedge.io/docs/playground.html)
+- [Trust badge setup](https://www.complyedge.io/docs/trust-badge.html)
