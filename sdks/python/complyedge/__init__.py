@@ -102,6 +102,12 @@ class ComplianceResult:
     latency_ms: int
     bundle_version: str
     evaluated_rules: list[str]
+    # SHA-256 of the evaluated text and the UTC instant of evaluation, both
+    # byte-identical to this event's Article 12 audit entry. Lets a caller bind
+    # the decision to its exact input without a second API call. Defaulted so
+    # older API responses that omit them still deserialize.
+    text_hash: str = ""
+    timestamp: str | None = None
 
     @property
     def safe(self) -> bool:
@@ -273,6 +279,8 @@ class ComplyEdge:
                 latency_ms=data.get("latency_ms", 0),
                 bundle_version=data.get("bundle_version", "opa-rego-v1"),
                 evaluated_rules=data.get("evaluated_rules", []),
+                text_hash=data.get("text_hash", ""),
+                timestamp=data.get("timestamp"),
             )
 
         except httpx.HTTPStatusError as e:
