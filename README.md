@@ -5,7 +5,7 @@
 
 Runtime compliance enforcement for AI agents. Not a scanner — runs in production, on every request.
 
-**Article 5 is already law.** GPAI fines start August 2, 2026. Your AI is either compliant right now, or it isn't.
+**Article 5 is already law.** GPAI obligations carry fines from 2 August 2026. Your AI is either compliant right now, or it isn't.
 
 > What does your compliance tool tell a regulator when it blocks a request? A probability score?
 >
@@ -97,7 +97,7 @@ Both cite the same legal article and differ only in engine. Map between them via
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
 packages/trustlint/   Offline regex linter (TrustLint) — no API key, for CI/CD
 rules/regulations/    64 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
-rules/rego/           51 leaf OPA/Rego policies + 5 package aggregators (EU AI Act)
+rules/rego/           63 leaf OPA/Rego policies + 6 package aggregators
 rules/schemas/        Rule validation schema
 examples/             Usage examples (decorators, OpenAI Agents)
 scripts/benchmark/    Runtime benchmark (runner + prompt YAMLs + committed results)
@@ -138,7 +138,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1 — Deterministic (hot path):** 51 leaf OPA/Rego policies (+ 5 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in ~1.5ms p99 in a local microbenchmark (`layer1_latency_latest.json`); end-to-end through the live API an OPA-blocked request returns in 110–218ms (median 135ms, `runtime_benchmark_latest.json`). Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1 — Deterministic (hot path):** 63 leaf OPA/Rego policies (+ 6 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in ~1.5ms p99 in a local microbenchmark (`layer1_latency_latest.json`). End-to-end through the live API, the published 60-prompt run measured a p50 of 1,484ms and p95 of 2,610ms across the 37 OPA-decided prompts, with individual requests spanning 44ms to 3,214ms (`runtime_benchmark_latest.json`, 2026-07-14). That run mixes cold and concurrent invocations, and the 44ms floor shows a warm request is far faster; we publish the run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
 
 **Layer 2 — Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
 
