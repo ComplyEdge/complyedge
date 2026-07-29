@@ -13,8 +13,11 @@ Runtime compliance enforcement for AI agents. Not a scanner — runs in producti
 
 ## Live enforcement seals
 
-Not a static badge. These seals reflect live `/v1/check` traffic from public OSS projects
+Not a static badge. These seals reflect live `/v1/check` traffic from open-source projects
 embedding ComplyEdge — they change as real enforcement happens.
+
+Both projects below are our own. We are Customer #0: ComplyEdge runs in production against our
+own code before we ask anyone else to run it against theirs.
 
 [![IVD Framework — runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
 [![Horizon — runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
@@ -60,12 +63,14 @@ api_key = os.environ["COMPLYEDGE_API_KEY"]
 if not is_safe(prompt, api_key=api_key, jurisdiction="EU"):
     raise ValueError("Prompt violates EU AI Act")
 
-# Full result — returns ComplianceResult with violations + citations
+# Full result — returns ComplianceResult with the violations that blocked it
 result = check(prompt, api_key=api_key, jurisdiction="EU")
 if not result.allowed:
     for v in result.violations:
-        print(v.rule_id, v.citation)
+        print(v.rule_id, v.severity, v.rule_description)
 ```
+
+`rule_id` is the citation key: every rule carries its article reference in the corpus (`rego-art5-1c-001` → Article 5(1)(c)), and the full citation text ships with the rule under [`rules/`](rules).
 
 Jurisdiction maps to the rule corpus: `EU` evaluates against EU AI Act Article 5, Article 50, and GPAI obligations. `US` evaluates against HIPAA, SOX, COPPA, TCPA, BIPA.
 
@@ -146,7 +151,7 @@ Security products protect AI from bad actors. **ComplyEdge protects companies fr
 
 ## Benchmark
 
-A 50-prompt corpus runs against the live API. The runner, prompt YAMLs, and the latest result JSON are committed under [`scripts/benchmark/`](scripts/benchmark) — inspect the results directly, or re-run with your own `COMPLYEDGE_API_KEY`.
+A 60-prompt corpus runs against the live API. The runner, prompt YAMLs, and the latest result JSON are committed under [`scripts/benchmark/`](scripts/benchmark) — inspect the results directly, or re-run with your own `COMPLYEDGE_API_KEY`.
 
 ## Contributing
 
