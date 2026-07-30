@@ -16,8 +16,8 @@ Runtime compliance enforcement for AI agents. Not a scanner — runs in producti
 Not a static badge. These seals reflect live `/v1/check` traffic from open-source projects
 embedding ComplyEdge — they change as real enforcement happens.
 
-Both projects below are our own. We are Customer #0: ComplyEdge runs in production against our
-own code before we ask anyone else to run it against theirs.
+Both projects below are our own. ComplyEdge runs in production against our own code
+before we ask anyone else to run it against theirs.
 
 [![IVD Framework — runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
 [![Horizon — runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
