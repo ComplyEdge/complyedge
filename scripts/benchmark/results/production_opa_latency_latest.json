@@ -1,0 +1,40 @@
+{
+  "benchmark": "production_opa_latency",
+  "kind": "live_api_warm_path",
+  "generated_at": "2026-07-30T23:13:28.140840+00:00",
+  "endpoint": "https://api.complyedge.io/v1/check",
+  "auth": "DEMO_KEY from .env.production (ce_demo_ prefix)",
+  "method": "1 warm-up discarded, then 20 sequential POSTs; read opa_latency_ms and latency_ms from JSON",
+  "request": {
+    "agent_id": "prod-opa-latency-archive",
+    "prompt": "What is the capital of France?",
+    "context": {
+      "use_case": "general"
+    }
+  },
+  "n": 20,
+  "engine_path": "opa",
+  "opa_latency_ms": {
+    "p50": 58.12,
+    "p95": 113.81,
+    "min": 41.68,
+    "max": 121.15,
+    "mean": 61.63
+  },
+  "latency_ms": {
+    "p50": 1342,
+    "p95": 1861,
+    "min": 1166,
+    "max": 1992
+  },
+  "client_round_trip_ms": {
+    "note": "Path-dependent; not a published claim. Measured from the archiving host.",
+    "p50": 2090.69,
+    "p95": 2613.4
+  },
+  "supports_enterprise_claim": {
+    "claim": "~64ms p50 opa_latency_ms (enterprise.html, dated 2026-07-22)",
+    "measured_p50": 58.12,
+    "within_tolerance": true
+  }
+}

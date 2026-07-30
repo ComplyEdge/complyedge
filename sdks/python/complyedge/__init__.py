@@ -38,6 +38,12 @@ Advanced Usage (Full Interface):
         )
 """
 
+# PEP 604 unions (str | None) are evaluated at def time, so this module
+# raised TypeError on import under Python 3.9 while pyproject, the PyPI
+# classifiers and the quick-start all advertised 3.9 support. Reproduced
+# on 3.9.19 at __init__.py:92. Do not remove without dropping 3.9.
+from __future__ import annotations
+
 import os
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -52,7 +58,7 @@ from tenacity import (
     wait_exponential,
 )
 
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
@@ -108,6 +114,11 @@ class ComplianceResult:
     # older API responses that omit them still deserialize.
     text_hash: str = ""
     timestamp: str | None = None
+    # Hot-path provenance from /v1/check. Defaulted so older mocks / API
+    # responses that omit them still deserialize. Mapped in every check()
+    # path — dropping these was the contract gap that left CI blind.
+    engine_path: str = ""
+    audit_logged: bool = True
 
     @property
     def safe(self) -> bool:
@@ -281,6 +292,8 @@ class ComplyEdge:
                 evaluated_rules=data.get("evaluated_rules", []),
                 text_hash=data.get("text_hash", ""),
                 timestamp=data.get("timestamp"),
+                engine_path=data.get("engine_path", ""),
+                audit_logged=data.get("audit_logged", True),
             )
 
         except httpx.HTTPStatusError as e:
@@ -600,6 +613,10 @@ class ComplyEdgeClient:
                 latency_ms=data.get("latency_ms", 0),
                 bundle_version=data.get("bundle_version", "opa-rego-v1"),
                 evaluated_rules=data.get("evaluated_rules", []),
+                text_hash=data.get("text_hash", ""),
+                timestamp=data.get("timestamp"),
+                engine_path=data.get("engine_path", ""),
+                audit_logged=data.get("audit_logged", True),
             )
 
             if raise_on_violation and not result.allowed:
@@ -756,6 +773,10 @@ class AsyncComplyEdgeClient:
                 latency_ms=data.get("latency_ms", 0),
                 bundle_version=data.get("bundle_version", "opa-rego-v1"),
                 evaluated_rules=data.get("evaluated_rules", []),
+                text_hash=data.get("text_hash", ""),
+                timestamp=data.get("timestamp"),
+                engine_path=data.get("engine_path", ""),
+                audit_logged=data.get("audit_logged", True),
             )
 
             if raise_on_violation and not result.allowed:
