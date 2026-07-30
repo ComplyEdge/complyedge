@@ -20,6 +20,12 @@ Usage:
     )
 """
 
+# PEP 604 unions (str | None) are evaluated at def time, so this module
+# raised TypeError on import under Python 3.9 while pyproject, the PyPI
+# classifiers and the quick-start all advertised 3.9 support. Reproduced
+# on 3.9.19 at __init__.py:92. Do not remove without dropping 3.9.
+from __future__ import annotations
+
 import logging
 import os
 from collections.abc import Callable

@@ -51,6 +51,24 @@ EVIDENCE_FIELDS = ("text_hash", "agent_id", "timestamp")
 #: reader for damage they did not cause and hides the gap behind a 500.
 EVIDENCE_CONTRACT_SINCE = "2026-07-25T20:30:00+00:00"
 
+#: The ACTUAL window in which evidence was destroyed (incident AUD-001), as
+#: measured by a full-table scan on 2026-07-27: 221 records affected, 6 later
+#: recovered from the stream archive, 215 permanently lost.
+#:
+#: This is deliberately NOT the same thing as EVIDENCE_CONTRACT_SINCE, and the
+#: distinction is what a reader needs. The contract date says "anything
+#: incomplete after this is a live regression". The window says "this is where
+#: the historical damage is."
+#:
+#: Stating only the contract date over-claims. An export spanning 2026-07-01
+#: onward returns 202 COMPLETE records dated before the fix (07-10, 07-11,
+#: 07-12) alongside the damaged ones — so telling a reader that "records
+#: predating the fix lost their evidence fields" contradicts the very data they
+#: are holding, and reads as either sloppiness or overstatement. Both are
+#: expensive in a due-diligence review. Name the window.
+INCIDENT_WINDOW_START = "2026-07-13"
+INCIDENT_WINDOW_END = "2026-07-25"
+
 
 class IncompleteEvidenceError(RuntimeError):
     """A post-contract audit record is missing Article 12 evidence fields.
@@ -132,11 +150,23 @@ def assess_evidence_completeness(events: list[dict[str, Any]]) -> dict[str, Any]
         "incomplete": len(legacy_incomplete),
     }
     if legacy_incomplete:
+        summary["incident_window"] = {
+            "from": INCIDENT_WINDOW_START,
+            "to": INCIDENT_WINDOW_END,
+        }
+        # Buyer-facing prose: this string reaches a due-diligence reviewer, so it
+        # is held to the same standard as published copy. No em dashes.
         summary["note"] = (
-            "Records predating the 2026-07-25 audit-write fix (incident AUD-001) "
-            "were overwritten in place by a telemetry dual-write and permanently "
-            "lost their evidence fields. They are listed rather than hidden: this "
-            "export is complete for every record written after that date."
+            f"Incomplete records fall in a single closed window, "
+            f"{INCIDENT_WINDOW_START} to {INCIDENT_WINDOW_END} (incident "
+            "AUD-001): a telemetry writer replaced the audit item on its own "
+            "key, destroying the evidence fields in place. 221 records were "
+            "affected, 6 were later recovered from the immutable stream "
+            "archive, and 215 are permanently unrecoverable. Records outside "
+            "that window are unaffected, both before it and after it, and this "
+            "export lists the incomplete ones rather than hiding them. The "
+            "write path was fixed and the recovery posture rebuilt; recovery is "
+            "now exercised on a schedule with a measured objective."
         )
         summary["incomplete_event_ids"] = [
             entry.split(" missing ")[0] for entry in legacy_incomplete[:50]

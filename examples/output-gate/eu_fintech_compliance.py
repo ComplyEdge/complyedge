@@ -191,7 +191,12 @@ def run_scenario(ce: ComplyEdge, scenario: dict, live: bool) -> dict:
             v = result.violations[0]
             rule_id = getattr(v, "rule_id", "—")
             lines.append(f"{_R}BLOCKED{_X}  rule_id='{rule_id}'")
-            citation = getattr(v, "citation", "")
+            # The legal citation arrives as rule_description: main.py maps the
+            # Rego rule's citation onto that field. There is no `citation`
+            # attribute, so the old getattr(v, "citation", "") silently printed
+            # nothing and this example never showed the article it exists to
+            # demonstrate.
+            citation = getattr(v, "rule_description", "")
             if citation:
                 lines.append(f"{_D}citation:{_X} {citation[:90]}…")
         else:

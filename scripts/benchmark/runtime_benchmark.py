@@ -544,6 +544,34 @@ def main() -> int:
         render_terminal(summary, results, args.base_url)
 
     if args.output in ("json", "all"):
+        # A run that never reached the engine is not a measurement. These
+        # artifacts are committed evidence and back the public detection badge
+        # in the OSS README, so a transport-level failure must NOT be allowed to
+        # overwrite a good result with a fabricated-looking bad one.
+        #
+        # Seen twice on 2026-07-28: a dev key against production returned 401 on
+        # all 60 prompts and wrote "detection 0.0%"; a re-run hit the free-plan
+        # 100/day rate limit and wrote "55.8%". Both silently replaced a valid
+        # 100.0% run, and both would have been committed and exported publicly
+        # had they not been caught by hand.
+        error_paths = {
+            path: n
+            for path, n in summary["aggregate"]["engine_path_distribution"].items()
+            if path == "http_error" or path.startswith("error")
+        }
+        if error_paths:
+            total = sum(error_paths.values())
+            print(
+                f"\n{C.R}Refusing to write artifacts: {total} prompt(s) never "
+                f"reached the engine ({error_paths}).{C.END}"
+            )
+            print(
+                f"{C.DIM}A transport failure is not a measurement. "
+                f"{LATEST_JSON.name} and {BADGE_MD.name} were left untouched. "
+                f"Fix auth / rate limits and re-run.{C.END}"
+            )
+            return 2
+
         RESULTS_DIR.mkdir(parents=True, exist_ok=True)
         out = {**summary, "results": results}
         LATEST_JSON.write_text(json.dumps(out, indent=2, default=str))
