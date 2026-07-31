@@ -1,6 +1,6 @@
 # Contributing to ComplyEdge
 
-ComplyEdge enforces EU AI Act compliance at runtime — not a scanner, not a linter. It runs in production, on every AI request, and blocks violations before they reach users. The EU AI Act is already in force. The corpus is what makes enforcement possible — and it only compounds if people outside the core team add rules. Each rule you contribute is a legal artifact, traceable to an exact article, paragraph, and sub-paragraph, that could appear in a regulator's audit trail or an external compliance review. This guide explains how.
+ComplyEdge blocks EU AI Act violations at runtime — not a scanner, not a linter. It runs in production, on every AI request, and logs a cited record on every decision. The EU AI Act is already in force. The corpus is what makes enforcement possible — and it only compounds if people outside the core team add rules. Each rule you contribute is a legal artifact, traceable to an exact article, paragraph, and sub-paragraph, that could appear in a regulator's audit trail or an external compliance review. This guide explains how.
 
 > **The strict format spec lives in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md).** This file is the front door — process, expectations, and the 5-step rule-writing workflow. RULE_STANDARD.md is the law.
 

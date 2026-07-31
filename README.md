@@ -111,11 +111,11 @@ tests/                Rule validation + acceptance tests
 
 ## Rules
 
-64 YAML rules + 51 deterministic leaf OPA/Rego policies across 4 jurisdictions:
+64 YAML rules + 63 deterministic leaf OPA/Rego policies (+ 6 package aggregators) across 4 jurisdictions:
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 36 YAML + 51 leaf Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR |
+| **EU** | 36 YAML + 63 leaf Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR + Art 15 IPI |
 | **US** | 16 YAML | HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA |
 | **Global** | 1 YAML | PCI DSS |
 | **Universal** | 11 YAML | PII detection, prompt injection (direct + indirect) |
@@ -147,7 +147,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 **Layer 2 — Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
 
-Security products protect AI from bad actors. **ComplyEdge protects companies from their own AI's legal violations during normal operations.**
+Security products protect AI from bad actors. **ComplyEdge blocks EU AI Act violations at runtime — and logs a cited record on every decision.**
 
 ## Benchmark
 
