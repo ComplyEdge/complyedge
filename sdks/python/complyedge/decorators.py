@@ -51,7 +51,7 @@ class ComplianceConfig:
         check_input: bool = True,
         check_output: bool = True,
         enable_condition: Callable[[], bool] | None = None,
-        violation_handler: Callable[["ComplianceResult", str], Any] | None = None,
+        violation_handler: Callable[[ComplianceResult, str], Any] | None = None,
         agent_id: str = "default",
         jurisdiction: str | None = None,
         base_url: str | None = _DEFAULT_BASE_URL,
@@ -85,7 +85,7 @@ class ComplianceConfig:
         self.max_retries = max_retries
 
 
-def default_violation_handler(result: "ComplianceResult", context: str) -> None:
+def default_violation_handler(result: ComplianceResult, context: str) -> None:
     """
     Default handler for compliance violations.
 
@@ -125,7 +125,7 @@ def compliance_check(
     agent_id: str = "default",
     jurisdiction: str | None = None,
     config: ComplianceConfig | None = None,
-    violation_handler: Callable[["ComplianceResult", str], Any] | None = None,
+    violation_handler: Callable[[ComplianceResult, str], Any] | None = None,
     base_url: str | None = _DEFAULT_BASE_URL,
 ):
     """

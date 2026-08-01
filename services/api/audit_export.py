@@ -225,9 +225,7 @@ def canonical_event_json(event: dict[str, Any]) -> str:
     recipient can verify is not.
     """
     payload = {k: v for k, v in event.items() if k != "chain_link"}
-    return json.dumps(
-        normalize_event(payload), sort_keys=True, separators=(",", ":")
-    )
+    return json.dumps(normalize_event(payload), sort_keys=True, separators=(",", ":"))
 
 
 def _link_hash(previous_hash: str, event: dict[str, Any]) -> str:
