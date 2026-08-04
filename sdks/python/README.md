@@ -82,11 +82,25 @@ result = check(text, api_key=api_key, jurisdiction="EU")
 
 ## MCP Server — Use ComplyEdge as an AI Agent Tool
 
-ComplyEdge runs as an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server,
-giving any MCP-compatible agent (Claude, Cursor, etc.) compliance checking with zero integration code.
+<!-- mcp-name: io.github.ComplyEdge/complyedge -->
+
+Agent/MCP tools that check prompts and outputs against ComplyEdge’s TrustLint
+corpus with article-cited findings — not another EU AI Act risk-tier chatbot
+and not a law-search database.
+
+ComplyEdge runs as an [MCP (Model Context Protocol)](https://modelcontextprotocol.io)
+stdio server for any MCP-compatible host (Claude, Cursor, Inspector).
 
 ```bash
-pip install complyedge[mcp]
+pip install 'complyedge[mcp]>=0.2.7'
+```
+
+Start with either entrypoint:
+
+```bash
+python -m complyedge.mcp_server
+# or
+complyedge-mcp
 ```
 
 Add to your MCP client config (e.g. `claude_desktop_config.json`):
@@ -95,22 +109,25 @@ Add to your MCP client config (e.g. `claude_desktop_config.json`):
 {
   "mcpServers": {
     "complyedge": {
-      "command": "python",
-      "args": ["-m", "complyedge.mcp_server"]
+      "command": "complyedge-mcp"
     }
   }
 }
 ```
 
-**Exposed tools:**
+(`command`/`args` with `python -m complyedge.mcp_server` is also valid.)
+
+**Exposed tools** (TrustLint offline YAML corpus):
 
 | Tool | Description |
 |------|-------------|
-| `check_compliance` | Check text against regulation rules. Returns violations or PASS. |
-| `list_rules` | List available rules, filterable by jurisdiction. |
-| `scan_prompt` | Pre-generation compliance check on prompts. |
+| `check_compliance` | Check text against TrustLint rules. Returns PASS/FAIL with article-cited findings. |
+| `list_rules` | List available TrustLint rules, filterable by jurisdiction. |
+| `scan_prompt` | Pre-generation prompt scan. Returns SAFE or RISK_DETECTED. |
 
-The MCP server uses the same engine as the REST API — deterministic OPA/Rego on the hot path.
+No API key is required for these tools. The optional extra installs `mcp` and
+`trustlint` (engine + bundled rules). This MCP path does not run the REST API
+policy engine.
 
 ## Documentation
 
