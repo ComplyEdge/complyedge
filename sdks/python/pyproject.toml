@@ -37,6 +37,7 @@ dependencies = [
 
 [project.scripts]
 complyedge = "complyedge.cli:main"
+complyedge-mcp = "complyedge.mcp_server:main"
 
 [project.urls]
 Homepage = "https://complyedge.io"
@@ -46,7 +47,10 @@ Issues = "https://github.com/ComplyEdge/complyedge/issues"
 
 [project.optional-dependencies]
 agents = ["openai-agents>=0.2.7"]
-mcp = ["mcp>=1.0.0"]
+mcp = [
+    "mcp>=1.0.0,<2",
+    "trustlint>=2.0.3",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
