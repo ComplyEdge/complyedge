@@ -36,6 +36,25 @@ def _import_models():
 logger = logging.getLogger(__name__)
 
 
+class ComplianceUnavailableError(RuntimeError):
+    """The compliance API could not be reached and fail_mode is "closed".
+
+    Raised instead of letting an unchecked call through. Callers who prefer
+    availability over enforcement set fail_mode="open".
+    """
+
+
+_FAIL_MODES = frozenset({"open", "closed"})
+
+
+def _validate_fail_mode(mode: str) -> str:
+    if mode not in _FAIL_MODES:
+        raise ValueError(
+            f"fail_mode must be one of {sorted(_FAIL_MODES)}, got {mode!r}"
+        )
+    return mode
+
+
 class ComplianceConfig:
     """
     Configuration object for compliance decorator.
@@ -57,6 +76,7 @@ class ComplianceConfig:
         base_url: str | None = _DEFAULT_BASE_URL,
         timeout: int = 300,
         max_retries: int = 3,
+        fail_mode: str = "open",
     ):
         """
         Initialize compliance configuration.
@@ -72,6 +92,18 @@ class ComplianceConfig:
             base_url: ComplyEdge API base URL
             timeout: Request timeout in seconds
             max_retries: Maximum retry attempts for API calls
+            fail_mode: Behaviour when the ComplyEdge API itself is unreachable
+                or errors. "open" lets the wrapped function run unchecked and
+                logs the failure; "closed" raises ComplianceUnavailableError so
+                an outage cannot silently disable enforcement.
+
+                Default is "open" to preserve existing behaviour, but note the
+                trade: with fail_mode="open" an API outage means traffic runs
+                UNENFORCED, and nothing in the response distinguishes that from
+                a clean pass. Compliance-critical deployments should set
+                "closed". This was previously hard-coded open and undocumented,
+                while ComplyEdge.is_safe() and the TypeScript client both failed
+                closed: three surfaces, three postures, none written down.
         """
         self.api_key = api_key
         self.check_input = check_input
@@ -83,6 +115,7 @@ class ComplianceConfig:
         self.base_url = base_url
         self.timeout = timeout
         self.max_retries = max_retries
+        self.fail_mode = _validate_fail_mode(fail_mode)
 
 
 def default_violation_handler(result: ComplianceResult, context: str) -> None:
@@ -114,6 +147,34 @@ def default_violation_handler(result: ComplianceResult, context: str) -> None:
         f"Event ID: {result.event_id}",
         violations=result.violations,
         event_id=result.event_id,
+    )
+
+
+_TRUTHY = frozenset({"1", "true", "t", "yes", "y", "on"})
+_FALSY = frozenset({"0", "false", "f", "no", "n", "off"})
+
+
+def _parse_enabled(raw: str | None, *, var_name: str) -> bool:
+    """Interpret the kill-switch env var.
+
+    Previously this was ``raw.lower() == "true"``, so every truthy spelling a
+    deployer would reasonably reach for (``1``, ``yes``, ``on``, or ``TRUE``
+    with a trailing space) evaluated False and SILENTLY DISABLED compliance
+    enforcement. The failure was invisible: the decorator simply stopped
+    checking. A value we cannot interpret now raises rather than guessing,
+    because guessing wrong means shipping unenforced.
+    """
+    if raw is None:
+        return True
+    value = raw.strip().lower()
+    if value in _TRUTHY:
+        return True
+    if value in _FALSY:
+        return False
+    raise ValueError(
+        f"{var_name}={raw!r} is not a recognised boolean. "
+        f"Use one of {sorted(_TRUTHY)} to enable or {sorted(_FALSY)} to disable. "
+        "Refusing to guess, because guessing wrong disables compliance checks."
     )
 
 
@@ -194,7 +255,7 @@ def compliance_check(
                 enabled = (
                     config.enable_condition()
                     if config.enable_condition
-                    else os.getenv(enabled_env, "true").lower() == "true"
+                    else _parse_enabled(os.getenv(enabled_env), var_name=enabled_env)
                 )
                 handler = (
                     config.violation_handler
@@ -204,15 +265,19 @@ def compliance_check(
                 agent = config.agent_id
                 juris = config.jurisdiction
                 api_base_url = config.base_url
+                fail_mode = config.fail_mode
             else:
                 check_input = input
                 check_output = output
                 api_key = os.getenv(api_key_env)
-                enabled = os.getenv(enabled_env, "true").lower() == "true"
+                enabled = _parse_enabled(os.getenv(enabled_env), var_name=enabled_env)
                 handler = violation_handler or default_violation_handler
                 agent = agent_id
                 juris = jurisdiction
                 api_base_url = base_url
+                fail_mode = _validate_fail_mode(
+                    os.getenv("COMPLYEDGE_FAIL_MODE", "open")
+                )
 
             # Graceful degradation: proceed without compliance if disabled or misconfigured
             if not enabled or not api_key:
@@ -240,7 +305,7 @@ def compliance_check(
 
             try:
                 # Input compliance checking
-                if check_input and args:
+                if check_input and (args or kwargs):
                     # Extract string arguments for compliance checking
                     input_texts = []
                     for _i, arg in enumerate(args):
@@ -268,7 +333,7 @@ def compliance_check(
 
                         _input_violation = None
                         try:
-                            result = ce.check(combined_input)
+                            result = ce.check(combined_input, direction="prompt")
                             if not result.safe:
                                 logger.warning(
                                     "Input compliance violation detected",
@@ -292,7 +357,17 @@ def compliance_check(
                                     "error": str(e),
                                 },
                             )
-                            # Conservative approach: allow function to proceed but log the failure
+                            # fail_mode decides. "open" proceeds unchecked (and
+                            # the caller has been told, in ComplianceConfig, that
+                            # this means traffic runs unenforced during an
+                            # outage); "closed" refuses rather than silently
+                            # dropping enforcement.
+                            if fail_mode == "closed":
+                                raise ComplianceUnavailableError(
+                                    "Input compliance check failed and "
+                                    "fail_mode='closed'; refusing to run "
+                                    f"{func.__name__} unchecked"
+                                ) from e
                         if _input_violation is not None:
                             return handler(_input_violation, "input")
 
@@ -347,7 +422,13 @@ def compliance_check(
                                 "error": str(e),
                             },
                         )
-                        # Conservative approach: return original response but log the failure
+                        # Same posture as the input side, see fail_mode.
+                        if fail_mode == "closed":
+                            raise ComplianceUnavailableError(
+                                "Output compliance check failed and "
+                                "fail_mode='closed'; refusing to return "
+                                f"unchecked output from {func.__name__}"
+                            ) from e
                     if _output_violation is not None:
                         return handler(_output_violation, "output")
 

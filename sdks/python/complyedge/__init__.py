@@ -53,7 +53,7 @@ from typing import Any
 import httpx
 from tenacity import (
     retry,
-    retry_if_exception_type,
+    retry_if_exception,
     stop_after_attempt,
     wait_exponential,
 )
@@ -153,10 +153,17 @@ class ComplianceError(Exception):
         message: str,
         violations: list[ComplianceViolation] | None = None,
         event_id: str | None = None,
+        retryable: bool = False,
     ):
+        # `retryable` exists because the retry decorator on check_compliance was
+        # dead code: it was configured to retry httpx.RequestError and
+        # HTTPStatusError, but the method body catches both and re-raises
+        # ComplianceError, so tenacity never saw a type it was watching and ZERO
+        # retries ever fired. Transience has to survive the conversion.
         super().__init__(message)
         self.violations = violations or []
         self.event_id = event_id
+        self.retryable = retryable
 
 
 # =============================================================================
@@ -239,6 +246,7 @@ class ComplyEdge:
         text: str,
         agent_id: str | None = None,
         jurisdiction: str | None = None,
+        direction: str = "output",
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -247,6 +255,12 @@ class ComplyEdge:
             text: Text to check
             agent_id: Agent identifier (uses default if not provided)
             jurisdiction: Regulatory jurisdiction (uses default if not provided)
+            direction: "prompt" for text going INTO the model, "output" for text
+                coming out. This was previously hard-coded to "output", so every
+                input check the decorator ran was filed in the Article 12 audit
+                trail as an output, and server-side input-scoped rules (for
+                example hipaa_phi_input_detection, coppa_child_input_detection)
+                were evaluated against the wrong direction.
 
         Returns:
             ComplianceResult with detailed information
@@ -262,7 +276,7 @@ class ComplyEdge:
             "text": text,
             "jurisdiction": jurisdiction or self.jurisdiction or "EU",
             "agent_id": agent_id or self.agent_id,
-            "direction": "output",
+            "direction": direction,
             "use_semantic_fallback": False,
         }
 
@@ -303,12 +317,17 @@ class ComplyEdge:
             except Exception:
                 error_detail = str(e)
 
+            # 429 and 5xx are transient; 4xx client errors are not and must
+            # not burn the retry budget.
+            status = e.response.status_code
             raise ComplianceError(
-                f"API error ({e.response.status_code}): {error_detail}"
-            )
+                f"API error ({status}): {error_detail}",
+                retryable=status == 429 or 500 <= status < 600,
+            ) from e
 
         except httpx.RequestError as e:
-            raise ComplianceError(f"Request failed: {str(e)}")
+            # Connection errors, DNS failures and timeouts are transient.
+            raise ComplianceError(f"Request failed: {str(e)}", retryable=True) from e
 
     def assess_pre_deployment(
         self,
@@ -544,7 +563,12 @@ class ComplyEdgeClient:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
-        retry=retry_if_exception_type((httpx.RequestError, httpx.HTTPStatusError)),
+        retry=retry_if_exception(lambda e: getattr(e, "retryable", False)),
+        # Surface the original ComplianceError once attempts are exhausted.
+        # Without this tenacity raises RetryError, so a caller following the
+        # documented contract ("Raises: ComplianceError") would miss it and the
+        # retry machinery would leak through the SDK's own abstraction.
+        reraise=True,
     )
     def check_compliance(
         self,
@@ -637,12 +661,17 @@ class ComplyEdgeClient:
             except Exception:
                 pass
 
+            # 429 and 5xx are transient and worth a retry; 4xx client errors
+            # are not and must not burn the retry budget.
+            status = e.response.status_code
             raise ComplianceError(
-                f"API error ({e.response.status_code}): {error_detail}"
-            )
+                f"API error ({status}): {error_detail}",
+                retryable=status == 429 or 500 <= status < 600,
+            ) from e
 
         except httpx.RequestError as e:
-            raise ComplianceError(f"Request failed: {str(e)}")
+            # Connection errors, DNS failures and timeouts are transient.
+            raise ComplianceError(f"Request failed: {str(e)}", retryable=True) from e
 
     def get_rules_info(self) -> dict[str, Any]:
         """Get information about the current rule bundle."""
@@ -724,7 +753,12 @@ class AsyncComplyEdgeClient:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
-        retry=retry_if_exception_type((httpx.RequestError, httpx.HTTPStatusError)),
+        retry=retry_if_exception(lambda e: getattr(e, "retryable", False)),
+        # Surface the original ComplianceError once attempts are exhausted.
+        # Without this tenacity raises RetryError, so a caller following the
+        # documented contract ("Raises: ComplianceError") would miss it and the
+        # retry machinery would leak through the SDK's own abstraction.
+        reraise=True,
     )
     async def check_compliance(
         self,
@@ -797,12 +831,17 @@ class AsyncComplyEdgeClient:
             except Exception:
                 pass
 
+            # 429 and 5xx are transient and worth a retry; 4xx client errors
+            # are not and must not burn the retry budget.
+            status = e.response.status_code
             raise ComplianceError(
-                f"API error ({e.response.status_code}): {error_detail}"
-            )
+                f"API error ({status}): {error_detail}",
+                retryable=status == 429 or 500 <= status < 600,
+            ) from e
 
         except httpx.RequestError as e:
-            raise ComplianceError(f"Request failed: {str(e)}")
+            # Connection errors, DNS failures and timeouts are transient.
+            raise ComplianceError(f"Request failed: {str(e)}", retryable=True) from e
 
     async def get_rules_info(self) -> dict[str, Any]:
         """Get information about the current rule bundle."""
