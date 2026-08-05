@@ -14,12 +14,15 @@ import argparse
 import json
 from pathlib import Path
 
+# Display labels follow Reg (EU) 2024/1689. Internal JSON/schema keys keep
+# legacy names (art_52_53_…, art_53_1_d_e_…) until a dedicated rename; do not
+# re-introduce Art 52 as "tech docs" or invent Art 53(1)(e) in public output.
 OBLIGATION_LABELS = {
     "art_50_2_content_disclosure": "Art 50(2) Disclosure",
-    "art_51_model_classification": "Art 51 Classification",
-    "art_52_53_1_a_b_technical_documentation": "Art 52/53(1)(a-b) Tech Docs",
+    "art_51_model_classification": "Art 51/52 Classification",
+    "art_52_53_1_a_b_technical_documentation": "Art 53(1)(a) Tech Docs",
     "art_53_1_c_copyright_transparency": "Art 53(1)(c) Copyright",
-    "art_53_1_d_e_downstream_obligations": "Art 53(1)(d-e) Downstream",
+    "art_53_1_d_e_downstream_obligations": "Art 53(1)(b) Downstream",
     "art_55_systemic_risk": "Art 55 Systemic Risk",
 }
 

@@ -21,7 +21,7 @@ In scope:
 - The `complyedge` Python SDK and the `trustlint` offline linter.
 - The OPA/Rego policies and YAML rule corpus in this repository.
 - Rule **misclassification** (a prompt that should block but passes, or vice
-  versa) — open an issue with the prompt and expected decision; this is a
+  versa): open an issue with the prompt and expected decision; this is a
   correctness bug, not a security report.
 
 Out of scope:
@@ -33,4 +33,4 @@ Out of scope:
 ## Supported Versions
 
 We support the latest released version of each package on PyPI. Older versions
-do not receive security backports — pin to the latest release.
+do not receive security backports: pin to the latest release.

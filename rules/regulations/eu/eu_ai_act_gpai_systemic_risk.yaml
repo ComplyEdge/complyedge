@@ -1,6 +1,6 @@
 id: EU_AI_ACT_GPAI_SYSTEMIC_RISK_001
 jurisdiction: EU
-effective_date: '2026-08-02'
+effective_date: '2025-08-02'
 description: >-
   Imposes additional obligations on providers of general-purpose AI models
   with systemic risk, including models trained with more than 10^25 FLOPs.
@@ -65,3 +65,7 @@ tags:
 - adversarial-testing
 - incident-reporting
 tier: enterprise
+
+compliance_notes:
+  - >-
+    GPAI obligations under Chapter V have applied since 2 August 2025. The 2 August 2026 date is when the Commission's Article 101 fining powers became exercisable, which is an enforcement milestone, not the date the obligation began. Conflating the two overstates when compliance was required.

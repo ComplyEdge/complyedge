@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/complyedge)](https://pypi.org/project/complyedge/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-Runtime compliance enforcement for AI agents. Not a scanner — runs in production, on every request.
+Runtime compliance enforcement for AI agents. Not a scanner: runs in production, on every request.
 
 **Article 5 is already law.** GPAI obligations carry fines from 2 August 2026. Your AI is either compliant right now, or it isn't.
 
@@ -14,20 +14,20 @@ Runtime compliance enforcement for AI agents. Not a scanner — runs in producti
 ## Live enforcement seals
 
 Not a static badge. These seals reflect live `/v1/check` traffic from open-source projects
-embedding ComplyEdge — they change as real enforcement happens.
+embedding ComplyEdge: they change as real enforcement happens.
 
 Both projects below are our own. ComplyEdge runs in production against our own code
 before we ask anyone else to run it against theirs.
 
-[![IVD Framework — runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
-[![Horizon — runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
+[![IVD Framework: runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
+[![Horizon: runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
 
 | Project | Live trust page |
 |---------|-----------------|
 | **IVD Framework** | [trust.complyedge.io/ivd](https://trust.complyedge.io/ivd) |
 | **Horizon** | [trust.complyedge.io/horizon](https://trust.complyedge.io/horizon) |
 
-Each trust page is generated from that project's real audit trail — enforcement status, check
+Each trust page is generated from that project's real audit trail: enforcement status, check
 volume, and the EU AI Act articles enforced at runtime. (GitHub proxies and caches images, so the
 seal above can lag; the trust page is always current.)
 
@@ -47,7 +47,7 @@ def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-Three lines. Every AI input and output evaluated against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations blocked before they reach the user — with article citation, rule ID, and timestamp on every decision.
+Three lines. Every AI input and output evaluated against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations blocked before they reach the user: with article citation, rule ID, and timestamp on every decision.
 
 Set `COMPLYEDGE_API_KEY` to your key. The decorator activates by default; to disable without removing the key (e.g., in CI), set `COMPLYEDGE_ENABLED=false`.
 
@@ -59,11 +59,11 @@ import os
 
 api_key = os.environ["COMPLYEDGE_API_KEY"]
 
-# Boolean check — returns True if no violations
+# Boolean check: returns True if no violations
 if not is_safe(prompt, api_key=api_key, jurisdiction="EU"):
     raise ValueError("Prompt violates EU AI Act")
 
-# Full result — returns ComplianceResult with the violations that blocked it
+# Full result: returns ComplianceResult with the violations that blocked it
 result = check(prompt, api_key=api_key, jurisdiction="EU")
 if not result.allowed:
     for v in result.violations:
@@ -74,7 +74,7 @@ if not result.allowed:
 
 Jurisdiction maps to the rule corpus: `EU` evaluates against EU AI Act Article 5, Article 50, and GPAI obligations. `US` evaluates against HIPAA, SOX, COPPA, TCPA, BIPA.
 
-## TrustLint — Offline Linter
+## TrustLint, Offline Linter
 
 No API key required. Scans text against the YAML rule corpus using regex patterns. Published as a standalone package, versioned independently of the SDK.
 
@@ -82,17 +82,17 @@ No API key required. Scans text against the YAML rule corpus using regex pattern
 pip install trustlint
 
 trustlint check --text "We use social credit scoring to evaluate applicants"
-# → CRITICAL: EU_AI_ACT_ART5_SOCIAL_SCORING_001 — Article 5(1)(c)
+# → CRITICAL: EU_AI_ACT_ART5_SOCIAL_SCORING_001, Article 5(1)(c)
 ```
 
 Exit codes: `0` = pass, `1` = violations found. Designed for CI/CD pipelines. Source: [`packages/trustlint/`](packages/trustlint).
 
-## Rule IDs — two namespaces
+## Rule IDs: two namespaces
 
 ComplyEdge resolves the same regulations through two engines, each with its own rule-ID namespace:
 
-- **Runtime API (OPA/Rego):** IDs like `rego-art5-1c-001` — returned by `compliance_check` and the `/v1/check` API. This is the audit trail your production system logs.
-- **TrustLint (offline, YAML corpus):** IDs like `EU_AI_ACT_ART5_SOCIAL_SCORING_001` — emitted by the offline linter.
+- **Runtime API (OPA/Rego):** IDs like `rego-art5-1c-001`: returned by `compliance_check` and the `/v1/check` API. This is the audit trail your production system logs.
+- **TrustLint (offline, YAML corpus):** IDs like `EU_AI_ACT_ART5_SOCIAL_SCORING_001`: emitted by the offline linter.
 
 Both cite the same legal article and differ only in engine. Map between them via the article reference carried in every rule.
 
@@ -100,7 +100,7 @@ Both cite the same legal article and differ only in engine. Map between them via
 
 ```
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
-packages/trustlint/   Offline regex linter (TrustLint) — no API key, for CI/CD
+packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
 rules/regulations/    64 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
 rules/rego/           63 leaf OPA/Rego policies + 6 package aggregators
 rules/schemas/        Rule validation schema
@@ -143,15 +143,15 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1 — Deterministic (hot path):** 63 leaf OPA/Rego policies (+ 6 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1, Deterministic (hot path):** 63 leaf OPA/Rego policies (+ 6 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
 
-**Layer 2 — Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
+**Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
 
-Security products protect AI from bad actors. **ComplyEdge blocks EU AI Act violations at runtime — and logs a cited record on every decision.**
+Security products protect AI from bad actors. **ComplyEdge blocks EU AI Act violations at runtime: and logs a cited record on every decision.**
 
 ## Benchmark
 
-A 60-prompt corpus runs against the live API. The runner, prompt YAMLs, and the latest result JSON are committed under [`scripts/benchmark/`](scripts/benchmark) — inspect the results directly, or re-run with your own `COMPLYEDGE_API_KEY`.
+A 60-prompt corpus runs against the live API. The runner, prompt YAMLs, and the latest result JSON are committed under [`scripts/benchmark/`](scripts/benchmark): inspect the results directly, or re-run with your own `COMPLYEDGE_API_KEY`.
 
 ## Contributing
 
@@ -165,7 +165,7 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md). Do not open a public 
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE).
+Apache License 2.0: see [LICENSE](LICENSE).
 
 ## Links
 

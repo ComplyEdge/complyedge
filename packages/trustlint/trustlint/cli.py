@@ -281,15 +281,36 @@ def rules_update() -> None:
 
         home_rules.mkdir(parents=True, exist_ok=True)
 
+        # The archive-relative path is attacker-controlled if a release is ever
+        # tampered with, and `home_rules / relative` happily resolves "../".
+        # A member named ".../rules/regulations/../../../.bashrc.yaml" would
+        # write outside ~/.trustlint/rules entirely. Low likelihood (it is our
+        # own GitHub release) but a real traversal, and this command runs on a
+        # user's machine, so the blast radius is their home directory.
+        # Resolve and containment-check every destination before writing.
+        rules_root = home_rules.resolve()
+        skipped_unsafe = 0
         with tarfile.open(tmp_path, "r:gz") as tar:
             for member in tar.getmembers():
+                if not member.isfile():
+                    continue  # ignore dirs, symlinks and devices outright
                 if "/rules/regulations/" in member.name and member.name.endswith(".yaml"):
                     relative = member.name.split("/rules/regulations/", 1)[1]
-                    dest = home_rules / relative
+                    dest = (home_rules / relative).resolve()
+                    if not dest.is_relative_to(rules_root):
+                        skipped_unsafe += 1
+                        continue
                     dest.parent.mkdir(parents=True, exist_ok=True)
                     src = tar.extractfile(member)
                     if src:
                         dest.write_bytes(src.read())
+        if skipped_unsafe:
+            click.echo(
+                f"{RED}Refused {skipped_unsafe} archive entr"
+                f"{'y' if skipped_unsafe == 1 else 'ies'} that resolved outside "
+                f"~/.trustlint/rules{RESET}",
+                err=True,
+            )
 
         os.unlink(tmp_path)
         rule_count = sum(1 for _ in home_rules.rglob("*.yaml"))

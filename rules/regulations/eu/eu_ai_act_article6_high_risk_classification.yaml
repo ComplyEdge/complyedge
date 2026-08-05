@@ -1,6 +1,6 @@
 id: EU_AI_ACT_ART6_HIGH_RISK_CLASSIFICATION_001
 jurisdiction: EU
-effective_date: '2026-08-02'
+effective_date: '2027-12-02'
 description: >-
   Requires classification assessment and documentation before deploying AI systems
   listed in Annex III or used as safety components of Annex I products. AI systems
@@ -59,3 +59,7 @@ tags:
 - classification
 - annex-iii
 tier: enterprise
+
+compliance_notes:
+  - >-
+    Chapter III high-risk obligations were postponed by Regulation (EU) 2026/1744: Annex III high-risk systems apply from 2 December 2027, and high-risk systems embedded in products under Annex I from 2 August 2028. This rule is enforceable readiness tooling before those dates, not a currently binding obligation, and must not be presented as one.

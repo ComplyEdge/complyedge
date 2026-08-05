@@ -1,7 +1,7 @@
 # ComplyEdge — additional leaf tests
 # Run with: opa test rules/rego/ -v
 
-package complyedge.corpus_leaf_test
+package complyedge.corpus_depth_test
 
 import rego.v1
 
