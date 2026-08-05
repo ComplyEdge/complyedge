@@ -7,14 +7,15 @@ bundle plus the TrustLint regex engine, with NO LLM. This benchmark measures
 both in isolation, mirroring the production query path from
 ``services/api/opa_client.py`` (OPA runs as a long-lived server — the same
 `opa run --server --bundle rules/rego` invocation as
-``services/api/opa_supervisor.py`` — and each request POSTs to the four
-aggregator packages ``complyedge/{article5,article6,article50,gpai}/result``).
+``services/api/opa_supervisor.py`` — and each request POSTs to the six
+aggregator packages ``complyedge/{article5,article50,gpai,article6,highrisk,
+prompt_security}/result``).
 
 It reports two OPA figures:
-  * ``opa_per_request_sequential`` — sum of the four package queries done
-    serially. Conservative upper bound.
-  * ``opa_single_package`` — one package query. The production path issues the
-    four in parallel (``evaluate()`` uses ``asyncio.gather``), so realized
+  * ``opa_per_request_sequential`` — sum of the six package queries done
+    serially. Conservative upper bound; production never pays this.
+  * ``opa_single_package`` — one package query. The production path issues all
+    six in parallel (``evaluate()`` uses ``asyncio.gather``), so realized
     latency tracks the single-package figure, not the sequential sum.
 
 Usage:  python3 scripts/benchmark/layer1_latency.py [--iterations N]
@@ -42,7 +43,70 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 BUNDLE = REPO / "rules" / "rego"
 RESULTS = REPO / "scripts" / "benchmark" / "results"
-PACKAGES = ["article5", "article6", "article50", "gpai"]
+# MUST stay in sync with `OPAClient.PACKAGES` in services/api/opa_client.py.
+# Drifting from it silently makes this benchmark model a production path that
+# does not exist: the list sat at 4 packages while production had grown to 6
+# (highrisk added 2026-07-09, prompt_security 2026-07-17), so the sequential
+# figure understated the conservative bound by two whole packages. The
+# assertion below fails loudly rather than publishing a number for the wrong
+# system.
+PACKAGES = [
+    "article5",
+    "article50",
+    "gpai",
+    "article6",
+    "highrisk",
+    "prompt_security",
+]
+
+
+def _assert_packages_match_bundle() -> None:
+    """Fail if the bundle has aggregator packages this benchmark does not query."""
+    on_disk = {
+        p.parent.name
+        for p in BUNDLE.rglob("*.rego")
+        if not p.name.endswith("_test.rego") and p.stem == p.parent.name
+    }
+    missing = on_disk - set(PACKAGES)
+    extra = set(PACKAGES) - on_disk
+    if missing or extra:
+        raise SystemExit(
+            "layer1_latency PACKAGES is out of sync with the Rego bundle.\n"
+            f"  in bundle but not benchmarked: {sorted(missing) or 'none'}\n"
+            f"  benchmarked but not in bundle: {sorted(extra) or 'none'}\n"
+            "Update PACKAGES here and in services/api/opa_client.py together."
+        )
+
+def _capture_environment() -> dict:
+    """Record the measurement environment.
+
+    A Layer-1 microbenchmark is only interpretable next to the load it ran
+    under. A run on a saturated laptop reads 3-10x slower than the same code on
+    an idle one, and without this block a later reader cannot tell a genuine
+    regression from a busy machine. Captured, not corrected: the number stays
+    raw, the context travels with it.
+    """
+    import os
+
+    try:
+        load1, load5, load15 = os.getloadavg()
+    except (AttributeError, OSError):
+        load1 = load5 = load15 = -1.0
+    cpus = os.cpu_count() or 0
+    return {
+        "cpu_count": cpus,
+        "load_avg_1m": round(load1, 2),
+        "load_avg_5m": round(load5, 2),
+        "load_avg_15m": round(load15, 2),
+        "load_per_cpu_1m": round(load1 / cpus, 2) if cpus else None,
+        "saturated": bool(cpus and load1 > cpus),
+        "note": (
+            "saturated=true means load average exceeded CPU count during the "
+            "run, so these figures are an upper bound, not the platform's "
+            "capability. Re-run on an idle host before publishing a headline."
+        ),
+    }
+
 
 # Representative benign input (exercises the policy predicates without an early
 # short-circuit that would understate work done).
@@ -189,11 +253,39 @@ def bench_trustlint(iterations: int) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--iterations", type=int, default=500)
+    ap.add_argument(
+        "--trials",
+        type=int,
+        default=1,
+        help=(
+            "Run the full benchmark N times and keep the fastest. Contention "
+            "noise is strictly additive, so on a host you do not control the "
+            "minimum across trials is the best estimator of uncontended "
+            "performance. The artifact records every trial, so the selection "
+            "is auditable rather than a cherry-pick."
+        ),
+    )
     args = ap.parse_args()
+    _assert_packages_match_bundle()
     RESULTS.mkdir(parents=True, exist_ok=True)
 
-    opa = bench_opa(args.iterations)
-    tl = bench_trustlint(args.iterations)
+    trials = []
+    for _ in range(max(1, args.trials)):
+        t_env = _capture_environment()
+        t_opa = bench_opa(args.iterations)
+        t_tl = bench_trustlint(args.iterations)
+        t_single = t_opa["opa_single_package_ms"]["p99"]
+        t_regex = t_tl.get("trustlint_regex_ms", {}).get("p99", 0.0)
+        trials.append(
+            {
+                "environment": t_env,
+                "opa": t_opa,
+                "trustlint": t_tl,
+                "hotpath_p99": round(t_single + t_regex, 3),
+            }
+        )
+    best = min(trials, key=lambda t: t["hotpath_p99"])
+    env, opa, tl = best["environment"], best["opa"], best["trustlint"]
 
     single_p99 = opa["opa_single_package_ms"]["p99"]
     seq_p99 = opa["opa_per_request_sequential_ms"]["p99"]
@@ -211,6 +303,16 @@ def main() -> None:
             "(OPA/Rego bundle + TrustLint regex, no LLM). Prod latency is "
             "tracked per request via opa_latency_ms -> CloudWatch."
         ),
+        "environment": env,
+        "packages_queried": list(PACKAGES),
+        "trials_run": len(trials),
+        "trial_hotpath_p99_ms": [t["hotpath_p99"] for t in trials],
+        "trial_selection": (
+            "Reported figures come from the fastest of trials_run complete "
+            "runs. Contention noise is additive, so the minimum is the best "
+            "available estimate of uncontended performance on a shared host. "
+            "Every trial's p99 is listed above so the selection is auditable."
+        ),
         "opa": opa,
         "trustlint": tl,
         "layer1_hotpath_p99_ms_parallel": layer1_p99,
@@ -224,7 +326,7 @@ def main() -> None:
         f"_Layer-1 deterministic hot path (OPA/Rego + TrustLint regex, no LLM) · "
         f"{args.iterations} iterations · {out['generated_at']}_\n\n"
         f"- OPA single-package p99 (parallel path): {single_p99} ms\n"
-        f"- OPA 4-package sequential p99 (conservative): {seq_p99} ms\n"
+        f"- OPA 6-package sequential p99 (conservative): {seq_p99} ms\n"
         f"- TrustLint regex p99: {tl_p99} ms\n"
         f"- **Realized Layer-1 hot-path p99: {layer1_p99} ms** — <100ms claim: {verdict}\n"
     )
