@@ -1,7 +1,7 @@
 # ComplyEdge — article50 new-rule tests
 # Run with: opa test rules/rego/ -v
 
-package complyedge.article50_m33_test
+package complyedge.article50_corpus_test
 
 import rego.v1
 

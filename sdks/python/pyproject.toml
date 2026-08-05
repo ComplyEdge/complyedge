@@ -33,6 +33,11 @@ dependencies = [
     "tenacity>=8.0.0",
     "pydantic>=2.0.0",
     "click>=8.0",
+    # complyedge/cli.py imports yaml for `pre-deploy -f agent.yaml`. Undeclared
+    # until 2026-08-05, so that command raised ModuleNotFoundError on a clean
+    # install while the JSON path worked, i.e. a documented flag that failed
+    # only for the users who used it.
+    "pyyaml>=6.0",
 ]
 
 [project.scripts]

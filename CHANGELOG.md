@@ -12,7 +12,7 @@ packages and version independently.
 ### [0.2.5]
 - Corpus aligned to leaf-basis counting: **64 YAML rules** + **51 deterministic
   leaf OPA/Rego policies** (+ 5 package aggregators) across EU, US, global, and
-  universal jurisdictions — matching the live website and hosted API.
+  universal jurisdictions: matching the live website and hosted API.
 - Added EU AI Act leaf coverage (Art. 6 Annex III 5b/5c, Art. 6(3) derogation,
   GPAI open-source exemption, Article 50 emotion permitted-context notice).
 - Runtime benchmark results refreshed (see `scripts/benchmark/results/`).

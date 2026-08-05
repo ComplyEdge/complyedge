@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 from datetime import date
@@ -100,11 +101,18 @@ def _compare(actual: Any, op: str, expected: Any) -> bool:
     return False
 
 
+logger = logging.getLogger(__name__)
+
+
 class TrustLintEngine:
     """Loads YAML rules and evaluates text against Tier 1 regex patterns."""
 
     def __init__(self, rules_dir: Optional[str] = None):
         self.rules: list[Rule] = []
+        #: (path, reason) for every rule file that failed to load. Exposed so a
+        #: caller can assert the corpus loaded completely instead of trusting a
+        #: silent count.
+        self.skipped_files: list[tuple[str, str]] = []
         self._rules_dir = self._resolve_rules_dir(rules_dir)
         if self._rules_dir and self._rules_dir.exists():
             self._load_rules()
@@ -147,8 +155,22 @@ class TrustLintEngine:
                 rule = self._parse_rule_file(yaml_file)
                 if rule:
                     self.rules.append(rule)
-            except Exception:
-                continue  # Skip malformed files silently
+            except Exception as exc:
+                # Warn, do not swallow. A malformed rule file used to vanish
+                # with zero feedback, so a user following the README (whose
+                # example used `pattern:` where the schema requires `value:`)
+                # got a KeyError here, saw nothing, and believed their rule was
+                # active. Silence on a compliance rule that failed to load is
+                # the worst possible default: the corpus is quietly smaller
+                # than the operator thinks it is.
+                logger.warning(
+                    "Skipping malformed rule file %s: %s: %s",
+                    yaml_file,
+                    type(exc).__name__,
+                    exc,
+                )
+                self.skipped_files.append((str(yaml_file), f"{type(exc).__name__}: {exc}"))
+                continue
 
     @staticmethod
     def _build_pattern_info(pattern: str, description: str, flags_str: str) -> Optional[dict]:

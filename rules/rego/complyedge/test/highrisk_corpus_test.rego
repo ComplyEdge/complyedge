@@ -1,7 +1,7 @@
 # ComplyEdge — highrisk new-rule tests
 # Run with: opa test rules/rego/ -v
 
-package complyedge.highrisk_m33_test
+package complyedge.highrisk_corpus_test
 
 import rego.v1
 

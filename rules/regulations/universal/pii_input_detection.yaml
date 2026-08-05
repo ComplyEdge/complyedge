@@ -21,9 +21,15 @@ conditions:
 severity: high
 category: input_protection
 source:
-  regulation: Universal Privacy Principles
-  article: PII Protection
-  url: https://www.complyedge.com/universal-pii-protection
+  # NOT a statutory rule. "Universal Privacy Principles" is not a law, and the
+  # previous url pointed at complyedge.com, i.e. the corpus cited itself as the
+  # authority for its own rule. That is the shape of a claim a diligence
+  # reviewer flags immediately, and it dilutes the 63 rules that do cite real
+  # statutes. Relabelled as what it actually is: a cross-jurisdiction detection
+  # control that supports several regimes without being derived from any one.
+  regulation: ComplyEdge detection control (not statutory)
+  article: Cross-jurisdiction PII detection
+  url: https://github.com/ComplyEdge/complyedge/blob/main/rules/regulations/universal/pii_input_detection.yaml
 remediation:
   action: proactive_warn
   timing: proactive

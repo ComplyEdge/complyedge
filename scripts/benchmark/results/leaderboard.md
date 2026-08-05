@@ -13,7 +13,7 @@ _Methodology: v1.0_
 
 ## Leaderboard
 
-| Rank | Provider | Class | Art 50(2) Disclosure | Art 51 Classification | Art 52/53(1)(a-b) Tech Docs | Art 53(1)(c) Copyright | Art 53(1)(d-e) Downstream | Art 55 Systemic Risk | Aggregate | % Compliance | Status |
+| Rank | Provider | Class | Art 50(2) Disclosure | Art 51/52 Classification | Art 53(1)(a) Tech Docs | Art 53(1)(c) Copyright | Art 53(1)(b) Downstream | Art 55 Systemic Risk | Aggregate | % Compliance | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | **Google (DeepMind)** | closed_api | 2 | 2 | 3 | 2 | 3 | 3 | 15 / 18 | 83.3% | needs_review |
 | 2 | **Meta (Llama)** | open_weights | 1 | 2 | 3 | 2 | 3 | 3 | 14 / 18 | 77.8% | needs_review |

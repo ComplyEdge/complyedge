@@ -1,7 +1,7 @@
 # ComplyEdge — gpai new-rule tests
 # Run with: opa test rules/rego/ -v
 
-package complyedge.gpai_m33_test
+package complyedge.gpai_corpus_test
 
 import rego.v1
 
