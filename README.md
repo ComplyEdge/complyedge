@@ -2,6 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/complyedge)](https://pypi.org/project/complyedge/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![smithery badge](https://smithery.ai/badge/complyedge/complyedge)](https://smithery.ai/servers/complyedge/complyedge)
 
 Runtime compliance enforcement for AI agents. Not a scanner: runs in production, on every request.
 
