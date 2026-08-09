@@ -134,7 +134,6 @@ severity: critical
 conditions:
   - type: regex
     value: "prohibited pattern"
-    description: "Matches prohibited practice X"
 source:
   regulation: "EU AI Act"
   article: "Article Y(1)(z)"
