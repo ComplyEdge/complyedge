@@ -351,12 +351,36 @@ class TestSdkDefaults:
             f"__init__.py (sync + async client), found {len(matches)}"
         )
 
-    def test_sdk_version_matches_pyproject(self, init_source, pyproject):
-        # Sanity: published version matches what the source reports
-        pyproject_ver = pyproject["project"]["version"]
-        assert (
-            f'__version__ = "{pyproject_ver}"' in init_source
-        ), f"__version__ in __init__.py does not match pyproject.toml ({pyproject_ver})"
+    def test_sdk_version_is_single_sourced(self, init_source, pyproject):
+        """The version must exist in exactly one place.
+
+        This used to read pyproject["project"]["version"] and compare it to the
+        literal in __init__.py. That check is obsolete BECAUSE the underlying
+        bug was fixed properly: pyproject 0.2.4 vs __init__ 0.2.3 once shipped
+        a wheel whose User-Agent disagreed with its own PyPI version, so the
+        version became dynamic and is now derived FROM __init__.py. There is no
+        second literal left to disagree, and the test raised KeyError('version')
+        looking for one. Assert the wiring that makes divergence impossible
+        instead of re-comparing two values that are now the same value.
+        """
+        assert "version" in pyproject["project"].get("dynamic", []), (
+            "pyproject no longer declares a dynamic version; a hardcoded "
+            "version can drift from __init__.py again"
+        )
+        attr = (
+            pyproject.get("tool", {})
+            .get("setuptools", {})
+            .get("dynamic", {})
+            .get("version", {})
+            .get("attr")
+        )
+        assert attr == "complyedge.__version__", (
+            f"dynamic version should read complyedge.__version__, got {attr!r}"
+        )
+        assert re.search(r'__version__ = "\d+\.\d+\.\d+"', init_source), (
+            "__init__.py must carry a concrete semver __version__; it is the "
+            "single source the build reads"
+        )
 
     def test_decorator_enabled_by_default(self, decorator_source):
         # Claim: "@compliance_check decorator is enabled-by-default when API key is set"

@@ -25,6 +25,7 @@ source:
   article: 15 U.S.C. §§ 6501-6506
   url: https://www.ftc.gov/enforcement/rules/rulemaking-regulatory-reform-proceedings/childrens-online-privacy-protection-rule
   last_updated: '2013-07-01'
+  citation: "15 U.S.C. §6502(b)(1)(A)(ii): to obtain verifiable parental consent for the collection, use, or disclosure of personal information from children."
 remediation:
   action: require_consent
   timing: proactive

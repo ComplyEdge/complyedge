@@ -84,23 +84,25 @@ result = check(text, api_key=api_key, jurisdiction="EU")
 
 <!-- mcp-name: io.github.ComplyEdge/complyedge -->
 
+[![Smithery](https://img.shields.io/badge/Smithery-listed-6b46c1)](https://smithery.ai/servers/complyedge/complyedge)
+
 Agent/MCP tools that check prompts and outputs against ComplyEdge’s TrustLint
 corpus with article-cited findings — not another EU AI Act risk-tier chatbot
 and not a law-search database.
 
-ComplyEdge runs as an [MCP (Model Context Protocol)](https://modelcontextprotocol.io)
-stdio server for any MCP-compatible host (Claude, Cursor, Inspector).
+**Hosted Streamable HTTP (preferred for remote / Smithery Toolbox):**
+`https://mcp.complyedge.io/mcp`
 
 ```bash
-pip install 'complyedge[mcp]>=0.2.7'
+npx -y @smithery/cli@latest mcp add complyedge/complyedge --client cursor
 ```
 
-Start with either entrypoint:
+**Local stdio** for any MCP-compatible host (Claude, Cursor, Inspector):
 
 ```bash
+pip install 'complyedge[mcp]>=0.2.8'
 python -m complyedge.mcp_server
-# or
-complyedge-mcp
+# or: complyedge-mcp
 ```
 
 Add to your MCP client config (e.g. `claude_desktop_config.json`):

@@ -8,6 +8,7 @@ description: Multi-tier hybrid detection system combining regex pre-screening wi
 category: financial
 effective_date: '2002-07-30'
 source:
+  article: 15 U.S.C. §7241(a)(2)
   regulation: Sarbanes-Oxley Act of 2002
   title: Sarbanes-Oxley Act of 2002, Sections 302, 404, 906, 807
   url: https://www.congress.gov/bill/107th-congress/house-bill/3763
@@ -20,6 +21,7 @@ source:
   - 18 U.S.C. § 1520 (Section 807) - Criminal penalties for records destruction
   - SEC Staff Accounting Bulletin No. 99 - Materiality standard (5% threshold)
   - SEC Regulation FD - Fair Disclosure requirements
+  citation: "15 U.S.C. §7241(a)(2): based on the officer's knowledge, the report does not contain any untrue statement of a material fact or omit to state a material fact necessary in order to make the statements made, in light of the circumstances under which such statements were made, not misleading."
 conditions:
 - type: hybrid_detection
   tier1_config:

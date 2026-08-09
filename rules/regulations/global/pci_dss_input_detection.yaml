@@ -25,7 +25,11 @@ conditions:
 severity: high
 category: financial
 source:
-  regulation: PCI DSS
+  # NOT a statute. PCI DSS is a private industry standard published by the PCI
+  # Security Standards Council; its text sits behind the SSC's terms, so a
+  # verbatim quote is neither available nor licensable here. Labelled as a
+  # standard reference so it is not mistaken for an uncited law.
+  regulation: PCI DSS (industry standard, not statute)
   article: Requirement 3.4
   url: https://www.pcisecuritystandards.org/pci_security/
   last_updated: '2022-03-31'

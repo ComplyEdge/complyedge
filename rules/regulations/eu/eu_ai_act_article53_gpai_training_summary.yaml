@@ -34,7 +34,12 @@ category: prohibited_practice
 source:
   regulation: EU AI Act
   article: Article 53(1)(d)
-  url: https://artificialintelligenceact.eu/article/53/
+  # EUR-Lex, matching the other 29 EU AI Act rules. This pointed at
+  # artificialintelligenceact.eu, an unofficial mirror: useful for reading,
+  # not a citable source for a compliance product. The quoted text below was
+  # checked against the Official Journal itself (OJ L, 12.7.2024, p. 84,
+  # CELEX 32024R1689) on 2026-08-06 and matches verbatim.
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-06-13'
   citation: >-
     Regulation (EU) 2024/1689 (EU AI Act), Article 53(1): Providers of

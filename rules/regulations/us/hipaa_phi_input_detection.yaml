@@ -23,6 +23,7 @@ source:
   article: 45 CFR § 164.502
   url: https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html
   last_updated: '2013-01-25'
+  citation: "45 CFR §164.502(a) Standard. A covered entity or business associate may not use or disclose protected health information, except as permitted or required by this subpart or by subpart C of part 160 of this subchapter. §164.502(b)(1) Minimum necessary applies: When using or disclosing protected health information or when requesting protected health information from another covered entity or business associate, a covered entity or business associate must make reasonable efforts to limit protected health information to the minimum necessary to accomplish the intended purpose of the use, disclosure, or request."
 exceptions:
 - condition: General health education questions
   description: Questions about general health topics without personal details

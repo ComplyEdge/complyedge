@@ -53,7 +53,10 @@ Issues = "https://github.com/ComplyEdge/complyedge/issues"
 [project.optional-dependencies]
 agents = ["openai-agents>=0.2.7"]
 mcp = [
-    "mcp>=1.0.0,<2",
+    # >=1.9: CallToolResult / structuredContent + outputSchema validation.
+    # Older 1.1.x wraps handler returns as content=list(results) and breaks
+    # structured tool results (Smithery: "no structured output returned").
+    "mcp>=1.9.0,<2",
     "trustlint>=2.0.3",
 ]
 dev = [

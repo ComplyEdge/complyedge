@@ -20,7 +20,7 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import TextContent, Tool
+from mcp.types import CallToolResult, TextContent, Tool
 from trustlint.engine import TrustLintEngine
 
 logger = logging.getLogger("complyedge.mcp")
@@ -142,8 +142,18 @@ def _optional_jurisdiction(arguments: dict[str, Any]) -> str | None:
     return value
 
 
-def _json_content(payload: dict[str, Any]) -> list[TextContent]:
-    return [TextContent(type="text", text=json.dumps(payload))]
+def _tool_result(payload: dict[str, Any]) -> CallToolResult:
+    """Return structured + text content (required when Tool.outputSchema is set).
+
+    MCP Server validates structuredContent against outputSchema. Returning only
+    TextContent triggers \"outputSchema defined but no structured output returned\".
+    Returning a bare dict is unsafe on older SDKs that treat dict as an iterable
+    of content blocks (keys like \"status\"). CallToolResult is unambiguous.
+    """
+    return CallToolResult(
+        content=[TextContent(type="text", text=json.dumps(payload))],
+        structuredContent=payload,
+    )
 
 
 def _tool(
@@ -200,13 +210,13 @@ async def list_tools() -> list[Tool]:
 
 async def _check_compliance(
     engine: TrustLintEngine, arguments: dict[str, Any]
-) -> list[TextContent]:
+) -> CallToolResult:
     text = _require_str(arguments, "text")
     jurisdiction = _optional_jurisdiction(arguments)
     result = engine.check(text, jurisdiction=jurisdiction)
 
     if result.clean:
-        return _json_content(
+        return _tool_result(
             {
                 "status": "PASS",
                 "violations": [],
@@ -227,7 +237,7 @@ async def _check_compliance(
         }
         for v in result.violations
     ]
-    return _json_content(
+    return _tool_result(
         {
             "status": "FAIL",
             "violations": violations,
@@ -239,7 +249,7 @@ async def _check_compliance(
 
 async def _list_rules(
     engine: TrustLintEngine, arguments: dict[str, Any]
-) -> list[TextContent]:
+) -> CallToolResult:
     jurisdiction = _optional_jurisdiction(arguments)
     rules = engine.rules
     if jurisdiction:
@@ -255,17 +265,17 @@ async def _list_rules(
         }
         for r in sorted(rules, key=lambda r: (r.jurisdiction, r.severity, r.id))
     ]
-    return _json_content({"total": len(rules_list), "rules": rules_list})
+    return _tool_result({"total": len(rules_list), "rules": rules_list})
 
 
 async def _scan_prompt(
     engine: TrustLintEngine, arguments: dict[str, Any]
-) -> list[TextContent]:
+) -> CallToolResult:
     prompt = _require_str(arguments, "prompt")
     result = engine.check(prompt)
 
     if result.clean:
-        return _json_content(
+        return _tool_result(
             {
                 "status": "SAFE",
                 "message": "Prompt contains no detectable compliance risks.",
@@ -283,7 +293,7 @@ async def _scan_prompt(
         }
         for v in result.violations
     ]
-    return _json_content(
+    return _tool_result(
         {
             "status": "RISK_DETECTED",
             "risks": risks,
@@ -297,7 +307,9 @@ async def _scan_prompt(
 
 
 @server.call_tool()
-async def call_tool(name: str, arguments: dict[str, Any] | None) -> list[TextContent]:
+async def call_tool(
+    name: str, arguments: dict[str, Any] | None
+) -> CallToolResult:
     """Dispatch a tool call. Unknown tools and bad args raise (isError=True)."""
     args = arguments or {}
     # Never log user text/prompt payloads (protocol_hygiene_stdio).

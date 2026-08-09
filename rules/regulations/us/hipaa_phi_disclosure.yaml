@@ -22,6 +22,7 @@ source:
   article: 45 CFR § 164.502
   url: https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html
   last_updated: '2013-01-25'
+  citation: "45 CFR §164.502(a) Standard. A covered entity or business associate may not use or disclose protected health information, except as permitted or required by this subpart or by subpart C of part 160 of this subchapter."
 exceptions:
 - condition: Treatment, payment, or healthcare operations
   description: PHI may be used/disclosed for TPO without authorization

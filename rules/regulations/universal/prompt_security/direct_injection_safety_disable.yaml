@@ -1,37 +1,34 @@
 id: PROMPT_SECURITY_DIRECT_INJECTION_SAFETY_DISABLE_001
 jurisdiction: GLOBAL
 effective_date: '2026-07-05'
-description: >-
-  Detects direct prompt injection that asks the assistant to disable or bypass
-  its safety filters, content policy, or guardrails. EU AI Act Article 15
-  robustness Layer-1 catch. OWASP LLM01.
+description: Detects direct prompt injection that asks the assistant to disable or bypass its safety filters,
+  content policy, or guardrails. EU AI Act Article 15 robustness Layer-1 catch. OWASP LLM01.
 title: Direct prompt injection — disable safety controls
 detection_scope: user_input
 conditions:
 - type: regex
-  value: >-
-    (?i)\b(?:disable|turn\s+off|deactivate|switch\s+off|remove|bypass|circumvent|ignore)\s+(?:your\s+|all\s+|any\s+|the\s+|every\s+)*(?:safety\s+(?:filters?|guidelines?|guardrails?|protocols?|checks?)|content\s+(?:policy|policies|filters?|moderation)|(?:ethical|moral)\s+(?:guidelines?|constraints?)|guardrails?|restrictions?|safeguards?)\b
+  value: (?i)\b(?:disable|turn\s+off|deactivate|switch\s+off|remove|bypass|circumvent|ignore)\s+(?:your\s+|all\s+|any\s+|the\s+|every\s+)*(?:safety\s+(?:filters?|guidelines?|guardrails?|protocols?|checks?)|content\s+(?:policy|policies|filters?|moderation)|(?:ethical|moral)\s+(?:guidelines?|constraints?)|guardrails?|restrictions?|safeguards?)\b
   flags: i
 severity: high
 category: security
 source:
   regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
   article: Regulation (EU) 2024/1689, Article 15
-  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
-  citation: >-
-    OWASP LLM Top 10 — LLM01: Prompt Injection. Article 15 requires high-risk AI
-    systems to be robust against adversarial input; instructions to disable
-    safety filters directly attack that robustness control.
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  citation: 'Regulation (EU) 2024/1689 (EU AI Act), Article 15(5): "High-risk AI systems shall be resilient
+    against attempts by unauthorised third parties to alter their use, outputs or performance by exploiting
+    system vulnerabilities. The technical solutions aiming to ensure the cybersecurity of high-risk AI
+    systems shall be appropriate to the relevant circumstances and the risks."'
   last_updated: '2026-07-05'
+  citations:
+  - 'Secondary reference (not the legal basis): OWASP Top 10 for LLM Applications, https://owasp.org/www-project-top-10-for-large-language-model-applications/'
 remediation:
   action: block
   timing: proactive
-  message: >-
-    🛡️ Prompt injection detected — an attempt to disable the assistant's safety
-    filters or content policy. Blocked.
-  suggestion: >-
-    Safety controls cannot be disabled by request. If a legitimate output is
-    being over-blocked, describe the specific goal instead.
+  message: 🛡️ Prompt injection detected — an attempt to disable the assistant's safety filters or content
+    policy. Blocked.
+  suggestion: Safety controls cannot be disabled by request. If a legitimate output is being over-blocked,
+    describe the specific goal instead.
   allow_override: false
   require_explicit_consent: false
 version: 1.0.0

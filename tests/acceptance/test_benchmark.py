@@ -1,10 +1,19 @@
 """
-OFFLINE — Validates the published benchmark results file (50 prompts, 6 categories).
+OFFLINE — Validates the published benchmark results file (60 prompts, 7 categories).
 No API key required.
 
+The counts here were frozen at the 50-prompt/6-category snapshot and went red
+when the prompt_security group landed and took runtime detection from 81.4% to
+100%. A correct improvement should not fail an acceptance suite, so the size
+assertions now check the file against ITS OWN declared aggregate (which catches
+a truncated or stale artifact, the failure that actually matters) plus the
+number published on the public surfaces, and the latency tests assert a sample
+FLOOR rather than an exact n.
+
 Claims verified:
-  - "50-prompt benchmark corpus"
-  - "6 categories: Article 5, Article 50, GPAI, safe harbor, edge cases, US corpus"
+  - "60-prompt benchmark corpus"
+  - "7 categories: Article 5, Article 50, GPAI, prompt security, safe harbor,
+    edge cases, US corpus"
   - "10/10 safe-harbor prompts returned 0 violations (zero false positives)"
   - "US corpus: all 10 prompts handled by hybrid/Layer 2 (0 on OPA path)"
   - Benchmark results file is present and well-formed
@@ -24,10 +33,19 @@ EXPECTED_CATEGORIES = {
     "article5",
     "article50",
     "gpai",
+    "prompt_security",
     "safe_harbor",
     "edge",
     "us_corpus",
 }
+
+#: The count published on README/enterprise/blog. Keep in step with those
+#: surfaces; a mismatch here means a public number is unbacked by the artifact.
+PUBLISHED_PROMPT_COUNT = 60
+
+#: Minimum true OPA fast-path blocks needed for the latency percentiles to mean
+#: anything. A floor, not a snapshot: the corpus is expected to grow.
+MIN_OPA_FAST_PATH_SAMPLES = 15
 REQUIRED_FIELDS = {
     "id",
     "category",
@@ -63,18 +81,33 @@ class TestBenchmarkIntegrity:
         # Claim: benchmark data is publicly verifiable
         assert BENCHMARK_FILE.exists(), f"Benchmark file not found at {BENCHMARK_FILE}"
 
-    def test_benchmark_has_50_results(self, results):
-        # Claim: "50-prompt benchmark corpus"
-        assert (
-            len(results) == 50
-        ), f"Expected 50 benchmark results, found {len(results)}"
+    def test_results_match_the_artifacts_own_declared_total(self, benchmark, results):
+        """Internal consistency: the file must not disagree with itself.
 
-    def test_benchmark_has_6_categories(self, results):
-        # Claim: "6 categories"
+        This is the assertion with teeth. A truncated or half-written artifact
+        keeps a plausible aggregate while losing rows, and every percentile
+        computed from it is then quietly wrong.
+        """
+        declared = benchmark["aggregate"]["total_prompts"]
+        assert len(results) == declared, (
+            f"artifact declares total_prompts={declared} but carries "
+            f"{len(results)} result rows"
+        )
+
+    def test_result_count_matches_the_published_number(self, results):
+        # Claim: "60-prompt benchmark corpus" on README/enterprise/blog.
+        assert len(results) == PUBLISHED_PROMPT_COUNT, (
+            f"benchmark holds {len(results)} prompts but public surfaces claim "
+            f"{PUBLISHED_PROMPT_COUNT}; correct one or the other before shipping"
+        )
+
+    def test_benchmark_covers_every_expected_category(self, results):
+        # Claim: "7 categories"
         found = {r["category"] for r in results}
-        assert (
-            found == EXPECTED_CATEGORIES
-        ), f"Expected categories {EXPECTED_CATEGORIES}, found {found}"
+        assert found == EXPECTED_CATEGORIES, (
+            f"category set drift: missing {EXPECTED_CATEGORIES - found}, "
+            f"unexpected {found - EXPECTED_CATEGORIES}"
+        )
 
     def test_every_result_has_required_fields(self, results):
         # Structural: every result must carry the fields the API contract guarantees
@@ -106,9 +139,10 @@ class TestBenchmarkIntegrity:
             for r in blocked_opa
             if r.get("api_latency_ms") is not None
         ]
-        assert (
-            len(latencies) == 15
-        ), f"Expected 15 OPA fast-path blocks, got {len(latencies)}"
+        assert len(latencies) >= MIN_OPA_FAST_PATH_SAMPLES, (
+            f"only {len(latencies)} OPA fast-path blocks; too few for the "
+            "percentiles below to be meaningful"
+        )
         p50 = statistics.median(latencies)
         assert (
             p50 <= 200
@@ -125,7 +159,7 @@ class TestBenchmarkIntegrity:
             for r in blocked_opa
             if r.get("api_latency_ms") is not None
         ]
-        assert len(latencies) == 15
+        assert len(latencies) >= MIN_OPA_FAST_PATH_SAMPLES
         p99 = statistics.quantiles(latencies, n=100)[98]
         assert (
             p99 <= 250
