@@ -20,13 +20,70 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import CallToolResult, TextContent, Tool
+from mcp.types import CallToolResult, TextContent, Tool, ToolAnnotations
 from trustlint.engine import TrustLintEngine
 
 logger = logging.getLogger("complyedge.mcp")
 
 # Deterministic tools/list order (load-bearing for hosts + registry copy).
 TOOL_NAMES = ("check_compliance", "list_rules", "scan_prompt")
+
+# TrustLint offline tools are read-only and idempotent (TDR-04 / Glama TD-03).
+TOOL_ANNOTATIONS = ToolAnnotations(readOnlyHint=True, idempotentHint=True)
+
+# Shared with mcp_http so stdio/HTTP surfaces cannot drift (Glama A1–A5).
+TOOL_DESCRIPTIONS: dict[str, str] = {
+    "check_compliance": (
+        "Check already-produced text (model input or output) against "
+        "ComplyEdge TrustLint offline YAML rules (regex corpus). Use "
+        "for post-hoc evaluation of text that already exists; for "
+        "pre-generation screening of a prompt about to be sent, use "
+        "scan_prompt. Argument `text` must be non-empty content to "
+        "evaluate (empty/whitespace is rejected before any rule "
+        "runs; this is not a system-risk questionnaire). Optional "
+        "`jurisdiction` is EU, US, or GLOBAL; omit it to evaluate "
+        "the full corpus. GLOBAL is a separate corpus tag, not the "
+        "union of EU and US — reuse the same token you used with "
+        "list_rules for a scoped check. Runs fully offline — no "
+        "network call, no API key, no credentials stored, no writes "
+        "outside the process, read-only and idempotent; "
+        "deterministic regex match against the bundled corpus; does "
+        "not classify AI-system risk tiers or call any remote API. "
+        "Returns PASS/FAIL with rule ID, severity, citation, and "
+        "remediation."
+    ),
+    "list_rules": (
+        "List TrustLint offline compliance rules in the ComplyEdge "
+        "corpus — the discovery tool; returns no PASS/FAIL or "
+        "SAFE/RISK verdict. Use it to scope a jurisdiction before "
+        "calling check_compliance; do not use it to evaluate text. "
+        "Optional `jurisdiction` is EU, US, or GLOBAL; omit it to "
+        "list the full corpus. GLOBAL is a separate corpus tag, not "
+        "EU∪US — pass that exact token into check_compliance next "
+        "for a consistent scoped evaluation. Returned `total` is "
+        "the post-filter count. Runs fully offline — no network "
+        "call, no API key, no credentials stored, no writes outside "
+        "the process, read-only and idempotent. Returns rule IDs, "
+        "titles, severities, jurisdictions, and categories."
+    ),
+    "scan_prompt": (
+        "Scan an AI prompt with ComplyEdge TrustLint offline YAML "
+        "rules (regex corpus) before generation — pre-generation "
+        "only. Use when the prompt is about to be sent; for post-hoc "
+        "evaluation of already-produced text, use check_compliance. "
+        "Argument `prompt` must be a non-empty candidate prompt "
+        "about to be sent to a model (empty/whitespace is rejected; "
+        "not already-produced output). This tool has no "
+        "jurisdiction filter — it always evaluates the full "
+        "bundled corpus. Runs fully offline — no network call, no "
+        "API key, no credentials stored, no writes outside the "
+        "process, read-only and idempotent; deterministic regex "
+        "match against the bundled corpus; does not classify "
+        "AI-system risk tiers or call any remote API. Returns SAFE "
+        "or RISK_DETECTED with cited findings from the offline "
+        "regex corpus."
+    ),
+}
 
 _JURISDICTION_ENUM = ["EU", "US", "GLOBAL"]
 
@@ -35,11 +92,20 @@ _CHECK_COMPLIANCE_SCHEMA: dict[str, Any] = {
     "properties": {
         "text": {
             "type": "string",
-            "description": "The text to check for compliance violations",
+            "description": (
+                "Non-empty already-produced content to evaluate "
+                "(model input or output). Empty/whitespace is "
+                "rejected before rules run; not a system-risk "
+                "questionnaire."
+            ),
         },
         "jurisdiction": {
             "type": "string",
-            "description": "Filter by jurisdiction: EU, US, or GLOBAL. Omit for all.",
+            "description": (
+                "Corpus scope: EU, US, or GLOBAL. Omit to evaluate "
+                "the full corpus. GLOBAL is a separate tag, not "
+                "EU∪US — reuse the same token from list_rules."
+            ),
             "enum": _JURISDICTION_ENUM,
         },
     },
@@ -51,7 +117,11 @@ _LIST_RULES_SCHEMA: dict[str, Any] = {
     "properties": {
         "jurisdiction": {
             "type": "string",
-            "description": "Filter by jurisdiction: EU, US, or GLOBAL. Omit for all.",
+            "description": (
+                "Corpus scope: EU, US, or GLOBAL. Omit to list the "
+                "full corpus. GLOBAL is a separate tag, not EU∪US — "
+                "pass the same token into check_compliance next."
+            ),
             "enum": _JURISDICTION_ENUM,
         },
     },
@@ -62,7 +132,11 @@ _SCAN_PROMPT_SCHEMA: dict[str, Any] = {
     "properties": {
         "prompt": {
             "type": "string",
-            "description": "The prompt text to scan before generation",
+            "description": (
+                "Non-empty candidate prompt about to be sent to a "
+                "model (pre-generation). Empty/whitespace is "
+                "rejected; not already-produced output."
+            ),
         },
     },
     "required": ["prompt"],
@@ -168,6 +242,7 @@ def _tool(
         description=description,
         inputSchema=input_schema,
         outputSchema=output_schema,
+        annotations=TOOL_ANNOTATIONS,
     )
 
 
@@ -177,31 +252,19 @@ async def list_tools() -> list[Tool]:
     return [
         _tool(
             "check_compliance",
-            (
-                "Check text against ComplyEdge TrustLint offline YAML rules "
-                "(regex corpus). Returns PASS/FAIL with rule ID, severity, "
-                "citation, and remediation."
-            ),
+            TOOL_DESCRIPTIONS["check_compliance"],
             _CHECK_COMPLIANCE_SCHEMA,
             _CHECK_COMPLIANCE_OUTPUT,
         ),
         _tool(
             "list_rules",
-            (
-                "List TrustLint offline compliance rules in the ComplyEdge "
-                "corpus. Returns rule IDs, titles, severities, jurisdictions, "
-                "and categories."
-            ),
+            TOOL_DESCRIPTIONS["list_rules"],
             _LIST_RULES_SCHEMA,
             _LIST_RULES_OUTPUT,
         ),
         _tool(
             "scan_prompt",
-            (
-                "Pre-generation TrustLint scan of an AI prompt. Returns SAFE "
-                "or RISK_DETECTED with cited findings from the offline regex "
-                "corpus."
-            ),
+            TOOL_DESCRIPTIONS["scan_prompt"],
             _SCAN_PROMPT_SCHEMA,
             _SCAN_PROMPT_OUTPUT,
         ),

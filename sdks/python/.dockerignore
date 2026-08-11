@@ -1,0 +1,18 @@
+# Keep the Glama / Docker build context = package + metadata only (DF-03).
+*.egg-info
+**/__pycache__
+**/*.pyc
+**/*.pyo
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.venv
+venv
+mcpb
+server.json
+glama.json
+mcp_stdio_server_intent.yaml
+.complyedge-public
+.git
+*.md
+!README.md
