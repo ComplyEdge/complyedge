@@ -32,8 +32,7 @@ pattern_match if {
 
 rule_id := "rego-art14-001"
 
-citation := "Regulation (EU) 2024/1689, Article 14: High-risk AI systems must be designed to be effectively overseen by natural persons during the period in which they are in use."
-
+citation := "Regulation (EU) 2024/1689, Article 14: High-risk AI systems shall be designed and developed in such a way, including with appropriate human-machine interface tools, that they can be effectively overseen by natural persons during the period in which they are in use. Human oversight shall aim to prevent or minimise the risks to health, safety or fundamental rights that may emerge when a high-risk AI system is used in accordance with its intended purpose or under conditions of reasonably foreseeable misuse."
 severity := "high"
 
 remediation := "Design effective human oversight measures for the high-risk AI system."

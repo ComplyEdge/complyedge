@@ -32,8 +32,7 @@ pattern_match if {
 
 rule_id := "rego-art5-1e-001"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(e): Prohibits the creation or expansion of facial recognition databases through the untargeted scraping of facial images from the internet or CCTV footage."
-
+citation := "Regulation (EU) 2024/1689, Article 5(1)(e): the placing on the market, the putting into service for this specific purpose, or the use of AI systems that create or expand facial recognition databases through the untargeted scraping of facial images from the internet or CCTV footage."
 severity := "critical"
 
 remediation := "Do not build or expand facial recognition databases via untargeted scraping of facial images from the internet or CCTV."

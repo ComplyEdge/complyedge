@@ -45,8 +45,7 @@ subliminal_pattern_match if {
 
 rule_id := "rego-art5-1a-001"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(a): Prohibits AI systems that deploy subliminal techniques beyond a person's consciousness or purposefully manipulative or deceptive techniques, with the objective or effect of materially distorting behaviour causing significant harm."
-
+citation := "Regulation (EU) 2024/1689, Article 5(1)(a): The placing on the market, the putting into service or the use of AI systems that deploy subliminal techniques beyond a person's consciousness or purposefully manipulative or deceptive techniques, with the objective or the effect of materially distorting the behaviour of a person or a group of persons by appreciably impairing their ability to make an informed decision, thereby causing them to take a decision that they would not have otherwise taken, in a manner that causes or is reasonably likely to cause that person, another person or group of persons significant harm."
 severity := "critical"
 
 remediation := "Remove any subliminal, manipulative, or deceptive techniques designed to distort user behaviour. Ensure AI interactions are transparent and do not impair informed decision-making."

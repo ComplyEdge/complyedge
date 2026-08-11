@@ -40,8 +40,7 @@ pattern_match if {
 
 rule_id := "rego-art50-3-002"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(f) exception + Article 50(3): Even where emotion recognition is permitted for medical or safety reasons, natural persons exposed to it must be informed."
-
+citation := "Regulation (EU) 2024/1689, Article 5(1)(f): The placing on the market, the putting into service for this specific purpose, or the use of AI systems to infer emotions of a natural person in the areas of workplace and education institutions, except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons."
 severity := "high"
 
 remediation := "If emotion recognition is deployed for a lawful medical or safety purpose, inform exposed natural persons of its operation per Article 50(3). Document the permitted-context basis."

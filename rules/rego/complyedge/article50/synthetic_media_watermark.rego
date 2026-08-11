@@ -40,8 +40,7 @@ synthetic_media_watermark_pattern_match if {
 
 rule_id := "rego-art50-2-002"
 
-citation := "Regulation (EU) 2024/1689, Article 50(2): AI-generated synthetic media must carry embedded watermarks to enable detection of artificial origin and be robust against common transformations."
-
+citation := "Regulation (EU) 2024/1689, Article 50(2): Providers of AI systems, including general purpose AI systems, generating synthetic audio, image, video or text content, shall ensure that the outputs of the AI system are marked in a machine-readable format and detectable as artificially generated or manipulated."
 severity := "high"
 
 remediation := "Embed robust watermarks into all AI-generated synthetic media (images, video, audio) that survive common transformations such as compression, cropping, and format conversion."

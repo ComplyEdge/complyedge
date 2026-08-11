@@ -180,3 +180,84 @@ class TestMalformedRulesAreNotSilent:
         eng = TrustLintEngine(rules_dir=str(REGS))
         assert eng.skipped_files == [], f"rules failed to load: {eng.skipped_files}"
         assert len(eng.rules) == 64
+
+
+class TestRegoCitationsMatchTheRegulationCorpus:
+    """The Rego `citation` string is what the API returns as
+    `rule_description`, and it is what a buyer reads in the audit export.
+
+    Incident: every one of the 40 Rego citations that had a regulation+article
+    sibling in rules/regulations/ was a hand-written paraphrase, not the
+    statutory text. For Article 5(1)(c) the shipped string dropped "over a
+    certain period of time", "known, inferred or predicted", and the "either
+    or both" (i)/(ii) structure. The substance of the block was right; the
+    quoted law was not, which is the one claim a paid "regulator-ready" pack
+    rests on. Counsel comparing an export to EUR-Lex would have found it.
+
+    The YAML corpus is the audited source of truth for citations. This asserts
+    the Rego copies have not drifted from it again.
+    """
+
+    @staticmethod
+    def _yaml_citations():
+        import yaml as _y
+
+        out = {}
+        for f in REGS.rglob("*.yaml"):
+            d = _y.safe_load(f.read_text()) or {}
+            src = d.get("source") or {}
+            reg, art, cit = src.get("regulation"), src.get("article"), src.get("citation")
+            if reg and art and cit:
+                out.setdefault((str(reg).strip(), str(art).strip()), []).append((f.stem, cit))
+        return out
+
+    @staticmethod
+    def _rego_files():
+        return sorted((ROOT / "rules/rego/complyedge").rglob("*.rego"))
+
+    def test_rego_citation_equals_its_regulation_sibling(self):
+        import re as _re
+
+        ymap = self._yaml_citations()
+        drifted = []
+        for f in self._rego_files():
+            txt = f.read_text()
+            m = _re.search(r'^citation := "(.*)"\s*$', txt, _re.M)
+            if not m:
+                continue
+            head_m = _re.search(r"^# Legal citation:\s*(.+)$", txt, _re.M)
+            head = head_m.group(1) if head_m else ""
+            art_m = _re.search(r"(Article\s+[0-9]+(?:\([0-9a-z]+\))*)", head)
+            art = art_m.group(1) if art_m else None
+            reg = (
+                "EU AI Act"
+                if "2024/1689" in head
+                else ("GDPR" if "GDPR" in head or "2016/679" in head else None)
+            )
+            cands = ymap.get((reg, art), [])
+            if len(cands) > 1:
+                cands = [c for c in cands if c[0].endswith(f.stem)]
+            if len(cands) != 1:
+                # No unambiguous sibling: not covered by the corpus, and not
+                # something this test can invent an answer for.
+                continue
+            if cands[0][1] != m.group(1):
+                drifted.append(f.name)
+        assert not drifted, (
+            "Rego citations no longer quote their regulation corpus sibling "
+            f"(the API returns these verbatim as rule_description): {drifted}"
+        )
+
+    def test_the_article5_1c_citation_carries_the_clauses_that_were_dropped(self):
+        """Anchored on the exact fragments the paraphrase omitted, so a future
+        rewrite that is merely longer does not pass by accident."""
+        import re as _re
+
+        f = ROOT / "rules/rego/complyedge/article5/social_scoring.rego"
+        cit = _re.search(r'^citation := "(.*)"\s*$', f.read_text(), _re.M).group(1)
+        for fragment in (
+            "over a certain period of time",
+            "known, inferred or predicted",
+            "either or both",
+        ):
+            assert fragment in cit, f"Article 5(1)(c) citation lost {fragment!r}"

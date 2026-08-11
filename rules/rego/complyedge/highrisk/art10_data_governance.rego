@@ -32,8 +32,7 @@ pattern_match if {
 
 rule_id := "rego-art10-001"
 
-citation := "Regulation (EU) 2024/1689, Article 10: High-risk AI systems using data-training techniques must be developed on training, validation, and testing datasets that meet quality, representativeness, and governance criteria."
-
+citation := "Regulation (EU) 2024/1689, Article 10: Training, validation and testing data sets shall be subject to data governance and management practices appropriate for the intended purpose of the high-risk AI system. Training, validation and testing data sets shall be relevant, sufficiently representative, and to the best extent possible, free of errors and complete in view of the intended purpose."
 severity := "high"
 
 remediation := "Apply data governance ensuring training data is relevant, representative, and appropriately vetted."

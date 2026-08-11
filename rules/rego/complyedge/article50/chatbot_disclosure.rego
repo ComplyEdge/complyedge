@@ -41,8 +41,7 @@ chatbot_disclosure_pattern_match if {
 
 rule_id := "rego-art50-1-001"
 
-citation := "Regulation (EU) 2024/1689, Article 50(1): Providers shall ensure that AI systems intended to interact directly with natural persons inform the user that they are interacting with an AI system."
-
+citation := "Regulation (EU) 2024/1689, Article 50(1): Providers shall ensure that AI systems intended to interact directly with natural persons are designed and developed in such a way that the natural persons concerned are informed that they are interacting with an AI system, unless this is obvious from the point of view of a natural person who is reasonably well-informed, observant and circumspect, taking into account the circumstances and the context of use. This obligation shall not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties."
 severity := "high"
 
 remediation := "Ensure all chatbots and AI-powered conversational agents clearly disclose their AI nature to users at the start of interactions. Do not impersonate or pose as a human."

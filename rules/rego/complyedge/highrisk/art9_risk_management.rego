@@ -32,8 +32,7 @@ pattern_match if {
 
 rule_id := "rego-art9-001"
 
-citation := "Regulation (EU) 2024/1689, Article 9: A risk management system must be established, implemented, documented, and maintained throughout the entire lifecycle of a high-risk AI system."
-
+citation := "Regulation (EU) 2024/1689, Article 9: A risk management system shall be established, implemented, documented and maintained in relation to high-risk AI systems. The risk management system shall be understood as a continuous iterative process planned and run throughout the entire lifecycle of a high-risk AI system, requiring regular systematic review and updating."
 severity := "high"
 
 remediation := "Establish and maintain a lifecycle risk-management system for the high-risk AI system."

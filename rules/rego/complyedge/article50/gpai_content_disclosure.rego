@@ -47,8 +47,7 @@ gpai_content_disclosure_pattern_match if {
 
 rule_id := "rego-art50-2-001"
 
-citation := "Regulation (EU) 2024/1689, Article 50(2): Providers of AI systems generating synthetic content shall ensure outputs are marked in a machine-readable format and detectable as artificially generated or manipulated."
-
+citation := "Regulation (EU) 2024/1689, Article 50(2): Providers of AI systems, including general purpose AI systems, generating synthetic audio, image, video or text content, shall ensure that the outputs of the AI system are marked in a machine-readable format and detectable as artificially generated or manipulated. Providers shall ensure their technical solutions are effective, interoperable, robust and reliable as far as this is technically feasible, taking into account the specificities and limitations of various types of content, the costs of implementation and the generally acknowledged state of the art, as may be reflected in relevant technical standards."
 severity := "high"
 
 remediation := "Implement machine-readable markers and disclosure labels on all AI-generated synthetic content (text, audio, image, video) to ensure outputs are detectable as artificially generated."

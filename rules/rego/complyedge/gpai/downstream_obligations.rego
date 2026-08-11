@@ -49,8 +49,7 @@ downstream_obligations_pattern_match if {
 
 rule_id := "rego-gpai-53b-001"
 
-citation := "Regulation (EU) 2024/1689, Article 53(1)(b): Providers of general-purpose AI models shall draw up, keep up-to-date and make available information and documentation to providers of AI systems who intend to integrate the GPAI model into their AI systems, enabling them to understand the model's capabilities and limitations and to comply with their obligations under this Regulation, containing at a minimum the elements set out in Annex XII."
-
+citation := "Regulation (EU) 2024/1689, Article 53(1)(b): Providers of general-purpose AI models shall draw up, keep up-to-date and make available information and documentation to providers of AI systems who intend to integrate the general-purpose AI model into their AI systems; the information shall enable downstream providers to understand the capabilities and limitations of the GPAI model and to comply with their obligations under this Regulation, and shall contain, at a minimum, the elements set out in Annex XII."
 severity := "high"
 
 remediation := "Provide comprehensive documentation and integration guidance to downstream providers. Include model capabilities, limitations, intended use cases, and compliance requirements to enable downstream regulatory compliance."

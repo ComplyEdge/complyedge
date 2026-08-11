@@ -1,0 +1,47 @@
+id: PROMPT_SECURITY_EXFIL_TRAINING_DATA_EXTRACTION_001
+jurisdiction: GLOBAL
+effective_date: '2026-07-05'
+description: >-
+  Detects training-data extraction attacks: "repeat a word forever" divergence
+  prompts and requests to output verbatim memorised/training text. EU AI Act
+  Article 15. OWASP LLM01 / LLM06.
+title: Injection exfiltration — training-data extraction
+detection_scope: user_input
+conditions:
+- type: regex
+  value: >-
+    (?i)(?:repeat\s+(?:the\s+word\s+)?["']?\w+["']?\s+(?:forever|infinitely|endlessly|(?:a\s+)?(?:thousand|million|hundred|billion)\s+times|until\s+you\s+(?:run\s+out|stop|break))|(?:output|print|reproduce|recite|dump|leak)\s+(?:your\s+)?(?:verbatim\s+)?(?:training\s+data|memori[sz]ed\s+(?:text|data|content|examples?)|(?:the\s+)?verbatim\s+(?:training|memori[sz]ed)\s+\w+))
+  flags: i
+severity: high
+category: security
+source:
+  regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
+  article: Regulation (EU) 2024/1689, Article 15
+  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  citation: >-
+    OWASP LLM Top 10 — LLM01/LLM06. "Divergence" repeat-forever prompts and
+    verbatim-training-data requests are documented memorisation-extraction
+    attacks; Article 15 robustness/cybersecurity requires resistance.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛡️ Blocked — this input matches a training-data extraction pattern
+    ("repeat forever" / dump memorised text).
+  suggestion: >-
+    Request generated content rather than verbatim reproduction of memorised or
+    training text.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- prompt_injection
+- ipi
+- data_exfiltration
+- training_data_extraction
+- divergence_attack
+- article_15
+- owasp_llm01
+- security
+tier: community

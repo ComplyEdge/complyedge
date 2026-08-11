@@ -45,8 +45,7 @@ model_classification_pattern_match if {
 
 rule_id := "rego-gpai-51-001"
 
-citation := "Regulation (EU) 2024/1689, Article 51: Providers of general-purpose AI models must classify their models according to the regulatory criteria, including assessment of systemic risk."
-
+citation := "Regulation (EU) 2024/1689, Article 51: The Commission shall classify a general-purpose AI model as a general-purpose AI model with systemic risk if it meets any of the criteria referred to in paragraph 1. A provider that has a general-purpose AI model that meets those criteria shall notify the AI Office without delay and in any event within two weeks after those criteria are met."
 severity := "high"
 
 remediation := "Classify the general-purpose AI model according to Article 51 criteria. Determine whether the model presents systemic risks and register the classification with the relevant authority."

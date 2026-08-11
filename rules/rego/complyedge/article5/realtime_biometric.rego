@@ -39,8 +39,7 @@ realtime_biometric_pattern_match if {
 
 rule_id := "rego-art5-1h-001"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(h): Prohibits the use of real-time remote biometric identification systems in publicly accessible spaces for law enforcement purposes, except in narrowly defined circumstances."
-
+citation := "Regulation (EU) 2024/1689, Article 5(1)(h): The use of real-time remote biometric identification systems in publicly accessible spaces for the purposes of law enforcement, unless and in so far as such use is strictly necessary for one of the following objectives: (i) the targeted search for specific victims of abduction, trafficking in human beings or sexual exploitation of human beings, as well as the search for missing persons; (ii) the prevention of a specific, substantial and imminent threat to the life or physical safety of natural persons or a genuine and present or genuine and foreseeable threat of a terrorist attack; (iii) the localisation or identification of a person suspected of having committed a criminal offence referred to in Annex II, for the purposes of conducting a criminal investigation, prosecution or execution of a criminal penalty."
 severity := "critical"
 
 remediation := "Remove real-time remote biometric identification from publicly accessible spaces. If deployment falls under a narrow exception (e.g., targeted search for missing persons), obtain prior judicial authorisation and document the lawful basis."

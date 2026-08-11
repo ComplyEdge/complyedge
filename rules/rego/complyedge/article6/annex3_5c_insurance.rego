@@ -39,8 +39,7 @@ pattern_match if {
 
 rule_id := "rego-art6-annex3-5c-001"
 
-citation := "Regulation (EU) 2024/1689, Article 6 + Annex III(5)(c): AI used for risk assessment and pricing in life and health insurance for natural persons is high-risk."
-
+citation := "Regulation (EU) 2024/1689, Article 6: AI systems referred to in Annex III shall be considered to be high-risk. An AI system referred to in Annex III shall always be considered to be high-risk where the AI system performs profiling of natural persons. A provider who considers that an AI system referred to in Annex III is not high-risk shall document its assessment before that system is placed on the market or put into service."
 severity := "high"
 
 remediation := "Treat life/health insurance risk-assessment and pricing AI as high-risk under Annex III(5)(c). Complete conformity assessment, fairness testing, human oversight (Art 14), and post-market monitoring before deployment."

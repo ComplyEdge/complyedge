@@ -31,8 +31,7 @@ pattern_match if {
 
 rule_id := "rego-art50-3-001"
 
-citation := "Regulation (EU) 2024/1689, Article 50(3): Deployers of an emotion recognition or biometric categorisation system must inform the natural persons exposed to it of its operation."
-
+citation := "Regulation (EU) 2024/1689, Article 50(3): Deployers of an emotion recognition system or a biometric categorisation system shall inform the natural persons exposed thereto of the operation of the system, and shall process the personal data in accordance with Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680, as applicable. This obligation shall not apply to AI systems used for biometric categorisation and emotion recognition, which are permitted by law to detect, prevent or investigate criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties, and in accordance with Union law."
 severity := "high"
 
 remediation := "Inform natural persons when they are subject to emotion recognition or biometric categorisation."

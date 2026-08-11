@@ -47,8 +47,7 @@ predictive_policing_pattern_match if {
 
 rule_id := "rego-art5-1d-001"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(d): Prohibits the placing on the market, putting into service, or use of an AI system for making risk assessments of natural persons in order to assess or predict the risk of a natural person committing a criminal offence, based solely on the profiling of a natural person or on assessing their personality traits and characteristics."
-
+citation := "Regulation (EU) 2024/1689, Article 5(1), first subparagraph, point (d): The placing on the market, the putting into service for this specific purpose, or the use of an AI system for making risk assessments of natural persons in order to assess or predict the risk of a natural person committing a criminal offence, based solely on the profiling of a natural person or on assessing their personality traits and characteristics; this prohibition shall not apply to AI systems used to support the human assessment of the involvement of a person in a criminal activity, which is already based on objective and verifiable facts directly linked to a criminal activity."
 severity := "critical"
 
 remediation := "Remove any predictive policing or individual criminal risk assessment functionality that relies solely on profiling or personality traits. Risk assessments must be based on objective, verifiable facts directly linked to criminal activity."

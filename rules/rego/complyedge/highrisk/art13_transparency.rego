@@ -31,8 +31,7 @@ pattern_match if {
 
 rule_id := "rego-art13-001"
 
-citation := "Regulation (EU) 2024/1689, Article 13: High-risk AI systems must be sufficiently transparent to enable deployers to interpret output and use it appropriately, accompanied by instructions for use."
-
+citation := "Regulation (EU) 2024/1689, Article 13: High-risk AI systems shall be designed and developed in such a way as to ensure that their operation is sufficiently transparent to enable deployers to interpret a system's output and use it appropriately. Instructions for use shall include concise, complete, correct and clear information that is relevant, accessible and comprehensible to deployers."
 severity := "high"
 
 remediation := "Provide instructions for use enabling deployers to interpret and use the system's output appropriately."

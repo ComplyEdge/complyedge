@@ -40,8 +40,7 @@ pattern_match if {
 
 rule_id := "rego-art6-annex3-8-001"
 
-citation := "Regulation (EU) 2024/1689, Article 6 + Annex III(8): AI used by judicial authorities (case research, sentencing assistance, dispute resolution) or to influence elections/democratic processes (where not prohibited by Art 5) is high-risk."
-
+citation := "Regulation (EU) 2024/1689, Article 6: AI systems referred to in Annex III shall be considered to be high-risk. An AI system referred to in Annex III shall always be considered to be high-risk where the AI system performs profiling of natural persons. A provider who considers that an AI system referred to in Annex III is not high-risk shall document its assessment before that system is placed on the market or put into service."
 severity := "high"
 
 remediation := "Complete high-risk classification assessment per Article 6 before deployment. Justice/democracy AI requires fundamental-rights impact assessment (Art 27), transparency, human oversight (Art 14), and EU-database registration."

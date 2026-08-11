@@ -48,8 +48,7 @@ technical_documentation_pattern_match if {
 
 rule_id := "rego-gpai-53a-001"
 
-citation := "Regulation (EU) 2024/1689, Article 53(1)(a): Providers of general-purpose AI models shall draw up and keep up-to-date the technical documentation of the model, including its training and testing process and the results of its evaluation, which shall contain, at a minimum, the information set out in Annex XI."
-
+citation := "Regulation (EU) 2024/1689, Article 53(1)(a-b): Providers of general-purpose AI models shall draw up and keep up-to-date the technical documentation of the model, including its training and testing process and the results of its evaluation, which shall contain, at a minimum, the information set out in Annex XI for the purpose of providing it, upon request, to the AI Office and the national competent authorities."
 severity := "high"
 
 remediation := "Create and maintain comprehensive technical documentation for the GPAI model, including training methodology, testing processes, evaluation results, and a model card. Keep documentation up-to-date."
