@@ -40,8 +40,7 @@ pattern_match if {
 
 rule_id := "rego-art6-annex3-3-001"
 
-citation := "Regulation (EU) 2024/1689, Article 6 + Annex III(3): AI systems used in education and vocational training for admissions, grading, evaluation, or proctoring are high-risk."
-
+citation := "Regulation (EU) 2024/1689, Article 6: AI systems referred to in Annex III shall be considered to be high-risk. An AI system referred to in Annex III shall always be considered to be high-risk where the AI system performs profiling of natural persons. A provider who considers that an AI system referred to in Annex III is not high-risk shall document its assessment before that system is placed on the market or put into service."
 severity := "high"
 
 remediation := "Complete high-risk classification assessment per Article 6 before deployment. Educational AI systems require human oversight, bias testing, transparency, technical documentation, and post-market monitoring per Articles 8–17."

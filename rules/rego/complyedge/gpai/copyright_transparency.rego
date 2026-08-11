@@ -45,8 +45,7 @@ copyright_transparency_pattern_match if {
 
 rule_id := "rego-gpai-53c-001"
 
-citation := "Regulation (EU) 2024/1689, Article 53(1)(c): Providers of GPAI models shall put in place a copyright compliance policy and make publicly available a sufficiently detailed summary of the training data content."
-
+citation := "Regulation (EU) 2024/1689, Article 53(1)(c): Providers of general-purpose AI models shall put in place a policy to comply with Union law on copyright and related rights, and in particular to identify and comply with, including through state of the art technologies, a reservation of rights expressed pursuant to Article 4(3) of Directive (EU) 2019/790; and make publicly available a sufficiently detailed summary about the content used for training of the general-purpose AI model, according to a template provided by the AI Office."
 severity := "high"
 
 remediation := "Publish a sufficiently detailed summary of training data content. Implement a copyright compliance policy that respects Union copyright law, including opt-out mechanisms for rights holders."

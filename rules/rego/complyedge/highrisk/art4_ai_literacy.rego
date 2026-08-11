@@ -31,8 +31,7 @@ pattern_match if {
 
 rule_id := "rego-art4-001"
 
-citation := "Regulation (EU) 2024/1689, Article 4: Providers and deployers must ensure a sufficient level of AI literacy among staff and others operating AI systems on their behalf."
-
+citation := "Regulation (EU) 2024/1689, Article 4 (AI literacy): Providers and deployers of AI systems shall take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used."
 severity := "medium"
 
 remediation := "Provide sufficient AI literacy training to staff operating AI systems."

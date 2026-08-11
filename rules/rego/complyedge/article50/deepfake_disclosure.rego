@@ -48,8 +48,7 @@ deepfake_disclosure_pattern_match if {
 
 rule_id := "rego-art50-4-001"
 
-citation := "Regulation (EU) 2024/1689, Article 50(4): Deployers of AI systems generating or manipulating deep fake content shall disclose that the content has been artificially generated or manipulated."
-
+citation := "Regulation (EU) 2024/1689, Article 50(4): Deployers of an AI system that generates or manipulates image, audio or video content constituting a deep fake, shall disclose that the content has been artificially generated or manipulated. This obligation shall not apply where the use is authorised by law to detect, prevent, investigate or prosecute criminal offences. Where the content forms part of an evidently artistic, creative, satirical, fictional or analogous work or programme, the transparency obligations set out in this paragraph are limited to disclosure of the existence of such generated or manipulated content in an appropriate manner that does not hamper the display or enjoyment of the work."
 severity := "high"
 
 remediation := "Clearly label all deepfake content as artificially generated or manipulated. Implement prominent disclosure at the point of distribution and embed machine-readable metadata indicating synthetic origin."

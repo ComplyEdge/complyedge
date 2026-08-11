@@ -59,8 +59,7 @@ biometric_pattern_match if {
 
 rule_id := "rego-art5-1g-001"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(g): Prohibits biometric categorisation systems that categorise natural persons based on their biometric data to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation. Exception per OJ text: this prohibition does not cover labelling or filtering of lawfully acquired biometric datasets, or categorizing of biometric data in the area of law enforcement (subject to a lawful basis)."
-
+citation := "Regulation (EU) 2024/1689, Article 5(1)(g): The placing on the market, the putting into service for this specific purpose, or the use of biometric categorisation systems that categorise individually natural persons based on their biometric data to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation. This prohibition shall not cover any labelling or filtering of lawfully acquired biometric datasets, such as images, based on biometric data or categorising of biometric data in the area of law enforcement."
 severity := "critical"
 
 remediation := "Remove any biometric categorisation that infers protected characteristics. If biometric processing is required, ensure it does not deduce race, religion, political views, sex life, or other prohibited categories."

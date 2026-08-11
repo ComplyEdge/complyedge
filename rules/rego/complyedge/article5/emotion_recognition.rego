@@ -42,8 +42,7 @@ emotion_recognition_pattern_match if {
 
 rule_id := "rego-art5-1f-001"
 
-citation := "Regulation (EU) 2024/1689, Article 5(1)(f): Prohibits AI systems that infer emotions of natural persons in workplace and education settings, except for medical or safety purposes."
-
+citation := "Regulation (EU) 2024/1689, Article 5(1)(f): The placing on the market, the putting into service for this specific purpose, or the use of AI systems to infer emotions of a natural person in the areas of workplace and education institutions, except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons."
 severity := "critical"
 
 remediation := "Remove emotion recognition capabilities from workplace and education contexts. If emotion inference is required for medical or safety reasons, document the lawful basis and ensure compliance with applicable exceptions."

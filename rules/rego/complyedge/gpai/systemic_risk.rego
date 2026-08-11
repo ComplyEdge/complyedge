@@ -40,8 +40,7 @@ systemic_risk_pattern_match if {
 
 rule_id := "rego-gpai-55-001"
 
-citation := "Regulation (EU) 2024/1689, Article 55: Providers of GPAI models with systemic risk shall perform model evaluations, assess and mitigate systemic risks, track and report serious incidents, and ensure adequate cybersecurity protection."
-
+citation := "Regulation (EU) 2024/1689, Article 55: Providers of general-purpose AI models with systemic risk shall perform model evaluation in accordance with standardised protocols and tools, including conducting and documenting adversarial testing of the model with a view to identifying and mitigating systemic risks, including for all groups of persons affected by such risks."
 severity := "critical"
 
 remediation := "Conduct adversarial testing and red-teaming for systemic risks. Implement risk mitigation measures, establish incident tracking and reporting processes, and ensure cybersecurity protections are in place."

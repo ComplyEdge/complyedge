@@ -40,8 +40,7 @@ pattern_match if {
 
 rule_id := "rego-art6-annex3-5b-001"
 
-citation := "Regulation (EU) 2024/1689, Article 6 + Annex III(5)(b): AI used to evaluate creditworthiness or establish a credit score of natural persons is high-risk (fraud-detection carve-out excepted)."
-
+citation := "Regulation (EU) 2024/1689, Article 6: AI systems referred to in Annex III shall be considered to be high-risk. An AI system referred to in Annex III shall always be considered to be high-risk where the AI system performs profiling of natural persons. A provider who considers that an AI system referred to in Annex III is not high-risk shall document its assessment before that system is placed on the market or put into service."
 severity := "high"
 
 remediation := "Treat creditworthiness / credit-scoring AI as high-risk under Annex III(5)(b). Complete conformity assessment, bias testing, human oversight (Art 14), and deployer transparency before deployment."
