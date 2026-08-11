@@ -20,6 +20,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from complyedge.mcp_server import (
+    TOOL_ANNOTATIONS,
+    TOOL_DESCRIPTIONS,
     TOOL_NAMES,
     _check_compliance,
     _get_engine,
@@ -157,11 +159,8 @@ def create_mcp() -> FastMCP:
 
     @mcp.tool(
         name="check_compliance",
-        description=(
-            "Check text against ComplyEdge TrustLint offline YAML rules "
-            "(regex corpus). Returns PASS/FAIL with rule ID, severity, "
-            "citation, and remediation."
-        ),
+        description=TOOL_DESCRIPTIONS["check_compliance"],
+        annotations=TOOL_ANNOTATIONS,
     )
     async def check_compliance(
         text: str,
@@ -176,11 +175,8 @@ def create_mcp() -> FastMCP:
 
     @mcp.tool(
         name="list_rules",
-        description=(
-            "List TrustLint offline compliance rules in the ComplyEdge "
-            "corpus. Returns rule IDs, titles, severities, jurisdictions, "
-            "and categories."
-        ),
+        description=TOOL_DESCRIPTIONS["list_rules"],
+        annotations=TOOL_ANNOTATIONS,
     )
     async def list_rules(
         jurisdiction: Jurisdiction | None = None,
@@ -192,11 +188,8 @@ def create_mcp() -> FastMCP:
 
     @mcp.tool(
         name="scan_prompt",
-        description=(
-            "Pre-generation TrustLint scan of an AI prompt. Returns SAFE "
-            "or RISK_DETECTED with cited findings from the offline regex "
-            "corpus."
-        ),
+        description=TOOL_DESCRIPTIONS["scan_prompt"],
+        annotations=TOOL_ANNOTATIONS,
     )
     async def scan_prompt(prompt: str) -> dict[str, Any]:
         return _payload_from_tool_result(
