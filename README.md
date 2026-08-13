@@ -4,7 +4,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Smithery](https://img.shields.io/badge/Smithery-listed-6b46c1)](https://smithery.ai/servers/complyedge/complyedge)
 
-Runtime compliance enforcement for AI agents. Not a scanner: runs in production, on every request.
+Runtime compliance enforcement for AI agents. Not a periodic scanner over a repo: the platform enforces in production, on every request — and the same discipline is available to your agent as an **MCP server** that checks and scans the text you pass it, offline, with an article citation on every finding.
 
 Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server** — a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
 
