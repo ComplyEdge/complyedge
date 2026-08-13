@@ -1,0 +1,64 @@
+id: EU_AI_ACT_ART9_RISK_MANAGEMENT_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires establishing, implementing, documenting, and maintaining a continuous
+  risk management system throughout the lifecycle of high-risk AI systems,
+  covering identification, estimation, evaluation, and mitigation of risks to
+  health, safety, or fundamental rights. Article 9.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    operating a high-risk AI system without establishing, implementing,
+    documenting, and maintaining a continuous iterative risk management system
+    as required by EU AI Act Article 9. The risk management system must cover:
+    (a) identification and analysis of known and reasonably foreseeable risks,
+    (b) estimation and evaluation of risks under intended use and foreseeable
+    misuse, (c) evaluation of post-market risks, and (d) adoption of risk
+    management measures. Residual risk must be judged acceptable. Testing must
+    use prior defined metrics and probabilistic thresholds. Impact on persons
+    under 18 and vulnerable groups must be considered.
+  model: gpt-4
+- type: regex
+  value: >-
+    (without\s+risk\s+management|no\s+risk\s+(?:management|assessment)\s+(?:system|process|plan)|skip(?:ping)?\s+risk\s+(?:management|assessment)|risk\s+management\s+not\s+(?:required|needed|implemented)|bypass(?:ing)?\s+risk\s+(?:management|assessment)|deploy(?:ing)?\s+without\s+risk|high[\-\s]risk\s+(?:ai\s+)?(?:system\s+)?without\s+(?:risk|lifecycle)|no\s+(?:continuous|iterative)\s+(?:risk|monitoring)|residual\s+risk\s+(?:not\s+)?(?:assessed|acceptable|evaluated)|unmitigated\s+(?:risk|hazard)|risk\s+(?:identification|evaluation)\s+(?:not\s+)?(?:performed|conducted))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 9
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 9: A risk management system shall be
+    established, implemented, documented and maintained in relation to high-risk
+    AI systems. The risk management system shall be understood as a continuous
+    iterative process planned and run throughout the entire lifecycle of a
+    high-risk AI system, requiring regular systematic review and updating.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 9 requires a continuous risk management system
+    for high-risk AI systems covering risk identification, estimation,
+    evaluation, and mitigation throughout the entire lifecycle. Penalties: up
+    to EUR 15M or 3% of global revenue.
+  suggestion: >-
+    Establish a documented risk management system that: (a) identifies known
+    and foreseeable risks, (b) estimates risks under intended use and misuse,
+    (c) evaluates post-market risks, (d) adopts targeted mitigation measures.
+    Ensure residual risk is acceptable and testing uses defined metrics.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-9
+- high-risk
+- risk-management
+- lifecycle
+tier: enterprise

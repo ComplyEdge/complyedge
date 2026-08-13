@@ -1,0 +1,85 @@
+id: NYC_LL144_AEDT_001
+jurisdiction: US-NY
+effective_date: '2023-07-05'
+description: >-
+  Prohibits employers and employment agencies in New York City from using an
+  automated employment decision tool (AEDT) unless: (1) the tool has been
+  subject to a bias audit within one year of use, (2) information about the
+  bias audit is publicly available, and (3) certain notices have been
+  provided to employees or job candidates. NYC Local Law 144 of 2021.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    using an automated employment decision tool (AEDT) for employment
+    decisions in New York City without complying with NYC Local Law 144 of
+    2021. An AEDT is any computational process that issues a simplified
+    output (score, classification, recommendation) used to substantially
+    assist or replace discretionary decision-making for employment decisions
+    that impact natural persons. Compliance requires: (1) an independent bias
+    audit within one year prior to use, (2) public posting of a summary of
+    the bias audit results on the employer's website, and (3) notice to
+    candidates and employees at least 10 business days before use, including
+    job qualifications/characteristics used and (upon request) data sources
+    and retention. Detect intent to use AEDTs without bias audits, hide audit
+    results, or skip candidate notices. Do NOT flag tools that are clearly
+    not AEDTs or compliant uses with documented audits.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:use|using|deploy|deploying)\w*\s+(?:AEDT|automated\s+employment\s+decision\s+tool|AI\s+(?:hiring|recruit\w*|screening)\s+tool|algorithmic\s+(?:hiring|screening|recruit\w*))\s+(?:without|lacking)\s+(?:bias\s+audit|disparate\s+impact\s+(?:audit|analysis))|(?:no|without)\s+(?:bias\s+audit|independent\s+audit)\s+(?:of|for)\s+(?:hiring|employment|recruit\w*|screening)\s+(?:tool|system|algorithm|AI)|(?:hiring|recruit\w*|screening)\s+(?:tool|algorithm|AI)\s+(?:bias\s+)?audit\s+(?:not\s+)?(?:public|posted|disclosed|published)|(?:fail|failing|skip|skipping)\w*\s+(?:to\s+)?(?:notify|inform|notice)\s+(?:candidate|applicant|employee)\s+(?:about|of|regarding)\s+(?:AEDT|automated|AI|algorithmic)\s+(?:tool|system|use)|(?:no|without)\s+(?:candidate|applicant|employee)\s+notice\s+(?:before|prior\s+to)\s+(?:AEDT|automated\s+employment|AI\s+hiring)|(?:NYC|New\s+York\s+City)\s+(?:hiring|employment|recruit\w*)\s+(?:AI|algorithm|tool)\s+(?:without|lacking)\s+(?:audit|notice|compliance))
+  flags: i
+severity: high
+category: employment
+source:
+  regulation: NYC Local Law 144 of 2021
+  article: NYC Admin Code §20-870 et seq.
+  url: https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page
+  last_updated: '2023-07-05'
+  citation: >-
+    NYC Department of Consumer and Worker Protection (official summary of
+    Local Law 144 of 2021): Local Law 144 of 2021 regarding automated
+    employment decision tools ("AEDT") prohibits employers and employment
+    agencies from using an automated employment decision tool unless the tool
+    has been subject to a bias audit within one year of the use of the tool,
+    information about the bias audit is publicly available, and certain
+    notices have been provided to employees or job candidates. The Department
+    of Consumer and Worker Protection began enforcement of this law and rule
+    on July 5, 2023. The Notice must be provided 10 business days prior to
+    use of an AEDT.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      Civil penalties of $500 for first violation and each additional
+      violation occurring on the same day; $500 to $1,500 for each subsequent
+      violation. Each day of non-compliant use and each failure to provide
+      notice constitutes a separate violation.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — NYC Local Law 144 prohibits employers and employment agencies
+    from using an automated employment decision tool (AEDT) without: a bias
+    audit within the past year, public posting of audit results, and 10
+    business days advance notice to candidates and employees. Penalties up
+    to $1,500 per violation per day.
+  suggestion: >-
+    Before using any AEDT for NYC employment decisions: (1) commission an
+    independent bias audit measuring selection rates and impact ratios across
+    protected categories within the past 12 months, (2) post a summary of the
+    bias audit results on a publicly accessible page of your website along
+    with the AEDT's distribution date, (3) provide candidates and employees
+    with notice at least 10 business days before AEDT use including job
+    qualifications/characteristics used and instructions for requesting an
+    alternative selection process or accommodation.
+version: 1.0.0
+tags:
+- nyc
+- ll144
+- aedt
+- bias-audit
+- automated-employment-decision
+- hiring
+- employment
+tier: enterprise

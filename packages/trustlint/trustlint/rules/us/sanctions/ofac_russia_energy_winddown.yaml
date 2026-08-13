@@ -1,0 +1,53 @@
+id: SANCTIONS_OFAC_RU_ENERGY_WINDDOWN_001
+jurisdiction: US
+effective_date: '2026-01-01'
+description: >-
+  OFAC Russia energy-sector dealings prohibition currently operating under a
+  General License wind-down window. In force now; scheduled to lift/supersede
+  on the window end date. Demonstrates the dynamic-state (effective_window)
+  sanctions primitive.
+title: OFAC Russia energy dealings — General License wind-down
+detection_scope: all
+category: sanctions
+conditions:
+- type: regex
+  value: >-
+    (?i)\b(VEB\.?RF|Gazprombank|Sovcomflot|shadow[- ]?fleet|Russian\s+(?:oil|crude|energy|gas|LNG)|Urals\s+crude|(?:oil\s+)?price[- ]?cap)\b
+  flags: i
+severity: high
+effective_window:
+  starts: '2026-01-01'
+  ends: '2026-12-31'
+  superseded_by: SANCTIONS_OFAC_RU_ENERGY_FULL_002
+source:
+  regulation: OFAC (US Treasury) Russia sanctions — General License framework
+  article: 31 CFR Part 587 / Executive Order 14024
+  url: https://ofac.treasury.gov/sanctions-programs-and-country-information/russian-harmful-foreign-activities-sanctions
+  citation: >-
+    OFAC administers Russia-related restrictions under EO 14024 and 31 CFR
+    Part 587, issuing General Licenses that authorise wind-down of specified
+    dealings through a stated expiry. This rule models such a prohibition
+    during its wind-down window; the successor rule takes effect on expiry.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛑 OFAC Russia energy-sector dealing. This prohibition is in force under a
+    General License wind-down; see the transition guidance for the scheduled
+    lift/supersession date.
+  suggestion: >-
+    Confirm the transaction falls within the authorised wind-down purpose and
+    completes before the window end date. After expiry the successor prohibition
+    applies.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- sanctions
+- ofac
+- russia
+- wind_down
+- transition_rule
+- effective_window
+tier: enterprise

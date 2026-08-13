@@ -1,0 +1,84 @@
+id: EU_AI_ACT_ART12_RECORD_KEEPING_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires high-risk AI systems to technically allow for the automatic
+  recording of events (logs) over the lifetime of the system, with logging
+  capabilities enabling traceability appropriate to the intended purpose.
+  Article 12.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    deploying or operating a high-risk AI system without the automatic
+    event-logging capability required by EU AI Act Article 12. High-risk AI
+    systems must technically allow for automatic recording of events (logs)
+    over the lifetime of the system, with logging capabilities enabling
+    traceability of the system's functioning appropriate to its intended
+    purpose, including: (a) identifying situations that may result in the
+    system presenting a risk under Article 79(1) or in a substantial
+    modification, (b) facilitating post-market monitoring under Article 72,
+    and (c) monitoring operation under Article 26(5). For Annex III point 1(a)
+    biometric systems, logs must record at minimum: period of each use, the
+    reference database, input data leading to a match, and the natural
+    persons involved in verification. Detect intent to disable logging,
+    bypass record-keeping, or deploy without traceability. Do NOT flag
+    legitimate log retention or privacy-preserving logging discussions.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:no|without|disable\w*|bypass|skip|skipping|turn\s+off)\s+(?:logging|logs|event\s+log|audit\s+log|record[\-\s]keeping)\s+(?:for|on|in)\s+(?:high[\-\s]risk\s+AI|AI\s+system|biometric)|(?:high[\-\s]risk\s+AI|AI\s+system)\s+(?:without|lacking)\s+(?:automatic\s+)?(?:logging|logs|event\s+recording|traceability)|(?:Article\s+12|Art\.?\s+12|record[\-\s]keeping)\s+(?:obligation|requirement)\s+(?:not\s+met|ignored|skipped|bypass\w*)|(?:traceability|audit\s+trail)\s+(?:not\s+(?:provided|implemented|enabled)|disabled|removed)|(?:deploy|operate|run)\w*\s+(?:high[\-\s]risk\s+AI|biometric\s+system)\s+(?:without|lacking)\s+(?:logs|logging|traceability|audit\s+trail))
+  flags: i
+severity: high
+category: security
+source:
+  regulation: EU AI Act
+  article: Article 12
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 12 (Record-keeping): 1. High-risk AI
+    systems shall technically allow for the automatic recording of events
+    (logs) over the lifetime of the system. 2. In order to ensure a level of
+    traceability of the functioning of a high-risk AI system that is
+    appropriate to the intended purpose of the system, logging capabilities
+    shall enable the recording of events relevant for: (a) identifying
+    situations that may result in the high-risk AI system presenting a risk
+    within the meaning of Article 79(1) or in a substantial modification;
+    (b) facilitating the post-market monitoring referred to in Article 72;
+    and (c) monitoring the operation of high-risk AI systems referred to in
+    Article 26(5). 3. For high-risk AI systems referred to in point 1(a) of
+    Annex III, the logging capabilities shall provide, at a minimum: (a)
+    recording of the period of each use of the system (start date and time
+    and end date and time of each use); (b) the reference database against
+    which input data has been checked by the system; (c) the input data for
+    which the search has led to a match; (d) the identification of the
+    natural persons involved in the verification of the results, as referred
+    to in Article 14(5).
+penalty_information:
+  civil_penalties:
+    eu_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover (Article 99)
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 12 requires high-risk AI systems to
+    technically support automatic event logging over the system's lifetime,
+    with traceability appropriate to the intended purpose. Penalties: up to
+    EUR 15M or 3% of global turnover.
+  suggestion: >-
+    Implement automatic logging covering the full system lifetime. Ensure
+    logs support: (a) risk-incident identification, (b) post-market
+    monitoring (Art 72), and (c) deployer operational monitoring (Art 26(5)).
+    For Annex III biometric systems, also record period of use, reference
+    database, matched input data, and verifying natural persons.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-12
+- high-risk
+- record-keeping
+- logging
+- traceability
+tier: enterprise

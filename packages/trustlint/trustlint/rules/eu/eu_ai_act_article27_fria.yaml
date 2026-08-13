@@ -1,0 +1,73 @@
+id: EU_AI_ACT_ART27_FRIA_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires public bodies and private entities providing public services to
+  perform a fundamental rights impact assessment before deploying high-risk AI
+  systems in areas listed in Annex III, and notify the market surveillance
+  authority of its results. Article 27.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    deploying a high-risk AI system without performing the fundamental rights
+    impact assessment required by EU AI Act Article 27. Prior to deploying a
+    high-risk AI system referred to in Article 6(2), deployers that are bodies
+    governed by public law, or are private entities providing public services,
+    shall perform an assessment of the impact on fundamental rights consisting
+    of: (a) a description of the deployer's processes in which the system will
+    be used, (b) a description of the period and frequency of use, (c) the
+    categories of natural persons and groups likely to be affected, (d) the
+    specific risks of harm to those persons, (e) a description of human
+    oversight measures, and (f) the measures to be taken if those risks
+    materialise, including internal governance and complaint mechanisms. The
+    deployer shall notify the market surveillance authority of its results.
+  model: gpt-4
+- type: regex
+  value: >-
+    (without\s+(?:fundamental\s+rights?\s+)?impact\s+assessment|no\s+(?:FRIA|fundamental\s+rights?\s+(?:impact\s+)?assessment)|skip(?:ping)?\s+(?:fundamental\s+rights?|impact)\s+assessment|deploy(?:ing)?\s+(?:without|before)\s+(?:FRIA|fundamental\s+rights?\s+assessment)|fundamental\s+rights?\s+(?:not\s+)?(?:assessed|evaluated|considered)|no\s+(?:impact|rights?)\s+assessment\s+(?:before|prior)|public\s+(?:body|service|entity)\s+(?:without|lacking)\s+(?:FRIA|assessment)|fail(?:ing|ure)?\s+to\s+(?:assess|evaluate)\s+(?:fundamental\s+rights?|impact))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 27
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 27(1): Prior to deploying a high-risk
+    AI system referred to in Article 6(2), with the exception of high-risk AI
+    systems intended to be used in the area listed in point 2 of Annex III,
+    deployers that are bodies governed by public law, or are private entities
+    providing public services, and deployers of high-risk AI systems referred
+    to in points 5(b) and (c) of Annex III, shall perform an assessment of
+    the impact on fundamental rights that the use of such system may produce.
+    Article 27(3): Once the assessment has been performed, the deployer shall
+    notify the market surveillance authority of its results.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 27 requires a fundamental rights impact
+    assessment before deploying high-risk AI systems in Annex III areas.
+    Public bodies and private entities providing public services must assess
+    affected persons, specific risks, and oversight measures. Penalties: up
+    to EUR 15M or 3% of global revenue.
+  suggestion: >-
+    Conduct a fundamental rights impact assessment covering: description of
+    deployment processes, period and frequency of use, categories of affected
+    persons, specific risks of harm, human oversight implementation, and
+    remediation measures. Notify the market surveillance authority of results.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-27
+- high-risk
+- fundamental-rights
+- impact-assessment
+- fria
+tier: enterprise

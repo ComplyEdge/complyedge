@@ -1,0 +1,67 @@
+id: EU_AI_ACT_ART5_REALTIME_BIOMETRIC_001
+jurisdiction: EU
+effective_date: '2025-02-02'
+description: >-
+  Prohibits the use of real-time remote biometric identification systems in
+  publicly accessible spaces for law enforcement purposes. Article 5(1)(h) of
+  the EU AI Act, with narrow exceptions (targeted search for specific victims,
+  imminent threat prevention, suspect identification for serious crimes) that
+  require judicial authorization.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    an AI system that performs real-time remote biometric identification
+    (such as facial recognition, gait recognition, or voice identification)
+    of natural persons in publicly accessible spaces, particularly for law
+    enforcement purposes. This is prohibited under EU AI Act Article 5(1)(h),
+    except in narrowly defined circumstances with judicial authorization.
+  model: gpt-4
+- type: regex
+  value: (real[- ]?time\s+(remote\s+)?biometric|live\s+facial[- ]?recognition|real[- ]?time\s+face\s+(id|identif|match)|public\s+space\s+(face|biometric)\s+(id|identif|scan|match)|mass\s+facial[- ]?recognition|crowd\s+facial[- ]?(scan|id|identif)|real[- ]?time\s+gait\s+(recognition|id)|real[- ]?time\s+voice\s+(identif|biometric))
+  flags: i
+severity: critical
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 5(1)(h)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 5(1)(h): The use of real-time remote
+    biometric identification systems in publicly accessible spaces for the
+    purposes of law enforcement, unless and in so far as such use is strictly
+    necessary for one of the following objectives: (i) the targeted search
+    for specific victims of abduction, trafficking in human beings or sexual
+    exploitation of human beings, as well as the search for missing persons;
+    (ii) the prevention of a specific, substantial and imminent threat to the
+    life or physical safety of natural persons or a genuine and present or
+    genuine and foreseeable threat of a terrorist attack; (iii) the
+    localisation or identification of a person suspected of having committed
+    a criminal offence referred to in Annex II, for the purposes of conducting
+    a criminal investigation, prosecution or execution of a criminal penalty.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 5(1)(h) prohibits real-time remote biometric
+    identification in publicly accessible spaces. Narrow exceptions exist for
+    law enforcement with judicial authorization (targeted victim search,
+    imminent threat prevention, serious crime suspect identification), but
+    these are not general-purpose use cases. Penalties: up to €35M or 7% of
+    global revenue.
+  suggestion: >-
+    Replace with post-event biometric analysis with appropriate legal basis,
+    or use non-biometric identification methods. If a narrow Article 5(1)(h)
+    exception applies, consult legal counsel about judicial authorization
+    requirements before deployment.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-5
+- prohibited-practice
+- biometric-identification
+- real-time
+- proactive
+tier: enterprise
