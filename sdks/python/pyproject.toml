@@ -57,7 +57,12 @@ mcp = [
     # Older 1.1.x wraps handler returns as content=list(results) and breaks
     # structured tool results (Smithery: "no structured output returned").
     "mcp>=1.9.0,<2",
-    "trustlint>=2.0.3",
+    # >=2.0.4: 2.0.3 and earlier bundle a pre-Omnibus rule corpus — Article 12
+    # high-risk carries effective_date 2026-08-02 with no Reg (EU) 2026/1744
+    # note, i.e. a legal clock the product is required never to imply. A fresh
+    # resolve already picks 2.0.4; this floor also excludes an explicit
+    # ==2.0.3 pin from ever reaching the MCP path.
+    "trustlint>=2.0.4",
 ]
 dev = [
     "pytest>=7.0.0",
