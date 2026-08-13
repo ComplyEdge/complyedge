@@ -1,0 +1,75 @@
+id: GDPR_CROSS_BORDER_TRANSFER_001
+jurisdiction: EU
+effective_date: '2018-05-25'
+description: >-
+  Requires that any transfer of personal data to a third country or
+  international organisation only takes place if the conditions of GDPR
+  Chapter V are met, ensuring the level of protection is not undermined.
+  Transfers require adequacy decisions, appropriate safeguards, or specific
+  derogations. GDPR Articles 44-49.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    transferring personal data to a third country or international
+    organisation without complying with GDPR Chapter V requirements
+    (Articles 44-49). Any transfer shall take place only if the conditions
+    laid down in Chapter V are complied with, to ensure that the level of
+    protection of natural persons guaranteed by the GDPR is not undermined.
+    Valid transfer mechanisms include: adequacy decisions (Art 45), appropriate
+    safeguards such as standard contractual clauses or binding corporate rules
+    (Art 46), or specific derogations such as explicit consent or necessity
+    for contract performance (Art 49).
+  model: gpt-4
+- type: regex
+  value: >-
+    (transfer\s+(?:personal\s+)?data\s+(?:to|outside|abroad|overseas|internationally)\s+(?:without|lacking)\s+(?:adequacy|safeguard|authorization)|cross[\-\s]border\s+(?:data\s+)?transfer\s+(?:without|lacking)\s+(?:adequacy|safeguard|SCC|BCR)|(?:export|send|transmit)\s+(?:personal\s+)?data\s+(?:to\s+)?(?:third\s+country|outside\s+(?:EU|EEA|Europe))\s+(?:without|lacking)|no\s+(?:adequacy\s+decision|standard\s+contractual\s+clauses?|SCC|BCR|binding\s+corporate\s+rules?)|(?:unauthorized|unlawful)\s+(?:international|cross[\-\s]border)\s+(?:data\s+)?transfer|international\s+(?:data\s+)?transfer\s+(?:without|lacking)\s+(?:legal\s+basis|safeguard|compliance)|data\s+(?:to|sent\s+to|stored\s+in)\s+(?:third\s+country|non[\-\s](?:EU|EEA)\s+country)\s+(?:without|lacking))
+  flags: i
+severity: high
+category: privacy
+source:
+  regulation: GDPR
+  article: Articles 44-49
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  last_updated: '2016-04-27'
+  citation: >-
+    Regulation (EU) 2016/679, Article 44: Any transfer of personal data which
+    are undergoing processing or are intended for processing after transfer to
+    a third country or to an international organisation shall take place only
+    if, subject to the other provisions of this Regulation, the conditions
+    laid down in this Chapter are complied with by the controller and
+    processor, including for onward transfers of personal data from the third
+    country or an international organisation to another third country or to
+    another international organisation. All provisions in this Chapter shall
+    be applied in order to ensure that the level of protection of natural
+    persons guaranteed by this Regulation is not undermined.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 20,000,000 or 4% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — GDPR Articles 44-49 require that any transfer of personal data
+    to a third country or international organisation complies with Chapter V
+    requirements. Transfers without adequacy decisions, appropriate safeguards
+    (SCCs, BCRs), or valid derogations are prohibited. Penalties: up to
+    EUR 20M or 4% of global revenue.
+  suggestion: >-
+    Before transferring personal data outside the EU/EEA, ensure one of the
+    following legal mechanisms is in place: (1) an adequacy decision by the
+    European Commission (Art 45), (2) appropriate safeguards such as Standard
+    Contractual Clauses or Binding Corporate Rules (Art 46), or (3) a valid
+    derogation under Art 49 (explicit consent, contractual necessity, etc.).
+    Conduct a transfer impact assessment where required.
+version: 1.0.0
+tags:
+- gdpr
+- article-44
+- cross-border-transfer
+- international-transfer
+- adequacy
+- scc
+- bcr
+tier: enterprise

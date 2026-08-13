@@ -1,0 +1,50 @@
+id: PROMPT_SECURITY_INDIRECT_INJECTION_EMBEDDED_INSTRUCTION_001
+jurisdiction: GLOBAL
+effective_date: '2026-07-05'
+description: >-
+  Detects indirect prompt injection: instructions embedded in untrusted content
+  (retrieved documents, tool outputs, web pages) that try to redirect the model
+  when it reads/summarises them. EU AI Act Article 15. OWASP LLM01.
+title: Indirect prompt injection — embedded instruction in content
+detection_scope: all
+conditions:
+- type: regex
+  value: >-
+    (?i)(?:when\s+(?:you|the\s+(?:ai|assistant|model|llm))\s+(?:read|process|summari[sz]e|analy[sz]e|parse)s?\s+this\b.{0,60}?\b(?:ignore|instead|you\s+must|do\s+not|disregard)|(?:^|\n)\s*(?:#{1,3}\s*)?(?:system|assistant)\s+(?:message|prompt|instruction|note)\s*[:>]|<\s*(?:system|important_instructions?)\s*>)
+  flags: i
+severity: high
+category: security
+source:
+  regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
+  article: Regulation (EU) 2024/1689, Article 15
+  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  citation: >-
+    OWASP LLM Top 10 — LLM01: Prompt Injection (indirect variant). Article 15
+    conformity requires resistance to adversarial content arriving via retrieved
+    documents, tool outputs, or web pages — the primary IPI channel.
+  last_updated: '2026-07-05'
+remediation:
+  action: warn
+  timing: proactive
+  message: >-
+    ⚠️ Possible indirect prompt injection — the content contains directives that
+    appear aimed at the AI rather than the human reader. Treat as untrusted data,
+    not instructions.
+  suggestion: >-
+    Strip or neutralise embedded "system/assistant" directives before feeding
+    retrieved content to the model; render such content as data, never as a
+    control channel.
+  allow_override: true
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- prompt_injection
+- ipi
+- indirect_injection
+- rag
+- tool_output
+- article_15
+- robustness
+- owasp_llm01
+- security
+tier: community

@@ -1,0 +1,93 @@
+id: TCPA_SMS_OPTIN_001
+jurisdiction: US
+effective_date: '1991-12-20'
+description: >-
+  Requires prior express written consent before sending marketing SMS or
+  text messages to consumers using an automatic telephone dialling system or
+  prerecorded voice. Telephone Consumer Protection Act, 47 U.S.C. §227.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    sending unsolicited marketing SMS or text messages to consumers without
+    obtaining prior express written consent, in violation of the Telephone
+    Consumer Protection Act (47 U.S.C. §227). The TCPA prohibits making calls
+    or sending texts using an automatic telephone dialling system or
+    prerecorded voice to cell phones without consent. Prior express written
+    consent is required for marketing messages. Detect intent to send bulk
+    marketing texts without consent, bypass opt-in requirements, or ignore
+    opt-out requests. Do NOT flag transactional messages (order confirmations,
+    shipping updates), emergency notifications, or compliant marketing with
+    proper consent.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:send|sending|transmit|blast|broadcast|deliver|push)\w*\s+(?:bulk\s+|mass\s+|unsolicited\s+)?(?:marketing|promotional|advertising|advert)\s+(?:sms|text\s+message|texts?|mms)(?!\s+(?:with|after|following|based\s+on|to\s+(?:opt[\-\s]?in|consent|consenting|consented|subscribed))(?:\s+|\b))|(?:send|sending|transmit|blast|broadcast|deliver|push)\w*\s+(?:sms|text\s+message|texts?|mms)\s+(?:marketing|promotional|advertising|advert)(?!\s+(?:with|after|following|based\s+on|to\s+(?:opt[\-\s]?in|consent|consenting|consented|subscribed))(?:\s+|\b))|(?:unsolicited|unwanted|spam)\s+(?:sms|text\s+message|texts?|mms)|(?:mass|bulk)\s+(?:sms|text|texting)\s+(?:without|lacking)\s+(?:consent|opt[\-\s]?in)|(?:auto[\-\s]?dial|robocall|robo[\-\s]?text|ATDS)\w*\s+(?:without|lacking)\s+(?:consent|opt[\-\s]?in|permission)|(?:ignore|disregard|bypass|override)\w*\s+(?:sms|text)\s+(?:opt[\-\s]?out|unsubscribe|stop\s+request)|(?:no|without)\s+(?:prior\s+)?(?:express\s+)?(?:written\s+)?consent\s+(?:for|to\s+send)\s+(?:marketing\s+)?(?:sms|text))
+  flags: i
+- type: metadata
+  key: message_type
+  op: ==
+  value: marketing
+- type: metadata
+  key: sms_consent
+  op: '!='
+  value: true
+severity: high
+category: marketing
+source:
+  regulation: TCPA
+  article: 47 U.S.C. §227
+  url: https://www.law.cornell.edu/uscode/text/47/227
+  last_updated: '2021-06-17'
+  citation: >-
+    47 U.S.C. §227(b)(1)(A): It shall be unlawful for any person within the
+    United States, or any person outside the United States if the recipient is
+    within the United States — (A) to make any call (other than a call made
+    for emergency purposes or made with the prior express consent of the
+    called party) using any automatic telephone dialing system or an
+    artificial or prerecorded voice — (iii) to any telephone number assigned
+    to a paging service, cellular telephone service, specialized mobile radio
+    service, or other radio common carrier service, or any service for which
+    the called party is charged for the call. 47 U.S.C. §227(b)(1)(B): to
+    initiate any telephone call to any residential telephone line using an
+    artificial or prerecorded voice to deliver a message without the prior
+    express consent of the called party.
+exceptions:
+- condition: Emergency or safety notifications
+  description: Messages related to health, safety, or emergency situations
+- condition: Transactional messages
+  description: >-
+    Order confirmations, shipping updates, account notifications, and other
+    non-marketing informational messages
+- condition: Prior express written consent obtained
+  description: >-
+    The called party has provided prior express written consent as defined
+    by FCC rules (47 CFR §64.1200)
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      $500 per violation; $1,500 per willful or knowing violation.
+      Class action exposure can reach millions for mass texting campaigns.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — The TCPA (47 U.S.C. §227) requires prior express written
+    consent before sending marketing SMS or text messages. Violations carry
+    penalties of $500-$1,500 per message with class action exposure.
+  suggestion: >-
+    Obtain prior express written consent before sending marketing texts.
+    Consent must be signed (including electronic signatures), clearly
+    authorise the specific sender, and disclose that consent is not a
+    condition of purchase. Honour all opt-out requests immediately and
+    maintain a suppression list.
+version: 2.0.0
+tags:
+- tcpa
+- sms
+- consent
+- marketing
+- telecommunications
+- opt-in
+tier: developer

@@ -1,0 +1,80 @@
+id: CCPA_CPRA_OPT_OUT_001
+jurisdiction: US-CA
+effective_date: '2023-01-01'
+description: >-
+  Grants California consumers the right to opt out of the sale or sharing of
+  their personal information. Businesses must honour opt-out requests and
+  provide a clear mechanism. Special protections for minors under 16.
+  Cal. Civ. Code §1798.120 (CCPA as amended by CPRA).
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    selling or sharing a California consumer's personal information after the
+    consumer has exercised their right to opt out, or failing to provide a
+    mechanism to opt out, in violation of California Civil Code §1798.120.
+    A consumer has the right, at any time, to direct a business not to sell
+    or share their personal information. Businesses must not sell or share
+    information about consumers under 16 unless affirmative authorization is
+    obtained. Detect violations such as ignoring opt-out requests, selling
+    data after opt-out, or lacking a "Do Not Sell or Share" link. Do NOT flag
+    compliant opt-out mechanisms or privacy-respecting practices.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:sell|share|shar)(?:ing|ed|s)?\s+(?:personal\s+)?(?:information|data)\s+(?:after|despite|ignoring)\s+opt[\-\s]?out|ignor(?:e|ing|ed)\s+(?:opt[\-\s]?out|do\s+not\s+sell)|no\s+opt[\-\s]?out\s+(?:mechanism|option|link|button|right)|fail(?:ing|ure|ed)?\s+to\s+(?:provide|honour|honor|respect|implement)\s+(?:opt[\-\s]?out|do\s+not\s+sell)|(?:disregard|override|bypass)\w*\s+(?:consumer'?s?\s+)?opt[\-\s]?out\s+(?:request|preference|direction)|(?:continue|continu)\w*\s+(?:selling|sharing)\s+(?:personal\s+)?(?:information|data)\s+(?:after|despite)\s+opt[\-\s]?out|(?:minor|child)\s+(?:data|information)\s+(?:sold|shared)\s+without\s+(?:consent|authorization|parental))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: CCPA/CPRA
+  article: Cal. Civ. Code §1798.120
+  url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=1798.120.&lawCode=CIV
+  last_updated: '2025-01-01'
+  citation: >-
+    California Civil Code §1798.120(a)(1): A consumer shall have the right,
+    at any time, to direct a business that sells or shares personal
+    information about the consumer to third parties not to sell or share the
+    consumer's personal information. This right may be referred to as the
+    right to opt out of sale or sharing. §1798.120(c): Notwithstanding
+    subdivision (a), a business shall not sell or share the personal
+    information of consumers if the business has actual knowledge that the
+    consumer is less than 16 years of age, unless the consumer, in the case
+    of consumers at least 13 years of age and less than 16 years of age, or
+    the consumer's parent or guardian, in the case of consumers who are less
+    than 13 years of age, has affirmatively authorized the sale or sharing
+    of the consumer's personal information. §1798.120(d): A business that has
+    received direction from a consumer not to sell or share the consumer's
+    personal information shall be prohibited from selling or sharing the
+    consumer's personal information after its receipt of the consumer's
+    direction, unless the consumer subsequently provides consent.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      Up to $2,500 per unintentional violation, $7,500 per intentional
+      violation (enforced by California Attorney General and CPPA)
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — California Civil Code §1798.120 grants consumers the right to
+    opt out of the sale or sharing of their personal information. Selling or
+    sharing data after an opt-out request is a violation. Penalties: up to
+    $7,500 per intentional violation.
+  suggestion: >-
+    Honour the consumer's opt-out request immediately. Provide a clear and
+    conspicuous 'Do Not Sell or Share My Personal Information' link on your
+    website. For consumers under 16, obtain affirmative authorization before
+    any sale or sharing. Maintain records of opt-out requests and ensure all
+    downstream recipients are notified.
+version: 1.0.0
+tags:
+- ccpa
+- cpra
+- opt-out
+- do-not-sell
+- personal-information
+- california
+- consumer-rights
+tier: enterprise

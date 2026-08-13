@@ -1,0 +1,64 @@
+id: EU_AI_ACT_ART14_HUMAN_OVERSIGHT_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires high-risk AI systems to be designed for effective human oversight,
+  enabling human operators to understand capabilities, monitor operation,
+  interpret output, and intervene or interrupt via a stop mechanism. Article 14.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    operating a high-risk AI system without implementing human oversight measures
+    as required by EU AI Act Article 14. Human oversight must enable individuals
+    to: (a) fully understand the system's capacities and limitations, (b) remain
+    aware of automation bias, (c) correctly interpret the system's output,
+    (d) decide not to use or override the output, and (e) intervene on or
+    interrupt the system's operation via a stop button or similar procedure.
+    Measures must be proportionate to the system's risks, level of autonomy,
+    and context of use.
+  model: gpt-4
+- type: regex
+  value: >-
+    (without\s+human\s+oversight|no\s+human\s+(?:oversight|supervision|review|intervention|control)|human\s+oversight\s+(?:not\s+)?(?:implemented|required|provided|possible)|fully\s+autonomous\s+(?:without|lacking)\s+(?:human|oversight)|no\s+(?:stop\s+button|kill\s+switch|override\s+mechanism|intervention\s+capability)|cannot\s+(?:override|intervene|interrupt|stop)\s+(?:the\s+)?(?:ai|system|model)|automation\s+bias\s+(?:not\s+)?(?:addressed|mitigated|considered)|unsupervised\s+(?:ai\s+)?(?:decision|operation|deployment)|deploy(?:ing)?\s+(?:ai\s+)?without\s+(?:human|oversight|supervision))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 14
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 14: High-risk AI systems shall be
+    designed and developed in such a way, including with appropriate
+    human-machine interface tools, that they can be effectively overseen by
+    natural persons during the period in which they are in use. Human oversight
+    shall aim to prevent or minimise the risks to health, safety or fundamental
+    rights that may emerge when a high-risk AI system is used in accordance
+    with its intended purpose or under conditions of reasonably foreseeable
+    misuse.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 14 requires human oversight for high-risk AI
+    systems, including the ability to understand, monitor, interpret, override,
+    and interrupt system operation. Penalties: up to EUR 15M or 3% of global
+    revenue.
+  suggestion: >-
+    Implement human oversight measures: ensure operators can understand system
+    capabilities, remain aware of automation bias, interpret outputs correctly,
+    override decisions, and interrupt operation via a stop mechanism.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-14
+- high-risk
+- human-oversight
+- automation-bias
+tier: enterprise

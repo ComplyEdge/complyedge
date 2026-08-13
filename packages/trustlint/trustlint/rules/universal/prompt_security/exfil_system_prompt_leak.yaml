@@ -1,0 +1,47 @@
+id: PROMPT_SECURITY_EXFIL_SYSTEM_PROMPT_LEAK_001
+jurisdiction: GLOBAL
+effective_date: '2026-07-05'
+description: >-
+  Detects data-exfiltration via injection: attempts to make the model reveal its
+  system prompt, hidden/initial instructions, or safety rules verbatim. EU AI Act
+  Article 15. OWASP LLM01 / LLM06 (sensitive information disclosure).
+title: Injection exfiltration — system-prompt / instruction leak
+detection_scope: user_input
+conditions:
+- type: regex
+  value: >-
+    (?i)\b(?:(?:reveal|print|repeat|show|display|output|tell\s+me|reproduce|echo|recite)\s+(?:me\s+)?(?:your\s+|the\s+|all\s+of\s+your\s+)?(?:system\s+prompt|initial\s+(?:instructions?|prompt)|(?:hidden|secret|original|confidential)\s+(?:instructions?|prompt|rules)|prompt\s+verbatim)|what\s+(?:are|were|is)\s+your\s+(?:exact\s+|full\s+|complete\s+)?(?:initial\s+|original\s+|system\s+|hidden\s+)(?:instructions?|prompt|rules|directives?))\b
+  flags: i
+severity: high
+category: security
+source:
+  regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
+  article: Regulation (EU) 2024/1689, Article 15
+  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  citation: >-
+    OWASP LLM Top 10 — LLM01 (Prompt Injection) / LLM06 (Sensitive Information
+    Disclosure). System-prompt extraction is a primary injection objective;
+    Article 15 cybersecurity requires resistance to it.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛡️ Blocked — this request attempts to extract the assistant's system prompt
+    or hidden instructions.
+  suggestion: >-
+    The system prompt is not disclosed. Ask about capabilities or behaviour in
+    general terms instead.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- prompt_injection
+- ipi
+- data_exfiltration
+- system_prompt_leak
+- article_15
+- owasp_llm01
+- owasp_llm06
+- security
+tier: community

@@ -1,0 +1,48 @@
+id: PROMPT_SECURITY_DIRECT_INJECTION_ROLE_HIJACK_001
+jurisdiction: GLOBAL
+effective_date: '2026-07-05'
+description: >-
+  Detects direct prompt injection that hijacks the assistant's persona to shed
+  its constraints (named jailbreak personas, "developer/DAN mode", "pretend you
+  have no rules"). EU AI Act Article 15 robustness Layer-1 catch. OWASP LLM01.
+title: Direct prompt injection — role / persona hijack
+detection_scope: user_input
+conditions:
+- type: regex
+  value: >-
+    (?i)\b(?:you\s+are\s+now\s+(?:DAN|STAN|an?\s+unrestricted|an?\s+unfiltered|a\s+jailbroken)|(?:enable|activate|enter|switch\s+to)\s+(?:DAN|developer|jailbreak|god|unrestricted)\s+mode|pretend\s+(?:that\s+)?you\s+(?:have|are\s+free\s+of)\s+no\s+(?:restrictions|rules|guidelines|filters|limits)|ignore\s+your\s+(?:role|persona|identity|programming)\s+as)\b
+  flags: i
+severity: high
+category: security
+source:
+  regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
+  article: Regulation (EU) 2024/1689, Article 15
+  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  citation: >-
+    OWASP LLM Top 10 — LLM01: Prompt Injection (persona/jailbreak variant).
+    Article 15 requires resilience against adversarial input that alters system
+    behaviour; persona hijack ("DAN"/"developer mode") is a canonical Layer-1
+    shape of that attack.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛡️ Prompt injection detected — an attempt to override the assistant's
+    persona or safety constraints ("jailbreak"/"developer mode"). Blocked.
+  suggestion: >-
+    If you are researching or teaching about jailbreak techniques, frame the
+    request descriptively rather than issuing the persona-override instruction.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- prompt_injection
+- ipi
+- direct_injection
+- jailbreak
+- article_15
+- robustness
+- owasp_llm01
+- security
+tier: community

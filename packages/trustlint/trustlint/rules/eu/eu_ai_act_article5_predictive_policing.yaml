@@ -1,0 +1,67 @@
+id: EU_AI_ACT_ART5_PREDICTIVE_POLICING_001
+jurisdiction: EU
+effective_date: '2025-02-02'
+description: >-
+  Prohibits AI systems that make risk assessments of natural persons to
+  predict the probability of committing a criminal offence, based solely on
+  profiling or on assessing their personality traits and characteristics.
+  Article 5(1)(d) of the EU AI Act. The prohibition does not apply to AI
+  systems used to support human assessment based on objective and verifiable
+  facts directly linked to a criminal activity.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    an AI system that predicts the probability of an individual committing a
+    criminal offence based solely on profiling or personality traits
+    (predictive policing), without human assessment grounded in objective,
+    verifiable facts directly linked to criminal activity. This is prohibited
+    under EU AI Act Article 5(1)(d).
+  model: gpt-4
+- type: regex
+  value: (predictive\s+policing|pre[- ]?crime\s+(predict|assess|detect)|(predict|assess|forecast)\w*\s+(the\s+)?(probability|risk|likelihood)\s+of\s+(a\s+)?(crime|criminal|offence|offense|reoffend)|(crime|criminal)\s+(probability|risk)\s+(predict|score|assess)|(score|assess|predict|rank|rate)\w*\s+(an\s+)?individual\s+(criminal|crime|offender)\s+(risk|probability|propensity)|individual\s+criminal\s+(risk|probability|propensity)|(offender|recidivism)\s+(risk|probability)\s+(predict|score)\s+(based\s+on\s+profil|from\s+profil|from\s+personality)|profiling[- ]?based\s+(crime|criminal|offence)\s+(predict|risk)|personality[- ]?based\s+(crime|criminal|offence)\s+(predict|risk)|criminal\s+risk\s+from\s+personality)
+  flags: i
+severity: critical
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 5(1)(d)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 5(1), first subparagraph, point (d):
+    The placing on the market, the putting into service for this specific
+    purpose, or the use of an AI system for making risk assessments of natural
+    persons in order to assess or predict the risk of a natural person
+    committing a criminal offence, based solely on the profiling of a natural
+    person or on assessing their personality traits and characteristics; this
+    prohibition shall not apply to AI systems used to support the human
+    assessment of the involvement of a person in a criminal activity, which is
+    already based on objective and verifiable facts directly linked to a
+    criminal activity.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 5(1)(d) prohibits AI systems that predict
+    individual criminal risk based solely on profiling or personality traits.
+    This is banned in the EU since February 2, 2025. AI assisting human
+    assessment based on objective verifiable facts linked to criminal
+    activity may still be permissible. Penalties: up to €35M or 7% of global
+    revenue.
+  suggestion: >-
+    Replace standalone profiling-based criminal risk prediction with a
+    human-led assessment that uses objective, verifiable facts directly
+    linked to the criminal activity. AI may support — but not replace — the
+    human decision-maker, and must not rely solely on personality traits or
+    profiling.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-5
+- prohibited-practice
+- predictive-policing
+- profiling
+- proactive
+tier: enterprise

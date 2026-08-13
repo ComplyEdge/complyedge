@@ -1,0 +1,67 @@
+id: EU_AI_ACT_GPAI_SYSTEMIC_RISK_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Imposes additional obligations on providers of general-purpose AI models
+  with systemic risk, including models trained with more than 10^25 FLOPs.
+  Article 55 of the EU AI Act requires these providers to perform model
+  evaluations, assess and mitigate systemic risks, conduct adversarial
+  testing (red teaming), report serious incidents, and ensure adequate
+  cybersecurity protections.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes deploying, operating,
+    or distributing a large-scale or systemic risk general-purpose AI
+    model (such as one trained with over 10^25 FLOPs) without performing
+    the required adversarial testing, red teaming, model evaluation,
+    incident reporting, or systemic risk mitigation as mandated by
+    Article 55 of the EU AI Act.
+  model: gpt-4
+- type: regex
+  value: (large[\-\s]scale|systemic[\-\s]risk|high[\-\s]capability|frontier)\s+(model|gpai|ai\s+model|ai\s+system)\b.{0,30}(without|lacking|missing|no)\s+(adversarial\s+test|red[\-\s]?team|incident\s+report|risk\s+mitigation|model\s+evaluation|safety\s+assessment)
+  flags: i
+severity: critical
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 55
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 55: Providers of general-purpose AI
+    models with systemic risk shall perform model evaluation in accordance
+    with standardised protocols and tools, including conducting and
+    documenting adversarial testing of the model with a view to identifying
+    and mitigating systemic risks, including for all groups of persons
+    affected by such risks.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 35,000,000 or 7% of worldwide annual turnover
+    reputational: Severe reputational damage and potential market exclusion
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 55 requires providers of systemic risk GPAI
+    models (including those trained with >10^25 FLOPs) to conduct adversarial
+    testing, red teaming, model evaluation, incident reporting, and systemic
+    risk mitigation. Non-compliance may result in penalties of up to
+    EUR 35M or 7% of global annual turnover.
+  suggestion: >-
+    Before deploying a systemic risk GPAI model, conduct comprehensive
+    adversarial testing and red teaming exercises. Document all model
+    evaluations and establish an incident reporting mechanism. Implement
+    ongoing systemic risk monitoring and maintain cybersecurity protections.
+    Notify the AI Office of any serious incidents without delay.
+version: 1.0.0
+tags:
+- eu-ai-act
+- gpai
+- article-55
+- systemic-risk
+- red-teaming
+- adversarial-testing
+- incident-reporting
+tier: enterprise

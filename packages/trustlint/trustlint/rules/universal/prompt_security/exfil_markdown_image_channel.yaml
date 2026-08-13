@@ -1,0 +1,48 @@
+id: PROMPT_SECURITY_EXFIL_MARKDOWN_IMAGE_CHANNEL_001
+jurisdiction: GLOBAL
+effective_date: '2026-07-05'
+description: >-
+  Detects the markdown-image / link data-exfiltration channel used by indirect
+  prompt injection: a markdown image or link whose URL query smuggles captured
+  data to an external host. EU AI Act Article 15. OWASP LLM01 / LLM06.
+title: Injection exfiltration — markdown image/link data channel
+detection_scope: all
+conditions:
+- type: regex
+  value: >-
+    (?i)(?:!\[[^\]]*\]\(|<img[^>]+src=["']?|\]\()https?://[^)"'\s]*[?&](?:data|leak|exfil|prompt|sys(?:tem)?|content|payload|q|c|s|secret|token)=
+  flags: i
+severity: critical
+category: security
+source:
+  regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
+  article: Regulation (EU) 2024/1689, Article 15
+  url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  citation: >-
+    OWASP LLM Top 10 — LLM01/LLM06. Rendering a markdown image/link whose URL
+    carries captured text is the canonical zero-click exfiltration channel for
+    indirect prompt injection; Article 15 cybersecurity requires blocking it.
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: both
+  message: >-
+    🛑 Blocked — a markdown image/link is smuggling data in its URL query
+    (data-exfiltration channel).
+  suggestion: >-
+    Strip or sanitise auto-rendering markdown images/links in model I/O; never
+    allow untrusted content to embed URLs with captured data in query strings.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- prompt_injection
+- ipi
+- data_exfiltration
+- markdown_image
+- zero_click
+- article_15
+- owasp_llm01
+- owasp_llm06
+- security
+tier: community

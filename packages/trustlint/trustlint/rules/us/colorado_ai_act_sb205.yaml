@@ -1,0 +1,106 @@
+id: COLORADO_AI_ACT_SB205_001
+jurisdiction: US
+effective_date: '2026-02-01'
+description: >-
+  Requires developers and deployers of high-risk artificial intelligence
+  systems to use reasonable care to protect consumers from algorithmic
+  discrimination. Mandates impact assessments, risk management programs,
+  consumer notice for consequential decisions, and disclosure to the
+  Attorney General. Colorado SB24-205 ("Colorado AI Act").
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    development or deployment of a high-risk artificial intelligence system
+    in Colorado without exercising reasonable care to protect consumers from
+    algorithmic discrimination, in violation of Colorado SB24-205. A "high-
+    risk AI system" is one that, when deployed, makes or is a substantial
+    factor in making a consequential decision (affecting education,
+    employment, financial/lending services, essential government services,
+    healthcare, housing, insurance, or legal services). Detect: (1)
+    deploying high-risk AI without an impact assessment, (2) failing to
+    implement a risk management policy/program, (3) failing to notify
+    consumers when a consequential decision is made about them, (4) failing
+    to provide opportunity to correct data or appeal an adverse decision,
+    (5) failing to disclose algorithmic discrimination to the AG within
+    90 days, (6) failing to disclose AI interaction to consumers. Do NOT flag
+    compliant deployments with documented impact assessments and proper
+    consumer notices.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:deploy|use|launch|operat\w*)\s+(?:high[\-\s]risk\s+)?(?:AI|artificial\s+intelligence|algorithm|automated\s+decision)\s+(?:system|model|tool)\s+(?:without|lacking)\s+(?:impact\s+assessment|risk\s+management|bias\s+audit|consumer\s+notice)|(?:no|without)\s+(?:consumer\s+notice|consumer\s+disclosure)\s+(?:before|for)\s+(?:consequential\s+decision|automated\s+decision|algorithmic\s+decision)|(?:algorithmic\s+discrimination|bias)\s+(?:not\s+disclosed|hidden|conceal\w*|undisclos\w*)\s+(?:to\s+)?(?:attorney\s+general|AG|regulator)|(?:no|without)\s+(?:right\s+to\s+appeal|opportunity\s+to\s+correct|human\s+review)\s+(?:of\s+)?(?:AI|algorithmic|automated)\s+decision|(?:AI|chatbot|automated\s+system)\s+(?:interaction|chat)\s+(?:without|lacking)\s+(?:disclosure|notification|notice)\s+(?:to\s+)?(?:consumer|user)|(?:education|employment|lending|housing|insurance|healthcare|legal|government)\s+(?:decision|determination)\s+(?:by|using)\s+(?:AI|algorithm|automated)\s+(?:without|lacking)\s+(?:notice|disclosure|review))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: Colorado AI Act
+  article: SB24-205
+  url: https://leg.colorado.gov/bills/sb24-205
+  last_updated: '2024-05-17'
+  citation: >-
+    Colorado SB24-205, Bill Summary (signed by Governor May 17, 2024,
+    effective February 1, 2026): On and after February 1, 2026, the act
+    requires a developer of a high-risk artificial intelligence system
+    (high-risk system) to use reasonable care to protect consumers from any
+    known or reasonably foreseeable risks of algorithmic discrimination in
+    the high-risk system. … The act also, on and after February 1, 2026,
+    requires a deployer of a high-risk system to use reasonable care to
+    protect consumers from any known or reasonably foreseeable risks of
+    algorithmic discrimination in the high-risk system. There is a rebuttable
+    presumption that a deployer used reasonable care if the deployer complied
+    with specified provisions in the act, including: implementing a risk
+    management policy and program for the high-risk system; completing an
+    impact assessment of the high-risk system; annually reviewing the
+    deployment of each high-risk system deployed by the deployer to ensure
+    that the high-risk system is not causing algorithmic discrimination;
+    notifying a consumer of specified items if the high-risk system makes,
+    or will be a substantial factor in making, a consequential decision
+    concerning the consumer; providing a consumer with an opportunity to
+    correct any incorrect personal data that a high-risk system processed in
+    making a consequential decision; providing a consumer with an opportunity
+    to appeal, via human review if technically feasible, an adverse
+    consequential decision concerning the consumer arising from the
+    deployment of a high-risk system; … and disclosing to the attorney
+    general the discovery of algorithmic discrimination, within 90 days
+    after the discovery, that the high-risk system has caused. A person
+    doing business in this state, including a deployer or other developer,
+    that deploys or makes available an artificial intelligence system that is
+    intended to interact with consumers must ensure disclosure to each
+    consumer who interacts with the artificial intelligence system that the
+    consumer is interacting with an artificial intelligence system.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: >-
+      Violations are deceptive trade practices under the Colorado Consumer
+      Protection Act. Enforcement is by the Colorado Attorney General with
+      exclusive enforcement authority; no private right of action.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — Colorado SB24-205 requires reasonable care to protect consumers
+    from algorithmic discrimination in high-risk AI systems. Deployers must
+    perform impact assessments, implement risk management programs, notify
+    consumers of consequential decisions, and disclose discrimination to the
+    AG within 90 days. Effective February 1, 2026.
+  suggestion: >-
+    Before deploying any high-risk AI system in Colorado: (1) complete a
+    documented impact assessment, (2) implement a risk management policy
+    aligned with NIST AI RMF or similar recognised framework, (3) provide
+    consumer notice when AI is a substantial factor in a consequential
+    decision, (4) offer rights to correct data and appeal via human review,
+    (5) annually review for algorithmic discrimination, (6) disclose any
+    discrimination to the Colorado Attorney General within 90 days, (7)
+    disclose AI interaction to consumers when the system is consumer-facing.
+version: 1.0.0
+tags:
+- colorado
+- ai-act
+- sb24-205
+- algorithmic-discrimination
+- high-risk-ai
+- impact-assessment
+- consumer-protection
+tier: enterprise
