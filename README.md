@@ -6,11 +6,46 @@
 
 Runtime compliance enforcement for AI agents. Not a scanner: runs in production, on every request.
 
+Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server** — a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
+
 **Article 5 is already law.** GPAI obligations carry fines from 2 August 2026. Your AI is either compliant right now, or it isn't.
 
 > What does your compliance tool tell a regulator when it blocks a request? A probability score?
 >
 > ComplyEdge says: **Article 5(1)(a), rule `rego-art5-1a-001`, timestamp, input hash.** One is an audit trail. One is a guess.
+
+## MCP Server (Model Context Protocol)
+
+ComplyEdge TrustLint is an MCP server built on the official [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) (`mcp>=1.9`). It gives an agent article-cited compliance checks instead of a probability score, and it runs fully offline: no API key, no network call, rules evaluated from the bundled YAML corpus.
+
+**Tools** (the server exposes MCP tools only — no resources, no prompts; all three are read-only and idempotent):
+
+| Tool | What it does |
+|---|---|
+| `check_compliance` | Check text against the TrustLint rule corpus. Returns PASS/FAIL with rule ID, severity, and the article citation behind each finding. |
+| `list_rules` | List available rules, filterable by jurisdiction (`EU`, `US`, `Global`, `Universal`). |
+| `scan_prompt` | Pre-generation prompt scan. Returns `SAFE` or `RISK_DETECTED` before the model is called. |
+
+**Local (stdio)** — for Claude Desktop, Cursor, MCP Inspector, or any MCP host:
+
+```bash
+pip install 'complyedge[mcp]'
+complyedge-mcp          # or: python -m complyedge.mcp_server
+```
+
+```json
+{
+  "mcpServers": {
+    "complyedge": {
+      "command": "complyedge-mcp"
+    }
+  }
+}
+```
+
+**Remote (Streamable HTTP):** `https://mcp.complyedge.io/mcp`
+
+Server source: [`sdks/python/complyedge/mcp_server.py`](sdks/python/complyedge/mcp_server.py). Full MCP docs: [`sdks/python/README.md`](sdks/python/README.md). This MCP path uses the offline TrustLint engine; it does not call the hosted OPA/Rego policy API.
 
 ## Live enforcement seals
 
@@ -101,6 +136,7 @@ Both cite the same legal article and differ only in engine. Map between them via
 
 ```
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
+  └ complyedge/mcp_server.py   MCP server (stdio): check_compliance, list_rules, scan_prompt
 packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
 rules/regulations/    64 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
 rules/rego/           63 leaf OPA/Rego policies + 6 package aggregators
@@ -170,6 +206,7 @@ Apache License 2.0: see [LICENSE](LICENSE).
 ## Links
 
 - **Website**: [complyedge.io](https://complyedge.io)
+- **MCP server docs**: [sdks/python/README.md](sdks/python/README.md) · remote endpoint `https://mcp.complyedge.io/mcp`
 - **Blog**: [complyedge.io/blog/](https://complyedge.io/blog/)
 - **GPAI Compliance Benchmark**: [complyedge.io/blog/gpai-compliance-benchmark.html](https://complyedge.io/blog/gpai-compliance-benchmark.html)
 - **Why OPA/Rego for EU AI Act**: [complyedge.io/blog/why-opa-rego-eu-ai-act.html](https://complyedge.io/blog/why-opa-rego-eu-ai-act.html)
