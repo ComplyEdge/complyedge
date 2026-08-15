@@ -34,3 +34,13 @@ Out of scope:
 
 We support the latest released version of each package on PyPI. Older versions
 do not receive security backports: pin to the latest release.
+
+## Vulnerability Report Archive
+
+No vulnerability reports have been resolved yet. Once a report is fixed and
+publicly disclosed, it will be listed here with the CVE (if assigned), the
+affected version range, the fixed version, and a summary of impact.
+
+| Date | Summary | Affected versions | Fixed in | CVE |
+|---|---|---|---|---|
+| — | none yet | — | — | — |
