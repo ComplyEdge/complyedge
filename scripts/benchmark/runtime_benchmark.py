@@ -20,6 +20,7 @@ Usage:
     #   A  --engine llm-only   raw OpenAI judge (needs OPENAI_API_KEY)
     #   B  --engine hybrid     CE /v1/check + semantic fallback (default)
     #   C  --engine opa        CE /v1/check OPA-only (--no-semantic-fallback alias)
+    #   pass^k: --repeat K (prompt passes only if all K trials succeed)
 
 Outputs:
     - Terminal: per-category color-coded summary
@@ -359,30 +360,109 @@ async def run_benchmark(
     semantic_fallback: bool = True,
     engine: str = "hybrid",
     llm_model: str = DEFAULT_LLM_MODEL,
+    repeat: int = 1,
 ) -> list[dict[str, Any]]:
-    """Run all prompts with bounded concurrency."""
-    sem = asyncio.Semaphore(concurrency)
+    """Run all prompts with bounded concurrency.
 
+    When repeat=k>1, each prompt is evaluated k times and collapsed with
+    pass^k (all trials must pass). See collapse_pass_at_k.
+    """
+    if repeat < 1:
+        raise ValueError("repeat must be >= 1")
+
+    sem = asyncio.Semaphore(concurrency)
+    oai = None
     if engine == "llm-only":
         from openai import AsyncOpenAI
 
         oai = AsyncOpenAI()
 
-        async def bounded_llm(p):
-            async with sem:
+    async def one_trial(p: dict[str, Any]) -> dict[str, Any]:
+        async with sem:
+            if engine == "llm-only":
+                assert oai is not None
                 return await check_one_llm_only(oai, llm_model, p, timeout_s)
+            async with httpx.AsyncClient() as client:
+                return await check_one(
+                    client, base_url, api_key, p, timeout_s, semantic_fallback
+                )
 
-        return await asyncio.gather(*(bounded_llm(p) for p in prompts))
+    # Prefer one shared HTTP client for CE arms (cheaper than per-trial).
+    if engine != "llm-only":
 
-    async with httpx.AsyncClient() as client:
-
-        async def bounded(p):
+        async def one_trial_http(
+            client: httpx.AsyncClient, p: dict[str, Any]
+        ) -> dict[str, Any]:
             async with sem:
                 return await check_one(
                     client, base_url, api_key, p, timeout_s, semantic_fallback
                 )
 
-        return await asyncio.gather(*(bounded(p) for p in prompts))
+        async with httpx.AsyncClient() as client:
+
+            async def all_trials(p: dict[str, Any]) -> dict[str, Any]:
+                trials = [await one_trial_http(client, p) for _ in range(repeat)]
+                return collapse_pass_at_k(trials, repeat)
+
+            return await asyncio.gather(*(all_trials(p) for p in prompts))
+
+    async def all_trials_llm(p: dict[str, Any]) -> dict[str, Any]:
+        trials = [await one_trial(p) for _ in range(repeat)]
+        return collapse_pass_at_k(trials, repeat)
+
+    return await asyncio.gather(*(all_trials_llm(p) for p in prompts))
+
+
+def collapse_pass_at_k(
+    trials: list[dict[str, Any]], repeat: int
+) -> dict[str, Any]:
+    """pass^k: a prompt passes only if every trial passed.
+
+    Latency fields are means across trials. trial_results kept for audit
+    (compact: id omitted — same as parent).
+    """
+    if not trials:
+        raise ValueError("collapse_pass_at_k requires at least one trial")
+    base = dict(trials[0])
+    trial_passes = sum(1 for t in trials if t.get("passed"))
+    base["passed"] = trial_passes == repeat
+    base["repeat"] = repeat
+    base["trial_passes"] = trial_passes
+    base["pass_at_k"] = base["passed"]
+    walls = [t["wall_ms"] for t in trials if t.get("wall_ms") is not None]
+    apis = [
+        t["api_latency_ms"] for t in trials if t.get("api_latency_ms") is not None
+    ]
+    base["wall_ms"] = round(statistics.mean(walls), 1) if walls else None
+    base["api_latency_ms"] = round(statistics.mean(apis), 1) if apis else None
+    # Majority actual for display; if any trial erred, surface error.
+    actuals = [t.get("actual") for t in trials]
+    if any(a == "error" for a in actuals):
+        base["actual"] = "error"
+        errs = [t.get("error") for t in trials if t.get("error")]
+        base["error"] = errs[0] if errs else "trial error"
+    elif not base["passed"]:
+        # Prefer the failing actual when mixed (shows the unstable outcome).
+        fails = [t for t in trials if not t.get("passed")]
+        if fails:
+            base["actual"] = fails[0].get("actual")
+            base["violations"] = fails[0].get("violations", [])
+            base["engine_path"] = fails[0].get("engine_path", base.get("engine_path"))
+    base["trial_results"] = [
+        {
+            "passed": t.get("passed"),
+            "actual": t.get("actual"),
+            "wall_ms": t.get("wall_ms"),
+            "api_latency_ms": t.get("api_latency_ms"),
+            "engine_path": t.get("engine_path"),
+            "error": t.get("error"),
+        }
+        for t in trials
+    ]
+    # Critical failure if collapsed fail and any trial was critical intent.
+    if not base["passed"] and any(t.get("critical") for t in trials):
+        base["critical"] = True
+    return base
 
 
 def percentile(values: list[float], pct: float) -> float | None:
@@ -494,17 +574,26 @@ def aggregate(results: list[dict[str, Any]]) -> dict[str, Any]:
             engine_path_dist.get(r["engine_path"], 0) + 1
         )
 
+    passed_n = sum(1 for r in results if r["passed"])
+    total_n = len(results)
+    repeats = {r.get("repeat", 1) for r in results}
+    repeat_k = next(iter(repeats)) if len(repeats) == 1 else max(repeats)
+
     return {
         "categories": cat_summaries,
         "aggregate": {
-            "total_prompts": len(results),
-            "passed": sum(1 for r in results if r["passed"]),
+            "total_prompts": total_n,
+            "passed": passed_n,
             "failed": sum(1 for r in results if not r["passed"]),
             "critical_failures": sum(
                 1 for r in results if not r["passed"] and r["critical"]
             ),
             "detection_rate_blocked_categories": detection_rate,
             "false_positive_rate_safe_harbor": fp_rate,
+            # pass^k: when --repeat k>1, "passed" already means all k trials passed
+            "repeat": repeat_k,
+            "pass_at_k_rate": round(passed_n / total_n * 100, 1) if total_n else 0,
+            "pass_at_k_definition": "all k trials must pass",
             # wall_ms: client-side end-to-end time including concurrency queue — NOT the CE SLA metric
             "wall_ms": {
                 "p50": round(percentile(all_wall, 50) or 0, 1),
@@ -541,7 +630,17 @@ def render_terminal(
 ) -> None:
     print(f"\n{C.BOLD}═══ GPAI Runtime Detection Benchmark ═══{C.END}")
     print(f"{C.DIM}Target: {base_url}{C.END}")
-    print(f"{C.DIM}Run: {summary['run_id']} @ {summary['timestamp']}{C.END}\n")
+    print(f"{C.DIM}Run: {summary['run_id']} @ {summary['timestamp']}{C.END}")
+    engine = summary.get("engine")
+    if engine:
+        print(f"{C.DIM}Engine: {engine}{C.END}")
+    repeat = summary.get("aggregate", {}).get("repeat", 1)
+    if repeat and repeat > 1:
+        print(
+            f"{C.DIM}pass^{repeat}: a prompt counts only if all {repeat} trials pass"
+            f"{C.END}"
+        )
+    print()
 
     print(f"{'Category':14}  {'Pass':>6}  {'api_lat p99':>11}  {'wall p99':>8}  attr")
     print(f"{'─'*14}  {'─'*6}  {'─'*11}  {'─'*8}  {'─'*4}")
@@ -664,7 +763,18 @@ def main() -> int:
         default=os.environ.get("OPENAI_MODEL", DEFAULT_LLM_MODEL),
         help=f"Model for --engine llm-only (default: {DEFAULT_LLM_MODEL})",
     )
+    p.add_argument(
+        "--repeat",
+        type=int,
+        default=1,
+        metavar="K",
+        help="pass^k: evaluate each prompt K times; pass only if all K succeed (default 1)",
+    )
     args = p.parse_args()
+
+    if args.repeat < 1:
+        print(f"{C.R}ERROR: --repeat must be >= 1{C.END}", file=sys.stderr)
+        return 2
 
     engine = resolve_engine(args.engine, args.no_semantic_fallback)
     semantic_fallback = engine == "hybrid"
@@ -711,6 +821,8 @@ def main() -> int:
             "opa": "OPA-only (C · default customer mode)",
         }[engine]
     print(f"{C.DIM}Mode: {mode}{C.END}")
+    if args.repeat > 1:
+        print(f"{C.DIM}pass^{args.repeat} enabled{C.END}")
     results = asyncio.run(
         run_benchmark(
             args.base_url,
@@ -721,6 +833,7 @@ def main() -> int:
             semantic_fallback,
             engine=engine,
             llm_model=args.llm_model,
+            repeat=args.repeat,
         )
     )
 
@@ -731,6 +844,7 @@ def main() -> int:
     summary["corpus_sha"] = sha
     summary["category_filter"] = args.category
     summary["engine"] = engine
+    summary["repeat"] = args.repeat
     if engine == "llm-only":
         summary["llm_model"] = args.llm_model
 
