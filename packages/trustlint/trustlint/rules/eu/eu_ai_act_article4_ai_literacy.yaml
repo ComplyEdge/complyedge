@@ -1,0 +1,67 @@
+id: EU_AI_ACT_ART4_AI_LITERACY_001
+jurisdiction: EU
+effective_date: '2025-02-02'
+description: >-
+  Requires providers and deployers of AI systems to take measures to ensure a
+  sufficient level of AI literacy of their staff and other persons dealing with
+  the operation and use of AI systems on their behalf. Article 4. Effective 2
+  February 2025.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    deploying or providing AI systems to staff or third parties without
+    ensuring a sufficient level of AI literacy as required by EU AI Act
+    Article 4. Providers and deployers must take measures to ensure their
+    staff (and other persons dealing with the operation and use of AI systems
+    on their behalf) have sufficient AI literacy, taking into account technical
+    knowledge, experience, education and training, the context of use, and the
+    persons or groups on whom the AI systems are to be used. Detect intent to
+    skip AI literacy training, deploy AI without staff competence, or rely on
+    untrained operators. Do NOT flag general technology training, AI ethics
+    discussions, or compliant AI literacy programs.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:no|without|skip|skipping|bypass|omit\w*)\s+(?:AI\s+literacy|AI\s+training|AI\s+competence|staff\s+training)\s+(?:program|requirement|measure|assessment)?|(?:deploy|roll\s*out|provide|use)\w*\s+(?:AI|artificial\s+intelligence)\s+(?:system|tool)\s+(?:without|lacking)\s+(?:staff|operator|user|employee)\s+(?:training|literacy|competence|education)|(?:untrained|unqualified|inexperienced)\s+(?:staff|operators|users|employees)\s+(?:operating|using|deploying)\s+(?:AI|artificial\s+intelligence)|(?:AI\s+literacy|Article\s+4)\s+(?:obligation|requirement)\s+(?:not\s+met|ignored|skipped)|no\s+(?:AI|artificial\s+intelligence)\s+(?:training|education|literacy)\s+(?:program|provided|required))
+  flags: i
+severity: medium
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 4
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 4 (AI literacy): Providers and deployers
+    of AI systems shall take measures to ensure, to their best extent, a
+    sufficient level of AI literacy of their staff and other persons dealing
+    with the operation and use of AI systems on their behalf, taking into
+    account their technical knowledge, experience, education and training and
+    the context the AI systems are to be used in, and considering the persons
+    or groups of persons on whom the AI systems are to be used.
+penalty_information:
+  civil_penalties:
+    eu_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover (Article 99)
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 4 requires providers and deployers to ensure a
+    sufficient level of AI literacy of staff and other persons operating AI
+    systems on their behalf. Effective 2 February 2025.
+  suggestion: >-
+    Implement an AI literacy programme proportionate to staff roles, the
+    context of use, and the affected persons or groups. Consider technical
+    knowledge, experience, education and training. Document training records
+    and refresh periodically as systems evolve.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-4
+- ai-literacy
+- training
+- providers
+- deployers
+tier: enterprise

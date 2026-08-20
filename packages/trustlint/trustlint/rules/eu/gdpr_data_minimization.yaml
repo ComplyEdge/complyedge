@@ -1,0 +1,43 @@
+id: GDPR_DATA_MINIMIZATION_001
+jurisdiction: EU
+effective_date: '2018-05-25'
+description: Personal data collection must be adequate, relevant and limited to what
+  is necessary
+conditions:
+- type: semantic
+  prompt: Does this request collect more personal data than necessary for the stated
+    purpose? Consider if each data field is directly relevant and needed.
+  model: gpt-5.4
+- type: regex
+  value: (collect|gather|request).*(personal|sensitive) (data|information)
+  flags: i
+severity: medium
+category: privacy
+source:
+  regulation: GDPR
+  article: Article 5(1)(c)
+  # Retrieved 2026-08-06 from the Official Journal PDF (the authoritative
+  # published text), OJ L 119, 4.5.2016, p. 35, CELEX 32016R0679.
+  #
+  # It took the PDF because every HTML route truncates: the CELEX HTML, the ELI
+  # route and the Publications Office cellar object all return the recitals and
+  # stop before Article 5. An earlier attempt PARAPHRASED this text as "for the
+  # purposes", and the Official Journal confirms the real wording is "in
+  # relation to the purposes" -- so the paraphrase would have published a
+  # subtly wrong quote of a statute in a compliance product.
+  citation: >-
+    Regulation (EU) 2016/679 (GDPR), Article 5(1)(c): personal data shall be
+    "adequate, relevant and limited to what is necessary in relation to the
+    purposes for which they are processed ('data minimisation')".
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  last_updated: '2016-04-27'
+remediation:
+  action: warn
+  message: Data collection may violate GDPR data minimization principle
+  suggestion: Review if all requested data fields are necessary for the stated purpose
+version: 1.0.0
+tags:
+- data_minimization
+- personal_data
+- collection
+tier: enterprise

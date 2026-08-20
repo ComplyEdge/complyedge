@@ -2,6 +2,18 @@
 
 Runtime compliance engine for EU AI Act. Open source. Deterministic.
 
+## Choose the Right Package
+
+`complyedge` is the Python client for the hosted ComplyEdge runtime API. It
+enforces policy decisions in your application and records the resulting
+evidence trail. For an offline command-line linter with no API key, use
+[TrustLint](https://pypi.org/project/trustlint/) instead.
+
+- [ComplyEdge package](https://pypi.org/project/complyedge/)
+- [TrustLint package](https://pypi.org/project/trustlint/)
+- [Documentation](https://complyedge.io/docs)
+- [Trust portal](https://trust.complyedge.io)
+
 ## Installation
 
 ```bash

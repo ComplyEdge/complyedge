@@ -1,14 +1,54 @@
 # TrustLint
 
-**Offline compliance linter for AI agents** — scans text against the ComplyEdge rule corpus using Tier 1 regex patterns. No API key required.
+[![npm version](https://img.shields.io/npm/v/trustlint)](https://www.npmjs.com/package/trustlint)
+[![npm downloads](https://img.shields.io/npm/dw/trustlint)](https://www.npmjs.com/package/trustlint)
+[![license](https://img.shields.io/npm/l/trustlint)](https://github.com/ComplyEdge/complyedge/blob/main/LICENSE)
+
+**Offline Node.js compliance linter for AI agents** — scans text against the bundled ComplyEdge rule corpus using Tier 1 regex patterns. No API key required.
 
 Catches EU AI Act, SOX, HIPAA, GDPR, COPPA, and PCI DSS violations before they reach production.
 
+## Hosted API vs. Offline Linter
+
+TrustLint runs locally and needs no API key. For runtime policy enforcement and
+an application-facing evidence trail, use the hosted
+[ComplyEdge Python SDK](https://pypi.org/project/complyedge/).
+
+- [ComplyEdge TypeScript SDK](https://www.npmjs.com/package/@complyedge/sdk)
+- [ComplyEdge MCP server](https://www.npmjs.com/package/@complyedge/mcp)
+- [ComplyEdge on PyPI](https://pypi.org/project/complyedge/)
+- [TrustLint on PyPI](https://pypi.org/project/trustlint/)
+- [Documentation](https://complyedge.io/docs)
+- [Trust portal](https://trust.complyedge.io)
+
 ## Installation
+
+This is the npm package README. PyPI uses its own
+[Python-first long description](PYPI_README.md), while both distributions use
+the same bundled rule corpus.
+
+Node.js:
+
+```bash
+npm install trustlint
+```
+
+Python:
 
 ```bash
 pip install trustlint
 ```
+
+Both bundle the rule corpus, so neither needs a local `rules/` directory.
+
+## Limitations (Node vs. Python)
+
+- The npm and PyPI packages share a rule corpus but not the same engine. Python
+  TrustLint evaluates temporal and effective-date rule state; the Node engine
+  runs Tier 1 regex and hybrid Tier-1 patterns only. Semantic-only YAML
+  conditions are skipped.
+- In the current npm release, 52 Tier-1 rules load from 64 bundled YAML files.
+  A version number is not a parity claim with PyPI TrustLint.
 
 ## Quick Start
 

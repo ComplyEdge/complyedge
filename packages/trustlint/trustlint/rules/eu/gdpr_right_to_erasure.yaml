@@ -1,0 +1,71 @@
+id: GDPR_RIGHT_TO_ERASURE_001
+jurisdiction: EU
+effective_date: '2018-05-25'
+description: >-
+  Requires controllers to erase personal data without undue delay when
+  requested by the data subject, where the data is no longer necessary,
+  consent is withdrawn, the subject objects, or data was unlawfully processed.
+  The right to be forgotten under GDPR Article 17.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    refusing or failing to honour a data subject's right to erasure (right to
+    be forgotten) under GDPR Article 17. The controller shall erase personal
+    data without undue delay where: (a) the data is no longer necessary for
+    its original purpose, (b) the data subject withdraws consent and there is
+    no other legal ground, (c) the data subject objects under Article 21,
+    (d) the data was unlawfully processed, (e) erasure is required by Union
+    or Member State law, or (f) data was collected in relation to information
+    society services offered to a child. Exceptions exist for freedom of
+    expression, legal obligations, public health, archiving, and legal claims.
+  model: gpt-4
+- type: regex
+  value: >-
+    (refus(?:e|ing)\s+(?:to\s+)?(?:erase|delete)\s+personal\s+data|cannot\s+(?:erase|delete)\s+(?:your|the|personal)\s+data|(?:erasure|deletion)\s+request\s+(?:denied|rejected|refused)|no\s+right\s+to\s+(?:erasure|deletion|be\s+forgotten)|(?:ignore|ignoring|disregard)\s+(?:erasure|deletion)\s+request|personal\s+data\s+(?:cannot|will\s+not)\s+be\s+(?:erased|deleted|removed)|retain(?:ing)?\s+(?:personal\s+)?data\s+(?:despite|after)\s+(?:erasure|deletion)\s+request|fail(?:ing|ure)?\s+to\s+(?:erase|delete)\s+(?:personal\s+)?data\s+(?:within|without\s+undue\s+delay))
+  flags: i
+severity: high
+category: privacy
+source:
+  regulation: GDPR
+  article: Article 17
+  url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+  last_updated: '2016-04-27'
+  citation: >-
+    Regulation (EU) 2016/679, Article 17(1): The data subject shall have the
+    right to obtain from the controller the erasure of personal data concerning
+    him or her without undue delay and the controller shall have the obligation
+    to erase personal data without undue delay where one of the following
+    grounds applies: (a) the personal data are no longer necessary in relation
+    to the purposes for which they were collected or otherwise processed;
+    (b) the data subject withdraws consent on which the processing is based
+    according to point (a) of Article 6(1), or point (a) of Article 9(2), and
+    where there is no other legal ground for the processing; (c) the data
+    subject objects to the processing pursuant to Article 21(1) and there are
+    no overriding legitimate grounds for the processing; (d) the personal data
+    have been unlawfully processed.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 20,000,000 or 4% of worldwide annual turnover
+remediation:
+  action: block
+  timing: reactive
+  message: >-
+    BLOCKED — GDPR Article 17 grants data subjects the right to erasure
+    (right to be forgotten). Controllers must erase personal data without
+    undue delay when requested on valid grounds. Penalties: up to EUR 20M
+    or 4% of global revenue.
+  suggestion: >-
+    Honour the erasure request by deleting the personal data without undue
+    delay. If an exception applies (freedom of expression, legal obligation,
+    public health, archiving, legal claims), document the legal basis for
+    continued retention and inform the data subject.
+version: 1.0.0
+tags:
+- gdpr
+- article-17
+- right-to-erasure
+- right-to-be-forgotten
+- data-subject-rights
+tier: enterprise
