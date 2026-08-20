@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trustlint"
+dynamic = ["version"]
+description = "Offline compliance linter for AI agents — scans text against the ComplyEdge rule corpus"
+readme = {file = "PYPI_README.md", content-type = "text/markdown"}
+license = {text = "Apache-2.0"}
+requires-python = ">=3.9"
+keywords = [
+    "ai-agents",
+    "compliance",
+    "eu-ai-act",
+    "offline-linter",
+    "security",
+    "trustlint",
+]
+authors = [
+    {name = "ComplyEdge", email = "support@complyedge.io"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "click>=8.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+trustlint = "trustlint.cli:main"
+
+[project.urls]
+Homepage = "https://complyedge.io"
+Documentation = "https://complyedge.io/docs"
+Repository = "https://github.com/ComplyEdge/complyedge"
+Issues = "https://github.com/ComplyEdge/complyedge/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "trustlint.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["trustlint*"]
+
+[tool.setuptools.package-data]
+trustlint = ["rules/**/*.yaml", "rules/**/*.yml"]

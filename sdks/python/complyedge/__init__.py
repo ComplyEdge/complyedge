@@ -58,7 +58,7 @@ from tenacity import (
     wait_exponential,
 )
 
-__version__ = "0.2.8"
+__version__ = "0.2.10"
 
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")

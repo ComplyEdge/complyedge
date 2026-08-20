@@ -1,3 +1,3 @@
 """TrustLint — offline compliance linter for AI agents."""
 
-__version__ = "2.0.4"
+__version__ = "2.0.6"
