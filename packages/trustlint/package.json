@@ -1,0 +1,69 @@
+{
+  "name": "trustlint",
+  "version": "2.0.5",
+  "description": "Offline EU AI Act compliance linter for AI agents. Tier-1 regex scan of prompts and outputs against a bundled 64-rule corpus — Art. 5 prohibited practices, Art. 50 transparency, GDPR, HIPAA, SOX, PCI DSS, COPPA. CLI and library. No API key, no network call.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "trustlint": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "eu-ai-act",
+    "ai-act",
+    "compliance",
+    "compliance-linter",
+    "ai-governance",
+    "offline",
+    "prompt-security",
+    "linter",
+    "cli",
+    "ci",
+    "article-5",
+    "gdpr",
+    "hipaa",
+    "sox",
+    "pci-dss",
+    "coppa",
+    "trustlint",
+    "complyedge"
+  ],
+  "author": "ComplyEdge <support@complyedge.io>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ComplyEdge/complyedge.git",
+    "directory": "packages/trustlint"
+  },
+  "bugs": {
+    "url": "https://github.com/ComplyEdge/complyedge/issues"
+  },
+  "homepage": "https://www.complyedge.io/docs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsup && node scripts/copy-rules.mjs",
+    "dev": "tsup --watch",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm run lint && npm run test"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}

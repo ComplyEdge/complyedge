@@ -1,0 +1,95 @@
+{
+  "name": "@complyedge/sdk",
+  "version": "0.2.3",
+  "description": "EU AI Act runtime enforcement SDK: OPA/Rego policy checks, Article 12 audit trails, risk assessment, and OpenAI middleware.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "eu-ai-act",
+    "ai-act",
+    "ai-governance",
+    "ai-compliance",
+    "compliance",
+    "runtime-enforcement",
+    "guardrails",
+    "llm-security",
+    "opa",
+    "rego",
+    "audit-trail",
+    "article-12",
+    "risk-assessment",
+    "openai",
+    "sdk",
+    "typescript"
+  ],
+  "author": "ComplyEdge",
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./openai-middleware": {
+      "types": "./dist/openai-middleware.d.ts",
+      "import": "./dist/openai-middleware.mjs",
+      "require": "./dist/openai-middleware.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run test && npm run lint"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0"
+  },
+  "peerDependencies": {
+    "openai": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "openai": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ComplyEdge/complyedge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ComplyEdge/complyedge/issues"
+  },
+  "homepage": "https://www.complyedge.io/docs/quick-start.html",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
