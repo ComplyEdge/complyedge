@@ -1,0 +1,73 @@
+{
+  "name": "@complyedge/mcp",
+  "version": "0.1.5",
+  "description": "Offline MCP server for EU AI Act compliance checks. Three read-only tools over a bundled 64-rule corpus \u2014 Art. 5 prohibited practices, Art. 50 transparency, GDPR, HIPAA, SOX, PCI DSS, COPPA. Runs with npx: no Python, no API key, no network call.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "mcpName": "io.github.ComplyEdge/complyedge",
+  "type": "module",
+  "bin": {
+    "complyedge-mcp": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run type-check && npm run test"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "eu-ai-act",
+    "ai-act",
+    "ai-governance",
+    "ai-compliance",
+    "ai-safety",
+    "compliance",
+    "prompt-scanning",
+    "prompt-injection",
+    "offline",
+    "article-5",
+    "article-50",
+    "gdpr",
+    "hipaa",
+    "sox",
+    "pci-dss",
+    "coppa",
+    "npx",
+    "trustlint",
+    "complyedge"
+  ],
+  "author": "ComplyEdge <support@complyedge.io>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ComplyEdge/complyedge.git",
+    "directory": "packages/mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/ComplyEdge/complyedge/issues"
+  },
+  "homepage": "https://www.complyedge.io/docs/quick-start.html",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "trustlint": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}
