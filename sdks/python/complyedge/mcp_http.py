@@ -31,6 +31,32 @@ from complyedge.mcp_server import (
 
 logger = logging.getLogger("complyedge.mcp.http")
 
+
+def _health_payload() -> tuple[dict[str, Any], int]:
+    """Hosted MCP readiness. An empty TrustLint corpus is not healthy.
+
+    Tools already refuse PASS/SAFE on zero rules. Health used to report
+    healthy anyway, so a load balancer kept sending traffic at a server
+    that cannot evaluate.
+    """
+    try:
+        n = len(_get_engine().rules)
+    except Exception:
+        n = 0
+    body: dict[str, Any] = {
+        "server": "complyedge-mcp-trustlint",
+        "transport": "streamable-http",
+        "stateless": True,
+        "tools": list(TOOL_NAMES),
+        "rules_loaded": n,
+    }
+    if n:
+        body["status"] = "healthy"
+        return body, 200
+    body["status"] = "unhealthy"
+    body["reason"] = "TrustLint corpus is empty"
+    return body, 503
+
 Jurisdiction = Literal["EU", "US", "GLOBAL"]
 
 # Per-container soft rate limit (API Gateway throttle + WAF are primary).
@@ -38,20 +64,35 @@ _rate_buckets: dict[str, deque[float]] = defaultdict(deque)
 
 
 def _client_ip(request: Request) -> str:
-    forwarded = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
+    """Client identity for the in-process rate limit.
+
+    Take the *rightmost* X-Forwarded-For hop. API Gateway appends the connecting
+    client; the leftmost value is attacker-controlled. Using the first hop
+    let a client rotate spoofed IPs and bypass the per-IP cap.
+    """
+    forwarded = (request.headers.get("x-forwarded-for") or "").strip()
     if forwarded:
-        return forwarded
+        hops = [part.strip() for part in forwarded.split(",") if part.strip()]
+        if hops:
+            return hops[-1]
     if request.client and request.client.host:
         return request.client.host
     return "unknown"
 
 
+_DEFAULT_RATE_LIMIT_PER_MINUTE = 120
+
+
 def _rate_limit_per_minute() -> int:
-    raw = os.environ.get("MCP_RATE_LIMIT_PER_MINUTE", "120").strip()
+    """Per-IP cap. Zero/negative/garbage is the default, not unlimited."""
+    raw = os.environ.get("MCP_RATE_LIMIT_PER_MINUTE", str(_DEFAULT_RATE_LIMIT_PER_MINUTE)).strip()
     try:
-        return max(0, int(raw))
+        n = int(raw)
     except ValueError:
-        return 120
+        return _DEFAULT_RATE_LIMIT_PER_MINUTE
+    if n < 1:
+        return _DEFAULT_RATE_LIMIT_PER_MINUTE
+    return n
 
 
 class _PerIpRateLimitMiddleware(BaseHTTPMiddleware):
@@ -60,7 +101,7 @@ class _PerIpRateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         limit = _rate_limit_per_minute()
         path = request.url.path or ""
-        if limit <= 0 or path.rstrip("/").endswith("/health"):
+        if path.rstrip("/").endswith("/health"):
             return await call_next(request)
 
         ip = _client_ip(request)
@@ -89,20 +130,24 @@ def _reset_rate_limit_state_for_tests() -> None:
     _rate_buckets.clear()
 
 
+_DEV_ENVS = frozenset({"development", "dev", "test", "testing", "local"})
+
+
+def _is_dev_env() -> bool:
+    env = (os.environ.get("ENVIRONMENT") or os.environ.get("ENV") or "").strip().lower()
+    return env in _DEV_ENVS
+
+
 def _allowed_hosts() -> list[str]:
     """Host headers accepted behind mcp.complyedge.io (and local smoke)."""
     raw = os.environ.get("MCP_ALLOWED_HOSTS", "").strip()
     if raw:
         return [h.strip() for h in raw.split(",") if h.strip()]
     domain = os.environ.get("DOMAIN", "complyedge.io").strip() or "complyedge.io"
-    return [
-        f"mcp.{domain}",
-        f"mcp.{domain}:*",
-        "localhost",
-        "localhost:*",
-        "127.0.0.1",
-        "127.0.0.1:*",
-    ]
+    hosts = [f"mcp.{domain}", f"mcp.{domain}:*"]
+    if _is_dev_env():
+        hosts.extend(["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*"])
+    return hosts
 
 
 def _allowed_origins() -> list[str]:
@@ -121,8 +166,18 @@ def _allowed_origins() -> list[str]:
 
 def _transport_security() -> TransportSecuritySettings:
     # Public discovery MCP: Host allowlist on; Origin absent is OK (MCP clients).
-    if os.environ.get("MCP_DNS_REBINDING", "1").strip() in ("0", "false", "False"):
+    want_off = os.environ.get("MCP_DNS_REBINDING", "1").strip().lower() in (
+        "0",
+        "false",
+        "no",
+    )
+    if want_off and _is_dev_env():
         return TransportSecuritySettings(enable_dns_rebinding_protection=False)
+    if want_off:
+        logger.warning(
+            "mcp_dns_rebinding_disable_ignored env=%s",
+            (os.environ.get("ENVIRONMENT") or os.environ.get("ENV") or "unset"),
+        )
     return TransportSecuritySettings(
         enable_dns_rebinding_protection=True,
         allowed_hosts=_allowed_hosts(),
@@ -198,15 +253,8 @@ def create_mcp() -> FastMCP:
 
     @mcp.custom_route("/health", methods=["GET"])
     async def health(_request: Request) -> Response:
-        return JSONResponse(
-            {
-                "status": "healthy",
-                "server": "complyedge-mcp-trustlint",
-                "transport": "streamable-http",
-                "stateless": True,
-                "tools": list(TOOL_NAMES),
-            }
-        )
+        body, code = _health_payload()
+        return JSONResponse(body, status_code=code)
 
     # Silence unused-name lint for TOOL_NAMES order documentation
     assert TOOL_NAMES == ("check_compliance", "list_rules", "scan_prompt")

@@ -118,7 +118,7 @@ class ComplianceResult:
     # responses that omit them still deserialize. Mapped in every check()
     # path — dropping these was the contract gap that left CI blind.
     engine_path: str = ""
-    audit_logged: bool = True
+    audit_logged: bool = False
 
     @property
     def safe(self) -> bool:
@@ -164,6 +164,27 @@ class ComplianceError(Exception):
         self.violations = violations or []
         self.event_id = event_id
         self.retryable = retryable
+
+
+def _allowed_from_payload(data: dict[str, Any]) -> bool:
+    """Missing ``allowed`` is a block, never a pass.
+
+    The parse sites used to default True, so a 200 with a truncated body
+    (or a proxy that dropped the field) looked like a clean check.
+    ``bool()`` still treated ``"false"`` and ``1`` as a pass. TypeScript
+    requires ``=== true``; match that.
+    """
+    return data.get("allowed") is True
+
+
+def _audit_logged_from_payload(data: dict[str, Any]) -> bool:
+    """Missing ``audit_logged`` is not a logged event.
+
+    The parse sites used to default True, so a truncated 200 claimed an
+    Article 12 write that the body never confirmed. TypeScript already
+    requires ``=== true``.
+    """
+    return data.get("audit_logged") is True
 
 
 # =============================================================================
@@ -299,7 +320,7 @@ class ComplyEdge:
 
             return ComplianceResult(
                 event_id=data["event_id"],
-                allowed=data.get("allowed", True),
+                allowed=_allowed_from_payload(data),
                 violations=violations,
                 latency_ms=data.get("latency_ms", 0),
                 bundle_version=data.get("bundle_version", "opa-rego-v1"),
@@ -307,7 +328,7 @@ class ComplyEdge:
                 text_hash=data.get("text_hash", ""),
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
-                audit_logged=data.get("audit_logged", True),
+                audit_logged=_audit_logged_from_payload(data),
             )
 
         except httpx.HTTPStatusError as e:
@@ -632,7 +653,7 @@ class ComplyEdgeClient:
 
             result = ComplianceResult(
                 event_id=data["event_id"],
-                allowed=data.get("allowed", True),
+                allowed=_allowed_from_payload(data),
                 violations=violations,
                 latency_ms=data.get("latency_ms", 0),
                 bundle_version=data.get("bundle_version", "opa-rego-v1"),
@@ -640,7 +661,7 @@ class ComplyEdgeClient:
                 text_hash=data.get("text_hash", ""),
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
-                audit_logged=data.get("audit_logged", True),
+                audit_logged=_audit_logged_from_payload(data),
             )
 
             if raise_on_violation and not result.allowed:
@@ -802,7 +823,7 @@ class AsyncComplyEdgeClient:
 
             result = ComplianceResult(
                 event_id=data["event_id"],
-                allowed=data.get("allowed", True),
+                allowed=_allowed_from_payload(data),
                 violations=violations,
                 latency_ms=data.get("latency_ms", 0),
                 bundle_version=data.get("bundle_version", "opa-rego-v1"),
@@ -810,7 +831,7 @@ class AsyncComplyEdgeClient:
                 text_hash=data.get("text_hash", ""),
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
-                audit_logged=data.get("audit_logged", True),
+                audit_logged=_audit_logged_from_payload(data),
             )
 
             if raise_on_violation and not result.allowed:

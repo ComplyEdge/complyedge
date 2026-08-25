@@ -44,11 +44,12 @@ class TestRegoCorpus:
             "gpai.rego",
             "highrisk.rego",
             "prompt_security.rego",
+            "us_corpus.rego",
         }
         leaves = [f for f in prod_rego_files if f.name not in AGGREGATOR_NAMES]
-        # 63 leaf + 6 aggregators (article5/50/6, gpai, highrisk, prompt_security)
-        assert len(prod_rego_files) == 69, (
-            f"Expected 69 production .rego files (63 leaf + 6 aggregators), "
+        # 64 leaf + 7 aggregators (article5/50/6, gpai, highrisk, prompt_security, us_corpus)
+        assert len(prod_rego_files) == 71, (
+            f"Expected 71 production .rego files (64 leaf + 7 aggregators), "
             f"found {len(prod_rego_files)}"
         )
         assert (
@@ -90,6 +91,7 @@ class TestRegoCorpus:
             "gpai.rego",
             "highrisk.rego",
             "prompt_security.rego",
+            "us_corpus.rego",
         }
         leaf_files = [f for f in prod_rego_files if f.name not in AGGREGATOR_NAMES]
         missing = []

@@ -68,11 +68,23 @@ def _create_output_guardrail(guardrail_function: Callable, name: str):
         return guardrail_function
 
 
+_RULE_TYPE_PATHS = {
+    "sox": "us/sox",
+    "gdpr": "eu/gdpr",
+    "hipaa": "us/hipaa",
+    "universal": "global/universal",
+    "eu-ai-act": "eu-ai-act/article-5",
+}
+
+
 def create_compliance_guardrail(
     api_key: str,
     rules: str | list[str] = "eu-ai-act/article-5",
     base_url: str = _DEFAULT_BASE_URL,
     direction: str = "input",
+    rule_type: str | None = None,
+    jurisdiction: str | None = None,
+    **_unused: Any,
 ) -> Callable:
     """
     Create a compliance guardrail for AI agent frameworks.
@@ -102,6 +114,10 @@ def create_compliance_guardrail(
             input_guardrails=[guardrail],
         )
     """
+
+    if rule_type:
+        rules = _RULE_TYPE_PATHS.get(rule_type, rule_type)
+    _ = jurisdiction  # accepted for the pre-pivot call sites; unused
 
     ce = ComplyEdge(api_key=api_key, base_url=base_url)
     rules_list = [rules] if isinstance(rules, str) else rules
@@ -181,3 +197,56 @@ def create_compliance_guardrail(
     if direction == "output":
         return _create_output_guardrail(compliance_guardrail, name)
     return _create_input_guardrail(compliance_guardrail, name)
+
+
+def create_sox_guardrail(
+    api_key: str,
+    base_url: str = _DEFAULT_BASE_URL,
+    custom_blocked_message: str | None = None,
+    **kwargs: Any,
+) -> Callable:
+    """Pre-pivot alias. SOX maps onto the same OPA engine as any other rule path."""
+    _ = custom_blocked_message
+    return create_compliance_guardrail(
+        api_key=api_key, rules="us/sox", base_url=base_url, **kwargs
+    )
+
+
+def create_gdpr_guardrail(
+    api_key: str,
+    base_url: str = _DEFAULT_BASE_URL,
+    custom_blocked_message: str | None = None,
+    **kwargs: Any,
+) -> Callable:
+    """Pre-pivot alias. GDPR maps onto the same OPA engine as any other rule path."""
+    _ = custom_blocked_message
+    return create_compliance_guardrail(
+        api_key=api_key, rules="eu/gdpr", base_url=base_url, **kwargs
+    )
+
+
+def create_hipaa_guardrail(
+    api_key: str,
+    base_url: str = _DEFAULT_BASE_URL,
+    custom_blocked_message: str | None = None,
+    **kwargs: Any,
+) -> Callable:
+    """Pre-pivot alias. HIPAA maps onto the same OPA engine as any other rule path."""
+    _ = custom_blocked_message
+    return create_compliance_guardrail(
+        api_key=api_key, rules="us/hipaa", base_url=base_url, **kwargs
+    )
+
+
+def create_universal_guardrail(
+    api_key: str,
+    base_url: str = _DEFAULT_BASE_URL,
+    use_simple_check: bool = False,
+    custom_blocked_message: str | None = None,
+    **kwargs: Any,
+) -> Callable:
+    """Pre-pivot alias. Universal maps onto the same OPA engine as any other rule path."""
+    _ = use_simple_check, custom_blocked_message
+    return create_compliance_guardrail(
+        api_key=api_key, rules="global/universal", base_url=base_url, **kwargs
+    )

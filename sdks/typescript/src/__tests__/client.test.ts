@@ -46,6 +46,16 @@ describe("ComplyEdgeClient", () => {
         expect.objectContaining({ baseURL: "https://api.test.io" })
       );
     });
+
+    it("User-Agent version matches package.json", () => {
+      const { readFileSync } = require("node:fs") as typeof import("node:fs");
+      const { resolve } = require("node:path") as typeof import("node:path");
+      const pkg = JSON.parse(
+        readFileSync(resolve(__dirname, "../../package.json"), "utf8")
+      );
+      const src = readFileSync(resolve(__dirname, "../client.ts"), "utf8");
+      expect(src).toContain(`SDK_VERSION = "${pkg.version}"`);
+    });
   });
 
   describe("check", () => {
@@ -119,6 +129,18 @@ describe("ComplyEdgeClient", () => {
         "/v1/check",
         expect.objectContaining({ jurisdiction: "EU" })
       );
+    });
+
+    it("treats a missing allowed field as a block", async () => {
+      mockPost.mockResolvedValue({
+        data: { event_id: "e", violations: [] },
+      });
+
+      const result = await client.check("test");
+
+      expect(result.allowed).toBe(false);
+      expect(result.status).toBe("violation");
+      expect(result.auditLogged).toBe(false);
     });
 
     it("maps article-cited violations from the Rego bundle", async () => {

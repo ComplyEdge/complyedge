@@ -328,8 +328,9 @@ def rules_update() -> None:
 def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> None:
     """Run Tier 2 LLM compliance analysis via the ComplyEdge API.
 
-    Requires COMPLYEDGE_API_KEY (env or --api-key flag). Falls back to
-    offline regex if the API is unreachable.
+    Requires COMPLYEDGE_API_KEY (env or --api-key flag). No key → offline
+    regex. If a key is set and the API is unreachable, exit 2 — do not
+    silently downgrade to a different engine.
     """
     import json
     from urllib.error import URLError
@@ -380,7 +381,7 @@ def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> 
         with urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read().decode("utf-8"))
 
-        allowed = data.get("allowed", True)
+        allowed = data.get("allowed") is True
         violations = data.get("violations", [])
         latency = data.get("latency_ms", 0)
 
@@ -393,13 +394,13 @@ def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> 
                 click.echo(f"    {v.get('rule_description','')[:100]}")
             sys.exit(1)
 
-    except (URLError, OSError) as e:
-        click.echo(f"{YELLOW}⚠ API unreachable ({e}), falling back to offline check{RESET}", err=True)
-        engine = TrustLintEngine()
-        result = engine.check(input_text)
-        _print_result(result, verbose=True)
-        if result.has_critical:
-            sys.exit(1)
+    except (URLError, OSError, json.JSONDecodeError) as e:
+        click.echo(
+            f"{RED}API unreachable ({e}). Not falling back to offline "
+            f"regex — that engine is not the API you asked for.{RESET}",
+            err=True,
+        )
+        sys.exit(2)
 
 
 @cli.command()

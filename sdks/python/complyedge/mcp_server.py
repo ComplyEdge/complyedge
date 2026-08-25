@@ -198,6 +198,19 @@ def _get_engine() -> TrustLintEngine:
     return TrustLintEngine(rules_dir=rules_dir)
 
 
+def _require_corpus(engine: TrustLintEngine) -> None:
+    """Refuse a PASS/SAFE verdict when no rules loaded.
+
+    TrustLintEngine.check() treats zero violations as clean. An empty corpus
+    therefore looks like a pass. That is a miss, not an evaluation.
+    """
+    if not engine.rules:
+        raise RuntimeError(
+            "TrustLint corpus is empty — refusing to evaluate. "
+            "Set TRUSTLINT_RULES_DIR or reinstall complyedge[mcp]."
+        )
+
+
 def _require_str(arguments: dict[str, Any], key: str) -> str:
     value = arguments.get(key)
     if not isinstance(value, str) or not value.strip():
@@ -276,6 +289,7 @@ async def _check_compliance(
 ) -> CallToolResult:
     text = _require_str(arguments, "text")
     jurisdiction = _optional_jurisdiction(arguments)
+    _require_corpus(engine)
     result = engine.check(text, jurisdiction=jurisdiction)
 
     if result.clean:
@@ -335,6 +349,7 @@ async def _scan_prompt(
     engine: TrustLintEngine, arguments: dict[str, Any]
 ) -> CallToolResult:
     prompt = _require_str(arguments, "prompt")
+    _require_corpus(engine)
     result = engine.check(prompt)
 
     if result.clean:
@@ -379,10 +394,12 @@ async def call_tool(
     engine = _get_engine()
 
     if name == "check_compliance":
+        _require_corpus(engine)
         return await _check_compliance(engine, args)
     if name == "list_rules":
         return await _list_rules(engine, args)
     if name == "scan_prompt":
+        _require_corpus(engine)
         return await _scan_prompt(engine, args)
 
     raise ValueError(

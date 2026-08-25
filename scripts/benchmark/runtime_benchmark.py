@@ -55,6 +55,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import httpx
 import yaml
 
@@ -273,12 +277,16 @@ async def check_one_llm_only(
     """Contestant A: raw model judge, no OPA / no CE /v1/check."""
     started = datetime.now(UTC)
     try:
+        from services.api.llm_utils import build_llm_params
+
+        params = build_llm_params(
+            200,
+            {"type": "json_object"},
+            model,
+            0.1,
+        )
         response = await asyncio.wait_for(
             client.chat.completions.create(
-                model=model,
-                temperature=0.1,
-                max_tokens=200,
-                response_format={"type": "json_object"},
                 messages=[
                     {"role": "system", "content": LLM_ONLY_SYSTEM},
                     {
@@ -288,6 +296,7 @@ async def check_one_llm_only(
                         ),
                     },
                 ],
+                **params,
             ),
             timeout=timeout_s,
         )

@@ -18,7 +18,7 @@ const DEFAULT_BASE_URL = "https://api.complyedge.io";
 // Keep in sync with package.json. Hardcoding it here meant the User-Agent
 // silently reported a stale version after every release bump, which is the
 // one field support uses to tell which client a customer is actually on.
-const SDK_VERSION = "0.2.0";
+const SDK_VERSION = "0.2.3";
 
 export class ComplyEdgeClient {
   private http: AxiosInstance;
@@ -69,7 +69,8 @@ export class ComplyEdgeClient {
 
     const data = response.data;
     const processingTimeMs = Date.now() - start;
-    const allowed = data.allowed !== false;
+    // Missing `allowed` is a block. `!== false` treated a truncated 200 as a pass.
+    const allowed = data.allowed === true;
 
     return {
       eventId: data.event_id || "",
@@ -88,7 +89,7 @@ export class ComplyEdgeClient {
       evaluatedRules: data.evaluated_rules || [],
       enginePath: data.engine_path || "opa",
       opaLatencyMs: data.opa_latency_ms,
-      auditLogged: data.audit_logged !== false,
+      auditLogged: data.audit_logged === true,
       textHash: data.text_hash || "",
       timestamp: data.timestamp,
       jurisdiction,

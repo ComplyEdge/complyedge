@@ -38,7 +38,7 @@ category: marketing
 source:
   regulation: TCPA
   article: 47 U.S.C. §227
-  url: https://www.law.cornell.edu/uscode/text/47/227
+  url: https://www.govinfo.gov/link/uscode/47/227
   last_updated: '2021-06-17'
   citation: >-
     47 U.S.C. §227(b)(1)(A): It shall be unlawful for any person within the
@@ -49,10 +49,14 @@ source:
     artificial or prerecorded voice — (iii) to any telephone number assigned
     to a paging service, cellular telephone service, specialized mobile radio
     service, or other radio common carrier service, or any service for which
-    the called party is charged for the call. 47 U.S.C. §227(b)(1)(B): to
-    initiate any telephone call to any residential telephone line using an
-    artificial or prerecorded voice to deliver a message without the prior
-    express consent of the called party.
+    the called party is charged for the call, unless such call is made solely
+    to collect a debt owed to or guaranteed by the United States. 47 U.S.C.
+    §227(b)(1)(B): to initiate any telephone call to any residential telephone
+    line using an artificial or prerecorded voice to deliver a message without
+    the prior express consent of the called party, unless the call is
+    initiated for emergency purposes, is made solely pursuant to the
+    collection of a debt owed to or guaranteed by the United States, or is
+    exempted by rule or order by the Commission under paragraph (2)(B).
 exceptions:
 - condition: Emergency or safety notifications
   description: Messages related to health, safety, or emergency situations

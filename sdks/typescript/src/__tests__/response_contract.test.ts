@@ -56,4 +56,10 @@ describe("response contract (/v1/check)", () => {
     expect(result.enginePath).toBe("opa");
     expect(result.auditLogged).toBe(true);
   });
+
+  it("does not treat a missing allowed field as a pass", () => {
+    const src = readFileSync(resolve(__dirname, "../client.ts"), "utf8");
+    expect(src).not.toContain("data.allowed !== false");
+    expect(src).toContain("data.allowed === true");
+  });
 });
