@@ -1,0 +1,403 @@
+# ComplyEdge — Rego corpus evidence classification
+#
+# WHAT EACH LEAF POLICY ACTUALLY ESTABLISHES.
+#
+# Every leaf in the corpus decides by matching a regular expression against
+# `input.text` (plus `input.jurisdiction`). That is a deliberate consequence of
+# the architecture: no LLM runs on the hot path, so the deterministic layer can
+# only reason about the text in front of it. It is also a hard limit on what a
+# decision proves, and this file states that limit per rule rather than leaving
+# a reader to discover it by opening a file.
+#
+# classification:
+#   content_inspecting  — the evaluated text IS, or asks for, the regulated act.
+#                         Blocking it prevents the act. The citation on the
+#                         decision is load-bearing.
+#   assertion_matching  — the rule fires on text that DESCRIBES a state of the
+#                         world the engine cannot verify. Blocking it does not
+#                         establish that state, and not firing does not
+#                         establish compliance.
+#
+# basis (why it lands where it lands):
+#   regulated_act_in_text    — the prohibited or regulated conduct is the text.
+#   absent_control_asserted  — keys on a phrase asserting a control is missing
+#                              ("high-risk AI without technical documentation").
+#                              No text matcher can establish whether a quality
+#                              management system, a technical file, a human
+#                              oversight assignment or a FRIA exists.
+#   domain_of_use_described  — labels a described use case against an Annex III
+#                              domain. It classifies a description; it does not
+#                              establish that a deployed system is high-risk,
+#                              and it is not a finding of non-compliance.
+#
+# A rule whose pattern list contains both kinds is classified by its WEAKEST
+# patterns and carries `mixed_patterns: true`. Never round a mixed rule up.
+#
+# REPRODUCE the census this file is checked against:
+#   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
+#     | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 64 leaves
+#   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
+#     | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  7 aggregators
+#
+# Enforced by tests/unit/test_corpus_evidence_classification.py, which fails if
+# a leaf is added, removed, renamed, or classified content_inspecting while its
+# only input is text keyed on an absent control.
+#
+# Provenance: assigned by reading every rule body. An absence-keying heuristic
+# was run as a cross-check and disagreed in BOTH directions — a false positive
+# on article5/vulnerability_exploitation ("exploit the elderly" is the act) and
+# a false negative on highrisk/art26_deployer_obligations ("deploying high-risk
+# AI without instructions" is an assertion). The heuristic grades the
+# assignment; it does not produce it.
+
+version: 1
+corpus:
+  leaves: 64
+  aggregators: 7
+  files_total: 71
+
+totals:
+  content_inspecting: 21
+  assertion_matching: 43
+
+by_basis:
+  regulated_act_in_text: 21
+  absent_control_asserted: 32
+  domain_of_use_described: 11
+
+by_group:
+  article5: {leaves: 8, content_inspecting: 8, assertion_matching: 0}
+  prompt_security: {leaves: 12, content_inspecting: 12, assertion_matching: 0}
+  us_corpus: {leaves: 1, content_inspecting: 1, assertion_matching: 0}
+  article50: {leaves: 7, content_inspecting: 0, assertion_matching: 7}
+  article6: {leaves: 11, content_inspecting: 0, assertion_matching: 11}
+  gpai: {leaves: 12, content_inspecting: 0, assertion_matching: 12}
+  highrisk: {leaves: 13, content_inspecting: 0, assertion_matching: 13}
+
+rules:
+  - file: article5/biometric_categorisation.rego
+    rule_id: rego-art5-1g-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article5/emotion_recognition.rego
+    rule_id: rego-art5-1f-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article5/facial_scraping.rego
+    rule_id: rego-art5-1e-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article5/predictive_policing.rego
+    rule_id: rego-art5-1d-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article5/realtime_biometric.rego
+    rule_id: rego-art5-1h-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article5/social_scoring.rego
+    rule_id: rego-art5-1c-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article5/subliminal_manipulation.rego
+    rule_id: rego-art5-1a-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article5/vulnerability_exploitation.rego
+    rule_id: rego-art5-1b-001
+    group: article5
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: article50/chatbot_disclosure.rego
+    rule_id: rego-art50-1-001
+    group: article50
+    classification: assertion_matching
+    basis: absent_control_asserted
+    mixed_patterns: true
+    note: >-
+      Also matches impersonation of a human, which IS the regulated act; the rule is classified by its weakest patterns, never its strongest.
+  - file: article50/deepfake_disclosure.rego
+    rule_id: rego-art50-4-001
+    group: article50
+    classification: assertion_matching
+    basis: absent_control_asserted
+    mixed_patterns: true
+    note: >-
+      Also matches face-swap/voice-clone generation requests, which are the act; classified by its weakest patterns.
+  - file: article50/emotion_notification.rego
+    rule_id: rego-art50-3-001
+    group: article50
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: article50/emotion_permitted_context_notice.rego
+    rule_id: rego-art50-3-002
+    group: article50
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: article50/gpai_content_disclosure.rego
+    rule_id: rego-art50-2-001
+    group: article50
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: article50/public_interest_text.rego
+    rule_id: rego-art50-4-002
+    group: article50
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: article50/synthetic_media_watermark.rego
+    rule_id: rego-art50-2-002
+    group: article50
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: article6/annex3_5b_creditworthiness.rego
+    rule_id: rego-art6-annex3-5b-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/annex3_5c_insurance.rego
+    rule_id: rego-art6-annex3-5c-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/art6_3_procedural_derogation.rego
+    rule_id: rego-art6-3-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/biometric_identification.rego
+    rule_id: rego-art6-annex3-1-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/critical_infrastructure.rego
+    rule_id: rego-art6-annex3-2-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/education_vocational.rego
+    rule_id: rego-art6-annex3-3-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/employment_workers.rego
+    rule_id: rego-art6-annex3-4-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/essential_services.rego
+    rule_id: rego-art6-annex3-5-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/justice_democracy.rego
+    rule_id: rego-art6-annex3-8-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/law_enforcement.rego
+    rule_id: rego-art6-annex3-6-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: article6/migration_asylum.rego
+    rule_id: rego-art6-annex3-7-001
+    group: article6
+    classification: assertion_matching
+    basis: domain_of_use_described
+  - file: gpai/copyright_transparency.rego
+    rule_id: rego-gpai-53c-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/cybersecurity_gpai.rego
+    rule_id: rego-art55-1d-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/downstream_obligations.rego
+    rule_id: rego-gpai-53b-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/incident_reporting.rego
+    rule_id: rego-art55-1c-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/model_classification.rego
+    rule_id: rego-gpai-51-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/model_evaluation.rego
+    rule_id: rego-art55-1a-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/open_source_exemption.rego
+    rule_id: rego-gpai-53-2-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/risk_mitigation.rego
+    rule_id: rego-art55-1b-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/sr_designation.rego
+    rule_id: rego-art52-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/systemic_risk.rego
+    rule_id: rego-gpai-55-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/technical_documentation.rego
+    rule_id: rego-gpai-53a-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: gpai/training_summary.rego
+    rule_id: rego-art53-1d-001
+    group: gpai
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art10_data_governance.rego
+    rule_id: rego-art10-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art11_technical_documentation.rego
+    rule_id: rego-art11-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art12_record_keeping.rego
+    rule_id: rego-art12-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art13_transparency.rego
+    rule_id: rego-art13-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art14_human_oversight.rego
+    rule_id: rego-art14-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art15_accuracy.rego
+    rule_id: rego-art15-1-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art15_cybersecurity.rego
+    rule_id: rego-art15-5-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art15_robustness.rego
+    rule_id: rego-art15-4-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art16_provider_obligations.rego
+    rule_id: rego-art16-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art26_deployer_obligations.rego
+    rule_id: rego-art26-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art27_fria.rego
+    rule_id: rego-art27-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art4_ai_literacy.rego
+    rule_id: rego-art4-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: highrisk/art9_risk_management.rego
+    rule_id: rego-art9-001
+    group: highrisk
+    classification: assertion_matching
+    basis: absent_control_asserted
+  - file: prompt_security/ai_addressed.rego
+    rule_id: rego-art15-ipi-004
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/embedded_instruction.rego
+    rule_id: rego-art15-ipi-003
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/indirect_embedded.rego
+    rule_id: rego-art15-ipi-003
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/indirect_injection.rego
+    rule_id: rego-art15-ipi-008
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/instruction_override.rego
+    rule_id: rego-art15-ipi-009
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/markdown_exfil.rego
+    rule_id: rego-art15-ipi-007
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/role_hijack.rego
+    rule_id: rego-art15-ipi-001
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/safety_disable.rego
+    rule_id: rego-art15-ipi-002
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/separator_hijack.rego
+    rule_id: rego-art15-ipi-008
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/sysprompt_leak.rego
+    rule_id: rego-art15-ipi-005
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/tool_hijack.rego
+    rule_id: rego-art15-ipi-010
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: prompt_security/training_extract.rego
+    rule_id: rego-art15-ipi-006
+    group: prompt_security
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: us_corpus/sox_material_disclosure.rego
+    rule_id: rego-sox-302-001
+    group: us_corpus
+    classification: content_inspecting
+    basis: regulated_act_in_text

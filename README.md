@@ -139,7 +139,7 @@ sdks/python/          Python SDK (@compliance_check decorator, CLI)
   └ complyedge/mcp_server.py   MCP server (stdio): check_compliance, list_rules, scan_prompt
 packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
 rules/regulations/    64 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
-rules/rego/           63 leaf OPA/Rego policies + 6 package aggregators
+rules/rego/           64 leaf OPA/Rego policies + 7 package aggregators
 rules/schemas/        Rule validation schema
 examples/             Usage examples (decorators, OpenAI Agents)
 scripts/benchmark/    Runtime benchmark (runner + prompt YAMLs + committed results)
@@ -148,11 +148,13 @@ tests/                Rule validation + acceptance tests
 
 ## Rules
 
-64 YAML rules + 63 deterministic leaf OPA/Rego policies (+ 6 package aggregators) across 4 jurisdictions:
+64 YAML rules + 64 deterministic leaf OPA/Rego policies (+ 7 package aggregators) across 4 jurisdictions.
+
+**What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf decides by matching the evaluated text (no LLM on the hot path). For 21 of them the text *is* the regulated act — Article 5 prohibited practices, Article 15 prompt-injection resilience, one US disclosure control — so a block prevents the act and the citation on the decision is load-bearing. The other 43 fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 36 YAML + 63 leaf Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR + Art 15 IPI |
+| **EU** | 36 YAML + 64 leaf Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR + Art 15 IPI |
 | **US** | 16 YAML | HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA |
 | **Global** | 1 YAML | PCI DSS |
 | **Universal** | 11 YAML | PII detection, prompt injection (direct + indirect) |
@@ -179,7 +181,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1, Deterministic (hot path):** 63 leaf OPA/Rego policies (+ 6 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1, Deterministic (hot path):** 64 leaf OPA/Rego policies (+ 7 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
 
 **Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
 

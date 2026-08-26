@@ -250,6 +250,78 @@ test_biometric_dataset_filtering_exception_no_violation if {
 	}
 }
 
+# ============================================================
+# Exemption transparency — a suppressed violation is still a decision
+#
+# The carve-outs above are caller-asserted: a request can switch off a
+# critical Article 5 prohibition by supplying two values that this engine
+# does not verify. Before these tests, a suppressed match left NO trace —
+# the record was indistinguishable from a request that never matched at
+# all, so the one decision a regulator is most likely to ask about was the
+# one decision the evidence could not describe. Each entry names the
+# carve-out, carries the values the caller asserted, and states that they
+# were not verified.
+# ============================================================
+
+test_law_enforcement_exemption_is_recorded if {
+	some e in biometric_categorisation.exemptions with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+	}
+	e.exemption == "law_enforcement"
+	e.rule_id == "rego-art5-1g-001"
+	e.asserted.use_case == "law_enforcement"
+	e.asserted.lawful_basis == true
+	e.asserted_by == "caller"
+	e.verified == false
+}
+
+test_dataset_operation_exemption_is_recorded if {
+	some e in biometric_categorisation.exemptions with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation across our lawfully acquired image corpus",
+		"dataset_operation": "labelling",
+	}
+	e.exemption == "dataset_operation"
+	e.asserted.dataset_operation == "labelling"
+	e.verified == false
+}
+
+# BOTH branches of the assumption, not just the firing one. An exemption is
+# recorded only when it actually SUPPRESSED a match — asserting the fields
+# on text that never matched must not manufacture an exemption event.
+test_no_exemption_recorded_when_nothing_was_suppressed if {
+	count(biometric_categorisation.exemptions) == 0 with input as {
+		"jurisdiction": "EU",
+		"text": "we send a weekly newsletter about gardening",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+	}
+}
+
+test_no_exemption_recorded_on_a_plain_violation if {
+	count(biometric_categorisation.exemptions) == 0 with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race",
+	}
+}
+
+# The aggregator must surface it, or the API never sees it.
+test_aggregator_surfaces_the_exemption if {
+	result := article5.result with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+	}
+	result.violation == false
+	count(result.exemptions) == 1
+	some e in result.exemptions
+	e.exemption == "law_enforcement"
+}
+
 test_biometric_base_prohibition_still_fires_when_no_exception_set if {
 	# Regression guard: existing prohibition path must keep working when
 	# the new optional input fields are absent.

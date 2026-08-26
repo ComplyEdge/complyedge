@@ -71,9 +71,17 @@ violations contains v if {
 	v := vulnerability_exploitation.result
 }
 
+# Carve-outs that SUPPRESSED a match are surfaced alongside violations, so a
+# decision that was switched off by a caller assertion is still visible in the
+# Article 12 record. Sub-rules without carve-outs contribute nothing here.
+exemptions contains e if {
+	some e in biometric_categorisation.exemptions
+}
+
 result := {
 	"violation": violation,
 	"violations": violations,
+	"exemptions": exemptions,
 	"rules_evaluated": [
 		biometric_categorisation.rule_id,
 		emotion_recognition.rule_id,

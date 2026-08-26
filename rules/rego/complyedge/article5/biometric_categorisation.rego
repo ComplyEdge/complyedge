@@ -42,6 +42,43 @@ dataset_operation_exception if {
 	input.dataset_operation in {"labelling", "filtering"}
 }
 
+# ── Transparency: a suppressed violation is still a decision ──────────────────
+# When the pattern matched and a carve-out suppressed it, the record must say
+# so. These fields are CALLER-ASSERTED and unverified by this engine, so the
+# entry states that explicitly rather than presenting them as established fact.
+# Without this, the one place where a prohibition can be switched off leaves no
+# trace in the Article 12 record.
+exemptions contains e if {
+	input.jurisdiction == "EU"
+	biometric_pattern_match
+	law_enforcement_exception
+	e := {
+		"rule_id": rule_id,
+		"exemption": "law_enforcement",
+		"basis": "Regulation (EU) 2024/1689, Article 5(1)(g): this prohibition shall not cover categorising of biometric data in the area of law enforcement.",
+		"asserted": {
+			"use_case": input.use_case,
+			"lawful_basis": input.lawful_basis,
+		},
+		"asserted_by": "caller",
+		"verified": false,
+	}
+}
+
+exemptions contains e if {
+	input.jurisdiction == "EU"
+	biometric_pattern_match
+	dataset_operation_exception
+	e := {
+		"rule_id": rule_id,
+		"exemption": "dataset_operation",
+		"basis": "Regulation (EU) 2024/1689, Article 5(1)(g): this prohibition shall not cover any labelling or filtering of lawfully acquired biometric datasets.",
+		"asserted": {"dataset_operation": input.dataset_operation},
+		"asserted_by": "caller",
+		"verified": false,
+	}
+}
+
 biometric_pattern_match if {
 	patterns := [
 		"biometric[\\- ]?categori[sz]",
