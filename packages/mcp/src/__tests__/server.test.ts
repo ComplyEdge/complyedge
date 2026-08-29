@@ -53,6 +53,11 @@ describe("ComplyEdge MCP server", () => {
       "list_rules",
       "scan_prompt"
     ]);
+    for (const tool of response.tools) {
+      expect(tool.description).toContain("EU AI Act");
+      expect(tool.description).toContain("Article 5");
+      expect(tool.description).toContain("Article 50");
+    }
   });
 
   it("returns cited offline findings for a prohibited social-scoring prompt", async () => {

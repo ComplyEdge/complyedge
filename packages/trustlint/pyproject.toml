@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "trustlint"
 dynamic = ["version"]
-description = "Offline compliance linter for AI agents — scans text against the ComplyEdge rule corpus"
+description = "Offline EU AI Act linter (Article 5, Article 50) for AI agents — scans text against the ComplyEdge rule corpus"
 readme = {file = "PYPI_README.md", content-type = "text/markdown"}
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
@@ -13,6 +13,8 @@ keywords = [
     "ai-agents",
     "compliance",
     "eu-ai-act",
+    "article-5",
+    "article-50",
     "offline-linter",
     "security",
     "trustlint",

@@ -1,0 +1,68 @@
+id: EU_AI_ACT_ART50_EMOTION_RECOGNITION_TRANSPARENCY_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires deployers of emotion recognition systems or biometric categorisation
+  systems to inform natural persons exposed thereto of the operation of the
+  system, and to process personal data in accordance with GDPR. Article 50(3).
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    deploying an emotion recognition system or a biometric categorisation
+    system without informing the natural persons exposed to it of the
+    system's operation, as required by EU AI Act Article 50(3). Deployers
+    must inform exposed persons and process personal data in accordance with
+    Regulation (EU) 2016/679 (GDPR), Regulation (EU) 2018/1725, and
+    Directive (EU) 2016/680 as applicable. The obligation does not apply to
+    AI systems permitted by law to detect, prevent, or investigate criminal
+    offences, subject to appropriate safeguards.
+  model: gpt-4
+- type: regex
+  value: >-
+    (emotion\s+recognition\s+(?:without|lacking)\s+(?:notice|disclosure|inform|consent)|biometric\s+categori[sz]ation\s+(?:without|lacking)\s+(?:notice|disclosure|inform|consent)|(?:deploy|use|operat)\w*\s+emotion\s+(?:detection|recognition|analysis)\s+(?:without|lacking)\s+(?:inform|noti|disclos)|(?:covert|secret|hidden|undisclosed)\s+emotion\s+(?:recognition|detection|analysis|monitoring)|(?:covert|secret|hidden|undisclosed)\s+biometric\s+(?:categori[sz]ation|classification|analysis)|emotion\s+(?:recognition|detection)\s+(?:not\s+)?(?:disclosed|notified|informed)|fail(?:ing|ure)?\s+to\s+inform\s+(?:persons?|individuals?|users?)\s+(?:of|about)\s+emotion|biometric\s+(?:analysis|processing)\s+(?:without|lacking)\s+(?:GDPR|data\s+protection)\s+compliance)
+  flags: i
+severity: high
+category: privacy
+source:
+  regulation: EU AI Act
+  article: Article 50(3)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 50(3): Deployers of an emotion
+    recognition system or a biometric categorisation system shall inform the
+    natural persons exposed thereto of the operation of the system, and shall
+    process the personal data in accordance with Regulations (EU) 2016/679
+    and (EU) 2018/1725 and Directive (EU) 2016/680, as applicable. This
+    obligation shall not apply to AI systems used for biometric categorisation
+    and emotion recognition, which are permitted by law to detect, prevent or
+    investigate criminal offences, subject to appropriate safeguards for the
+    rights and freedoms of third parties, and in accordance with Union law.
+penalty_information:
+  civil_penalties:
+    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 50(3) requires deployers of emotion
+    recognition and biometric categorisation systems to inform exposed
+    persons of the system's operation and process personal data in
+    accordance with GDPR. Penalties: up to EUR 15M or 3% of global revenue.
+  suggestion: >-
+    Inform all persons exposed to the emotion recognition or biometric
+    categorisation system of its operation. Ensure personal data processing
+    complies with GDPR (Regulation 2016/679). Provide clear notice at the
+    time of first exposure. The law enforcement exception requires
+    appropriate safeguards and Union law authorisation.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-50
+- transparency
+- emotion-recognition
+- biometric-categorisation
+- gdpr
+tier: enterprise

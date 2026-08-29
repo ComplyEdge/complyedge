@@ -1,10 +1,10 @@
-# Rego corpus — what each rule actually establishes
+# Rego corpus: what each rule actually establishes
 
 **Machine-readable source of truth:** [`corpus-evidence-classification.yaml`](corpus-evidence-classification.yaml). This page restates that file for a human reader; the YAML is authoritative and `tests/unit/test_corpus_evidence_classification.py` fails if the two disagree on any headline number.
 
 ## Why this document exists
 
-Every leaf policy in the corpus decides by matching a regular expression against `input.text` (plus `input.jurisdiction`). **All 64 of 64.** That follows from the architecture — no LLM runs on the hot path, so the deterministic layer can only reason about the text in front of it — and it is a hard limit on what a decision proves.
+Every leaf policy in the corpus **detects** by matching a regular expression against `input.text` (plus `input.jurisdiction`). **All 64 of 64.** One rule, `article5/biometric_categorisation.rego`, additionally reads inputs that can only ever *suppress* a match, the Article 5(1)(g) carve-outs, and never uses them to detect one. That follows from the architecture: no LLM runs on the hot path, so the deterministic layer can only reason about the text in front of it, and it is a hard limit on what a decision proves.
 
 For some obligations that limit costs nothing: a request to socially score citizens *is* the prohibited practice, so blocking the text prevents the act. For others it is decisive: no text matcher can establish whether a quality management system, an Annex IV technical file, a human-oversight assignment or a FRIA exists. Stating which rule is which, in public, is cheaper than letting a reviewer discover it by opening one file.
 
@@ -12,8 +12,8 @@ For some obligations that limit costs nothing: a request to socially score citiz
 
 | | Leaves |
 |---|---:|
-| **content_inspecting** — the text is, or asks for, the regulated act | **21** |
-| **assertion_matching** — the text describes a state the engine cannot verify | **43** |
+| **content_inspecting**: the text is, or asks for, the regulated act | **21** |
+| **assertion_matching**: the text describes a state the engine cannot verify | **43** |
 | Total leaf policies | 64 |
 | Package aggregators (no legal condition of their own) | 7 |
 
@@ -21,13 +21,13 @@ Broken down by why each rule lands where it does:
 
 | Basis | Leaves |
 |---|---:|
-| `regulated_act_in_text` — the evaluated text is, or asks for, the regulated act | 21 |
-| `absent_control_asserted` — fires on a phrase asserting a control is missing | 32 |
-| `domain_of_use_described` — labels a described use case against an Annex III domain | 11 |
+| `regulated_act_in_text`: the evaluated text is, or asks for, the regulated act | 21 |
+| `absent_control_asserted`: fires on a phrase asserting a control is missing | 32 |
+| `domain_of_use_described`: labels a described use case against an Annex III domain | 11 |
 
 ## By group
 
-### `article5` — 8 leaves, all `content_inspecting`
+### `article5`: 8 leaves, all `content_inspecting`
 
 The prohibited practice is the content. A request to score citizens socially, to scrape faces untargeted, or to exploit a protected vulnerability is the thing Article 5 forbids, so blocking the text prevents the act and the citation on the decision is load-bearing.
 
@@ -42,9 +42,9 @@ The prohibited practice is the content. A request to score citizens socially, to
 | `subliminal_manipulation.rego` | `rego-art5-1a-001` | `regulated_act_in_text` |
 | `vulnerability_exploitation.rego` | `rego-art5-1b-001` | `regulated_act_in_text` |
 
-### `prompt_security` — 12 leaves, all `content_inspecting`
+### `prompt_security`: 12 leaves, all `content_inspecting`
 
-The attack is the text. "Ignore all previous instructions", a jailbreak persona, an exfiltration payload — the string itself is the conduct, so matching it is inspecting the act.
+The attack is the text. "Ignore all previous instructions", a jailbreak persona, an exfiltration payload: the string itself is the conduct, so matching it is inspecting the act.
 
 | Rule | Rule ID | Basis |
 |---|---|---|
@@ -61,7 +61,7 @@ The attack is the text. "Ignore all previous instructions", a jailbreak persona,
 | `tool_hijack.rego` | `rego-art15-ipi-010` | `regulated_act_in_text` |
 | `training_extract.rego` | `rego-art15-ipi-006` | `regulated_act_in_text` |
 
-### `us_corpus` — 1 leaves, all `content_inspecting`
+### `us_corpus`: 1 leaves, all `content_inspecting`
 
 Forward-looking guidance and material non-public information are the disclosure. The text is the regulated act.
 
@@ -69,7 +69,7 @@ Forward-looking guidance and material non-public information are the disclosure.
 |---|---|---|
 | `sox_material_disclosure.rego` | `rego-sox-302-001` | `regulated_act_in_text` |
 
-### `article50` — 7 leaves, all `assertion_matching`
+### `article50`: 7 leaves, all `assertion_matching`
 
 Every rule keys on a phrase asserting a disclosure is absent ("chatbot ... without disclosure"). It detects text DESCRIBING an undisclosed chatbot, not an undisclosed chatbot. Two rules also carry impersonation and synthetic-media patterns that ARE the act; they are classified by their weakest patterns and flagged mixed.
 
@@ -83,9 +83,9 @@ Every rule keys on a phrase asserting a disclosure is absent ("chatbot ... witho
 | `public_interest_text.rego` | `rego-art50-4-002` | `absent_control_asserted` |
 | `synthetic_media_watermark.rego` | `rego-art50-2-002` | `absent_control_asserted` |
 
-### `article6` — 11 leaves, all `assertion_matching`
+### `article6`: 11 leaves, all `assertion_matching`
 
-These label a described system against an Annex III domain — credit scoring, employment screening, migration. Useful for routing and triage. They do not establish that a deployed system is high-risk, and firing is not a finding of non-compliance.
+These label a described system against an Annex III domain: credit scoring, employment screening, migration. Useful for routing and triage. They do not establish that a deployed system is high-risk, and firing is not a finding of non-compliance.
 
 | Rule | Rule ID | Basis |
 |---|---|---|
@@ -101,7 +101,7 @@ These label a described system against an Annex III domain — credit scoring, e
 | `law_enforcement.rego` | `rego-art6-annex3-6-001` | `domain_of_use_described` |
 | `migration_asylum.rego` | `rego-art6-annex3-7-001` | `domain_of_use_described` |
 
-### `gpai` — 12 leaves, all `assertion_matching`
+### `gpai`: 12 leaves, all `assertion_matching`
 
 Chapter V duties are organisational: a training-data summary, a copyright policy, incident reporting, model evaluation. The rules key on assertions that these are absent, which no text matcher can verify.
 
@@ -120,9 +120,9 @@ Chapter V duties are organisational: a training-data summary, a copyright policy
 | `technical_documentation.rego` | `rego-gpai-53a-001` | `absent_control_asserted` |
 | `training_summary.rego` | `rego-art53-1d-001` | `absent_control_asserted` |
 
-### `highrisk` — 13 leaves, all `assertion_matching`
+### `highrisk`: 13 leaves, all `assertion_matching`
 
-Articles 4, 9-16, 26 and 27 require documents, processes and assignments to EXIST. Every rule fires on a phrase admitting one does not. `art11_technical_documentation.rego` matches "high-risk AI system without technical documentation" — it cannot check whether an Annex IV file exists.
+Articles 4, 9-16, 26 and 27 require documents, processes and assignments to EXIST. Every rule fires on a phrase admitting one does not. `art11_technical_documentation.rego` matches "high-risk AI system without technical documentation": it cannot check whether an Annex IV file exists.
 
 | Rule | Rule ID | Basis |
 |---|---|---|
@@ -142,7 +142,7 @@ Articles 4, 9-16, 26 and 27 require documents, processes and assignments to EXIS
 
 ## What this means for a claim
 
-Safe to say: the corpus deterministically inspects **Article 5 prohibited practices, Article 15 prompt-injection resilience, and one US disclosure control** — 21 policies where the evaluated text is the regulated conduct, each carrying the operative article text and emitting a cited, hash-chained record.
+Safe to say: the corpus deterministically inspects **Article 5 prohibited practices, Article 15 prompt-injection resilience, and one US disclosure control**: 21 policies where the evaluated text is the regulated conduct, each carrying the operative article text and emitting a cited, hash-chained record.
 
 Not safe to say: that the corpus "covers the high-risk requirements", or that a rule count is evidence of coverage. The Article 4/9-16/26/27, Chapter V and Annex III policies fire on descriptions. They are useful for triage and for catching an operator who states an absent control in writing. They do not establish the underlying fact, and their silence is not a compliance finding.
 

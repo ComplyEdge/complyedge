@@ -78,10 +78,17 @@ exemptions contains e if {
 	some e in biometric_categorisation.exemptions
 }
 
+# Carve-outs a caller CLAIMED and the service refused. The violation stands;
+# the attempt is still part of the record.
+rejected_exemptions contains e if {
+	some e in biometric_categorisation.rejected_exemptions
+}
+
 result := {
 	"violation": violation,
 	"violations": violations,
 	"exemptions": exemptions,
+	"rejected_exemptions": rejected_exemptions,
 	"rules_evaluated": [
 		biometric_categorisation.rule_id,
 		emotion_recognition.rule_id,

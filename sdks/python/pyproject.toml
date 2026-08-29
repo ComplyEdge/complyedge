@@ -8,7 +8,7 @@ name = "complyedge"
 # [tool.setuptools.dynamic]). pyproject 0.2.4 vs __init__ 0.2.3 once shipped
 # a wheel whose User-Agent header disagreed with its own PyPI version.
 dynamic = ["version"]
-description = "Python SDK for ComplyEdge Compliance API — runtime EU AI Act enforcement for AI agents"
+description = "Runtime EU AI Act deny for agent I/O (Article 5, Article 50) — ComplyEdge Python SDK"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
@@ -16,6 +16,10 @@ keywords = [
     "ai-agents",
     "compliance",
     "eu-ai-act",
+    "article-5",
+    "article-50",
+    "mcp",
+    "trustlint",
     "opa",
     "python-sdk",
     "runtime-enforcement",

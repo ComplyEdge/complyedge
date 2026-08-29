@@ -27,7 +27,7 @@ const tools = [
   {
     name: "check_compliance",
     description:
-      "Check already-produced text against the offline TrustLint corpus. Returns PASS or FAIL with cited findings. No network call or API key is required.",
+      "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted OPA, not a system classifier. Check already-produced text against the offline TrustLint corpus. Returns PASS or FAIL with cited findings. No network call or API key is required.",
     inputSchema: {
       type: "object",
       properties: {
@@ -45,7 +45,7 @@ const tools = [
   {
     name: "list_rules",
     description:
-      "List offline TrustLint rules. This discovers rule coverage; it does not evaluate text or return a compliance verdict.",
+      "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted OPA, not a system classifier. List offline TrustLint rules. This discovers rule coverage; it does not evaluate text or return a compliance verdict.",
     inputSchema: {
       type: "object",
       properties: {
@@ -61,7 +61,7 @@ const tools = [
   {
     name: "scan_prompt",
     description:
-      "Scan a candidate prompt before generation against the offline TrustLint corpus. Returns SAFE or RISK_DETECTED. No network call or API key is required.",
+      "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted OPA, not a system classifier. Scan a candidate prompt before generation against the offline TrustLint corpus. Returns SAFE or RISK_DETECTED. No network call or API key is required.",
     inputSchema: {
       type: "object",
       properties: {

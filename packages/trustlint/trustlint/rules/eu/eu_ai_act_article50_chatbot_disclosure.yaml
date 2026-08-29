@@ -1,0 +1,64 @@
+id: EU_AI_ACT_ART50_CHATBOT_DISCLOSURE_001
+jurisdiction: EU
+effective_date: '2026-08-02'
+description: >-
+  Requires providers of AI systems intended to interact directly with
+  natural persons (chatbots, voice agents) to design them so that users
+  are informed they are interacting with an AI system, unless that is
+  obvious from the context. Article 50(1) of the EU AI Act. Narrow
+  exception for law enforcement.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text is a chatbot or voice agent
+    message to an end user that impersonates a human, denies being an
+    AI, or otherwise fails to disclose its AI nature when asked. Article
+    50(1) of the EU AI Act requires users to be informed they are
+    interacting with an AI unless it is obvious from the context.
+  model: gpt-4
+- type: regex
+  value: (i\s+(am|'m)\s+(a\s+)?(human|real\s+person|not\s+an\s+ai|not\s+a\s+(bot|chatbot|machine)|definitely\s+(a\s+)?human)|(no|nope),?\s+i('?m|\s+am)\s+not\s+(an?\s+)?(ai|bot|chatbot|machine|robot)|of\s+course\s+i('?m|\s+am)\s+(a\s+)?human|trust\s+me,?\s+i('?m|\s+am)\s+(not\s+(an?\s+)?ai|human|real)|this\s+is\s+(jane|john|sarah|mike|\w+)\s+speaking\s+from\s+\w+\s+(support|customer|service)(?!.*(ai|automated|virtual)))
+  flags: i
+severity: high
+category: consumer_protection
+source:
+  regulation: EU AI Act
+  article: Article 50(1)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 50(1): Providers shall ensure
+    that AI systems intended to interact directly with natural persons
+    are designed and developed in such a way that the natural persons
+    concerned are informed that they are interacting with an AI system,
+    unless this is obvious from the point of view of a natural person
+    who is reasonably well-informed, observant and circumspect, taking
+    into account the circumstances and the context of use. This
+    obligation shall not apply to AI systems authorised by law to
+    detect, prevent, investigate or prosecute criminal offences, subject
+    to appropriate safeguards for the rights and freedoms of third
+    parties.
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 50(1) requires chatbots/voice agents to
+    disclose they are an AI system. Denying being an AI or impersonating
+    a human is prohibited unless the law-enforcement exception applies.
+    Penalties: up to €15M or 3% of global revenue.
+  suggestion: >-
+    Always disclose AI identity when asked. Replace denial responses
+    with a clear statement such as "I'm an AI assistant." For voice
+    agents, include an AI identity disclosure in the greeting. If your
+    chatbot is used for law enforcement purposes, consult legal counsel
+    about the narrow Article 50(1) exception.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-50
+- transparency
+- chatbot
+- ai-disclosure
+- impersonation
+tier: enterprise

@@ -32,9 +32,15 @@ TOOL_NAMES = ("check_compliance", "list_rules", "scan_prompt")
 TOOL_ANNOTATIONS = ToolAnnotations(readOnlyHint=True, idempotentHint=True)
 
 # Shared with mcp_http so stdio/HTTP surfaces cannot drift (Glama A1–A5).
+# Each description must name EU AI Act / Article 5 / Article 50 (GE-5).
+_LAW = (
+    "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted "
+    "OPA, not a system classifier. "
+)
 TOOL_DESCRIPTIONS: dict[str, str] = {
     "check_compliance": (
-        "Check already-produced text (model input or output) against "
+        _LAW
+        + "Check already-produced text (model input or output) against "
         "ComplyEdge TrustLint offline YAML rules (regex corpus). Use "
         "for post-hoc evaluation of text that already exists; for "
         "pre-generation screening of a prompt about to be sent, use "
@@ -47,13 +53,14 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
         "list_rules for a scoped check. Runs fully offline — no "
         "network call, no API key, no credentials stored, no writes "
         "outside the process, read-only and idempotent; "
-        "deterministic regex match against the bundled corpus; does "
+        "regex match against the bundled corpus; does "
         "not classify AI-system risk tiers or call any remote API. "
         "Returns PASS/FAIL with rule ID, severity, citation, and "
         "remediation."
     ),
     "list_rules": (
-        "List TrustLint offline compliance rules in the ComplyEdge "
+        _LAW
+        + "List TrustLint offline compliance rules in the ComplyEdge "
         "corpus — the discovery tool; returns no PASS/FAIL or "
         "SAFE/RISK verdict. Use it to scope a jurisdiction before "
         "calling check_compliance; do not use it to evaluate text. "
@@ -67,7 +74,8 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
         "titles, severities, jurisdictions, and categories."
     ),
     "scan_prompt": (
-        "Scan an AI prompt with ComplyEdge TrustLint offline YAML "
+        _LAW
+        + "Scan an AI prompt with ComplyEdge TrustLint offline YAML "
         "rules (regex corpus) before generation — pre-generation "
         "only. Use when the prompt is about to be sent; for post-hoc "
         "evaluation of already-produced text, use check_compliance. "
@@ -77,7 +85,7 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
         "jurisdiction filter — it always evaluates the full "
         "bundled corpus. Runs fully offline — no network call, no "
         "API key, no credentials stored, no writes outside the "
-        "process, read-only and idempotent; deterministic regex "
+        "process, read-only and idempotent; regex "
         "match against the bundled corpus; does not classify "
         "AI-system risk tiers or call any remote API. Returns SAFE "
         "or RISK_DETECTED with cited findings from the offline "

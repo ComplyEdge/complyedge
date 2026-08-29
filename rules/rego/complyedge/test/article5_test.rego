@@ -5,14 +5,14 @@ package complyedge.article5_test
 
 import rego.v1
 
-import data.complyedge.article5.social_scoring
-import data.complyedge.article5.subliminal_manipulation
-import data.complyedge.article5.vulnerability_exploitation
+import data.complyedge.article5
 import data.complyedge.article5.biometric_categorisation
 import data.complyedge.article5.emotion_recognition
 import data.complyedge.article5.predictive_policing
 import data.complyedge.article5.realtime_biometric
-import data.complyedge.article5
+import data.complyedge.article5.social_scoring
+import data.complyedge.article5.subliminal_manipulation
+import data.complyedge.article5.vulnerability_exploitation
 
 # ============================================================
 # Social Scoring — Article 5(1)(c)
@@ -217,11 +217,14 @@ test_biometric_allows_normal_text if {
 # fields.
 
 test_biometric_law_enforcement_exception_no_violation if {
+	# Now requires the service-set authorisation as well: the carve-out is a
+	# property of the deployer, not of the request.
 	not biometric_categorisation.violation with input as {
 		"jurisdiction": "EU",
 		"text": "Biometric categorisation to infer race for criminal investigation",
 		"use_case": "law_enforcement",
 		"lawful_basis": true,
+		"law_enforcement_authorised": true,
 	}
 }
 
@@ -263,12 +266,98 @@ test_biometric_dataset_filtering_exception_no_violation if {
 # were not verified.
 # ============================================================
 
+# ============================================================
+# The carve-out belongs to the DEPLOYER, not to the request
+#
+# Regulation (EU) 2024/1689 confines the Art 5(1)(g) law-enforcement carve-out
+# to activities carried out by law enforcement authorities or on their behalf.
+# It was previously granted on two caller-supplied fields alone, so anyone able
+# to reach the API could switch off a critical Article 5 prohibition by adding
+# `use_case` and `lawful_basis` to a request body. `law_enforcement_authorised`
+# is set by the service from tenant configuration and never read from the
+# request.
+# ============================================================
+
+test_unauthorised_tenant_cannot_switch_off_the_prohibition if {
+	biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+	}
+}
+
+test_explicit_false_authorisation_cannot_switch_it_off if {
+	biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+		"law_enforcement_authorised": false,
+	}
+}
+
+test_refused_claim_is_recorded_not_silently_dropped if {
+	some e in biometric_categorisation.rejected_exemptions with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+	}
+	e.outcome == "refused"
+	e.asserted.use_case == "law_enforcement"
+	e.asserted_by == "caller"
+}
+
+test_authorised_tenant_still_gets_the_carve_out if {
+	not biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+		"law_enforcement_authorised": true,
+	}
+}
+
+# Both branches: no refusal is invented where nothing was claimed, and none
+# where the claim was honoured.
+test_no_refusal_recorded_when_nothing_was_claimed if {
+	count(biometric_categorisation.rejected_exemptions) == 0 with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race",
+	}
+}
+
+test_no_refusal_recorded_when_the_claim_was_honoured if {
+	count(biometric_categorisation.rejected_exemptions) == 0 with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation to infer race for criminal investigation",
+		"use_case": "law_enforcement",
+		"lawful_basis": true,
+		"law_enforcement_authorised": true,
+	}
+}
+
+# The dataset carve-out is NOT law-enforcement-bound in the Act ("any labelling
+# or filtering of lawfully acquired biometric datasets"), so it is deliberately
+# left as a caller assertion and must keep working without authorisation.
+test_dataset_carve_out_is_unaffected_by_the_authorisation_gate if {
+	not biometric_categorisation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Biometric categorisation across our lawfully acquired image corpus",
+		"dataset_operation": "labelling",
+	}
+}
+
 test_law_enforcement_exemption_is_recorded if {
+	# GRANTED exemptions now require the service-set authorisation; a claim
+	# without it is recorded as refused instead (see the tests above).
 	some e in biometric_categorisation.exemptions with input as {
 		"jurisdiction": "EU",
 		"text": "Biometric categorisation to infer race for criminal investigation",
 		"use_case": "law_enforcement",
 		"lawful_basis": true,
+		"law_enforcement_authorised": true,
 	}
 	e.exemption == "law_enforcement"
 	e.rule_id == "rego-art5-1g-001"
@@ -315,6 +404,7 @@ test_aggregator_surfaces_the_exemption if {
 		"text": "Biometric categorisation to infer race for criminal investigation",
 		"use_case": "law_enforcement",
 		"lawful_basis": true,
+		"law_enforcement_authorised": true,
 	}
 	result.violation == false
 	count(result.exemptions) == 1

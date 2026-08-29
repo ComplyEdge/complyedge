@@ -125,6 +125,16 @@ class _PerIpRateLimitMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 
+class _RejectGetMcpMiddleware(BaseHTTPMiddleware):
+    """POST-only /mcp. GET SSE on Lambda sits until the 15s timeout."""
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        path = (request.url.path or "").rstrip("/") or "/"
+        if request.method == "GET" and path == "/mcp":
+            return Response(status_code=405, headers={"Allow": "POST"})
+        return await call_next(request)
+
+
 def _reset_rate_limit_state_for_tests() -> None:
     """Clear in-process buckets (unit tests only)."""
     _rate_buckets.clear()
@@ -265,4 +275,5 @@ def create_asgi_app():
     """ASGI app for Mangum / uvicorn (/mcp + /health + soft per-IP rate limit)."""
     app = create_mcp().streamable_http_app()
     app.add_middleware(_PerIpRateLimitMiddleware)
+    app.add_middleware(_RejectGetMcpMiddleware)
     return app

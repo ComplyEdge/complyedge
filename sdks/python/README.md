@@ -1,6 +1,6 @@
 # ComplyEdge Python SDK
 
-Runtime compliance engine for EU AI Act. Open source. Deterministic.
+Runtime EU AI Act Article 5 and Article 50 enforcement. Open source.
 
 ## Choose the Right Package
 
@@ -31,6 +31,23 @@ def my_agent(prompt):
 ```
 
 That's it. Every input and output is checked against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations are blocked before they reach the user, with legal citation, rule ID, and timestamp on every check.
+
+Classifiers (`eu-ai-act-*` MCPs) score the *system*. ComplyEdge denies *this* prompt or output now. Article 50 here is unlabeled or deceptive use, not C2PA watermarking.
+
+```bash
+pip install complyedge
+pip install trustlint
+pip install 'complyedge[mcp]'
+pip install 'complyedge[agents]'
+npx -y @complyedge/mcp
+claude mcp add complyedge -- npx -y @complyedge/mcp
+```
+
+OpenAI Agents extra (hosted path; needs `COMPLYEDGE_API_KEY`): `from complyedge.agents import create_compliance_guardrail`
+
+GitHub Action: `uses: complyedge/trustlint-action@v1`
+
+GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + trust page + MCP.
 
 The decorator reads your API key from the `COMPLYEDGE_API_KEY` environment variable by default. Pass `api_key_env="MY_VAR"` to use a different one.
 

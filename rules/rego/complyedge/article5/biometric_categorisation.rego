@@ -26,13 +26,23 @@ violation if {
 	not dataset_operation_exception
 }
 
-# Article 5(1)(g) OJ carve-out: the prohibition does NOT cover
-# categorizing of biometric data in the area of law enforcement when the
-# caller asserts a lawful basis. Both `use_case` and `lawful_basis` must
-# be present in the input for the exception to fire.
+# Article 5(1)(g) OJ carve-out: the prohibition does NOT cover categorising of
+# biometric data in the area of law enforcement.
+#
+# THE ACT BINDS THIS CARVE-OUT TO THE ACTOR, NOT TO THE REQUEST. "Law
+# enforcement purpose" is defined as activities carried out BY law enforcement
+# authorities, or ON THEIR BEHALF. Whether it applies is therefore a property
+# of the deployer, and cannot be established by two fields in a request body:
+# on the caller assertion alone, anyone able to reach the API could switch off
+# a critical Article 5 prohibition by adding `use_case` and `lawful_basis`.
+#
+# `law_enforcement_authorised` is set by the SERVICE from tenant configuration
+# and is never accepted from the request. Absent it the caller's assertion is
+# recorded as refused and the prohibition STANDS.
 law_enforcement_exception if {
 	input.use_case == "law_enforcement"
 	input.lawful_basis == true
+	input.law_enforcement_authorised == true
 }
 
 # Article 5(1)(g) OJ carve-out: dataset *labelling* and
@@ -48,6 +58,29 @@ dataset_operation_exception if {
 # entry states that explicitly rather than presenting them as established fact.
 # Without this, the one place where a prohibition can be switched off leaves no
 # trace in the Article 12 record.
+# An assertion that was made and REFUSED is evidence too. Without this, a
+# caller claiming the carve-out on an unauthorised tenant is indistinguishable
+# in the record from one who never claimed it, and the claim is exactly what an
+# investigator would want to see.
+rejected_exemptions contains e if {
+	input.jurisdiction == "EU"
+	biometric_pattern_match
+	input.use_case == "law_enforcement"
+	input.lawful_basis == true
+	not input.law_enforcement_authorised == true
+	e := {
+		"rule_id": rule_id,
+		"exemption": "law_enforcement",
+		"outcome": "refused",
+		"reason": "the tenant is not configured as a law enforcement authority; Regulation (EU) 2024/1689 confines this carve-out to activities carried out by law enforcement authorities or on their behalf",
+		"asserted": {
+			"use_case": input.use_case,
+			"lawful_basis": input.lawful_basis,
+		},
+		"asserted_by": "caller",
+	}
+}
+
 exemptions contains e if {
 	input.jurisdiction == "EU"
 	biometric_pattern_match

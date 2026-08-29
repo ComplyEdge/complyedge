@@ -4,8 +4,9 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/trustlint.svg)](https://pypi.org/project/trustlint/)
 [![PyPI provenance](https://img.shields.io/badge/PyPI-PEP%20740%20provenance-3775A9)](https://docs.pypi.org/attestations/)
 
-**Offline Python compliance linter for AI agents** — scans text against the
-bundled ComplyEdge rule corpus. No API key is required for local checks.
+**Offline Python compliance linter for AI agents** — EU AI Act Article 5 and
+Article 50 (and related corpus rules). Scans text against the bundled ComplyEdge
+rule corpus. No API key is required for local checks.
 
 TrustLint catches rule-backed EU AI Act, SOX, HIPAA, GDPR, COPPA, and PCI DSS
 risks before text reaches production.

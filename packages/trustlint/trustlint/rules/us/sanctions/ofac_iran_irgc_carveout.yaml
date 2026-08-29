@@ -1,0 +1,61 @@
+id: SANCTIONS_OFAC_IR_IRGC_CARVEOUT_001
+jurisdiction: US
+effective_date: '2026-01-01'
+description: >-
+  Iran-related dealings prohibition that, following a partial delisting, survives
+  ONLY for IRGC-affiliated counterparties and nuclear-program nexus. General Iran
+  dealings are permitted; IRGC-linked dealings remain blocked. Demonstrates the
+  conditional carve-out (conditional_on) sanctions primitive.
+title: OFAC Iran dealings — IRGC-only partial-delisting carve-out
+detection_scope: all
+category: sanctions
+conditions:
+- type: regex
+  value: >-
+    (?i)\b(Iran(?:ian)?|Tehran|rial\s+payment|Hormuz\s+(?:transit|toll)|Persian\s+Gulf|Bank\s+Melli|Bank\s+Saderat|IRGC|Revolutionary\s+Guard)\b
+  flags: i
+severity: high
+conditional_on:
+- parameter: counterparty_irgc_status
+  operator: "=="
+  value: true
+  rationale: >-
+    After the partial delisting, OFAC retains the Iran prohibition only for
+    IRGC-affiliated counterparties (and nuclear-program nexus). Dealings with
+    non-IRGC Iranian counterparties are permitted; the prohibition here applies
+    solely when the counterparty is IRGC-affiliated.
+source:
+  regulation: OFAC (US Treasury) Iran sanctions — IRGC designation carve-out
+  article: 31 CFR Part 560 / Executive Order 13224 (IRGC)
+  url: https://ofac.treasury.gov/sanctions-programs-and-country-information/iran-sanctions
+  citation: >-
+    OFAC administers Iran sanctions under 31 CFR Part 560; the IRGC is designated
+    under EO 13224. A partial delisting lifts general Iran restrictions while
+    retaining them for IRGC-affiliated and nuclear-nexus counterparties. This
+    rule fires only when the caller asserts IRGC affiliation (or leaves it
+    unverified, in which case it applies conservatively pending verification).
+  last_updated: '2026-07-05'
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    🛑 Iran dealing with an IRGC-affiliated counterparty. The Iran prohibition
+    survives the partial delisting only for IRGC-linked and nuclear-nexus
+    counterparties.
+  suggestion: >-
+    If the counterparty is not IRGC-affiliated, assert counterparty_irgc_status
+    = false in the request context to clear the carve-out. CE does not verify
+    affiliation — the assertion is logged for the audit trail.
+  allow_override: false
+  require_explicit_consent: false
+version: 1.0.0
+tags:
+- sanctions
+- ofac
+- iran
+- irgc
+- partial_delisting
+- carve_out
+- conditional_on
+- transition_rule
+tier: enterprise

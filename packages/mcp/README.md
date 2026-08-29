@@ -4,6 +4,16 @@
 [![npm downloads](https://img.shields.io/npm/dw/@complyedge/mcp)](https://www.npmjs.com/package/@complyedge/mcp)
 [![license](https://img.shields.io/npm/l/@complyedge/mcp)](https://github.com/ComplyEdge/complyedge/blob/main/LICENSE)
 
+EU AI Act Article 5 and Article 50 runtime deny via TrustLint, offline. Classifiers (`eu-ai-act-*`) score the *system*; this server denies *this* prompt or output. Article 50 here is unlabeled or deceptive use, not C2PA.
+
+```bash
+npx -y @complyedge/mcp
+pip install 'complyedge[mcp]'
+pip install complyedge
+pip install trustlint
+claude mcp add complyedge -- npx -y @complyedge/mcp
+```
+
 Run offline TrustLint checks from any MCP host with Node.js:
 
 ```json
@@ -43,6 +53,8 @@ The server exposes three read-only tools.
 - [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk) — hosted runtime enforcement and the Article 12 audit trail
 - [`trustlint`](https://www.npmjs.com/package/trustlint) — the same offline engine as a CLI
 - [`complyedge` on PyPI](https://pypi.org/project/complyedge/) — Python MCP server, published under this same registry entry
+- GitHub Action: `uses: complyedge/trustlint-action@v1`
+- GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + trust page + MCP.
 - [`trustlint` on PyPI](https://pypi.org/project/trustlint/) — Python linter
 - [Documentation](https://www.complyedge.io/docs) · [Trust portal](https://trust.complyedge.io)
 

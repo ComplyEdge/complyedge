@@ -1,4 +1,4 @@
-# ComplyEdge — Rego corpus evidence classification
+# ComplyEdge: Rego corpus evidence classification
 #
 # WHAT EACH LEAF POLICY ACTUALLY ESTABLISHES.
 #
@@ -10,22 +10,22 @@
 # a reader to discover it by opening a file.
 #
 # classification:
-#   content_inspecting  — the evaluated text IS, or asks for, the regulated act.
+#   content_inspecting : the evaluated text IS, or asks for, the regulated act.
 #                         Blocking it prevents the act. The citation on the
 #                         decision is load-bearing.
-#   assertion_matching  — the rule fires on text that DESCRIBES a state of the
+#   assertion_matching : the rule fires on text that DESCRIBES a state of the
 #                         world the engine cannot verify. Blocking it does not
 #                         establish that state, and not firing does not
 #                         establish compliance.
 #
 # basis (why it lands where it lands):
-#   regulated_act_in_text    — the prohibited or regulated conduct is the text.
-#   absent_control_asserted  — keys on a phrase asserting a control is missing
+#   regulated_act_in_text   : the prohibited or regulated conduct is the text.
+#   absent_control_asserted : keys on a phrase asserting a control is missing
 #                              ("high-risk AI without technical documentation").
 #                              No text matcher can establish whether a quality
 #                              management system, a technical file, a human
 #                              oversight assignment or a FRIA exists.
-#   domain_of_use_described  — labels a described use case against an Annex III
+#   domain_of_use_described : labels a described use case against an Annex III
 #                              domain. It classifies a description; it does not
 #                              establish that a deployed system is high-risk,
 #                              and it is not a finding of non-compliance.
@@ -44,7 +44,7 @@
 # only input is text keyed on an absent control.
 #
 # Provenance: assigned by reading every rule body. An absence-keying heuristic
-# was run as a cross-check and disagreed in BOTH directions — a false positive
+# was run as a cross-check and disagreed in BOTH directions: a false positive
 # on article5/vulnerability_exploitation ("exploit the elderly" is the act) and
 # a false negative on highrisk/art26_deployer_obligations ("deploying high-risk
 # AI without instructions" is an assertion). The heuristic grades the
