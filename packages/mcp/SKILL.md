@@ -34,6 +34,10 @@ pip install 'complyedge[agents]'
 from complyedge.agents import create_compliance_guardrail
 ```
 
+CI: `uses: complyedge/trustlint-action@v1`
+
+GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + trust page + MCP.
+
 ## Tools
 
 - `check_compliance` — already-produced text

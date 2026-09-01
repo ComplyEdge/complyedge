@@ -47,6 +47,34 @@ complyedge-mcp          # or: python -m complyedge.mcp_server
 
 Server source: [`sdks/python/complyedge/mcp_server.py`](sdks/python/complyedge/mcp_server.py). Full MCP docs: [`sdks/python/README.md`](sdks/python/README.md). This MCP path uses the offline TrustLint engine; it does not call the hosted OPA/Rego policy API.
 
+**Install (coding agents):**
+
+```bash
+pip install complyedge
+pip install trustlint
+pip install 'complyedge[mcp]'
+npx -y @complyedge/mcp
+claude mcp add complyedge -- npx -y @complyedge/mcp
+```
+
+Listing: [smithery.ai/servers/complyedge/complyedge](https://smithery.ai/servers/complyedge/complyedge)
+
+Cursor one-click: [Install TrustLint MCP](cursor://anysphere.cursor-deeplink/mcp/install?name=ComplyEdge%20TrustLint%20EU%20AI%20Act&config=eyJ1cmwiOiAiaHR0cHM6Ly9tY3AuY29tcGx5ZWRnZS5pby9tY3AifQ)
+
+OpenAI Agents extra (hosted path; needs `COMPLYEDGE_API_KEY`):
+
+```bash
+pip install 'complyedge[agents]'
+```
+
+```python
+from complyedge.agents import create_compliance_guardrail
+```
+
+CI: `uses: complyedge/trustlint-action@v1`
+
+GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + trust page + MCP.
+
 ## Live enforcement seals
 
 Not a static badge. These seals reflect live `/v1/check` traffic from open-source projects
