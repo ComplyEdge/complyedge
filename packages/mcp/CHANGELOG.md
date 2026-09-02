@@ -9,7 +9,7 @@ this package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 changelog existed; they are listed from their commits rather than reconstructed
 from memory, and anything not evidenced is left out instead of guessed at.
 
-## [0.1.5] - 2026-08-21
+## [0.1.5] - 2026-08-26
 
 ### Changed
 - Keywords: 9 -> 22. The other two npm packages were given a buyer-search
