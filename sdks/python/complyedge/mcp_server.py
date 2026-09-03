@@ -1,4 +1,4 @@
-"""ComplyEdge MCP stdio server — TrustLint offline compliance tools.
+"""ComplyEdge MCP stdio server : TrustLint offline compliance tools.
 
 Install-true entrypoints (after ``pip install 'complyedge[mcp]'``)::
 
@@ -34,8 +34,8 @@ TOOL_ANNOTATIONS = ToolAnnotations(readOnlyHint=True, idempotentHint=True)
 # Shared with mcp_http so stdio/HTTP surfaces cannot drift (Glama A1–A5).
 # Each description must name EU AI Act / Article 5 / Article 50 (GE-5).
 _LAW = (
-    "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted "
-    "OPA, not a system classifier. "
+    "EU AI Act Article 5 and Article 50. TrustLint offline regex: not the "
+    "hosted policy engine, not a system classifier. "
 )
 TOOL_DESCRIPTIONS: dict[str, str] = {
     "check_compliance": (
@@ -49,8 +49,8 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
         "runs; this is not a system-risk questionnaire). Optional "
         "`jurisdiction` is EU, US, or GLOBAL; omit it to evaluate "
         "the full corpus. GLOBAL is a separate corpus tag, not the "
-        "union of EU and US — reuse the same token you used with "
-        "list_rules for a scoped check. Runs fully offline — no "
+        "union of EU and US : reuse the same token you used with "
+        "list_rules for a scoped check. Runs fully offline : no "
         "network call, no API key, no credentials stored, no writes "
         "outside the process, read-only and idempotent; "
         "regex match against the bundled corpus; does "
@@ -61,14 +61,14 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
     "list_rules": (
         _LAW
         + "List TrustLint offline compliance rules in the ComplyEdge "
-        "corpus — the discovery tool; returns no PASS/FAIL or "
+        "corpus : the discovery tool; returns no PASS/FAIL or "
         "SAFE/RISK verdict. Use it to scope a jurisdiction before "
         "calling check_compliance; do not use it to evaluate text. "
         "Optional `jurisdiction` is EU, US, or GLOBAL; omit it to "
         "list the full corpus. GLOBAL is a separate corpus tag, not "
-        "EU∪US — pass that exact token into check_compliance next "
+        "EU∪US : pass that exact token into check_compliance next "
         "for a consistent scoped evaluation. Returned `total` is "
-        "the post-filter count. Runs fully offline — no network "
+        "the post-filter count. Runs fully offline : no network "
         "call, no API key, no credentials stored, no writes outside "
         "the process, read-only and idempotent. Returns rule IDs, "
         "titles, severities, jurisdictions, and categories."
@@ -76,14 +76,14 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
     "scan_prompt": (
         _LAW
         + "Scan an AI prompt with ComplyEdge TrustLint offline YAML "
-        "rules (regex corpus) before generation — pre-generation "
+        "rules (regex corpus) before generation : pre-generation "
         "only. Use when the prompt is about to be sent; for post-hoc "
         "evaluation of already-produced text, use check_compliance. "
         "Argument `prompt` must be a non-empty candidate prompt "
         "about to be sent to a model (empty/whitespace is rejected; "
         "not already-produced output). This tool has no "
-        "jurisdiction filter — it always evaluates the full "
-        "bundled corpus. Runs fully offline — no network call, no "
+        "jurisdiction filter : it always evaluates the full "
+        "bundled corpus. Runs fully offline : no network call, no "
         "API key, no credentials stored, no writes outside the "
         "process, read-only and idempotent; regex "
         "match against the bundled corpus; does not classify "
@@ -112,7 +112,7 @@ _CHECK_COMPLIANCE_SCHEMA: dict[str, Any] = {
             "description": (
                 "Corpus scope: EU, US, or GLOBAL. Omit to evaluate "
                 "the full corpus. GLOBAL is a separate tag, not "
-                "EU∪US — reuse the same token from list_rules."
+                "EU∪US : reuse the same token from list_rules."
             ),
             "enum": _JURISDICTION_ENUM,
         },
@@ -127,7 +127,7 @@ _LIST_RULES_SCHEMA: dict[str, Any] = {
             "type": "string",
             "description": (
                 "Corpus scope: EU, US, or GLOBAL. Omit to list the "
-                "full corpus. GLOBAL is a separate tag, not EU∪US — "
+                "full corpus. GLOBAL is a separate tag, not EU∪US : "
                 "pass the same token into check_compliance next."
             ),
             "enum": _JURISDICTION_ENUM,
@@ -214,7 +214,7 @@ def _require_corpus(engine: TrustLintEngine) -> None:
     """
     if not engine.rules:
         raise RuntimeError(
-            "TrustLint corpus is empty — refusing to evaluate. "
+            "TrustLint corpus is empty : refusing to evaluate. "
             "Set TRUSTLINT_RULES_DIR or reinstall complyedge[mcp]."
         )
 

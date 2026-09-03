@@ -8,7 +8,7 @@ import { TrustLintEngine, type LintResult, type Rule } from "trustlint";
 
 // Single source of truth for the version: package.json. A hardcoded constant
 // here read 0.1.1 while package.json said 0.1.2, so the published 0.1.2 server
-// introduced itself to every MCP host as 0.1.1. Third instance of this class —
+// introduced itself to every MCP host as 0.1.1. Third instance of this class :
 // trustlint's CLI held a hardcoded 2.0.0 against package.json 2.0.1, and
 // setup.py records the Python side hitting it first.
 //
@@ -27,7 +27,7 @@ const tools = [
   {
     name: "check_compliance",
     description:
-      "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted OPA, not a system classifier. Check already-produced text against the offline TrustLint corpus. Returns PASS or FAIL with cited findings. No network call or API key is required.",
+      "EU AI Act Article 5 and Article 50. TrustLint offline regex: not the hosted policy engine, not a system classifier. Check already-produced text against the offline TrustLint corpus. Returns PASS or FAIL with cited findings. No network call or API key is required.",
     inputSchema: {
       type: "object",
       properties: {
@@ -45,7 +45,7 @@ const tools = [
   {
     name: "list_rules",
     description:
-      "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted OPA, not a system classifier. List offline TrustLint rules. This discovers rule coverage; it does not evaluate text or return a compliance verdict.",
+      "EU AI Act Article 5 and Article 50. TrustLint offline regex: not the hosted policy engine, not a system classifier. List offline TrustLint rules. This discovers rule coverage; it does not evaluate text or return a compliance verdict.",
     inputSchema: {
       type: "object",
       properties: {
@@ -61,7 +61,7 @@ const tools = [
   {
     name: "scan_prompt",
     description:
-      "EU AI Act Article 5 and Article 50. TrustLint offline regex — not hosted OPA, not a system classifier. Scan a candidate prompt before generation against the offline TrustLint corpus. Returns SAFE or RISK_DETECTED. No network call or API key is required.",
+      "EU AI Act Article 5 and Article 50. TrustLint offline regex: not the hosted policy engine, not a system classifier. Scan a candidate prompt before generation against the offline TrustLint corpus. Returns SAFE or RISK_DETECTED. No network call or API key is required.",
     inputSchema: {
       type: "object",
       properties: {
