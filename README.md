@@ -8,7 +8,7 @@ EU AI Act Article 5 and Article 50 runtime deny for AI agents. Not a periodic sc
 
 Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server** — a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
 
-**Article 5 is already law.** GPAI obligations carry fines from 2 August 2026. Your AI is either compliant right now, or it isn't.
+**Article 5 is already law.** GPAI fines have applied since 2 August 2026. Your AI is either compliant right now, or it isn't.
 
 > What does your compliance tool tell a regulator when it blocks a request? A probability score?
 >
@@ -136,7 +136,7 @@ if not result.allowed:
 
 `rule_id` is the citation key: every rule carries its article reference in the corpus (`rego-art5-1c-001` → Article 5(1)(c)), and the full citation text ships with the rule under [`rules/`](rules).
 
-Jurisdiction maps to the rule corpus: `EU` evaluates against EU AI Act Article 5, Article 50, and GPAI obligations. `US` evaluates against HIPAA, SOX, COPPA, TCPA, BIPA.
+Jurisdiction maps to the rule corpus: `EU` evaluates against EU AI Act Article 5, Article 50, and GPAI obligations. `US` evaluates against HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA.
 
 ## TrustLint, Offline Linter
 
@@ -169,6 +169,7 @@ packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
 rules/regulations/    64 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
 rules/rego/           64 leaf OPA/Rego policies + 7 package aggregators
 rules/schemas/        Rule validation schema
+rules/scripts/        Schema validator (`validate_rules.py`)
 examples/             Usage examples (decorators, OpenAI Agents)
 scripts/benchmark/    Runtime benchmark (runner + prompt YAMLs + committed results)
 tests/                Rule validation + acceptance tests
@@ -182,7 +183,7 @@ tests/                Rule validation + acceptance tests
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 36 YAML + 64 leaf Rego | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR + Art 15 IPI |
+| **EU** | 36 YAML | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR + Art 15 IPI |
 | **US** | 16 YAML | HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA |
 | **Global** | 1 YAML | PCI DSS |
 | **Universal** | 11 YAML | PII detection, prompt injection (direct + indirect) |
