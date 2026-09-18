@@ -16,7 +16,13 @@
  * ```
  */
 
-export { ComplyEdgeClient } from "./client";
+export {
+  ComplyEdgeClient,
+  REGION_BASE_URLS,
+  regionFromApiKey,
+  resolveBaseUrl,
+} from "./client";
+export type { Region } from "./client";
 export { withCompliance, ComplianceError } from "./openai-middleware";
 export type {
   ComplyEdgeConfig,

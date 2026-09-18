@@ -1,0 +1,3 @@
+complyedge>=0.2
+cryptography>=42        # Part 1: Ed25519 per-record signatures (the hand-built trail)
+pydantic-ai>=0.4        # optional: --agent lets Pydantic AI produce the loan proposals

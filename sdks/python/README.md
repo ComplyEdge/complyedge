@@ -109,6 +109,24 @@ if not is_safe(text, api_key=api_key, jurisdiction="EU"):
 result = check(text, api_key=api_key, jurisdiction="EU")
 ```
 
+## Regions
+
+ComplyEdge runs one independent stack per region — US (`api.complyedge.io`) and
+EU (`eu.api.complyedge.io`, Frankfurt). Your tenant, its audit trail and its
+API keys live in exactly one of them. The key says which: keys issued by the EU
+stack start with `ce_eu_`, US keys with `ce_`. The SDK reads the prefix and
+picks the host, so nothing needs configuring:
+
+```python
+ce = ComplyEdge(api_key="ce_eu_...")   # -> https://eu.api.complyedge.io
+ce = ComplyEdge(api_key="ce_...")      # -> https://api.complyedge.io
+```
+
+To override, highest precedence first: `base_url=` (or `COMPLYEDGE_API_URL`),
+then `region="us" | "eu"` (or `COMPLYEDGE_REGION`), then the key prefix. A key
+presented to the other region's stack is refused with
+`401 {"error": "wrong_region", "use": "<host>"}` before any lookup.
+
 ## MCP Server — Use ComplyEdge as an AI Agent Tool
 
 <!-- mcp-name: io.github.ComplyEdge/complyedge -->

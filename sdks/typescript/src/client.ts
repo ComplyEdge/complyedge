@@ -14,11 +14,56 @@ import type {
   PreDeploymentResult,
 } from "./types";
 
-const DEFAULT_BASE_URL = "https://api.complyedge.io";
+// ComplyEdge runs one independent stack per region. A tenant lives in exactly
+// one of them, and its API keys are only valid there. The key itself says
+// which: `ce_` -> US (api.complyedge.io), `ce_eu_` -> EU (eu.api.complyedge.io).
+export type Region = "us" | "eu";
+
+export const REGION_BASE_URLS: Record<Region, string> = {
+  us: "https://api.complyedge.io",
+  eu: "https://eu.api.complyedge.io",
+};
+
+/** Region an API key was issued in, read from its prefix; undefined if unknown. */
+export function regionFromApiKey(apiKey?: string): Region | undefined {
+  if (!apiKey) return undefined;
+  // Longest prefix first: `ce_eu_` also starts with `ce_`.
+  if (apiKey.startsWith("ce_eu_")) return "eu";
+  if (apiKey.startsWith("ce_")) return "us";
+  return undefined;
+}
+
+/**
+ * Pick the API host. Precedence, highest first:
+ *   1. `baseUrl` option
+ *   2. `COMPLYEDGE_API_URL` environment variable
+ *   3. `region` option, else `COMPLYEDGE_REGION` environment variable
+ *   4. the region encoded in the API key prefix (`ce_eu_` -> EU)
+ *   5. US
+ */
+export function resolveBaseUrl(opts: {
+  apiKey?: string;
+  baseUrl?: string;
+  region?: Region;
+}): string {
+  if (opts.baseUrl) return opts.baseUrl.replace(/\/+$/, "");
+  const envUrl = process.env.COMPLYEDGE_API_URL;
+  if (envUrl) return envUrl.replace(/\/+$/, "");
+  const chosen = (opts.region || process.env.COMPLYEDGE_REGION || "").trim().toLowerCase();
+  if (chosen) {
+    if (!(chosen in REGION_BASE_URLS)) {
+      throw new Error(
+        `Unknown ComplyEdge region "${chosen}"; expected one of ${Object.keys(REGION_BASE_URLS).join(", ")}`
+      );
+    }
+    return REGION_BASE_URLS[chosen as Region];
+  }
+  return REGION_BASE_URLS[regionFromApiKey(opts.apiKey) || "us"];
+}
 // Keep in sync with package.json. Hardcoding it here meant the User-Agent
 // silently reported a stale version after every release bump, which is the
 // one field support uses to tell which client a customer is actually on.
-const SDK_VERSION = "0.2.3";
+const SDK_VERSION = "0.2.4";
 
 export class ComplyEdgeClient {
   private http: AxiosInstance;
@@ -26,13 +71,17 @@ export class ComplyEdgeClient {
   private jurisdiction?: string;
 
   constructor(config: ComplyEdgeConfig) {
-    const baseUrl = config.baseUrl || process.env.COMPLYEDGE_API_URL || DEFAULT_BASE_URL;
+    const baseUrl = resolveBaseUrl({
+      apiKey: config.apiKey,
+      baseUrl: config.baseUrl,
+      region: config.region,
+    });
 
     this.agentId = config.agentId || "default";
     this.jurisdiction = config.jurisdiction;
 
     this.http = axios.create({
-      baseURL: baseUrl.replace(/\/+$/, ""),
+      baseURL: baseUrl,
       timeout: config.timeout || 30_000,
       headers: {
         Authorization: `Bearer ${config.apiKey}`,

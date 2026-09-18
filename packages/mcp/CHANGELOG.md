@@ -9,6 +9,30 @@ this package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 changelog existed; they are listed from their commits rather than reconstructed
 from memory, and anything not evidenced is left out instead of guessed at.
 
+## [0.2.0] - 2026-09-05
+
+### Changed
+- **`trustlint` floor raised from `^2.0.5` to `^2.1.0`.** This is the release
+  where the offline injection checks start working at all.
+
+  In every published `trustlint` before 2.1.0, all ten `prompt_security` rules
+  loaded from the bundled corpus and **none of them matched** — including the
+  simplest direct-override rule. JavaScript's `RegExp` rejects the corpus's
+  inline `(?i)` flag prefix, so each pattern threw at compile time and a silent
+  `catch` turned "will not compile" into "never matches". `scan_prompt` and
+  `check_compliance` returned clean on text the Python engine and the hosted MCP
+  both blocked.
+
+  `^2.0.5` already permitted 2.1.0, so a fresh `npx` would have resolved the fix
+  on its own. The floor is raised anyway: `^2.0.5` also permits 2.0.5, 2.0.6 and
+  2.0.7, all of which carry the dead-rule bug. A stale cache or an older
+  resolution would otherwise hand someone a linter that silently detects nothing.
+
+### Note
+No code in this package changed. The version moves to 0.2.0 rather than 0.1.6
+because the observable behaviour changes substantially — text that previously
+came back clean now returns violations.
+
 ## [0.1.5] - 2026-08-26
 
 ### Changed

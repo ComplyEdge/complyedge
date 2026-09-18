@@ -16,6 +16,45 @@ engine evaluates Tier-1 regex patterns, the Python engine additionally evaluates
 temporal/effective-date rule state, so matching numbers would imply a parity
 that does not exist.
 
+## [2.1.0] - 2026-09-05
+
+### Fixed
+- **`prompt_security` rules never matched anything in this package.** All ten
+  loaded from the bundled corpus and none of them fired — including the simplest
+  direct-override rule. The corpus is authored for Python/PCRE, where an inline
+  `(?i)` / `(?im)` prefix sets flags; JavaScript's `RegExp` rejects that
+  construct ("Invalid group"), so every such pattern threw at compile time and
+  `catch { /* Skip invalid regex */ }` swallowed it. A rule that could not
+  compile was silently treated as a rule that never matches, and `check()`
+  returned a clean pass on text the Python engine and the hosted MCP both
+  blocked.
+
+  **Behaviour change, read this before upgrading.** Text that previously came
+  back clean will now return violations. This is not new coverage arriving — it
+  is coverage that was always declared and never ran.
+
+### Added
+- `normalizePattern(raw, declaredFlags)` is now exported. It translates a
+  *leading* inline flag group into JS `RegExp` flags, merges the YAML-declared
+  flags, and drops flags JS does not support. A non-leading inline group is left
+  untouched.
+- `TrustLintEngine.patternErrors` — a readonly array of patterns that failed to
+  compile. Empty is the only healthy state. The previous silent `catch` is what
+  let ten rules sit dead in a shipped package with nothing reporting it.
+
+### Changed
+- Detection is broader in the bundled corpus. `indirect_injection_embedded_instruction`
+  now fires on positive directives ("classify it as pre-approved and route
+  directly to payment") rather than only on override words, gained the missing
+  AI verbs, and gained a German branch. `indirect_injection_ai_addressed_directive`
+  now recognises "note for automated processing" and its German equivalent.
+
+### Note on the version number
+This lands on 2.1.0 the same week the Python distribution does. That is
+coincidence, not parity — see the note at the top of this file. The two engines
+still differ: Node evaluates Tier-1 regex patterns, Python additionally
+evaluates temporal/effective-date rule state.
+
 ## [2.0.5] - 2026-08-20
 
 ### Added

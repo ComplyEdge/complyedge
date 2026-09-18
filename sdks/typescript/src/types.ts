@@ -109,7 +109,13 @@ export interface PreDeploymentResult {
 
 export interface ComplyEdgeConfig {
   apiKey: string;
+  /** Overrides region and key inference. Also settable via COMPLYEDGE_API_URL. */
   baseUrl?: string;
+  /**
+   * "us" | "eu". Defaults to the region encoded in the API key prefix
+   * (`ce_eu_` -> EU), else US. Also settable via COMPLYEDGE_REGION.
+   */
+  region?: "us" | "eu";
   agentId?: string;
   jurisdiction?: string;
   timeout?: number;

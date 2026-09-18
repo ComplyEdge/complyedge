@@ -57,19 +57,25 @@ function parseRuleFile(filePath: string): Rule | null {
     const condType = cond.type ?? "";
 
     if (condType === "regex") {
-      patterns.push({
-        pattern: cond.value,
-        description: cond.description ?? "",
-        flags: cond.flags ?? "",
-      });
+      {
+        const norm = normalizePattern(String(cond.value), cond.flags ?? "");
+        patterns.push({
+          pattern: norm.pattern,
+          description: cond.description ?? "",
+          flags: norm.flags,
+        });
+      }
     } else if (condType === "hybrid_detection") {
       const tier1 = cond.tier1_config ?? {};
       for (const rp of tier1.risk_flag_patterns ?? []) {
-        patterns.push({
-          pattern: rp.pattern,
-          description: rp.description ?? "",
-          flags: rp.flags ?? "",
-        });
+        {
+          const norm = normalizePattern(String(rp.pattern), rp.flags ?? "");
+          patterns.push({
+            pattern: norm.pattern,
+            description: rp.description ?? "",
+            flags: norm.flags,
+          });
+        }
       }
     }
   }
@@ -105,6 +111,36 @@ function parseRuleFile(filePath: string): Rule | null {
     remediationMessage: remediationMsg,
     regexPatterns: patterns,
   };
+}
+
+/**
+ * Translate a YAML pattern into a JS-compatible pattern + flags.
+ *
+ * The corpus is authored for Python/PCRE, where an inline `(?i)` / `(?im)`
+ * prefix sets flags. JavaScript's RegExp REJECTS that construct outright
+ * ("Invalid group"), so every rule authored with an inline prefix threw at
+ * compile time and was silently skipped by the catch in check(). That is why
+ * `npm install trustlint` loaded all 10 prompt_security rules and matched none
+ * of them, including the simplest direct-override rule.
+ *
+ * Only a LEADING prefix is stripped; an inline group elsewhere in the pattern
+ * is left alone. Flags not supported by JS are dropped rather than passed on.
+ */
+export function normalizePattern(
+  raw: string,
+  declaredFlags = ""
+): { pattern: string; flags: string } {
+  let pattern = raw;
+  let collected = declaredFlags;
+  const leading = pattern.match(/^\(\?([a-zA-Z]+)\)/);
+  if (leading) {
+    collected += leading[1];
+    pattern = pattern.slice(leading[0].length);
+  }
+  const flags = [...new Set(collected.split(""))]
+    .filter((c) => "imsu".includes(c))
+    .join("");
+  return { pattern, flags };
 }
 
 function findYamlFiles(dir: string): string[] {
@@ -169,6 +205,8 @@ function resolveRulesDir(rulesDir?: string): string | null {
 export class TrustLintEngine {
   public rules: Rule[] = [];
   private rulesDir: string | null;
+  /** Patterns that failed to compile. Empty is the only healthy state. */
+  readonly patternErrors: string[] = [];
 
   constructor(rulesDir?: string) {
     this.rulesDir = resolveRulesDir(rulesDir);
@@ -204,9 +242,7 @@ export class TrustLintEngine {
     for (const rule of applicable) {
       for (const pat of rule.regexPatterns) {
         try {
-          let flags = "";
-          if (pat.flags.includes("i")) flags += "i";
-          const regex = new RegExp(pat.pattern, flags);
+          const regex = new RegExp(pat.pattern, pat.flags);
           if (regex.test(text)) {
             violations.push({
               ruleId: rule.id,
@@ -220,8 +256,12 @@ export class TrustLintEngine {
             });
             break; // One match per rule is enough
           }
-        } catch {
-          // Skip invalid regex
+        } catch (err) {
+          // A pattern that will not compile must never fail silently — that is
+          // how 10 prompt_security rules sat dead in the shipped package.
+          this.patternErrors.push(
+            `${rule.id}: ${(err as Error).message}`
+          );
         }
       }
     }

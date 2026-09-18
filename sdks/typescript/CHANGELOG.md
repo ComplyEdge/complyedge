@@ -14,6 +14,19 @@ numbers are deliberately not kept level between the two — they are separate
 implementations with different capability surfaces, so matching numbers would
 imply a parity that does not exist.
 
+## [Unreleased]
+
+## [0.2.4] - 2026-09-16
+
+### Added
+- `region: "us" | "eu"` config option and `COMPLYEDGE_REGION` environment
+  variable. The client now picks the API host from the key prefix
+  (`ce_eu_` -> `https://eu.api.complyedge.io`, `ce_` -> `https://api.complyedge.io`)
+  when neither `baseUrl` nor `COMPLYEDGE_API_URL` is set. Exported helpers:
+  `resolveBaseUrl`, `regionFromApiKey`, `REGION_BASE_URLS`, type `Region`.
+  Precedence: `baseUrl` > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION`
+  > key prefix > US. Existing configurations resolve exactly as before.
+
 ## [0.2.3] - 2026-08-20
 
 ### Added
@@ -67,6 +80,7 @@ imply a parity that does not exist.
 
 Released before this changelog existed. See the repository history.
 
+[0.2.4]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.4
 [0.2.3]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.3
 [0.2.2]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.2
 [0.2.1]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.1

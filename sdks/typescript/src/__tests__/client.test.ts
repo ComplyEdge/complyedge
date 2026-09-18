@@ -11,6 +11,8 @@ vi.mock("axios", () => ({
 }));
 
 import axios from "axios";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 describe("ComplyEdgeClient", () => {
   let client: ComplyEdgeClient;
@@ -48,8 +50,6 @@ describe("ComplyEdgeClient", () => {
     });
 
     it("User-Agent version matches package.json", () => {
-      const { readFileSync } = require("node:fs") as typeof import("node:fs");
-      const { resolve } = require("node:path") as typeof import("node:path");
       const pkg = JSON.parse(
         readFileSync(resolve(__dirname, "../../package.json"), "utf8")
       );

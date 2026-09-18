@@ -1,0 +1,67 @@
+id: EU_AI_ACT_ART5_FACIAL_SCRAPING_001
+jurisdiction: EU
+effective_date: '2025-02-02'
+description: >-
+  Prohibits placing on the market, putting into service, or using AI systems
+  that create or expand facial recognition databases through the untargeted
+  scraping of facial images from the internet or CCTV footage. Article 5(1)(e).
+  Effective 2 February 2025.
+detection_scope: all
+conditions:
+- type: semantic
+  prompt: >-
+    Determine whether the following text describes, requests, or facilitates
+    creating or expanding a facial recognition database through the untargeted
+    scraping of facial images from the internet or CCTV footage, in violation
+    of EU AI Act Article 5(1)(e). Untargeted means indiscriminate collection
+    (e.g., scraping all images from a website, social media, or CCTV feeds)
+    rather than targeted retrieval of specific persons under lawful authority.
+    Detect intent to bulk-scrape, harvest, crawl, or download facial images
+    to train, build, or augment a facial recognition system or database. Do
+    NOT flag: targeted lawful image retrieval, datasets collected under valid
+    legal basis, biometric verification on consenting subjects, or general
+    web scraping unrelated to facial recognition.
+  model: gpt-4
+- type: regex
+  value: >-
+    ((?:scrape|scraping|harvest|harvesting|crawl|crawling|bulk[\-\s]?download|mass[\-\s]?download|mass[\-\s]?collect)\w*\s+(?:of\s+)?(?:facial|face)\s+(?:images|photos|pictures|data|recognition\s+data)|(?:facial|face)\s+(?:image|photo|picture|recognition)\s+(?:database|dataset)\s+(?:from|using|via)\s+(?:scraping|harvesting|crawling|untargeted|web\s+crawl|internet|CCTV)|(?:untargeted|indiscriminate|bulk|mass)\s+(?:collection|gathering|acquisition)\s+of\s+(?:facial|face)\s+(?:images|data|recognition\s+data)|(?:create|building|build|expand|grow|populate)\w*\s+(?:facial|face)\s+recognition\s+(?:database|dataset|model)\s+(?:from|via|using|by)\s+(?:scraping|web|internet|CCTV|untargeted)|(?:web|internet|CCTV)\s+(?:scrape|scraping|crawl|crawling|harvest)\w*\s+(?:for|to\s+(?:build|create|train))\s+(?:facial|face)\s+recognition|(?:Clearview|PimEyes)[\-\s]?(?:style|like|approach)\s+(?:facial|face)\s+(?:database|recognition))
+  flags: i
+severity: critical
+category: prohibited_practice
+source:
+  regulation: EU AI Act
+  article: Article 5(1)(e)
+  url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  last_updated: '2024-07-12'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 5(1)(e): the placing on the market,
+    the putting into service for this specific purpose, or the use of AI
+    systems that create or expand facial recognition databases through the
+    untargeted scraping of facial images from the internet or CCTV footage.
+penalty_information:
+  civil_penalties:
+    eu_enforcement: Up to EUR 35,000,000 or 7% of worldwide annual turnover (Article 99 — prohibited practices tier)
+remediation:
+  action: block
+  timing: proactive
+  message: >-
+    BLOCKED — EU AI Act Article 5(1)(e) prohibits creating or expanding
+    facial recognition databases through untargeted scraping of facial images
+    from the internet or CCTV footage. This is a prohibited AI practice
+    carrying the highest penalty tier: up to EUR 35M or 7% of global turnover.
+  suggestion: >-
+    Do not build or augment facial recognition systems by indiscriminately
+    collecting facial images from the internet or CCTV. Use only datasets
+    obtained with a valid lawful basis (consent, contract, statutory
+    authority) and targeted at identified individuals. Document data
+    provenance and lawful basis under GDPR Article 6 and the LED. Consult
+    the EDPB guidelines on facial recognition before any deployment.
+version: 1.0.0
+tags:
+- eu-ai-act
+- article-5
+- prohibited-practice
+- facial-recognition
+- biometric
+- scraping
+tier: enterprise

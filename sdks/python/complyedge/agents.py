@@ -27,14 +27,15 @@ Usage:
 from __future__ import annotations
 
 import logging
-import os
 from collections.abc import Callable
 from typing import Any
 
 from . import ComplyEdge
 
-# Resolve default base URL from environment
-_DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL", "https://api.complyedge.io")
+# No default host here: ComplyEdge() resolves it (base_url > COMPLYEDGE_API_URL
+# > region > API-key prefix > US). Pinning a host at import time would send a
+# ce_eu_ key to the US stack.
+_DEFAULT_BASE_URL: str | None = None
 
 logger = logging.getLogger(__name__)
 
@@ -80,10 +81,11 @@ _RULE_TYPE_PATHS = {
 def create_compliance_guardrail(
     api_key: str,
     rules: str | list[str] = "eu-ai-act/article-5",
-    base_url: str = _DEFAULT_BASE_URL,
+    base_url: str | None = _DEFAULT_BASE_URL,
     direction: str = "input",
     rule_type: str | None = None,
     jurisdiction: str | None = None,
+    agent_id: str = "default",
     **_unused: Any,
 ) -> Callable:
     """
@@ -95,7 +97,17 @@ def create_compliance_guardrail(
         api_key: Your ComplyEdge API key
         rules: Rule path or list of rule paths to enforce
         base_url: ComplyEdge API base URL
-        direction: "input" for input guardrail, "output" for output guardrail
+        direction: "input" for input guardrail, "output" for output guardrail.
+            Also selects the audit direction filed on the Article 12 record:
+            input guardrails check text going INTO the model ("prompt"),
+            output guardrails check what came OUT ("output"). Before this the
+            guardrail always filed "output", so every input check landed in the
+            audit trail as a model output and input-scoped rules never ran.
+        jurisdiction: Rule corpus evaluated server-side ("EU", "US"). None
+            lets the server default apply.
+        agent_id: Filed on every audit row so the dashboard can attribute
+            checks to the agent that made them. Previously discarded, which
+            recorded every guardrail check as agent "default".
 
     Returns:
         A guardrail compatible with OpenAI Agents and other frameworks
@@ -117,11 +129,15 @@ def create_compliance_guardrail(
 
     if rule_type:
         rules = _RULE_TYPE_PATHS.get(rule_type, rule_type)
-    _ = jurisdiction  # accepted for the pre-pivot call sites; unused
-
-    ce = ComplyEdge(api_key=api_key, base_url=base_url)
+    ce = ComplyEdge(
+        api_key=api_key,
+        agent_id=agent_id,
+        jurisdiction=jurisdiction,
+        base_url=base_url,
+    )
     rules_list = [rules] if isinstance(rules, str) else rules
     rules_label = ", ".join(rules_list)
+    check_direction = "output" if direction == "output" else "prompt"
 
     def compliance_guardrail(ctx: Any, agent: Any, input_data: str | list) -> Any:
         if isinstance(input_data, list):
@@ -130,10 +146,13 @@ def create_compliance_guardrail(
             text_to_check = input_data
 
         try:
-            result = ce.check(text_to_check)
+            result = ce.check(text_to_check, direction=check_direction)
 
             output_info = {
                 "rules": rules_list,
+                "direction": check_direction,
+                "agent_id": agent_id,
+                "jurisdiction": jurisdiction,
                 "event_id": result.event_id,
                 "latency_ms": result.latency_ms,
                 "evaluated_rules": result.evaluated_rules,
@@ -147,8 +166,11 @@ def create_compliance_guardrail(
                         "violations": [
                             {
                                 "rule_id": v.rule_id,
+                                "rule_description": v.rule_description,
                                 "severity": v.severity.value,
                                 "confidence": v.confidence,
+                                "reason": v.reason,
+                                "text_excerpt": v.text_excerpt,
                             }
                             for v in result.violations
                         ],
@@ -201,7 +223,7 @@ def create_compliance_guardrail(
 
 def create_sox_guardrail(
     api_key: str,
-    base_url: str = _DEFAULT_BASE_URL,
+    base_url: str | None = _DEFAULT_BASE_URL,
     custom_blocked_message: str | None = None,
     **kwargs: Any,
 ) -> Callable:
@@ -214,7 +236,7 @@ def create_sox_guardrail(
 
 def create_gdpr_guardrail(
     api_key: str,
-    base_url: str = _DEFAULT_BASE_URL,
+    base_url: str | None = _DEFAULT_BASE_URL,
     custom_blocked_message: str | None = None,
     **kwargs: Any,
 ) -> Callable:
@@ -227,7 +249,7 @@ def create_gdpr_guardrail(
 
 def create_hipaa_guardrail(
     api_key: str,
-    base_url: str = _DEFAULT_BASE_URL,
+    base_url: str | None = _DEFAULT_BASE_URL,
     custom_blocked_message: str | None = None,
     **kwargs: Any,
 ) -> Callable:
@@ -240,7 +262,7 @@ def create_hipaa_guardrail(
 
 def create_universal_guardrail(
     api_key: str,
-    base_url: str = _DEFAULT_BASE_URL,
+    base_url: str | None = _DEFAULT_BASE_URL,
     use_simple_check: bool = False,
     custom_blocked_message: str | None = None,
     **kwargs: Any,

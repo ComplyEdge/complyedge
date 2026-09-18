@@ -1,6 +1,6 @@
 {
   "name": "@complyedge/sdk",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "EU AI Act runtime enforcement SDK: OPA/Rego policy checks, Article 12 audit trails, risk assessment, and OpenAI middleware.",
   "publishConfig": {
     "access": "public"

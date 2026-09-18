@@ -48,7 +48,7 @@ import os
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 from tenacity import (
@@ -58,10 +58,66 @@ from tenacity import (
     wait_exponential,
 )
 
-__version__ = "0.2.15"
+__version__ = "0.2.17"
 
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
+
+# ComplyEdge runs one independent stack per region. A tenant lives in exactly
+# one of them, and its API keys are only valid there. The key itself says which:
+#   ce_     -> US (api.complyedge.io)
+#   ce_eu_  -> EU (eu.api.complyedge.io)
+# so the SDK can pick the right host from the key alone. Explicit settings win.
+Region = Literal["us", "eu"]
+
+REGION_BASE_URLS: dict[str, str] = {
+    "us": "https://api.complyedge.io",
+    "eu": "https://eu.api.complyedge.io",
+}
+
+_KEY_PREFIX_REGIONS: tuple[tuple[str, str], ...] = (
+    ("ce_eu_", "eu"),  # longest prefix first: ce_eu_ also starts with ce_
+    ("ce_", "us"),
+)
+
+
+def region_from_api_key(api_key: str | None) -> Region | None:
+    """Region an API key was issued in, read from its prefix; None if unknown."""
+    if not api_key:
+        return None
+    for prefix, region in _KEY_PREFIX_REGIONS:
+        if api_key.startswith(prefix):
+            return region  # type: ignore[return-value]
+    return None
+
+
+def resolve_base_url(
+    api_key: str | None = None,
+    base_url: str | None = None,
+    region: str | None = None,
+) -> str:
+    """Pick the API host. Precedence, highest first:
+
+    1. ``base_url`` argument
+    2. ``COMPLYEDGE_API_URL`` environment variable
+    3. ``region`` argument, else ``COMPLYEDGE_REGION`` environment variable
+    4. the region encoded in the API key prefix (``ce_eu_`` -> EU)
+    5. US
+    """
+    if base_url:
+        return base_url.rstrip("/")
+    env_url = os.getenv("COMPLYEDGE_API_URL")
+    if env_url:
+        return env_url.rstrip("/")
+    chosen = (region or os.getenv("COMPLYEDGE_REGION") or "").strip().lower()
+    if chosen:
+        if chosen not in REGION_BASE_URLS:
+            raise ValueError(
+                f"Unknown ComplyEdge region {chosen!r}; expected one of {sorted(REGION_BASE_URLS)}"
+            )
+        return REGION_BASE_URLS[chosen]
+    inferred = region_from_api_key(api_key)
+    return REGION_BASE_URLS[inferred or "us"]
 
 # Decorator functionality will be imported at the end to avoid circular imports
 
@@ -213,7 +269,8 @@ class ComplyEdge:
         api_key: str,
         agent_id: str = "default",
         jurisdiction: str | None = None,
-        base_url: str | None = DEFAULT_BASE_URL,
+        base_url: str | None = None,
+        region: Region | None = None,
     ):
         """
         Initialize ComplyEdge client.
@@ -222,14 +279,14 @@ class ComplyEdge:
             api_key: Your ComplyEdge API key
             agent_id: Default agent identifier
             jurisdiction: Regulatory jurisdiction (e.g., 'EU', 'US')
-            base_url: API base URL
+            base_url: API base URL (overrides region and key inference)
+            region: "us" or "eu". Defaults to the region encoded in the API
+                key prefix (ce_eu_ -> EU), else US. See resolve_base_url().
         """
         self.api_key = api_key
         self.agent_id = agent_id
         self.jurisdiction = jurisdiction
-        self.base_url = (
-            base_url or DEFAULT_BASE_URL or "https://api.complyedge.io"
-        ).rstrip("/")
+        self.base_url = resolve_base_url(api_key, base_url, region)
 
         self._client = httpx.Client(
             base_url=self.base_url,
@@ -422,7 +479,8 @@ def is_safe(
     api_key: str,
     agent_id: str = "default",
     jurisdiction: str | None = None,
-    base_url: str | None = DEFAULT_BASE_URL,
+    base_url: str | None = None,
+    region: Region | None = None,
 ) -> bool:
     """
     Global convenience function to check if text is safe.
@@ -432,7 +490,8 @@ def is_safe(
         api_key: ComplyEdge API key
         agent_id: Agent identifier
         jurisdiction: Regulatory jurisdiction
-        base_url: API base URL
+        base_url: API base URL (overrides region and key inference)
+        region: "us" or "eu"; defaults to the key's region prefix, else US
 
     Returns:
         True if safe, False if blocked
@@ -444,7 +503,11 @@ def is_safe(
             print("Safe to use")
     """
     client = ComplyEdge(
-        api_key=api_key, agent_id=agent_id, jurisdiction=jurisdiction, base_url=base_url
+        api_key=api_key,
+        agent_id=agent_id,
+        jurisdiction=jurisdiction,
+        base_url=base_url,
+        region=region,
     )
     try:
         return client.is_safe(text)
@@ -457,7 +520,8 @@ def check(
     api_key: str,
     agent_id: str = "default",
     jurisdiction: str | None = None,
-    base_url: str | None = DEFAULT_BASE_URL,
+    base_url: str | None = None,
+    region: Region | None = None,
 ) -> ComplianceResult:
     """
     Global convenience function to check text compliance.
@@ -467,7 +531,8 @@ def check(
         api_key: ComplyEdge API key
         agent_id: Agent identifier
         jurisdiction: Regulatory jurisdiction
-        base_url: API base URL
+        base_url: API base URL (overrides region and key inference)
+        region: "us" or "eu"; defaults to the key's region prefix, else US
 
     Returns:
         ComplianceResult with detailed information
@@ -482,7 +547,11 @@ def check(
             print(f"Blocked: {result.reason}")
     """
     client = ComplyEdge(
-        api_key=api_key, agent_id=agent_id, jurisdiction=jurisdiction, base_url=base_url
+        api_key=api_key,
+        agent_id=agent_id,
+        jurisdiction=jurisdiction,
+        base_url=base_url,
+        region=region,
     )
     try:
         return client.check(text)
@@ -539,25 +608,25 @@ class ComplyEdgeClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str | None = DEFAULT_BASE_URL,
+        base_url: str | None = None,
         timeout: int = 300,
         max_retries: int = 3,
         verify_ssl: bool = True,
+        region: Region | None = None,
     ):
         """
         Initialize the ComplyEdge client.
 
         Args:
             api_key: Your ComplyEdge API key
-            base_url: Base URL for the ComplyEdge API
+            base_url: Base URL for the ComplyEdge API (overrides region and key inference)
             timeout: Request timeout in seconds
             max_retries: Maximum number of retry attempts
             verify_ssl: Whether to verify SSL certificates
+            region: "us" or "eu"; defaults to the key's region prefix, else US
         """
         self.api_key = api_key
-        self.base_url = (
-            base_url or DEFAULT_BASE_URL or "https://api.complyedge.io"
-        ).rstrip("/")
+        self.base_url = resolve_base_url(api_key, base_url, region)
 
         self.client = httpx.Client(
             base_url=self.base_url,
@@ -738,16 +807,15 @@ class AsyncComplyEdgeClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str | None = DEFAULT_BASE_URL,
+        base_url: str | None = None,
         timeout: int = 300,
         max_retries: int = 3,
         verify_ssl: bool = True,
+        region: Region | None = None,
     ):
         """Initialize the async ComplyEdge client."""
         self.api_key = api_key
-        self.base_url = (
-            base_url or DEFAULT_BASE_URL or "https://api.complyedge.io"
-        ).rstrip("/")
+        self.base_url = resolve_base_url(api_key, base_url, region)
 
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
@@ -973,6 +1041,11 @@ __all__ = [
     # Environment helpers
     "get_api_key",
     "safe",
+    # Region resolution (one stack per region; keys are region-bound)
+    "Region",
+    "REGION_BASE_URLS",
+    "region_from_api_key",
+    "resolve_base_url",
     # Agent integration module (import separately)
     # from complyedge.agents import create_compliance_guardrail
 ]

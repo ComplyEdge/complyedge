@@ -17,8 +17,9 @@ import os
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-# Resolve default base URL from environment
-_DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
+# No default host here: ComplyEdge() resolves it at construction time
+# (base_url > COMPLYEDGE_API_URL > region > API-key prefix > US).
+_DEFAULT_BASE_URL: str | None = None
 
 if TYPE_CHECKING:
     from . import ComplianceResult

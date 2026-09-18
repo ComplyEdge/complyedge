@@ -1,6 +1,6 @@
 {
   "name": "trustlint",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "description": "Offline EU AI Act compliance linter for AI agents. Tier-1 regex scan of prompts and outputs against a bundled 64-rule corpus — Art. 5 prohibited practices, Art. 50 transparency, GDPR, HIPAA, SOX, PCI DSS, COPPA. CLI and library. No API key, no network call.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

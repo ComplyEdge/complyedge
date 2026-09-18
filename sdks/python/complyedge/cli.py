@@ -75,7 +75,10 @@ def cli() -> None:
     help="Your ComplyEdge API key (or paste when prompted)",
 )
 @click.option(
-    "--base-url", default=None, help="API base URL (default: https://api.complyedge.io)"
+    "--base-url",
+    default=None,
+    help="API base URL (default: the region your key was issued in — "
+    "ce_eu_ keys use https://eu.api.complyedge.io, ce_ keys https://api.complyedge.io)",
 )
 def login(api_key: str, base_url: str | None) -> None:
     """Authenticate and store your API key locally.
@@ -204,11 +207,11 @@ def status() -> None:
 
     api_key = _get_api_key()
     config = _load_config()
-    base_url = (
-        config.get("base_url")
-        or os.getenv("COMPLYEDGE_API_URL")
-        or "https://api.complyedge.io"
-    )
+    from . import resolve_base_url
+
+    # Same precedence as the SDK: saved --base-url > COMPLYEDGE_API_URL >
+    # COMPLYEDGE_REGION > the key's region prefix (ce_eu_ -> EU) > US.
+    base_url = resolve_base_url(api_key, config.get("base_url"))
 
     click.echo(f"\n{BOLD}ComplyEdge v{__version__}{RESET}")
     click.echo(f"{'─' * 40}")
@@ -383,7 +386,9 @@ def rules_info() -> None:
     try:
         import httpx
 
-        url = (base_url or "https://api.complyedge.io").rstrip("/")
+        from . import resolve_base_url
+
+        url = resolve_base_url(api_key, base_url)
         resp = httpx.get(
             f"{url}/v1/rules/info",
             headers={"Authorization": f"Bearer {api_key}"},
