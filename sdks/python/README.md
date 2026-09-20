@@ -47,7 +47,7 @@ OpenAI Agents extra (hosted path; needs `COMPLYEDGE_API_KEY`): `from complyedge.
 
 GitHub Action: `uses: complyedge/trustlint-action@v1`
 
-GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + trust page + MCP.
+GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + AI Trust Center + MCP.
 
 The decorator reads your API key from the `COMPLYEDGE_API_KEY` environment variable by default. Pass `api_key_env="MY_VAR"` to use a different one.
 
@@ -93,6 +93,18 @@ else:
         print(f"{v.rule_id}: {v.citation}")
 ```
 
+### Try a case without recording it
+
+`sandbox=True` calls `POST /v1/sandbox/check`: the same rules, the same tenant
+settings and the same verdict, but no audit entry, no usage and no rate-limit
+count. Use it to test cases before wiring an integration. A sandbox result is
+never evidence: `result.sandbox` is `True` and `result.audit_logged` is `False`.
+
+```python
+result = ce.check("Score users based on their social behavior", sandbox=True)
+print(result.blocked, result.sandbox)  # True True
+```
+
 Or the global convenience functions:
 
 ```python
@@ -108,6 +120,23 @@ if not is_safe(text, api_key=api_key, jurisdiction="EU"):
 # Full result
 result = check(text, api_key=api_key, jurisdiction="EU")
 ```
+
+## Rotating your key
+
+Keys are shown once, at creation, and stored as a hash: a lost key cannot be
+recovered, only replaced. Rotate without downtime, in this order:
+
+1. In the dashboard, click **Rotate key** (overview card, or a row under
+   Account, API keys). A new key is minted and shown once; the old one keeps
+   working.
+2. Put the new key in your integration (`COMPLYEDGE_API_KEY` or the `api_key` you pass to the client) and deploy.
+3. Back in the reveal, click **Revoke previous key**. Requests with the old key
+   fail from that moment. If you need more time, **Keep both for now** and
+   revoke it later from Account.
+
+Compromised key: revoke first (Revoke this key on the card, or Revoke on the
+row), then rotate. Via the API the same flow is `POST /v1/account/api-keys`,
+then `DELETE /v1/account/api-keys/{key_id}` for the old key.
 
 ## Regions
 
@@ -178,9 +207,24 @@ No API key is required for these tools. The optional extra installs `mcp` and
 `trustlint` (engine + bundled rules). This MCP path does not run the REST API
 policy engine.
 
+**Optional hosted sandbox.** Set `COMPLYEDGE_API_KEY` in the server's
+environment and a fourth tool appears:
+
+| Tool | Description |
+|------|-------------|
+| `sandbox_check` | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. Returns BLOCKED/ALLOWED with rule ID and article citation. Never evidence. |
+
+Without the key the tool is not listed and the server stays fully offline.
+
+On the hosted server (`https://mcp.complyedge.io/mcp`) `sandbox_check` is
+always listed and works only for a caller that sends its own key as the
+`Authorization: Bearer <key>` header on the MCP connection (set it in your MCP
+client's headers). The key is never a tool argument and never logged; the
+hosted server keeps no keys.
+
 ## Documentation
 
 - [Quick start](https://www.complyedge.io/docs/quick-start.html)
 - [API reference](https://www.complyedge.io/docs/api-reference.html)
 - [Browser playground](https://www.complyedge.io/docs/playground.html)
-- [Trust badge setup](https://www.complyedge.io/docs/trust-badge.html)
+- [Enforcement Seal embed](https://www.complyedge.io/docs/trust-badge.html)

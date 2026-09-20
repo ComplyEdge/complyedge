@@ -4,7 +4,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Smithery](https://img.shields.io/badge/Smithery-listed-6b46c1)](https://smithery.ai/servers/complyedge/complyedge)
 
-EU AI Act Article 5 and Article 50 runtime deny for AI agents. Not a periodic scanner over a repo: the platform enforces in production, on every request — and the same discipline is available to your agent as an **MCP server** that checks and scans the text you pass it, offline, with an article citation on every finding. Classifiers (`eu-ai-act-*`) score the *system*; ComplyEdge denies *this* prompt or output. Article 50 here is unlabeled or deceptive use, not C2PA.
+EU AI Act Article 5 and Article 50 runtime deny for AI agents. The platform enforces in production, on every request — and the same discipline is available to your agent as an **MCP server** that checks and scans the text you pass it, offline, with an article citation on every finding. Classifiers (`eu-ai-act-*`) score the *system*; ComplyEdge denies *this* prompt or output. Article 50 here is unlabeled or deceptive use, not C2PA.
 
 Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server** — a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
 
@@ -18,13 +18,14 @@ Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP s
 
 ComplyEdge TrustLint is an MCP server built on the official [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) (`mcp>=1.9`). It gives an agent article-cited compliance checks instead of a probability score, and it runs fully offline: no API key, no network call, rules evaluated from the bundled YAML corpus.
 
-**Tools** (the server exposes MCP tools only — no resources, no prompts; all three are read-only and idempotent):
+**Tools** (the server exposes MCP tools only — no resources, no prompts; all are read-only and idempotent):
 
 | Tool | What it does |
 |---|---|
 | `check_compliance` | Check text against the TrustLint rule corpus. Returns PASS/FAIL with rule ID, severity, and the article citation behind each finding. |
 | `list_rules` | List available rules, filterable by jurisdiction (`EU`, `US`, `Global`, `Universal`). |
 | `scan_prompt` | Pre-generation prompt scan. Returns `SAFE` or `RISK_DETECTED` before the model is called. |
+| `sandbox_check` | Optional, with your API key: hosted enforcement in sandbox mode (`POST /v1/sandbox/check`). Your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. Returns `BLOCKED`/`ALLOWED` with rule ID and article citation. Never evidence. |
 
 **Local (stdio)** — for Claude Desktop, Cursor, MCP Inspector, or any MCP host:
 
@@ -45,7 +46,25 @@ complyedge-mcp          # or: python -m complyedge.mcp_server
 
 **Remote (Streamable HTTP):** `https://mcp.complyedge.io/mcp`
 
-Server source: [`sdks/python/complyedge/mcp_server.py`](sdks/python/complyedge/mcp_server.py). Full MCP docs: [`sdks/python/README.md`](sdks/python/README.md). This MCP path uses the offline TrustLint engine; it does not call the hosted OPA/Rego policy API.
+`sandbox_check` is the one tool that needs a key. Locally, set `COMPLYEDGE_API_KEY`
+in the server's environment (without it the tool is not listed and the server stays
+fully offline). On the hosted server it is always listed and works only for a caller
+that sends its own key as the `Authorization: Bearer <key>` header on the MCP
+connection; the key is never a tool argument, never logged, and the hosted server
+keeps no keys.
+
+```json
+{
+  "mcpServers": {
+    "complyedge": {
+      "url": "https://mcp.complyedge.io/mcp",
+      "headers": { "Authorization": "Bearer ce_live_your_api_key" }
+    }
+  }
+}
+```
+
+Server source: [`sdks/python/complyedge/mcp_server.py`](sdks/python/complyedge/mcp_server.py). Full MCP docs: [`sdks/python/README.md`](sdks/python/README.md). The three offline tools use the TrustLint engine and never call the hosted OPA/Rego policy API; `sandbox_check` is the one that does, and only with your key.
 
 **Install (coding agents):**
 
@@ -73,7 +92,7 @@ from complyedge.agents import create_compliance_guardrail
 
 CI: `uses: complyedge/trustlint-action@v1`
 
-GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + trust page + MCP.
+GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + AI Trust Center + MCP.
 
 ## Live enforcement seals
 
@@ -86,14 +105,14 @@ before we ask anyone else to run it against theirs.
 [![IVD Framework: runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
 [![Horizon: runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
 
-| Project | Live trust page |
+| Project | Live AI Trust Center |
 |---------|-----------------|
 | **IVD Framework** | [trust.complyedge.io/ivd](https://trust.complyedge.io/ivd) |
 | **Horizon** | [trust.complyedge.io/horizon](https://trust.complyedge.io/horizon) |
 
-Each trust page is generated from that project's real audit trail: enforcement status, check
+Each AI Trust Center is generated from that project's real audit trail: enforcement status, check
 volume, and the EU AI Act articles enforced at runtime. (GitHub proxies and caches images, so the
-seal above can lag; the trust page is always current.)
+seal above can lag; the AI Trust Center is always current.)
 
 Embed one on your own project: [Enforcement Seal docs](https://complyedge.io/docs/trust-badge.html).
 

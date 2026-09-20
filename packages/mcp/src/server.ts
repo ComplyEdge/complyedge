@@ -20,8 +20,49 @@ const VERSION: string = createRequire(import.meta.url)("../package.json").versio
 const TOOL_NAMES = ["check_compliance", "list_rules", "scan_prompt"] as const;
 const JURISDICTIONS = ["EU", "US", "GLOBAL"] as const;
 
-type ToolName = (typeof TOOL_NAMES)[number];
+// Optional fourth tool. Listed ONLY when COMPLYEDGE_API_KEY is set: it calls
+// the hosted API (POST /v1/sandbox/check), so without a key it does not exist
+// and the offline contract of the three tools above is untouched. The hosted
+// sandbox evaluates with the tenant's real rules and settings and records
+// nothing: no audit entry, no usage, no rate-limit count. Never evidence.
+export const SANDBOX_TOOL_NAME = "sandbox_check";
+export const API_KEY_ENV = "COMPLYEDGE_API_KEY";
+// One stack per region; the key prefix says which (same rule as the SDKs).
+const REGION_BASE_URLS = { us: "https://api.complyedge.io", eu: "https://eu.api.complyedge.io" };
+
+type ToolName = (typeof TOOL_NAMES)[number] | typeof SANDBOX_TOOL_NAME;
 type Arguments = Record<string, unknown> | undefined;
+
+export interface SandboxOptions {
+  /** Injected in tests; defaults to the environment variable. */
+  apiKey?: string;
+  /** Overrides the region resolved from the key prefix. */
+  baseUrl?: string;
+  /** Injected in tests; defaults to global fetch. */
+  fetchImpl?: typeof fetch;
+}
+
+export function resolveSandboxBaseUrl(apiKey: string, override?: string): string {
+  if (override) return override.replace(/\/+$/, "");
+  const fromEnv = (process.env.COMPLYEDGE_API_URL || "").trim();
+  if (fromEnv) return fromEnv.replace(/\/+$/, "");
+  return apiKey.startsWith("ce_eu_") ? REGION_BASE_URLS.eu : REGION_BASE_URLS.us;
+}
+
+const sandboxTool = {
+  name: SANDBOX_TOOL_NAME,
+  description:
+    "EU AI Act Article 5 and Article 50. Hosted ComplyEdge enforcement, sandbox mode: the same deterministic rules and tenant settings as production, but NOTHING is recorded : no audit entry, no usage, no rate-limit count. Use it to try a case before wiring an integration or to see what a rule catches; the result is never evidence. Requires COMPLYEDGE_API_KEY (this tool is listed only when it is set) and makes one network call to the ComplyEdge API (POST /v1/sandbox/check). Argument `text` must be non-empty; optional `jurisdiction` defaults to EU. Returns BLOCKED or ALLOWED with rule ID and article citation, engine_path and latency.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      text: { type: "string", description: "Non-empty text to evaluate against hosted enforcement." },
+      jurisdiction: { type: "string", description: "Regulatory scope, e.g. EU (default), US, US-CA." }
+    },
+    required: ["text"]
+  },
+  annotations: { readOnlyHint: true, idempotentHint: true }
+} as const;
 
 const tools = [
   {
@@ -122,7 +163,63 @@ function promptPayload(result: LintResult) {
   };
 }
 
-export function createServer(engine = new TrustLintEngine()): Server {
+interface SandboxApiResponse {
+  allowed?: unknown;
+  violations?: Array<Record<string, unknown>>;
+  engine_path?: string;
+  latency_ms?: number;
+  audit_logged?: unknown;
+  sandbox?: unknown;
+}
+
+async function sandboxCheck(args: Arguments, apiKey: string, options: SandboxOptions) {
+  const text = requireText(args, "text");
+  const jurisdictionArg = args?.jurisdiction;
+  if (jurisdictionArg !== undefined && (typeof jurisdictionArg !== "string" || !jurisdictionArg.trim())) {
+    throw new Error("jurisdiction must be a non-empty string when given");
+  }
+  const doFetch = options.fetchImpl ?? fetch;
+  const response = await doFetch(`${resolveSandboxBaseUrl(apiKey, options.baseUrl)}/v1/sandbox/check`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text,
+      agent_id: "mcp-sandbox",
+      jurisdiction: (jurisdictionArg as string | undefined) ?? "EU",
+      direction: "output",
+      use_semantic_fallback: false
+    })
+  });
+  if (!response.ok) {
+    throw new Error(`ComplyEdge API ${response.status} on /v1/sandbox/check`);
+  }
+  const data = (await response.json()) as SandboxApiResponse;
+  if (data.sandbox !== true) {
+    // The server is the only thing allowed to say a decision was not
+    // recorded. A response without sandbox=true is not a sandbox result.
+    throw new Error("API did not confirm sandbox mode; refusing to report");
+  }
+  const violations = (data.violations ?? []).map((v) => ({
+    rule_id: (v.rule_id as string) ?? "",
+    citation: (v.rule_description as string) ?? "",
+    severity: (v.severity as string) ?? "",
+    remediation: (v.reason as string) ?? ""
+  }));
+  const blocked = data.allowed !== true;
+  return {
+    status: blocked ? "BLOCKED" : "ALLOWED",
+    violations,
+    engine_path: data.engine_path ?? "",
+    latency_ms: Math.trunc(data.latency_ms ?? 0),
+    audit_logged: false,
+    sandbox: true,
+    message: violations.length
+      ? `${violations.length} rule(s) fired. Sandbox: not recorded.`
+      : "No rule fired. Sandbox: not recorded."
+  };
+}
+
+export function createServer(engine = new TrustLintEngine(), sandbox: SandboxOptions = {}): Server {
   if (engine.rules.length === 0) {
     throw new Error("TrustLint loaded no bundled rules.");
   }
@@ -132,7 +229,12 @@ export function createServer(engine = new TrustLintEngine()): Server {
     { capabilities: { tools: {} } }
   );
 
-  server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
+  // Read at call time, not at import: a host may set the key after start.
+  const apiKey = () => (sandbox.apiKey ?? process.env[API_KEY_ENV] ?? "").trim();
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: apiKey() ? [...tools, sandboxTool] : [...tools]
+  }));
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const name = request.params.name as ToolName;
@@ -161,6 +263,10 @@ export function createServer(engine = new TrustLintEngine()): Server {
 
       if (name === "scan_prompt") {
         return resultContent(promptPayload(engine.check(requireText(args, "prompt"))));
+      }
+
+      if (name === SANDBOX_TOOL_NAME && apiKey()) {
+        return resultContent(await sandboxCheck(args, apiKey(), sandbox));
       }
 
       throw new Error(`Unknown tool: ${request.params.name}`);

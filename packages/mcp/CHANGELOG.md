@@ -9,6 +9,31 @@ this package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 changelog existed; they are listed from their commits rather than reconstructed
 from memory, and anything not evidenced is left out instead of guessed at.
 
+## [Unreleased]
+
+### Docs
+- Key rotation guidance in the README: rotate in the dashboard (mint, swap,
+  revoke previous) or with `POST` then `DELETE /v1/account/api-keys`; both
+  keys work until the old one is revoked. No code change.
+
+### Added
+- **`sandbox_check`, an optional fourth tool, listed only when
+  `COMPLYEDGE_API_KEY` is set.** It calls the hosted
+  `POST /v1/sandbox/check` — the tenant's real deterministic rules and
+  settings, the same verdict as production, and nothing recorded: no audit
+  entry, no usage, no rate-limit count. Returns `BLOCKED` / `ALLOWED` with rule
+  ID and article citation, `audit_logged: false`, `sandbox: true`. The region
+  follows the key prefix (`ce_eu_` -> `eu.api.complyedge.io`);
+  `COMPLYEDGE_API_URL` overrides it. The tool refuses to report any response
+  the server did not mark `sandbox: true`, and rejects empty text before any
+  network call. No new dependency (`fetch`, Node >= 20).
+
+  Without the key the server is exactly the three offline tools: same names,
+  same order, same descriptions, no network call. The "makes no network calls
+  and needs no API key" claim now reads "for the three offline tools";
+  `sandbox_check` is the one key-gated exception and says so in its
+  description.
+
 ## [0.2.0] - 2026-09-05
 
 ### Changed

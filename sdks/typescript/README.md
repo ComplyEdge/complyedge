@@ -18,6 +18,23 @@ Requires Node.js 18 or later. Get an API key at [dashboard.complyedge.io](https:
 
 The SDK works in both ESM and CommonJS projects; no bundler-specific setup is required.
 
+## Rotating your key
+
+Keys are shown once, at creation, and stored as a hash: a lost key cannot be
+recovered, only replaced. Rotate without downtime, in this order:
+
+1. In the dashboard, click **Rotate key** (overview card, or a row under
+   Account, API keys). A new key is minted and shown once; the old one keeps
+   working.
+2. Put the new key in your integration (`COMPLYEDGE_API_KEY` or the `apiKey` you pass to the client) and deploy.
+3. Back in the reveal, click **Revoke previous key**. Requests with the old key
+   fail from that moment. If you need more time, **Keep both for now** and
+   revoke it later from Account.
+
+Compromised key: revoke first (Revoke this key on the card, or Revoke on the
+row), then rotate. Via the API the same flow is `POST /v1/account/api-keys`,
+then `DELETE /v1/account/api-keys/{key_id}` for the old key.
+
 ## Package map
 
 - [`@complyedge/mcp`](https://www.npmjs.com/package/@complyedge/mcp) runs the local, offline TrustLint MCP tools with `npx`.
@@ -63,6 +80,19 @@ Blocked output:
 Blocked: rego-art5-1c-001
 Why: Social scoring prohibited under Article 5(1)(c)
 Audit event: evt_01J...
+```
+
+### Try a case without recording it
+
+`{ sandbox: true }` calls `POST /v1/sandbox/check`: the same rules, the same
+tenant settings and the same verdict, but no audit entry, no usage and no
+rate-limit count. Use it to test cases before wiring an integration. A sandbox
+result is never evidence: `result.sandbox` is `true` and `result.auditLogged`
+is `false`.
+
+```typescript
+const trial = await ce.check("Score users based on their social behavior", { sandbox: true });
+console.log(trial.allowed, trial.sandbox); // false true
 ```
 
 ## Configuration
@@ -182,7 +212,7 @@ Network and HTTP failures surface as `AxiosError`. The middleware throws
 - Quick start: https://www.complyedge.io/docs/quick-start.html
 - API reference: https://www.complyedge.io/docs/api-reference.html
 - Browser playground: https://www.complyedge.io/docs/playground.html
-- Trust badge setup: https://www.complyedge.io/docs/trust-badge.html
+- Enforcement Seal embed: https://www.complyedge.io/docs/trust-badge.html
 - Python SDK: `pip install complyedge`
 
 ## License

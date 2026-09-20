@@ -36,12 +36,13 @@ from complyedge.agents import create_compliance_guardrail
 
 CI: `uses: complyedge/trustlint-action@v1`
 
-GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + trust page + MCP.
+GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + AI Trust Center + MCP.
 
 ## Tools
 
 - `check_compliance` — already-produced text
 - `scan_prompt` — prompt about to be sent
 - `list_rules` — corpus inventory, not a verdict
+- `sandbox_check` — hosted enforcement, sandbox mode, nothing recorded. Local: only with `COMPLYEDGE_API_KEY`. Hosted MCP: send your key as `Authorization: Bearer` on the connection.
 
-Offline TrustLint regex. Not hosted OPA. Not legal advice.
+Offline TrustLint regex for the first three. `sandbox_check` is hosted, trial only, never evidence. Not legal advice.

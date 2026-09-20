@@ -119,6 +119,7 @@ def resolve_base_url(
     inferred = region_from_api_key(api_key)
     return REGION_BASE_URLS[inferred or "us"]
 
+
 # Decorator functionality will be imported at the end to avoid circular imports
 
 # =============================================================================
@@ -175,6 +176,9 @@ class ComplianceResult:
     # path — dropping these was the contract gap that left CI blind.
     engine_path: str = ""
     audit_logged: bool = False
+    # True when the decision came from /v1/sandbox/check: same verdict, no
+    # audit entry, no usage, no rate-limit count. Never evidence.
+    sandbox: bool = False
 
     @property
     def safe(self) -> bool:
@@ -231,6 +235,13 @@ def _allowed_from_payload(data: dict[str, Any]) -> bool:
     requires ``=== true``; match that.
     """
     return data.get("allowed") is True
+
+
+def _check_path(sandbox: bool) -> str:
+    """/v1/sandbox/check evaluates with the tenant's real rules and settings
+    but records nothing: no audit entry, no usage, no daily rate-limit count.
+    For trying cases, never for production traffic."""
+    return "/v1/sandbox/check" if sandbox else "/v1/check"
 
 
 def _audit_logged_from_payload(data: dict[str, Any]) -> bool:
@@ -325,6 +336,7 @@ class ComplyEdge:
         agent_id: str | None = None,
         jurisdiction: str | None = None,
         direction: str = "output",
+        sandbox: bool = False,
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -333,6 +345,9 @@ class ComplyEdge:
             text: Text to check
             agent_id: Agent identifier (uses default if not provided)
             jurisdiction: Regulatory jurisdiction (uses default if not provided)
+            sandbox: Evaluate without recording (POST /v1/sandbox/check). Same
+                verdict, no audit entry, no usage, no rate-limit count. For
+                trying cases; the result is never evidence.
             direction: "prompt" for text going INTO the model, "output" for text
                 coming out. This was previously hard-coded to "output", so every
                 input check the decorator ran was filed in the Article 12 audit
@@ -359,7 +374,7 @@ class ComplyEdge:
         }
 
         try:
-            response = self._client.post("/v1/check", json=request_data)
+            response = self._client.post(_check_path(sandbox), json=request_data)
             response.raise_for_status()
             data = response.json()
 
@@ -386,6 +401,7 @@ class ComplyEdge:
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
                 audit_logged=_audit_logged_from_payload(data),
+                sandbox=data.get("sandbox") is True,
             )
 
         except httpx.HTTPStatusError as e:
@@ -522,6 +538,7 @@ def check(
     jurisdiction: str | None = None,
     base_url: str | None = None,
     region: Region | None = None,
+    sandbox: bool = False,
 ) -> ComplianceResult:
     """
     Global convenience function to check text compliance.
@@ -533,6 +550,8 @@ def check(
         jurisdiction: Regulatory jurisdiction
         base_url: API base URL (overrides region and key inference)
         region: "us" or "eu"; defaults to the key's region prefix, else US
+        sandbox: Evaluate without recording (same verdict, no audit entry,
+            no usage, no rate-limit count). For trying cases only.
 
     Returns:
         ComplianceResult with detailed information
@@ -554,7 +573,7 @@ def check(
         region=region,
     )
     try:
-        return client.check(text)
+        return client.check(text, sandbox=sandbox)
     finally:
         client.close()
 
@@ -669,6 +688,7 @@ class ComplyEdgeClient:
         context: dict[str, Any] | None = None,
         use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
+        sandbox: bool = False,
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -683,6 +703,9 @@ class ComplyEdgeClient:
                 cases. Defaults to False (OPA fast-path only, ~73ms median). Set True
                 to add 2-5s LLM deepening on cases OPA passes.
             raise_on_violation: Raise ComplianceError if violations are found
+            sandbox: Evaluate without recording (POST /v1/sandbox/check). Same
+                verdict, no audit entry, no usage, no rate-limit count. For
+                trying cases; the result is never evidence.
 
         Returns:
             ComplianceResult with decision and any violations
@@ -704,7 +727,7 @@ class ComplyEdgeClient:
             if context:
                 request_data["context"] = context
 
-            response = self.client.post("/v1/check", json=request_data)
+            response = self.client.post(_check_path(sandbox), json=request_data)
             response.raise_for_status()
             data = response.json()
 
@@ -731,12 +754,12 @@ class ComplyEdgeClient:
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
                 audit_logged=_audit_logged_from_payload(data),
+                sandbox=data.get("sandbox") is True,
             )
 
             if raise_on_violation and not result.allowed:
                 raise ComplianceError(
-                    f"Compliance violations detected: "
-                    f"{len(violations)} rules violated",
+                    f"Compliance violations detected: {len(violations)} rules violated",
                     violations=violations,
                     event_id=result.event_id,
                 )
@@ -858,6 +881,7 @@ class AsyncComplyEdgeClient:
         context: dict[str, Any] | None = None,
         use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
+        sandbox: bool = False,
     ) -> ComplianceResult:
         """Async version of check_compliance."""
         try:
@@ -873,7 +897,7 @@ class AsyncComplyEdgeClient:
             if context:
                 request_data["context"] = context
 
-            response = await self.client.post("/v1/check", json=request_data)
+            response = await self.client.post(_check_path(sandbox), json=request_data)
             response.raise_for_status()
             data = response.json()
 
@@ -900,12 +924,12 @@ class AsyncComplyEdgeClient:
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
                 audit_logged=_audit_logged_from_payload(data),
+                sandbox=data.get("sandbox") is True,
             )
 
             if raise_on_violation and not result.allowed:
                 raise ComplianceError(
-                    f"Compliance violations detected: "
-                    f"{len(violations)} rules violated",
+                    f"Compliance violations detected: {len(violations)} rules violated",
                     violations=violations,
                     event_id=result.event_id,
                 )

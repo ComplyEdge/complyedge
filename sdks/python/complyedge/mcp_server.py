@@ -28,6 +28,14 @@ logger = logging.getLogger("complyedge.mcp")
 # Deterministic tools/list order (load-bearing for hosts + registry copy).
 TOOL_NAMES = ("check_compliance", "list_rules", "scan_prompt")
 
+# Optional fourth tool. Listed ONLY when COMPLYEDGE_API_KEY is set: it calls
+# the hosted API (POST /v1/sandbox/check), so without a key it does not exist
+# and the offline contract of the three tools above is untouched. The hosted
+# sandbox evaluates with the tenant's real rules and settings and records
+# nothing: no audit entry, no usage, no rate-limit count. Never evidence.
+SANDBOX_TOOL_NAME = "sandbox_check"
+API_KEY_ENV = "COMPLYEDGE_API_KEY"
+
 # TrustLint offline tools are read-only and idempotent (TDR-04 / Glama TD-03).
 TOOL_ANNOTATIONS = ToolAnnotations(readOnlyHint=True, idempotentHint=True)
 
@@ -39,8 +47,7 @@ _LAW = (
 )
 TOOL_DESCRIPTIONS: dict[str, str] = {
     "check_compliance": (
-        _LAW
-        + "Check already-produced text (model input or output) against "
+        _LAW + "Check already-produced text (model input or output) against "
         "ComplyEdge TrustLint offline YAML rules (regex corpus). Use "
         "for post-hoc evaluation of text that already exists; for "
         "pre-generation screening of a prompt about to be sent, use "
@@ -59,8 +66,7 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
         "remediation."
     ),
     "list_rules": (
-        _LAW
-        + "List TrustLint offline compliance rules in the ComplyEdge "
+        _LAW + "List TrustLint offline compliance rules in the ComplyEdge "
         "corpus : the discovery tool; returns no PASS/FAIL or "
         "SAFE/RISK verdict. Use it to scope a jurisdiction before "
         "calling check_compliance; do not use it to evaluate text. "
@@ -74,8 +80,7 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
         "titles, severities, jurisdictions, and categories."
     ),
     "scan_prompt": (
-        _LAW
-        + "Scan an AI prompt with ComplyEdge TrustLint offline YAML "
+        _LAW + "Scan an AI prompt with ComplyEdge TrustLint offline YAML "
         "rules (regex corpus) before generation : pre-generation "
         "only. Use when the prompt is about to be sent; for post-hoc "
         "evaluation of already-produced text, use check_compliance. "
@@ -94,6 +99,50 @@ TOOL_DESCRIPTIONS: dict[str, str] = {
 }
 
 _JURISDICTION_ENUM = ["EU", "US", "GLOBAL"]
+
+# Kept OUT of TOOL_DESCRIPTIONS on purpose: that dict is the offline trio and
+# the guards over it ("not the hosted policy engine") must keep meaning that.
+SANDBOX_TOOL_DESCRIPTION = (
+    "EU AI Act Article 5 and Article 50. Hosted ComplyEdge enforcement, "
+    "sandbox mode: the same deterministic rules and tenant settings as "
+    "production, but NOTHING is recorded : no audit entry, no usage, no "
+    "rate-limit count. Use it to try a case before wiring an "
+    "integration or to see what a rule catches; the result is never "
+    "evidence. Requires COMPLYEDGE_API_KEY (this tool is listed only "
+    "when it is set) and makes one network call to the ComplyEdge API "
+    "(POST /v1/sandbox/check). Argument `text` must be non-empty; "
+    "optional `jurisdiction` defaults to EU. Returns BLOCKED or ALLOWED "
+    "with rule ID and article citation, engine_path and latency."
+)
+
+_SANDBOX_CHECK_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "text": {
+            "type": "string",
+            "description": "Non-empty text to evaluate against hosted enforcement.",
+        },
+        "jurisdiction": {
+            "type": "string",
+            "description": "Regulatory scope, e.g. EU (default), US, US-CA.",
+        },
+    },
+    "required": ["text"],
+}
+
+_SANDBOX_CHECK_OUTPUT: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "status": {"type": "string", "enum": ["BLOCKED", "ALLOWED"]},
+        "violations": {"type": "array"},
+        "engine_path": {"type": "string"},
+        "latency_ms": {"type": "integer"},
+        "audit_logged": {"type": "boolean", "const": False},
+        "sandbox": {"type": "boolean", "const": True},
+        "message": {"type": "string"},
+    },
+    "required": ["status", "violations", "audit_logged", "sandbox"],
+}
 
 _CHECK_COMPLIANCE_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -267,10 +316,15 @@ def _tool(
     )
 
 
+def _sandbox_enabled() -> bool:
+    return bool((os.environ.get(API_KEY_ENV) or "").strip())
+
+
 @server.list_tools()
 async def list_tools() -> list[Tool]:
-    """Return tools in fixed order: check_compliance → list_rules → scan_prompt."""
-    return [
+    """Fixed order: check_compliance → list_rules → scan_prompt, then
+    sandbox_check only when COMPLYEDGE_API_KEY is set."""
+    tools = [
         _tool(
             "check_compliance",
             TOOL_DESCRIPTIONS["check_compliance"],
@@ -290,6 +344,74 @@ async def list_tools() -> list[Tool]:
             _SCAN_PROMPT_OUTPUT,
         ),
     ]
+    if _sandbox_enabled():
+        tools.append(
+            _tool(
+                SANDBOX_TOOL_NAME,
+                SANDBOX_TOOL_DESCRIPTION,
+                _SANDBOX_CHECK_SCHEMA,
+                _SANDBOX_CHECK_OUTPUT,
+            )
+        )
+    return tools
+
+
+async def _sandbox_check(
+    arguments: dict[str, Any], api_key: str | None = None
+) -> CallToolResult:
+    """Hosted sandbox via the SDK client (region from the key prefix).
+
+    stdio passes no key and the environment is read; the hosted HTTP server
+    passes the caller's own key from its Authorization header.
+    """
+    text = _require_str(arguments, "text")
+    jurisdiction = arguments.get("jurisdiction")
+    if jurisdiction is not None and (
+        not isinstance(jurisdiction, str) or not jurisdiction.strip()
+    ):
+        raise ValueError("jurisdiction must be a non-empty string when given")
+    api_key = (api_key if api_key is not None else os.environ.get(API_KEY_ENV) or "").strip()
+    if not api_key:
+        raise RuntimeError(
+            f"{SANDBOX_TOOL_NAME} needs {API_KEY_ENV}; the offline tools do not."
+        )
+    from complyedge import ComplyEdge
+
+    client = ComplyEdge(api_key=api_key, agent_id="mcp-sandbox")
+    try:
+        result = await asyncio.to_thread(
+            client.check, text, jurisdiction=jurisdiction, sandbox=True
+        )
+    finally:
+        client.close()
+    if not result.sandbox:
+        # The server is the only thing allowed to say a decision was not
+        # recorded. A response without sandbox=true is not a sandbox result.
+        raise RuntimeError("API did not confirm sandbox mode; refusing to report")
+    violations = [
+        {
+            "rule_id": v.rule_id,
+            "citation": v.rule_description,
+            "severity": v.severity.value,
+            "remediation": v.reason,
+        }
+        for v in result.violations
+    ]
+    return _tool_result(
+        {
+            "status": "BLOCKED" if result.blocked else "ALLOWED",
+            "violations": violations,
+            "engine_path": result.engine_path,
+            "latency_ms": int(result.latency_ms),
+            "audit_logged": False,
+            "sandbox": True,
+            "message": (
+                f"{len(violations)} rule(s) fired. Sandbox: not recorded."
+                if violations
+                else "No rule fired. Sandbox: not recorded."
+            ),
+        }
+    )
 
 
 async def _check_compliance(
@@ -393,9 +515,7 @@ async def _scan_prompt(
 
 
 @server.call_tool()
-async def call_tool(
-    name: str, arguments: dict[str, Any] | None
-) -> CallToolResult:
+async def call_tool(name: str, arguments: dict[str, Any] | None) -> CallToolResult:
     """Dispatch a tool call. Unknown tools and bad args raise (isError=True)."""
     args = arguments or {}
     # Never log user text/prompt payloads (protocol_hygiene_stdio).
@@ -409,10 +529,11 @@ async def call_tool(
     if name == "scan_prompt":
         _require_corpus(engine)
         return await _scan_prompt(engine, args)
+    if name == SANDBOX_TOOL_NAME and _sandbox_enabled():
+        return await _sandbox_check(args)
 
-    raise ValueError(
-        f"Unknown tool: {name!r}. Available: {', '.join(TOOL_NAMES)}"
-    )
+    available = TOOL_NAMES + ((SANDBOX_TOOL_NAME,) if _sandbox_enabled() else ())
+    raise ValueError(f"Unknown tool: {name!r}. Available: {', '.join(available)}")
 
 
 async def run_stdio() -> None:

@@ -16,6 +16,19 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+### Docs
+- Key rotation guidance in the README: rotate in the dashboard (mint, swap,
+  revoke previous) or with `POST` then `DELETE /v1/account/api-keys`; both
+  keys work until the old one is revoked. No code change.
+
+### Added
+- `sandbox: true` on `ComplianceContext` routes `check()` to
+  `POST /v1/sandbox/check`: the same rules, tenant settings and verdict as
+  `/v1/check`, with nothing recorded — no audit entry, no usage, no rate-limit
+  count. For trying cases before wiring an integration; never evidence.
+  `ComplianceResult.sandbox` is `true` only when the server says so, beside
+  `auditLogged: false`. Default is unchanged (`/v1/check`).
+
 ## [0.2.4] - 2026-09-16
 
 ### Added

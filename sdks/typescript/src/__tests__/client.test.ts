@@ -91,6 +91,43 @@ describe("ComplyEdgeClient", () => {
       expect(result.bundleVersion).toBe("rego-corpus-2026.07.09");
     });
 
+    it("sandbox: true targets /v1/sandbox/check with the same body and reads sandbox back", async () => {
+      mockPost.mockResolvedValue({
+        data: {
+          event_id: "evt-sb",
+          allowed: false,
+          violations: [{ rule_id: "rego-art5-1c-001", rule_description: "Article 5(1)(c)" }],
+          latency_ms: 7,
+          engine_path: "opa",
+          audit_logged: false,
+          sandbox: true,
+        },
+      });
+
+      const result = await client.check("Score users by social behaviour", { sandbox: true });
+
+      expect(mockPost).toHaveBeenCalledWith("/v1/sandbox/check", {
+        text: "Score users by social behaviour",
+        agent_id: "default",
+        jurisdiction: "EU",
+        direction: "output",
+        use_semantic_fallback: false,
+        context: undefined,
+      });
+      expect(result.allowed).toBe(false);
+      expect(result.sandbox).toBe(true);
+      expect(result.auditLogged).toBe(false);
+    });
+
+    it("sandbox is off by default and never inferred from the response alone", async () => {
+      mockPost.mockResolvedValue({
+        data: { event_id: "e", allowed: true, violations: [], audit_logged: true },
+      });
+      const result = await client.check("Hello world");
+      expect(mockPost.mock.calls[0][0]).toBe("/v1/check");
+      expect(result.sandbox).toBe(false);
+    });
+
     it("surfaces the evidence fields that bind a decision to its input", async () => {
       mockPost.mockResolvedValue({
         data: {

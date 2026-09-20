@@ -11,21 +11,25 @@ import logging
 import os
 import time
 from collections import defaultdict, deque
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from typing import Any, Literal
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from complyedge.mcp_server import (
+    SANDBOX_TOOL_DESCRIPTION,
+    SANDBOX_TOOL_NAME,
     TOOL_ANNOTATIONS,
     TOOL_DESCRIPTIONS,
     TOOL_NAMES,
     _check_compliance,
     _get_engine,
     _list_rules,
+    _sandbox_check,
     _scan_prompt,
 )
 
@@ -48,6 +52,9 @@ def _health_payload() -> tuple[dict[str, Any], int]:
         "transport": "streamable-http",
         "stateless": True,
         "tools": list(TOOL_NAMES),
+        # Always listed; usable only by a caller that sends its own API key
+        # as `Authorization: Bearer` on the MCP request.
+        "optional_tools": [SANDBOX_TOOL_NAME],
         "rules_loaded": n,
     }
     if n:
@@ -56,6 +63,7 @@ def _health_payload() -> tuple[dict[str, Any], int]:
     body["status"] = "unhealthy"
     body["reason"] = "TrustLint corpus is empty"
     return body, 503
+
 
 Jurisdiction = Literal["EU", "US", "GLOBAL"]
 
@@ -85,7 +93,9 @@ _DEFAULT_RATE_LIMIT_PER_MINUTE = 120
 
 def _rate_limit_per_minute() -> int:
     """Per-IP cap. Zero/negative/garbage is the default, not unlimited."""
-    raw = os.environ.get("MCP_RATE_LIMIT_PER_MINUTE", str(_DEFAULT_RATE_LIMIT_PER_MINUTE)).strip()
+    raw = os.environ.get(
+        "MCP_RATE_LIMIT_PER_MINUTE", str(_DEFAULT_RATE_LIMIT_PER_MINUTE)
+    ).strip()
     try:
         n = int(raw)
     except ValueError:
@@ -195,6 +205,36 @@ def _transport_security() -> TransportSecuritySettings:
     )
 
 
+# Hosted sandbox description: the hosted server is multi-tenant and has no
+# key of its own, so the caller's key travels on the MCP HTTP request itself.
+HOSTED_SANDBOX_DESCRIPTION = SANDBOX_TOOL_DESCRIPTION.replace(
+    "Requires COMPLYEDGE_API_KEY (this tool is listed only when it is set)",
+    "Requires your ComplyEdge API key sent as the `Authorization: Bearer` "
+    "header on the MCP connection (configure it in your MCP client; the key "
+    "is never a tool argument and never logged)",
+)
+
+
+def _api_key_from_request(ctx: Context) -> str:
+    """The caller's key from `Authorization: Bearer ce_...` on the HTTP request.
+
+    Read per request: the hosted server is stateless and multi-tenant, so a key
+    is never cached, never put in a tool argument, and never logged.
+    """
+    request = getattr(ctx.request_context, "request", None)
+    header = ""
+    if request is not None:
+        header = (request.headers.get("authorization") or "").strip()
+    scheme, _, value = header.partition(" ")
+    if scheme.lower() != "bearer" or not value.strip():
+        raise RuntimeError(
+            f"{SANDBOX_TOOL_NAME} needs your ComplyEdge API key as "
+            "`Authorization: Bearer <key>` on the MCP request. The offline "
+            "tools do not."
+        )
+    return value.strip()
+
+
 def _payload_from_tool_result(result: Any) -> dict[str, Any]:
     """Unwrap CallToolResult → plain dict for FastMCP structured return."""
     sc = getattr(result, "structuredContent", None)
@@ -213,7 +253,10 @@ def create_mcp() -> FastMCP:
         "complyedge",
         instructions=(
             "ComplyEdge TrustLint — offline compliance check tools. "
-            "Use check_compliance, list_rules, or scan_prompt. No API key required."
+            "Use check_compliance, list_rules, or scan_prompt. No API key required. "
+            "sandbox_check tries a case against your hosted enforcement without "
+            "recording it; it needs your API key as Authorization: Bearer on the "
+            "MCP connection."
         ),
         website_url="https://www.complyedge.io",
         streamable_http_path="/mcp",
@@ -234,9 +277,7 @@ def create_mcp() -> FastMCP:
         args: dict[str, Any] = {"text": text}
         if jurisdiction is not None:
             args["jurisdiction"] = jurisdiction
-        return _payload_from_tool_result(
-            await _check_compliance(_get_engine(), args)
-        )
+        return _payload_from_tool_result(await _check_compliance(_get_engine(), args))
 
     @mcp.tool(
         name="list_rules",
@@ -260,6 +301,22 @@ def create_mcp() -> FastMCP:
         return _payload_from_tool_result(
             await _scan_prompt(_get_engine(), {"prompt": prompt})
         )
+
+    @mcp.tool(
+        name=SANDBOX_TOOL_NAME,
+        description=HOSTED_SANDBOX_DESCRIPTION,
+        annotations=TOOL_ANNOTATIONS,
+    )
+    async def sandbox_check(
+        text: str,
+        ctx: Context,
+        jurisdiction: str | None = None,
+    ) -> dict[str, Any]:
+        api_key = _api_key_from_request(ctx)
+        args: dict[str, Any] = {"text": text}
+        if jurisdiction is not None:
+            args["jurisdiction"] = jurisdiction
+        return _payload_from_tool_result(await _sandbox_check(args, api_key))
 
     @mcp.custom_route("/health", methods=["GET"])
     async def health(_request: Request) -> Response:

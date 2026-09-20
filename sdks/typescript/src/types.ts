@@ -8,6 +8,12 @@ export interface ComplianceContext {
   jurisdiction?: string;
   userRole?: string;
   direction?: "prompt" | "output";
+  /**
+   * Evaluate without recording: POST /v1/sandbox/check. Same rules, same
+   * tenant settings, same verdict as /v1/check; no audit entry, no usage,
+   * no rate-limit count. For trying cases, never for production traffic.
+   */
+  sandbox?: boolean;
 }
 
 export type SeverityLevel =
@@ -42,6 +48,8 @@ export interface ComplianceResult {
   enginePath: string;
   opaLatencyMs?: number;
   auditLogged: boolean;
+  /** True when the decision came from /v1/sandbox/check. Never evidence. */
+  sandbox: boolean;
   /**
    * SHA-256 of the evaluated text as a bare hex digest, byte-identical to this
    * event's Article 12 audit entry. Binds the decision to its exact input

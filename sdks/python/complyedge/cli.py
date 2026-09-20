@@ -98,7 +98,7 @@ def login(api_key: str, base_url: str | None) -> None:
 @cli.command()
 def signup() -> None:
     """Open the ComplyEdge sign-up page in your browser."""
-    url = "https://complyedge.io/signup"
+    url = "https://dashboard.complyedge.io/?intent=get-started"
     click.echo(f"Opening {url} ...")
     webbrowser.open(url)
 

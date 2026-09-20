@@ -97,12 +97,16 @@ export class ComplyEdgeClient {
    * Calls POST /v1/check: the deterministic OPA hot path. A decision here is
    * evaluated against the Rego rule bundle, returns article-cited violations,
    * and is written to the Article 12 audit trail (`auditLogged`).
+   *
+   * With `context.sandbox: true` it calls POST /v1/sandbox/check instead:
+   * same verdict, nothing recorded (`auditLogged` false, `sandbox` true).
    */
   async check(text: string, context?: ComplianceContext): Promise<ComplianceResult> {
     const start = Date.now();
     const jurisdiction = context?.jurisdiction || this.jurisdiction || "EU";
+    const path = context?.sandbox ? "/v1/sandbox/check" : "/v1/check";
 
-    const response = await this.http.post("/v1/check", {
+    const response = await this.http.post(path, {
       text,
       agent_id: context?.agentId || this.agentId,
       jurisdiction,
@@ -139,6 +143,7 @@ export class ComplyEdgeClient {
       enginePath: data.engine_path || "opa",
       opaLatencyMs: data.opa_latency_ms,
       auditLogged: data.audit_logged === true,
+      sandbox: data.sandbox === true,
       textHash: data.text_hash || "",
       timestamp: data.timestamp,
       jurisdiction,
