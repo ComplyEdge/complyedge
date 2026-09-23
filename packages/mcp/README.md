@@ -44,7 +44,8 @@ appears. Without it the tool is not listed and the server stays fully offline.
 |---|---|---|
 | `sandbox_check` | `BLOCKED` / `ALLOWED` with rule ID and article citation | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. One network call per check. Never evidence. Region follows the key prefix (`ce_eu_` → EU); `COMPLYEDGE_API_URL` overrides it. |
 
-Rotating the key: mint the new one with **Rotate key** in the dashboard, update
+Rotating the key: mint the new one with **Rotate key** on the dashboard's API
+Key page (it asks first), update
 `COMPLYEDGE_API_KEY` (or the `Authorization: Bearer` header on the hosted
 server) and restart the client, then click **Revoke previous key** in the
 reveal. Both keys work until you revoke, so nothing has to go dark in between.

@@ -12,6 +12,10 @@ from memory, and anything not evidenced is left out instead of guessed at.
 ## [Unreleased]
 
 ### Docs
+- Key rotation now lives on the dashboard's API Key page (Rotate asks before
+  minting; every active key is listed there). The public trust surface shows
+  one company name, set under Account, Profile; `display_name` on
+  `PATCH /v1/tenant/trust` sets the same value. No code change.
 - Key rotation guidance in the README: rotate in the dashboard (mint, swap,
   revoke previous) or with `POST` then `DELETE /v1/account/api-keys`; both
   keys work until the old one is revoked. No code change.

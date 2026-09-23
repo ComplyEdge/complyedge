@@ -126,17 +126,24 @@ result = check(text, api_key=api_key, jurisdiction="EU")
 Keys are shown once, at creation, and stored as a hash: a lost key cannot be
 recovered, only replaced. Rotate without downtime, in this order:
 
-1. In the dashboard, click **Rotate key** (overview card, or a row under
-   Account, API keys). A new key is minted and shown once; the old one keeps
-   working.
+1. In the dashboard, open **API Key** and click **Rotate key** on the card
+   (or **Rotate** on a row under Other active keys), then confirm. A new key
+   is minted and shown once; the old one keeps working.
 2. Put the new key in your integration (`COMPLYEDGE_API_KEY` or the `api_key` you pass to the client) and deploy.
 3. Back in the reveal, click **Revoke previous key**. Requests with the old key
    fail from that moment. If you need more time, **Keep both for now** and
-   revoke it later from Account.
+   revoke it later from the API Key page, where every active key is listed.
 
 Compromised key: revoke first (Revoke this key on the card, or Revoke on the
 row), then rotate. Via the API the same flow is `POST /v1/account/api-keys`,
 then `DELETE /v1/account/api-keys/{key_id}` for the old key.
+
+## Company name on the public trust surface
+
+Your public AI Trust Center and Enforcement Seal show one company name: the
+one set in the dashboard under Account, Profile. `display_name` on
+`PATCH /v1/tenant/trust` sets the same value, so an API call and the profile
+never disagree. Email is your sign-in and cannot be changed from the dashboard.
 
 ## Regions
 
