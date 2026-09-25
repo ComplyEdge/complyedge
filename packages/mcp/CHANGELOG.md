@@ -11,6 +11,12 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-25
+
+### Changed
+- Hosted calls with no recognised key prefix use
+  `https://eu.api.complyedge.io`. A legacy `ce_` key still uses the US host.
+
 ### Docs
 - Key rotation now lives on the dashboard's API Key page (Rotate asks before
   minting; every active key is listed there). The public trust surface shows

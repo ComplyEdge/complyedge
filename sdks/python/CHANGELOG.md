@@ -14,6 +14,14 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.18] - 2026-09-25
+
+### Changed
+- A key with no region prefix, and a client with no `base_url` /
+  `COMPLYEDGE_API_URL` / `region`, now calls `https://eu.api.complyedge.io`.
+  Legacy `ce_` keys still use `https://api.complyedge.io`. The 0.2.16
+  fallback was the US host.
+
 ### Docs
 - Key rotation now lives on the dashboard's API Key page (Rotate asks before
   minting; every active key is listed there). The public trust surface shows

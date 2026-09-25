@@ -16,6 +16,12 @@ engine evaluates Tier-1 regex patterns, the Python engine additionally evaluates
 temporal/effective-date rule state, so matching numbers would imply a parity
 that does not exist.
 
+## [2.1.1] - 2026-09-25
+
+### Changed
+- `trustlint scan` (Python CLI and the npm CLI) posts to
+  `https://eu.api.complyedge.io/v1/check`. The previous default was the US host.
+
 ## [2.1.0] - 2026-09-05
 
 ### Fixed

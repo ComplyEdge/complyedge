@@ -65,7 +65,7 @@ export function resolveBaseUrl(opts: {
 // Keep in sync with package.json. Hardcoding it here meant the User-Agent
 // silently reported a stale version after every release bump, which is the
 // one field support uses to tell which client a customer is actually on.
-const SDK_VERSION = "0.2.4";
+const SDK_VERSION = "0.2.5";
 
 export class ComplyEdgeClient {
   private http: AxiosInstance;
