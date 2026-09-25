@@ -65,9 +65,12 @@ DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
 
 # ComplyEdge runs one independent stack per region. A tenant lives in exactly
 # one of them, and its API keys are only valid there. The key itself says which:
-#   ce_     -> US (api.complyedge.io)
-#   ce_eu_  -> EU (eu.api.complyedge.io)
+#   ce_eu_  -> EU (eu.api.complyedge.io), where every new account lives
+#   ce_     -> US (api.complyedge.io), the dormant stack; older keys only
 # so the SDK can pick the right host from the key alone. Explicit settings win.
+# No key, or a key with neither prefix, goes to EU: the US stack creates no
+# new tenants, so a US default sends new users to a stack that has no
+# account for them (2026-09-25).
 Region = Literal["us", "eu"]
 
 REGION_BASE_URLS: dict[str, str] = {
@@ -101,8 +104,8 @@ def resolve_base_url(
     1. ``base_url`` argument
     2. ``COMPLYEDGE_API_URL`` environment variable
     3. ``region`` argument, else ``COMPLYEDGE_REGION`` environment variable
-    4. the region encoded in the API key prefix (``ce_eu_`` -> EU)
-    5. US
+    4. the region encoded in the API key prefix (``ce_eu_`` -> EU, ``ce_`` -> US)
+    5. EU
     """
     if base_url:
         return base_url.rstrip("/")
@@ -117,7 +120,7 @@ def resolve_base_url(
             )
         return REGION_BASE_URLS[chosen]
     inferred = region_from_api_key(api_key)
-    return REGION_BASE_URLS[inferred or "us"]
+    return REGION_BASE_URLS[inferred or "eu"]
 
 
 # Decorator functionality will be imported at the end to avoid circular imports

@@ -135,11 +135,14 @@ def run(providers_dir: Path, schema_path: Path, output_path: Path) -> dict[str, 
             print(f"  SCHEMA ERROR: {e}", file=sys.stderr)
         raise SystemExit(f"validation failed: {len(all_errors)} error(s)")
 
-    scored.sort(key=lambda r: r["aggregate_score"], reverse=True)
+    # Rank by percentage, not raw points: providers below the systemic-risk
+    # threshold are scored out of 15 and the rest out of 18, so raw points
+    # put a 10/18 (55.6%) above a 9/15 (60.0%). Ties break on points, then id.
+    scored.sort(key=lambda r: (-r["compliance_pct"], -r["aggregate_score"], r["provider_id"]))
 
     output = {
         "generated_at": datetime.now(UTC).isoformat(),
-        "methodology_version": "1.0",
+        "methodology_version": "1.1",
         "scored_providers": scored,
         "pending_providers": sorted(pending),
         "summary": {

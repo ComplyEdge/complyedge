@@ -78,7 +78,7 @@ def cli() -> None:
     "--base-url",
     default=None,
     help="API base URL (default: the region your key was issued in — "
-    "ce_eu_ keys use https://eu.api.complyedge.io, ce_ keys https://api.complyedge.io)",
+    "ce_eu_ keys and new accounts use https://eu.api.complyedge.io; legacy ce_ keys https://api.complyedge.io)",
 )
 def login(api_key: str, base_url: str | None) -> None:
     """Authenticate and store your API key locally.
@@ -210,7 +210,7 @@ def status() -> None:
     from . import resolve_base_url
 
     # Same precedence as the SDK: saved --base-url > COMPLYEDGE_API_URL >
-    # COMPLYEDGE_REGION > the key's region prefix (ce_eu_ -> EU) > US.
+    # COMPLYEDGE_REGION > the key's region prefix (ce_eu_ -> EU, ce_ -> US) > EU.
     base_url = resolve_base_url(api_key, config.get("base_url"))
 
     click.echo(f"\n{BOLD}ComplyEdge v{__version__}{RESET}")

@@ -361,7 +361,7 @@ def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> 
             sys.exit(1)
         return
 
-    api_url = "https://api.complyedge.io/v1/check"
+    api_url = "https://eu.api.complyedge.io/v1/check"
     agent_id = os.environ.get("COMPLYEDGE_AGENT_ID", "trustlint-cli")
     payload = json.dumps(
         {

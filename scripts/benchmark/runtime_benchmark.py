@@ -13,7 +13,7 @@ documentation completeness). This one audits CE engine performance.
 Usage:
     python scripts/benchmark/runtime_benchmark.py \\
         --api-key "$COMPLYEDGE_API_KEY" \\
-        --base-url https://api.complyedge.io \\
+        --base-url https://eu.api.complyedge.io \\
         --output json
 
     # Contestant arms (A/B/C category ruler):
@@ -738,7 +738,7 @@ def main() -> int:
     )
     p.add_argument(
         "--base-url",
-        default="https://api.complyedge.io",
+        default="https://eu.api.complyedge.io",
         help="CE API base URL (default: production); ignored for llm-only",
     )
     p.add_argument(

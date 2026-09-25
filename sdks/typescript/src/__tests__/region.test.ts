@@ -45,7 +45,9 @@ describe("resolveBaseUrl", () => {
   it("the key alone picks the region", () => {
     expect(resolveBaseUrl({ apiKey: "ce_eu_x" })).toBe(EU);
     expect(resolveBaseUrl({ apiKey: "ce_x" })).toBe(US);
-    expect(resolveBaseUrl({ apiKey: "unknown" })).toBe(US);
+    // No recognisable prefix: EU, where new accounts live (US is dormant).
+    expect(resolveBaseUrl({ apiKey: "unknown" })).toBe(EU);
+    expect(resolveBaseUrl({})).toBe(EU);
   });
 
   it("region option beats the key", () => {

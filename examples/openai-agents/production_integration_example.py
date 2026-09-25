@@ -153,7 +153,7 @@ async def main():
 
     print("ComplyEdge + OpenAI Agents Integration Demo")
     print("=" * 50)
-    print(f"API: https://api.complyedge.io")
+    print(f"API: https://eu.api.complyedge.io")
     print(f"Rules: eu-ai-act/article-5")
     print(f"Setup: 1 line of code")
     print()

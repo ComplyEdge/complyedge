@@ -45,7 +45,7 @@ BENCHMARK_RESULTS_DIR = REPO_ROOT / "scripts" / "benchmark" / "results"
 # Live test fixtures
 # ---------------------------------------------------------------------------
 
-DEFAULT_API_BASE_URL = "https://api.complyedge.io"
+DEFAULT_API_BASE_URL = "https://eu.api.complyedge.io"
 
 
 #: Key prefixes that are only valid against a local or dev deployment. A key
@@ -73,7 +73,7 @@ def api_key(api_base_url: str) -> str:
     if not key:
         pytest.skip("COMPLYEDGE_API_KEY not set — live tests skipped")
 
-    is_production_target = "api.complyedge.io" in api_base_url
+    is_production_target = "complyedge.io" in api_base_url  # either region
     is_non_production_key = key.lower().startswith(NON_PRODUCTION_KEY_PREFIXES)
     if is_production_target and is_non_production_key:
         pytest.skip(

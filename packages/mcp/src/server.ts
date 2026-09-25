@@ -46,7 +46,11 @@ export function resolveSandboxBaseUrl(apiKey: string, override?: string): string
   if (override) return override.replace(/\/+$/, "");
   const fromEnv = (process.env.COMPLYEDGE_API_URL || "").trim();
   if (fromEnv) return fromEnv.replace(/\/+$/, "");
-  return apiKey.startsWith("ce_eu_") ? REGION_BASE_URLS.eu : REGION_BASE_URLS.us;
+  // Only a legacy `ce_` key (not `ce_eu_`) belongs to the dormant US stack;
+  // everything else goes to EU, where new accounts live (2026-09-25).
+  return apiKey.startsWith("ce_") && !apiKey.startsWith("ce_eu_")
+    ? REGION_BASE_URLS.us
+    : REGION_BASE_URLS.eu;
 }
 
 const sandboxTool = {

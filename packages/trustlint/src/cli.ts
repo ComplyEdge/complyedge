@@ -379,7 +379,7 @@ program
       }
 
       try {
-        const response = await fetch("https://api.complyedge.io/v1/check", {
+        const response = await fetch("https://eu.api.complyedge.io/v1/check", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${opts.apiKey}`,

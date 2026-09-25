@@ -16,7 +16,9 @@ import type {
 
 // ComplyEdge runs one independent stack per region. A tenant lives in exactly
 // one of them, and its API keys are only valid there. The key itself says
-// which: `ce_` -> US (api.complyedge.io), `ce_eu_` -> EU (eu.api.complyedge.io).
+// which: `ce_eu_` -> EU (eu.api.complyedge.io, every new account), `ce_` -> US
+// (api.complyedge.io, the dormant stack; older keys only). No key or an
+// unknown prefix goes to EU: US creates no new tenants (2026-09-25).
 export type Region = "us" | "eu";
 
 export const REGION_BASE_URLS: Record<Region, string> = {
@@ -38,8 +40,8 @@ export function regionFromApiKey(apiKey?: string): Region | undefined {
  *   1. `baseUrl` option
  *   2. `COMPLYEDGE_API_URL` environment variable
  *   3. `region` option, else `COMPLYEDGE_REGION` environment variable
- *   4. the region encoded in the API key prefix (`ce_eu_` -> EU)
- *   5. US
+ *   4. the region encoded in the API key prefix (`ce_eu_` -> EU, `ce_` -> US)
+ *   5. EU
  */
 export function resolveBaseUrl(opts: {
   apiKey?: string;
@@ -58,7 +60,7 @@ export function resolveBaseUrl(opts: {
     }
     return REGION_BASE_URLS[chosen as Region];
   }
-  return REGION_BASE_URLS[regionFromApiKey(opts.apiKey) || "us"];
+  return REGION_BASE_URLS[regionFromApiKey(opts.apiKey) || "eu"];
 }
 // Keep in sync with package.json. Hardcoding it here meant the User-Agent
 // silently reported a stale version after every release bump, which is the

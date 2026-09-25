@@ -2,26 +2,22 @@ provider_id: xai
 provider_name: xAI (Grok)
 model_class: closed_api
 systemic_risk_threshold: true
-last_updated: '2026-07-10'
+last_updated: '2026-09-24'
 verification_status: needs_review
 
 obligations:
 
   art_50_2_content_disclosure:
-    score: 0
+    score: 1
     rationale: >-
-      xAI ships consumer and API surfaces for AI-generated images
-      (Imagine API), AI-generated video (Grok Imagine Quality Mode),
-      AI-generated voice (Grok Voice / TTS API, including custom voice
-      cloning), and an autoregressive image model (Aurora). The
-      Acceptable Use Policy places the disclosure burden on the
-      deployer ("You should be transparent and disclose your use of AI
-      assistance"), not on the model itself. No machine-readable
-      content marking, watermarking, C2PA metadata, or provenance
-      signal is documented on any official xAI surface (x.ai/news,
-      docs.x.ai, x.ai/legal). Score is 0: Article 50(2) requires
-      providers to mark AI-generated outputs in machine-readable form;
-      xAI offloads the obligation to deployers.
+      xAI now documents a visible "Grok" watermark on generated images and
+      video that users cannot switch off, and its Acceptable Use Policy
+      (effective 14 August 2026) prohibits stripping "embedded provenance
+      metadata or watermarks". A visible logo is not machine-readable
+      marking: no xAI page documents C2PA, an invisible watermark, a
+      detector, or text marking, and xAI is not on the Commission's Code of
+      Practice signatory list (updated 24 September 2026). Partial showing.
+      (Re-scored 2026-09-24 from 0.)
     evidence:
     - url: https://x.ai/legal/acceptable-use-policy
       verified_date: '2026-07-10'
@@ -46,6 +42,32 @@ obligations:
       sha256: 3732258bbaa70afb80337e56b870a1c2a9645c628207206e267768afa6f71e15
       wayback_url: https://web.archive.org/web/20260509180132/https://docs.x.ai/developers/models/grok-4.3
       archived_date: '2026-05-09'
+    - url: https://docs.x.ai/grok/faq
+      verified_date: '2026-09-24'
+      doc_type: other
+      summary: >-
+        "Generated images and videos include a Grok watermark to indicate
+        that the content was created with AI. There is no setting to remove
+        the watermark ... Removing, altering, or obscuring the watermark or
+        other provenance signals is prohibited under our Acceptable Use
+        Policy."
+    - url: https://x.ai/legal/acceptable-use-policy
+      verified_date: '2026-09-24'
+      doc_type: terms_of_service
+      summary: >-
+        Version effective 14 Aug 2026 lists as prohibited: "Stripping,
+        altering or circumventing embedded provenance metadata or
+        watermarks". Read via Wayback snapshot 20260921183014 (live URL
+        returns 403 to scripts).
+      wayback_url: https://web.archive.org/web/20260921183014/https://x.ai/legal/acceptable-use-policy
+      archived_date: '2026-09-21'
+    - url: https://digital-strategy.ec.europa.eu/en/news/strong-backing-code-practice-transparency-ai-generated-content
+      verified_date: '2026-09-24'
+      doc_type: other
+      summary: >-
+        Commission signatory list for the Code of Practice on Transparency
+        of AI-Generated Content (95 Section 1 / 192 Section 2 signatories,
+        page updated 24 Sep 2026); no xAI, SpaceX or Grok entry.
   art_51_model_classification:
     score: 0
     rationale: >-

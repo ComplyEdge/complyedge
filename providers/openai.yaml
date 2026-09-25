@@ -2,18 +2,21 @@ provider_id: openai
 provider_name: OpenAI
 model_class: closed_api
 systemic_risk_threshold: true
-last_updated: '2026-07-10'
+last_updated: '2026-09-24'
 verification_status: needs_review
 
 obligations:
 
   art_50_2_content_disclosure:
-    score: 1
+    score: 2
     rationale: >-
-      OpenAI labels images from DALL·E with C2PA metadata and ships
-      provenance in some surfaces, but text outputs are not machine-readable
-      as AI-generated and the disclosure is not enforced in the API surface
-      consumers must build it themselves.
+      OpenAI marks generated images with C2PA Content Credentials plus a
+      SynthID watermark and, since 31 July 2026, generated audio with
+      SynthID, across ChatGPT and the API. A verification API
+      (POST /v1/content_provenance_checks) checks images and audio. Not 3: text outputs are unmarked (OpenAI calls text marking a
+      "goal" under its Code of Practice commitments) and no independent
+      audit is published. OpenAI signed the EU Code of Practice on
+      Transparency of AI-Generated Content. (Re-scored 2026-09-24 from 1.)
     evidence:
     - url: https://help.openai.com/en/articles/8912793-c2pa-in-chatgpt-images
       verified_date: '2026-07-10'
@@ -25,6 +28,43 @@ obligations:
       sha256: fc70769243c5f2e805b2594958a931d5d10b429399fe67aed15a4e6bad356790
       wayback_url: https://web.archive.org/web/20260711000222/https://help.openai.com/en/articles/8912793-c2pa-in-chatgpt-images
       archived_date: '2026-07-10'
+    - url: https://openai.com/index/advancing-content-provenance/
+      verified_date: '2026-09-24'
+      doc_type: blog
+      summary: >-
+        Post of 19 May 2026 (OpenAI a "C2PA Conforming Generator Product"),
+        updated 31 Jul 2026: "Supported audio generated with OpenAI tools,
+        including through ChatGPT and the OpenAI API, now includes SynthID
+        watermarking ... We're also introducing API access for
+        verification". Read via Wayback snapshot 20260921022254 (live URL
+        returns 403 to scripts).
+      wayback_url: https://web.archive.org/web/20260921022254/https://openai.com/index/advancing-content-provenance/
+      archived_date: '2026-09-21'
+    - url: https://help.openai.com/en/articles/8912793-provenance-signals-content-credentials-synthid-in-openai-generated-content
+      verified_date: '2026-09-24'
+      doc_type: other
+      summary: >-
+        Same help article as the July evidence, new slug. Images: "C2PA
+        metadata and SynthID watermarks"; Audio: "SynthID watermarks"; no
+        text row. "Consistent with our commitments under the European
+        Commission's Code of Practice on Transparency of AI-generated
+        content, our goal is to expand provenance signals to all modalities
+        including text". Read via Wayback snapshot 20260922063538.
+      wayback_url: https://web.archive.org/web/20260922063538/https://help.openai.com/en/articles/8912793-provenance-signals-content-credentials-synthid-in-openai-generated-content
+      archived_date: '2026-09-22'
+    - url: https://developers.openai.com/api/docs/guides/content-provenance
+      verified_date: '2026-09-24'
+      doc_type: api_doc
+      summary: >-
+        POST /v1/content_provenance_checks checks images (PNG/JPEG/WebP) for
+        C2PA and SynthID and audio for SynthID; text is not covered.
+    - url: https://digital-strategy.ec.europa.eu/en/news/strong-backing-code-practice-transparency-ai-generated-content
+      verified_date: '2026-09-24'
+      doc_type: other
+      summary: >-
+        Commission signatory list for the Code of Practice on Transparency
+        of AI-Generated Content (95 Section 1 / 192 Section 2 signatories,
+        page updated 24 Sep 2026); OpenAI is listed as a signatory.
     - url: https://platform.openai.com/docs/guides/images
       verified_date: '2026-07-10'
       doc_type: api_doc

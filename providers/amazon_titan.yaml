@@ -2,34 +2,23 @@ provider_id: amazon_titan
 provider_name: Amazon (Titan / Nova)
 model_class: closed_api
 systemic_risk_threshold: false
-last_updated: '2026-07-10'
+last_updated: '2026-09-24'
 verification_status: needs_review
 
 obligations:
 
   art_50_2_content_disclosure:
-    score: 1
+    score: 2
     rationale: >-
-      AWS Responsible AI Policy (last updated 2025-01-13) prohibits
-      use of AI/ML services "for intentional disinformation or
-      deception" and "to depict a person's voice or likeness without
-      their consent or other appropriate rights, including
-      unauthorized impersonation and non-consensual sexual imagery"
-      — flowing deployer-side disclosure obligations. Amazon's
-      first-party model portfolio (Titan Text/Embeddings, Nova text
-      LLMs Micro/Lite/Pro/Premier, Nova Canvas image, Nova Reel
-      video, Nova Sonic audio) explicitly includes image- and
-      video-generation services where Article 50(2) machine-readable
-      provenance applies. AWS-provided documentation references
-      content-watermarking / invisible-watermark on Nova Canvas and
-      Nova Reel outputs but the Responsible AI Policy URL itself
-      doesn't enumerate the exact mechanism. Score is 1: deployer-
-      side AUP / Responsible AI Policy disclosure obligations are
-      explicit, and AWS has documented some output-marking
-      capabilities for image/video Nova models, but the schema-level
-      evidence here is limited to the published Responsible AI
-      Policy clauses (without explicit C2PA / watermark technical
-      specification on a public URL).
+      AWS's own Nova service cards document provider-side machine-readable
+      marking: Nova Canvas applies an invisible watermark plus C2PA Content
+      Credentials to every image, Nova Reel 1.1 does the same for video,
+      Nova Sonic embeds an audio watermark, and Titan Image Generator has
+      carried Content Credentials since September 2024. C2PA data can be
+      checked with public verify tools. Not 3: text outputs (Titan Text,
+      Nova LLMs) are unmarked, the Sonic detection tool is not public, and
+      no independent audit is published. (Re-scored 2026-09-24 from 1: the
+      July rating missed service cards that date from 2025.)
     evidence:
     - url: https://aws.amazon.com/ai/responsible-ai/policy/
       verified_date: '2026-07-10'
@@ -46,6 +35,34 @@ obligations:
       sha256: d22ef4a39c794aa858ab949a6bc590f4562970dfa5703852d091a6e754872412
       wayback_url: https://web.archive.org/web/20260509180850/https://aws.amazon.com/ai/responsible-ai/policy/
       archived_date: '2026-05-09'
+    - url: https://docs.aws.amazon.com/ai/responsible-ai/nova-canvas/overview.html
+      verified_date: '2026-09-24'
+      doc_type: model_card
+      summary: >-
+        Nova Canvas service card (as of 2 Jul 2025): "applies an invisible
+        watermark to all images it generates" and "adds content credentials
+        to images it generates" (C2PA); a detection solution can check for
+        the watermark.
+    - url: https://docs.aws.amazon.com/ai/responsible-ai/nova-reel/overview.html
+      verified_date: '2026-09-24'
+      doc_type: model_card
+      summary: >-
+        Nova Reel service card (as of 16 Jul 2025): "applies an invisible
+        watermark to all videos it generates"; Nova Reel 1.1 adds Content
+        Credentials verifiable in public tools such as Verify.
+    - url: https://docs.aws.amazon.com/ai/responsible-ai/nova-sonic/overview.html
+      verified_date: '2026-09-24'
+      doc_type: model_card
+      summary: >-
+        Nova Sonic service card: "embeds a robust, nearly imperceptible
+        watermark into all generated speech outputs"; detection solution to
+        follow post launch.
+    - url: https://aws.amazon.com/about-aws/whats-new/2024/09/content-credentials-amazon-titan-image-generator/
+      verified_date: '2026-09-24'
+      doc_type: blog
+      summary: >-
+        20 Sep 2024: "Amazon now adds Content Credentials to images created
+        using Amazon Titan Image Generator v1 and v2".
   art_51_model_classification:
     score: 0
     rationale: >-

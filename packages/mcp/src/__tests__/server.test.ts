@@ -195,6 +195,8 @@ describe("ComplyEdge MCP server", () => {
     it("resolves the region from the key prefix, overridable by option or COMPLYEDGE_API_URL", () => {
       expect(resolveSandboxBaseUrl("ce_abc")).toBe("https://api.complyedge.io");
       expect(resolveSandboxBaseUrl("ce_eu_abc")).toBe("https://eu.api.complyedge.io");
+      // Anything that is not a legacy ce_ key goes to EU (US is dormant).
+      expect(resolveSandboxBaseUrl("sk_other")).toBe("https://eu.api.complyedge.io");
       expect(resolveSandboxBaseUrl("ce_eu_abc", "http://localhost:18310/")).toBe("http://localhost:18310");
       process.env.COMPLYEDGE_API_URL = "http://127.0.0.1:9/";
       expect(resolveSandboxBaseUrl("ce_abc")).toBe("http://127.0.0.1:9");

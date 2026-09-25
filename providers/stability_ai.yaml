@@ -2,32 +2,23 @@ provider_id: stability_ai
 provider_name: Stability AI
 model_class: open_weights
 systemic_risk_threshold: false
-last_updated: '2026-07-10'
+last_updated: '2026-09-24'
 verification_status: needs_review
 
 obligations:
 
   art_50_2_content_disclosure:
-    score: 1
+    score: 2
     rationale: >-
-      Stability's Acceptable Use Policy (effective 2025-07-31)
-      explicitly prohibits "misleading end users about the nature of
-      outputs from Stability AI Technology (such as pretending it was
-      made by a human) or failing to appropriately disclose when
-      someone is interacting with AI where it is not apparent" — a
-      deployer-side AI-disclosure obligation flowed through the AUP
-      to all downstream users of Stable Diffusion, Stable Video,
-      Stable Audio and Stable 3D models. Stability's Annual Integrity
-      Transparency Report (Sept 2025) and Tech Coalition membership
-      (Feb 2026) signal commitment to provenance-related responsible
-      AI. However, no published model card for SD 3.5 Large, Stable
-      Audio 2.5, or Stable Video documents a Stability-implemented
-      C2PA Content Credentials manifest, invisible-watermark, or
-      machine-readable provenance signal applied at inference time
-      across all model surfaces. Score is 1: strong deployer-flow-down
-      AUP clause + transparency culture, but no provider-side
-      machine-readable marking documented for synthetic image / audio
-      / video output.
+      Stability's Annual Integrity Transparency Report states that every
+      image, video and audio file generated through its API carries C2PA
+      metadata digitally sealed with a Stability AI certificate, i.e.
+      provider-side machine-readable marking on the hosted surface. The
+      Acceptable Use Policy additionally binds deployers to disclose AI
+      output. Not 3: the report itself says openly released models are not
+      marked, there is no invisible watermark, and no independent audit is
+      published. (Re-scored 2026-09-24 from 1: the July rating missed the
+      C2PA statement in a report published September 2025.)
     evidence:
     - url: https://stability.ai/use-policy
       verified_date: '2026-07-10'
@@ -53,6 +44,16 @@ obligations:
       sha256: baa75d2c5efb64ccddac2764ff0bfda2a52c8f5add8281170cbec41d0bb4a4b3
       wayback_url: https://web.archive.org/web/20260509195648/https://stability.ai/news-updates/stability-ais-annual-integrity-transparency-report
       archived_date: '2026-05-09'
+    - url: https://stability.ai/news-updates/stability-ais-annual-integrity-transparency-report
+      verified_date: '2026-09-24'
+      doc_type: transparency_report
+      summary: >-
+        Re-read 2026-09-24: "we implement Coalition for Content Provenance
+        and Authenticity (C2PA) through our API ... Images, video, as well
+        as ... audio media ... generated through our API are tagged with
+        metadata ... digitally sealed with a cryptographic Stability AI
+        certificate"; "Content provenance has not been implemented during
+        the content generation process for our openly released models."
   art_51_model_classification:
     score: 0
     rationale: >-

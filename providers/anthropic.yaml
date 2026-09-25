@@ -2,25 +2,51 @@ provider_id: anthropic
 provider_name: Anthropic
 model_class: closed_api
 systemic_risk_threshold: true
-last_updated: '2026-07-10'
+last_updated: '2026-09-24'
 verification_status: needs_review
 
 obligations:
 
   art_50_2_content_disclosure:
-    score: 0
+    score: 2
     rationale: >-
-      Claude is text-only at the time of evaluation; no machine-readable
-      AI-generated content marking is implemented in the API. Anthropic
-      has stated the obligation is acknowledged but no implementation
-      has shipped.
+      Since August 2026 Claude embeds an imperceptible, keyed statistical
+      watermark in generated text (SynthID-Text approach) and attaches
+      signed C2PA Content Credentials to generated PNG and JPEG files.
+      Models launched on or after 2 August 2026 carry it at launch; older
+      models are being covered by 2 December 2026. Not 3: detection is a
+      private preview limited to eligible organisations, rollout to older
+      models is incomplete, and no independent audit is published.
+      (Re-scored 2026-09-24 from 0; the July rating predates the shipment.)
     evidence:
+    - url: https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content
+      verified_date: '2026-09-24'
+      doc_type: other
+      summary: >-
+        Help Center: Claude uses "watermarks embedded in text, and Content
+        Credentials (C2PA) attached to files". Models launched 2 Aug 2026
+        or later are watermarked at launch; "Anthropic is adding watermarks
+        to outputs from models released before August 2, 2026, with all
+        covered by December 2, 2026." Watermark detection "is currently in
+        private preview, available to eligible organizations as required
+        under EU law".
+    - url: https://www.anthropic.com/news/claude-text-watermark
+      verified_date: '2026-09-24'
+      doc_type: blog
+      summary: >-
+        Announcement (14 Aug 2026) describing the text watermark: a keyed
+        function of the key and the preceding words replaces the random
+        choice among candidate words; no characters or tokens are added.
+        Anthropic signed the EU Code of Practice on Transparency of
+        AI-Generated Content in July 2026.
     - url: https://docs.anthropic.com/en/api/messages
       verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
-        Messages API reference contains no machine-readable disclosure
-        field; output is plain text.
+        Superseded July evidence: Messages API reference contains no
+        machine-readable disclosure field; output is plain text. The
+        watermark is applied at the model layer, so no API field is
+        needed for it.
 
       sha256: 01a5a5217ff98279c7a5cc9a8fbbdeea902573315beb28f56256565060ad0f25
       wayback_url: https://web.archive.org/web/20260509181134/https://platform.claude.com/docs/en/api/messages
