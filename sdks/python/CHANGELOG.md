@@ -14,6 +14,11 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.19] - 2026-09-26
+
+### Changed
+- Docs only. The key still chooses the host, and it still does not move the account. With no key, the client still calls `https://eu.api.complyedge.io`. A US host is only for an account support has moved. No request behavior change from 0.2.18.
+
 ## [0.2.18] - 2026-09-25
 
 ### Changed

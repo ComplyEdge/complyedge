@@ -16,6 +16,11 @@ engine evaluates Tier-1 regex patterns, the Python engine additionally evaluates
 temporal/effective-date rule state, so matching numbers would imply a parity
 that does not exist.
 
+## [2.1.2] - 2026-09-26
+
+### Removed
+- Python package only. Colorado AI Act SB205 is no longer in the bundled corpus. It was not the enacted text. `trustlint` 2.1.2 evaluates 63 rules. The npm package version is unchanged.
+
 ## [2.1.1] - 2026-09-25
 
 ### Changed
