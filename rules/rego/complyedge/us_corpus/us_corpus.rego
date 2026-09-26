@@ -11,9 +11,19 @@ import data.complyedge.us_corpus.sox_material_disclosure
 
 default violation := false
 
-violation if sox_material_disclosure.violation
+# US law applies only to checks for US end users. Without this gate an EU
+# customer's "revenue is expected to increase after the acquisition" was
+# blocked under a US securities statute (2026-09-26). `jurisdiction` names
+# where the end user is, not where the company is based.
+us_scope if startswith(input.jurisdiction, "US")
+
+violation if {
+	us_scope
+	sox_material_disclosure.violation
+}
 
 violations contains v if {
+	us_scope
 	sox_material_disclosure.violation
 	v := sox_material_disclosure.result
 }

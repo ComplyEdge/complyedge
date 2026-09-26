@@ -19,6 +19,7 @@ import type {
 // `ce_eu_` -> EU (eu.api.complyedge.io), every new account.
 // `ce_` -> US (api.complyedge.io), only after support moves the account.
 // No key or an unknown prefix goes to EU. The US stack creates no new tenants.
+// `baseUrl` and COMPLYEDGE_API_URL pick a host. They do not move the account.
 export type Region = "us" | "eu";
 
 export const REGION_BASE_URLS: Record<Region, string> = {

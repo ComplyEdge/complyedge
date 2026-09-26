@@ -179,7 +179,7 @@ class TestMalformedRulesAreNotSilent:
 
         eng = TrustLintEngine(rules_dir=str(REGS))
         assert eng.skipped_files == [], f"rules failed to load: {eng.skipped_files}"
-        assert len(eng.rules) == 64
+        assert len(eng.rules) == 63
 
 
 class TestRegoCitationsMatchTheRegulationCorpus:

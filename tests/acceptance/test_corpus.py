@@ -6,7 +6,7 @@ Claims verified:
   - "19 Rego policies covering EU AI Act Article 5, Article 50, and GPAI"
   - "53 YAML regulation definitions spanning EU, US, global, and universal rules"
   - "EU covers Articles 4–27, 50, 53, GPAI, GDPR"
-  - "US covers HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA"
+  - "US covers HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA"
   - "Plus PCI DSS and prompt injection detection"
   - "OPA-only by default; LLM evaluation is opt-in via use_semantic_fallback=True"
   - "SDK default for use_semantic_fallback is False across all three call sites"
@@ -125,12 +125,13 @@ class TestYamlCorpus:
             RULES_REGULATIONS_DIR.rglob("*.yml")
         )
 
-    def test_exactly_64_yaml_regulations(self, yaml_files):
-        # Claim: "64 YAML regulation definitions" (53 → +8 IPI prompt-security
-        # rules → +2 OFAC sanctions transition rules, both 2026-07-05).
+    def test_exactly_63_yaml_regulations(self, yaml_files):
+        # Claim: "63 YAML regulation definitions" (53 → +8 IPI prompt-security
+        # rules → +2 OFAC sanctions transition rules, both 2026-07-05 → -1
+        # Colorado SB 24-205, repealed by SB 26-189, retired 2026-09-26).
         assert (
-            len(yaml_files) == 64
-        ), f"Expected 64 YAML regulation files, found {len(yaml_files)}"
+            len(yaml_files) == 63
+        ), f"Expected 63 YAML regulation files, found {len(yaml_files)}"
 
     def test_yaml_covers_eu_regulations(self, yaml_files):
         eu = [f for f in yaml_files if "eu" in f.parts]
@@ -196,8 +197,8 @@ class TestEuRegulationCoverage:
 
 class TestUsRegulationCoverage:
     """
-    HN claim: "US covers HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act,
-               NYC LL144, ECPA"
+    HN claim: "US covers HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA"
+    (Colorado SB 24-205 retired 2026-09-26: repealed by SB 26-189.)
     Verifies a YAML file exists for each named regulation.
     """
 
@@ -227,8 +228,11 @@ class TestUsRegulationCoverage:
     def test_us_covers_ccpa(self, us_files):
         assert self._has_keyword(us_files, "ccpa"), "No CCPA YAML found"
 
-    def test_us_covers_colorado_ai_act(self, us_files):
-        assert self._has_keyword(us_files, "colorado"), "No Colorado AI Act YAML found"
+    def test_repealed_colorado_act_is_not_in_the_corpus(self, us_files):
+        # SB 24-205 was repealed and replaced by SB 26-189 (signed 2026-05-14,
+        # effective 2027-01-01, leg.colorado.gov/bills/sb26-189). A rule citing
+        # the repealed act must not ship until it is re-authored on the new one.
+        assert not self._has_keyword(us_files, "colorado"), "Rule cites repealed SB 24-205"
 
     def test_us_covers_nyc_ll144(self, us_files):
         assert self._has_keyword(us_files, "nyc"), "No NYC LL144 YAML found"

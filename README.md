@@ -160,7 +160,7 @@ if not result.allowed:
 
 `rule_id` is the citation key: every rule carries its article reference in the corpus (`rego-art5-1c-001` → Article 5(1)(c)), and the full citation text ships with the rule under [`rules/`](rules).
 
-Jurisdiction maps to the rule corpus: `EU` evaluates against EU AI Act Article 5, Article 50, and GPAI obligations. `US` evaluates against HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA.
+`jurisdiction` is where the end user is, not where your company is based: the EU AI Act applies when an AI system's output is used in the EU, wherever the provider or deployer is established ([Art. 2(1)(c)](https://eur-lex.europa.eu/eli/reg/2024/1689)). Default: `EU`. On the hosted API's deterministic path, `EU` runs the EU AI Act rules, `US` and `US-*` run the SOX §302 disclosure rule, and every check runs prompt-injection detection. The other US rules (HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA) and the GDPR rules run offline in TrustLint, not on the hosted `/v1/check` path. The opt-in Layer 2 (`use_semantic_fallback=True`) is a general LLM review, not these rules.
 
 ## TrustLint, Offline Linter
 
@@ -190,7 +190,7 @@ Both cite the same legal article and differ only in engine. Map between them via
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
   └ complyedge/mcp_server.py   MCP server (stdio): check_compliance, list_rules, scan_prompt
 packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
-rules/regulations/    64 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
+rules/regulations/    63 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
 rules/rego/           64 leaf OPA/Rego policies + 7 package aggregators
 rules/schemas/        Rule validation schema
 rules/scripts/        Schema validator (`validate_rules.py`)
@@ -201,14 +201,14 @@ tests/                Rule validation + acceptance tests
 
 ## Rules
 
-64 YAML rules + 64 deterministic leaf OPA/Rego policies (+ 7 package aggregators) across 4 jurisdictions.
+63 YAML rules + 64 deterministic leaf OPA/Rego policies (+ 7 package aggregators) across 4 jurisdictions.
 
 **What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf decides by matching the evaluated text (no LLM on the hot path). For 21 of them the text *is* the regulated act — Article 5 prohibited practices, Article 15 prompt-injection resilience, one US disclosure control — so a block prevents the act and the citation on the decision is load-bearing. The other 43 fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 36 YAML | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI, GDPR + Art 15 IPI |
-| **US** | 16 YAML | HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, Colorado AI Act, NYC LL144, ECPA |
+| **EU** | 36 YAML | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI + Art 15 IPI (hosted); GDPR (offline, TrustLint) |
+| **US** | 15 YAML | SOX §302 (hosted, US checks); HIPAA, SOX §§404/802, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA (offline, TrustLint) |
 | **Global** | 1 YAML | PCI DSS |
 | **Universal** | 11 YAML | PII detection, prompt injection (direct + indirect) |
 

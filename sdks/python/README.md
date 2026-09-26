@@ -53,12 +53,14 @@ The decorator reads your API key from the `COMPLYEDGE_API_KEY` environment varia
 
 ## Multi-Jurisdiction Enforcement
 
-`jurisdiction` selects which rule corpus is evaluated server-side.
+`jurisdiction` is where the end user is, not where your company is based: the EU AI Act applies when an AI system's output is used in the EU, wherever the provider or deployer is established ([Art. 2(1)(c)](https://eur-lex.europa.eu/eli/reg/2024/1689)). Default: `EU`.
 
-| Value | Corpus |
+| Value | What the hosted API enforces deterministically |
 |---|---|
-| `EU` | EU AI Act Article 5 + Article 50 + GPAI (Articles 51–55) |
-| `US` | HIPAA, SOX, COPPA, TCPA, BIPA |
+| `EU` | EU AI Act (Article 5, Article 6 high-risk, Article 50, GPAI Articles 51–55) + prompt-injection detection |
+| `US`, `US-*` | SOX §302 material disclosure + prompt-injection detection |
+
+HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA and GDPR rules run offline in TrustLint (`pip install trustlint`), not on the hosted `/v1/check` path.
 
 ```python
 @compliance_check(jurisdiction="EU", agent_id="hr-screening")
@@ -147,12 +149,13 @@ never disagree. Email is your sign-in and cannot be changed from the dashboard.
 
 ## Regions
 
-ComplyEdge runs one independent stack per region — EU (`eu.api.complyedge.io`,
-Frankfurt, where every new account lives) and US (`api.complyedge.io`, older
-accounts only). Your tenant, its audit trail and its
-API keys live in exactly one of them. The key says which: keys issued by the EU
-stack start with `ce_eu_`, US keys with `ce_`. The SDK reads the prefix and
-picks the host, so nothing needs configuring:
+Two regions, one home per account. A new account is created in the EU
+(`eu.api.complyedge.io`) and its key starts with `ce_eu_`. An account that
+support has moved to the US uses `api.complyedge.io` and a key that starts
+with `ce_`. The SDK reads the prefix and picks the host. You cannot switch
+region yourself. Email support@complyedge.io. A move issues a new key.
+`base_url`, `region`, `COMPLYEDGE_API_URL`, and `COMPLYEDGE_REGION` only
+choose which host to call. They do not move the account.
 
 ```python
 ce = ComplyEdge(api_key="ce_eu_...")   # -> https://eu.api.complyedge.io

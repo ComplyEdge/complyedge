@@ -117,12 +117,13 @@ const ce = new ComplyEdgeClient({
 
 ### Regions
 
-ComplyEdge runs one independent stack per region — EU (`eu.api.complyedge.io`,
-Frankfurt, where every new account lives) and US (`api.complyedge.io`, older
-accounts only). Your tenant, its audit trail and
-its API keys live in exactly one of them. Keys issued by the EU stack start
-with `ce_eu_`, US keys with `ce_`; the client reads the prefix and picks the
-host, so `region` is only needed to override it. Precedence, highest first:
+Two regions, one home per account. A new account is created in the EU
+(`eu.api.complyedge.io`) and its key starts with `ce_eu_`. An account that
+support has moved to the US uses `api.complyedge.io` and a key that starts
+with `ce_`. The client reads the prefix and picks the host. You cannot switch
+region yourself. Email support@complyedge.io. A move issues a new key.
+`baseUrl`, `region`, `COMPLYEDGE_API_URL`, and `COMPLYEDGE_REGION` only choose
+which host to call. They do not move the account. Precedence, highest first:
 `baseUrl` / `COMPLYEDGE_API_URL`, then `region` / `COMPLYEDGE_REGION`, then
 the key prefix, then EU. A key presented to the other region's stack is
 refused with `401 {"error":"wrong_region","use":"<host>"}` before any lookup.
