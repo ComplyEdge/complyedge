@@ -102,8 +102,8 @@ embedding ComplyEdge: they change as real enforcement happens.
 Both projects below are our own. ComplyEdge runs in production against our own code
 before we ask anyone else to run it against theirs.
 
-[![IVD Framework: runtime enforcement](https://eu.api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
-[![Horizon: runtime enforcement](https://eu.api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
+[![IVD Framework: runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
+[![Horizon: runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
 
 | Project | Live AI Trust Center |
 |---------|-----------------|
