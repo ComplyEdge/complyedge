@@ -100,7 +100,12 @@ Not a static badge. These seals reflect live `/v1/check` traffic from open-sourc
 embedding ComplyEdge: they change as real enforcement happens.
 
 Both projects below are our own. ComplyEdge runs in production against our own code
-before we ask anyone else to run it against theirs.
+before we ask anyone else to run it against theirs. A new account is created in
+the EU (`https://eu.api.complyedge.io`, key prefix `ce_eu_`). The seals below use
+`https://api.complyedge.io` because those accounts live in the US (key prefix `ce_`).
+The SDK reads the key and calls that host. You cannot switch region yourself.
+Email support@complyedge.io. Support moves the account and issues a new key.
+Setting an API URL does not move the account.
 
 [![IVD Framework: runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
 [![Horizon: runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
