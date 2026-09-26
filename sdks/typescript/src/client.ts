@@ -14,11 +14,11 @@ import type {
   PreDeploymentResult,
 } from "./types";
 
-// ComplyEdge runs one independent stack per region. A tenant lives in exactly
-// one of them, and its API keys are only valid there. The key itself says
-// which: `ce_eu_` -> EU (eu.api.complyedge.io, every new account), `ce_` -> US
-// (api.complyedge.io, the dormant stack; older keys only). No key or an
-// unknown prefix goes to EU: US creates no new tenants (2026-09-25).
+// ComplyEdge runs two regions. A tenant lives in exactly one of them.
+// The key says which host to call. It does not move the account.
+// `ce_eu_` -> EU (eu.api.complyedge.io), every new account.
+// `ce_` -> US (api.complyedge.io), only after support moves the account.
+// No key or an unknown prefix goes to EU. The US stack creates no new tenants.
 export type Region = "us" | "eu";
 
 export const REGION_BASE_URLS: Record<Region, string> = {

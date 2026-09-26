@@ -63,14 +63,12 @@ __version__ = "0.2.18"
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
 
-# ComplyEdge runs one independent stack per region. A tenant lives in exactly
-# one of them, and its API keys are only valid there. The key itself says which:
-#   ce_eu_  -> EU (eu.api.complyedge.io), where every new account lives
-#   ce_     -> US (api.complyedge.io), the dormant stack; older keys only
-# so the SDK can pick the right host from the key alone. Explicit settings win.
-# No key, or a key with neither prefix, goes to EU: the US stack creates no
-# new tenants, so a US default sends new users to a stack that has no
-# account for them (2026-09-25).
+# ComplyEdge runs two regions. A tenant lives in exactly one of them.
+# The key says which host to call. It does not move the account.
+#   ce_eu_  -> EU (eu.api.complyedge.io). Every new account.
+#   ce_     -> US (api.complyedge.io). Only after support moves the account.
+# No key, or a key with neither prefix, goes to EU. The US stack creates no
+# new tenants. Setting COMPLYEDGE_API_URL does not change the account's home.
 Region = Literal["us", "eu"]
 
 REGION_BASE_URLS: dict[str, str] = {
@@ -295,7 +293,9 @@ class ComplyEdge:
             jurisdiction: Regulatory jurisdiction (e.g., 'EU', 'US')
             base_url: API base URL (overrides region and key inference)
             region: "us" or "eu". Defaults to the region encoded in the API
-                key prefix (ce_eu_ -> EU), else US. See resolve_base_url().
+                key prefix (ce_eu_ -> EU, ce_ -> US), else EU. A region or
+                base_url argument picks a host and does not move the account.
+                See resolve_base_url().
         """
         self.api_key = api_key
         self.agent_id = agent_id
@@ -510,7 +510,7 @@ def is_safe(
         agent_id: Agent identifier
         jurisdiction: Regulatory jurisdiction
         base_url: API base URL (overrides region and key inference)
-        region: "us" or "eu"; defaults to the key's region prefix, else US
+        region: "us" or "eu"; defaults to the key's region prefix, else EU
 
     Returns:
         True if safe, False if blocked
@@ -552,7 +552,7 @@ def check(
         agent_id: Agent identifier
         jurisdiction: Regulatory jurisdiction
         base_url: API base URL (overrides region and key inference)
-        region: "us" or "eu"; defaults to the key's region prefix, else US
+        region: "us" or "eu"; defaults to the key's region prefix, else EU
         sandbox: Evaluate without recording (same verdict, no audit entry,
             no usage, no rate-limit count). For trying cases only.
 
@@ -645,7 +645,7 @@ class ComplyEdgeClient:
             timeout: Request timeout in seconds
             max_retries: Maximum number of retry attempts
             verify_ssl: Whether to verify SSL certificates
-            region: "us" or "eu"; defaults to the key's region prefix, else US
+            region: "us" or "eu"; defaults to the key's region prefix, else EU
         """
         self.api_key = api_key
         self.base_url = resolve_base_url(api_key, base_url, region)

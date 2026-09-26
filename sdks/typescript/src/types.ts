@@ -121,7 +121,8 @@ export interface ComplyEdgeConfig {
   baseUrl?: string;
   /**
    * "us" | "eu". Defaults to the region encoded in the API key prefix
-   * (`ce_eu_` -> EU), else US. Also settable via COMPLYEDGE_REGION.
+   * (`ce_eu_` -> EU, `ce_` -> US), else EU. Also settable via COMPLYEDGE_REGION.
+   * This picks a host. It does not move the account.
    */
   region?: "us" | "eu";
   agentId?: string;
