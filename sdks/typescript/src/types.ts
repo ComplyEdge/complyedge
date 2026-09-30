@@ -6,7 +6,12 @@
 export interface ComplianceContext {
   agentId?: string;
   jurisdiction?: string;
+  /** Person the agent acts for. Recorded on the audit entry as `user_id`. */
+  userId?: string;
+  /** That person's role. Recorded as `user_role`. */
   userRole?: string;
+  /** Conversation, run or job identifier. Recorded as `session_id`. */
+  sessionId?: string;
   direction?: "prompt" | "output";
   /**
    * Evaluate without recording: POST /v1/sandbox/check. Same rules, same
@@ -128,4 +133,10 @@ export interface ComplyEdgeConfig {
   agentId?: string;
   jurisdiction?: string;
   timeout?: number;
+  /** Default `userId` for every call; a per-call context value overrides it. */
+  userId?: string;
+  /** Default `userRole` for every call; a per-call context value overrides it. */
+  userRole?: string;
+  /** Default `sessionId` for every call; a per-call context value overrides it. */
+  sessionId?: string;
 }

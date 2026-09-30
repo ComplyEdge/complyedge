@@ -14,11 +14,11 @@ from __future__ import annotations
 import functools
 import logging
 import os
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
 
 # No default host here: ComplyEdge() resolves it at construction time
-# (base_url > COMPLYEDGE_API_URL > region > API-key prefix > US).
+# (base_url > COMPLYEDGE_API_URL > region > API-key prefix > EU).
 _DEFAULT_BASE_URL: str | None = None
 
 if TYPE_CHECKING:
@@ -46,6 +46,26 @@ class ComplianceUnavailableError(RuntimeError):
 
 
 _FAIL_MODES = frozenset({"open", "closed"})
+
+
+#: Who a decorated call acts for. A mapping for a fixed identity, or a
+#: zero-argument callable read on EVERY call, for identity that changes per
+#: request (a contextvar, a request-local user). Keys: user_id, user_role,
+#: session_id; anything else is ignored.
+Attribution = Mapping[str, Any] | Callable[[], Mapping[str, Any] | None]
+
+
+def _resolve_attribution(attribution: Attribution | None) -> dict[str, Any]:
+    if attribution is None:
+        return {}
+    value = attribution() if callable(attribution) else attribution
+    if not value:
+        return {}
+    return {
+        k: value[k]
+        for k in ("user_id", "user_role", "session_id")
+        if value.get(k) is not None
+    }
 
 
 def _validate_fail_mode(mode: str) -> str:
@@ -78,6 +98,7 @@ class ComplianceConfig:
         timeout: int = 300,
         max_retries: int = 3,
         fail_mode: str = "open",
+        attribution: Attribution | None = None,
     ):
         """
         Initialize compliance configuration.
@@ -105,6 +126,9 @@ class ComplianceConfig:
                 "closed". This was previously hard-coded open and undocumented,
                 while ComplyEdge.is_safe() and the TypeScript client both failed
                 closed: three surfaces, three postures, none written down.
+            attribution: Who each call acts for, recorded on the audit entry
+                (user_id, user_role, session_id). A dict, or a zero-argument
+                callable evaluated on every call for per-request identity.
         """
         self.api_key = api_key
         self.check_input = check_input
@@ -117,6 +141,7 @@ class ComplianceConfig:
         self.timeout = timeout
         self.max_retries = max_retries
         self.fail_mode = _validate_fail_mode(fail_mode)
+        self.attribution = attribution
 
 
 def default_violation_handler(result: ComplianceResult, context: str) -> None:
@@ -189,6 +214,7 @@ def compliance_check(
     config: ComplianceConfig | None = None,
     violation_handler: Callable[[ComplianceResult, str], Any] | None = None,
     base_url: str | None = _DEFAULT_BASE_URL,
+    attribution: Attribution | None = None,
 ):
     """
     Decorator for automatic ComplyEdge compliance checking.
@@ -237,6 +263,9 @@ def compliance_check(
         config: ComplianceConfig object (overrides individual parameters)
         violation_handler: Custom function to handle compliance violations
         base_url: ComplyEdge API base URL
+        attribution: Who each call acts for (user_id, user_role, session_id),
+            recorded on the audit entry. A dict, or a zero-argument callable
+            evaluated on every call, e.g. ``lambda: {"user_id": current_user.id}``.
 
     Returns:
         Decorated function with automatic compliance checking
@@ -267,6 +296,7 @@ def compliance_check(
                 juris = config.jurisdiction
                 api_base_url = config.base_url
                 fail_mode = config.fail_mode
+                attr_source = config.attribution or attribution
             else:
                 check_input = input
                 check_output = output
@@ -276,6 +306,7 @@ def compliance_check(
                 agent = agent_id
                 juris = jurisdiction
                 api_base_url = base_url
+                attr_source = attribution
                 fail_mode = _validate_fail_mode(
                     os.getenv("COMPLYEDGE_FAIL_MODE", "open")
                 )
@@ -302,6 +333,8 @@ def compliance_check(
                 agent_id=agent,
                 jurisdiction=juris,
                 base_url=api_base_url,
+                # Read per call: identity can change between requests.
+                **_resolve_attribution(attr_source),
             )
 
             try:

@@ -100,12 +100,19 @@ Not a static badge. These seals reflect live `/v1/check` traffic from open-sourc
 embedding ComplyEdge: they change as real enforcement happens.
 
 Both projects below are our own. ComplyEdge runs in production against our own code
-before we ask anyone else to run it against theirs. A new account is created in
-the EU (`https://eu.api.complyedge.io`, key prefix `ce_eu_`). The seals below use
-`https://api.complyedge.io` because those accounts live in the US (key prefix `ce_`).
-The SDK reads the key and calls that host. You cannot switch region yourself.
-Email support@complyedge.io. Support moves the account and issues a new key.
+before we ask anyone else to run it against theirs. You choose the region
+when you create an account: EU (`https://eu.api.complyedge.io`, key prefix `ce_eu_`)
+or US (`https://api.complyedge.io`, key prefix `ce_`). The seals below use the US
+host because those accounts live in the US. The SDK reads the key and calls that
+host. To move an existing account, use Request a region change in the dashboard.
+Support moves the account and issues a new key.
 Setting an API URL does not move the account.
+The region is where your prompts and audit records are processed and stored.
+It does not decide which laws are checked: the `jurisdiction` field on each
+check does. No general law requires either region. US law does not require US
+storage, and GDPR allows transfers outside the EU with safeguards such as
+standard contractual clauses (Chapter V). Choose the region your own contracts
+or customers ask for.
 
 [![IVD Framework: runtime enforcement](https://api.complyedge.io/v1/public/badge/ivd.svg)](https://trust.complyedge.io/ivd)
 [![Horizon: runtime enforcement](https://api.complyedge.io/v1/public/badge/horizon.svg)](https://trust.complyedge.io/horizon)
@@ -160,7 +167,7 @@ if not result.allowed:
 
 `rule_id` is the citation key: every rule carries its article reference in the corpus (`rego-art5-1c-001` → Article 5(1)(c)), and the full citation text ships with the rule under [`rules/`](rules).
 
-`jurisdiction` is where the end user is, not where your company is based: the EU AI Act applies when an AI system's output is used in the EU, wherever the provider or deployer is established ([Art. 2(1)(c)](https://eur-lex.europa.eu/eli/reg/2024/1689)). Default: `EU`. On the hosted API's deterministic path, `EU` runs the EU AI Act rules, `US` and `US-*` run the SOX §302 disclosure rule, and every check runs prompt-injection detection. The other US rules (HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA) and the GDPR rules run offline in TrustLint, not on the hosted `/v1/check` path. The opt-in Layer 2 (`use_semantic_fallback=True`) is a general LLM review, not these rules.
+`jurisdiction` is where the end user is, not where your company is based: the EU AI Act applies when an AI system's output is used in the EU, wherever the provider or deployer is established ([Art. 2(1)(c)](https://eur-lex.europa.eu/eli/reg/2024/1689)). Default: `EU`. On the hosted API's deterministic path, `EU` runs the EU AI Act rules, `US` and `US-*` run the SOX §302 disclosure rule, and every check runs prompt-injection detection. The other US rules (HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA) and the GDPR rules run offline in TrustLint, not on the hosted `/v1/check` path. The opt-in Layer 2 (`use_semantic_fallback=True`) adds two LLM judges: a prompt-injection classifier that judges by meaning against the same Article 15 categories and cites them, and a general LLM review. Neither runs the other rules.
 
 ## TrustLint, Offline Linter
 
@@ -236,7 +243,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 **Layer 1, Deterministic (hot path):** 64 leaf OPA/Rego policies (+ 7 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
 
-**Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, an LLM evaluates the request and blocks if a violation is found. Off by default since v0.2.2. Adds 2–5s latency per request.
+**Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, two LLM judges run in parallel after the rules pass, and either can block: a prompt-injection classifier that judges by meaning against the Article 15 `prompt_security` categories (a block is `llm-art15-ipi-*`, carries the Article 15 citation, and must quote the injected text from the request) and a general LLM review. If either cannot answer, the request is denied. Off by default since v0.2.2. Adds 2–5s latency per request.
 
 Security products protect AI from bad actors. **ComplyEdge blocks EU AI Act violations at runtime: and logs a cited record on every decision.**
 

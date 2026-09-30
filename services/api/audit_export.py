@@ -252,6 +252,19 @@ def _compute_chain_head_in_order(events: list[dict[str, Any]]) -> str | None:
     return previous
 
 
+#: DynamoDB storage keys: how the row is found and when it expires, not what
+#: was decided. They are not part of the customer's record, so neither export
+#: carries them (Leo, 2026-09-29). `timestamp` and `event_id` already say what
+#: `sk` encodes; retention is stated once in the envelope (`retention_days`).
+EXPORT_INTERNAL_KEYS = frozenset({"pk", "sk", "gsi1_pk", "gsi1_sk", "ttl"})
+
+
+def export_event(event: dict[str, Any]) -> dict[str, Any]:
+    """One event as the customer receives it: JSON-native, storage keys removed."""
+    normalized = normalize_event(event)
+    return {k: v for k, v in normalized.items() if k not in EXPORT_INTERNAL_KEYS}
+
+
 def build_hash_chain(events: list[dict[str, Any]]) -> dict[str, Any]:
     """
     Build a tamper-evident hash chain over audit events.
@@ -263,7 +276,7 @@ def build_hash_chain(events: list[dict[str, Any]]) -> dict[str, Any]:
     # The object that gets hashed is the object that gets returned, so a caller
     # can recompute the chain from the JSON they received. Normalizing here
     # rather than inside the loop also makes the sort key type-stable.
-    normalized = [normalize_event(e) for e in events]
+    normalized = [export_event(e) for e in events]
     ordered = _sort_events_chronologically(normalized)
     previous = GENESIS_HASH
     chained_events: list[dict[str, Any]] = []

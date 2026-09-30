@@ -63,6 +63,9 @@ export function withCompliance<T extends Record<string, unknown>>(
 
   completions.create = async function (...args: unknown[]) {
     const params = args[0] as Record<string, unknown> | undefined;
+    // OpenAI's own end-user identifier, when the caller set one, is the same
+    // person the audit record's user_id names. Client defaults fill the rest.
+    const userId = typeof params?.user === "string" && params.user ? params.user : undefined;
 
     if (opts.checkInput && params?.messages) {
       const messages = params.messages as Array<{ role: string; content: unknown }>;
@@ -75,6 +78,7 @@ export function withCompliance<T extends Record<string, unknown>>(
           const result = await ceClient.check(text, {
             direction: "prompt",
             jurisdiction: opts.jurisdiction,
+            userId,
           });
           if (!result.allowed && opts.blockOnViolation) {
             throw new ComplianceError(
@@ -96,6 +100,7 @@ export function withCompliance<T extends Record<string, unknown>>(
         const result = await ceClient.check(text, {
           direction: "output",
           jurisdiction: opts.jurisdiction,
+          userId,
         });
         if (!result.allowed && opts.blockOnViolation) {
           throw new ComplianceError(

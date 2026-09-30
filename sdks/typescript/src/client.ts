@@ -16,9 +16,10 @@ import type {
 
 // ComplyEdge runs two regions. A tenant lives in exactly one of them.
 // The key says which host to call. It does not move the account.
-// `ce_eu_` -> EU (eu.api.complyedge.io), every new account.
-// `ce_` -> US (api.complyedge.io), only after support moves the account.
-// No key or an unknown prefix goes to EU. The US stack creates no new tenants.
+// `ce_eu_` -> EU (eu.api.complyedge.io). `ce_` -> US (api.complyedge.io).
+// The region is chosen when the API key is created (EU preselected); changing
+// it later goes through support and issues a new key.
+// No key or an unknown prefix goes to EU.
 // `baseUrl` and COMPLYEDGE_API_URL pick a host. They do not move the account.
 export type Region = "us" | "eu";
 
@@ -66,12 +67,22 @@ export function resolveBaseUrl(opts: {
 // Keep in sync with package.json. Hardcoding it here meant the User-Agent
 // silently reported a stale version after every release bump, which is the
 // one field support uses to tell which client a customer is actually on.
-const SDK_VERSION = "0.2.5";
+const SDK_VERSION = "0.2.6";
+
+/** The audit record's user attribution, in the API's field names. */
+export interface AttributionFields {
+  user_id?: string;
+  user_role?: string;
+  session_id?: string;
+}
 
 export class ComplyEdgeClient {
   private http: AxiosInstance;
   private agentId: string;
   private jurisdiction?: string;
+  private userId?: string;
+  private userRole?: string;
+  private sessionId?: string;
 
   constructor(config: ComplyEdgeConfig) {
     const baseUrl = resolveBaseUrl({
@@ -82,6 +93,9 @@ export class ComplyEdgeClient {
 
     this.agentId = config.agentId || "default";
     this.jurisdiction = config.jurisdiction;
+    this.userId = config.userId;
+    this.userRole = config.userRole;
+    this.sessionId = config.sessionId;
 
     this.http = axios.create({
       baseURL: baseUrl,
@@ -92,6 +106,23 @@ export class ComplyEdgeClient {
         "User-Agent": `complyedge-typescript-sdk/${SDK_VERSION}`,
       },
     });
+  }
+
+  /**
+   * user_id / user_role / session_id for the audit record: the per-call
+   * context wins, then the client defaults. Only userRole used to be sent, so
+   * no SDK caller could fill the user and session columns of its records.
+   * Undefined when there is nothing to send.
+   */
+  attribution(context?: ComplianceContext): AttributionFields | undefined {
+    const fields: AttributionFields = {};
+    const userId = context?.userId ?? this.userId;
+    const userRole = context?.userRole ?? this.userRole;
+    const sessionId = context?.sessionId ?? this.sessionId;
+    if (userId) fields.user_id = userId;
+    if (userRole) fields.user_role = userRole;
+    if (sessionId) fields.session_id = sessionId;
+    return Object.keys(fields).length ? fields : undefined;
   }
 
   /**
@@ -120,7 +151,7 @@ export class ComplyEdgeClient {
       // declared the correct union; only this line disagreed with it.
       direction: context?.direction ?? "output",
       use_semantic_fallback: false,
-      context: context?.userRole ? { user_role: context.userRole } : undefined,
+      context: this.attribution(context),
     });
 
     const data = response.data;
@@ -158,8 +189,9 @@ export class ComplyEdgeClient {
    * Run proactive sensitivity detection on user input.
    *
    * Calls POST /v1/sensitivity/detect, which deliberately stays on the legacy
-   * TrustLint + LLM pipeline. It does NOT run OPA and does NOT write the
-   * Article 12 audit trail. Use `check()` for runtime EU AI Act enforcement.
+   * TrustLint + LLM pipeline. It does NOT run OPA. It does write an audit
+   * record, attributed like check(). Use `check()` for runtime EU AI Act
+   * enforcement.
    */
   async detectSensitivity(
     text: string,
@@ -175,7 +207,9 @@ export class ComplyEdgeClient {
       agent_id: context?.agentId || this.agentId,
       jurisdiction,
       direction: context?.direction || "prompt",
-      user_role: context?.userRole,
+      // The API reads attribution from `context` (SensitivityContext). A
+      // top-level user_role was silently dropped by the request model.
+      context: this.attribution(context),
     });
 
     const data = response.data;

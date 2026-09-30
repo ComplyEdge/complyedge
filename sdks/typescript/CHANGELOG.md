@@ -16,6 +16,15 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-09-29
+
+### Added
+- `userId` and `sessionId` on `ComplianceContext`, and `userId` / `userRole` / `sessionId` client defaults on `ComplyEdgeConfig`. `check()` and `detectSensitivity()` send all three in `context`, recorded on the audit entry. The OpenAI middleware records the request's `user` as `userId`.
+
+### Fixed
+- `detectSensitivity()` sent `user_role` at the top level of the request, where the API ignores it, so it never reached the audit record. It is now sent in `context`.
+- `check()` sent only `user_role`; `user_id` and `session_id` could not be sent at all.
+
 ## [0.2.5] - 2026-09-25
 
 ### Changed

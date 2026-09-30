@@ -42,7 +42,7 @@ appears. Without it the tool is not listed and the server stays fully offline.
 
 | Tool | Returns | Notes |
 |---|---|---|
-| `sandbox_check` | `BLOCKED` / `ALLOWED` with rule ID and article citation | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. One network call per check. Never evidence. A new account is EU (`ce_eu_` calls `eu.api.complyedge.io`). A US account uses `ce_` and `api.complyedge.io`. `COMPLYEDGE_API_URL` picks a host and does not move the account. Email support@complyedge.io to change region. |
+| `sandbox_check` | `BLOCKED` / `ALLOWED` with rule ID and article citation | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. One network call per check. Never evidence. An EU account's key is `ce_eu_` and calls `eu.api.complyedge.io`; a US account's key is `ce_` and calls `api.complyedge.io`. The region is chosen when you create your API key. `COMPLYEDGE_API_URL` picks a host and does not change the account's region. To change the region later, contact support@complyedge.io. |
 
 Rotating the key: mint the new one with **Rotate key** on the dashboard's API
 Key page (it asks first), update

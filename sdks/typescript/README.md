@@ -117,16 +117,22 @@ const ce = new ComplyEdgeClient({
 
 ### Regions
 
-Two regions, one home per account. A new account is created in the EU
-(`eu.api.complyedge.io`) and its key starts with `ce_eu_`. An account that
-support has moved to the US uses `api.complyedge.io` and a key that starts
-with `ce_`. The client reads the prefix and picks the host. You cannot switch
-region yourself. Email support@complyedge.io. A move issues a new key.
+Two regions, one home per account, chosen when you create your API key: EU
+(`eu.api.complyedge.io`, key prefix `ce_eu_`) or US (`api.complyedge.io`, key
+prefix `ce_`). The client reads the prefix and picks the host. To change the
+region later, use Request a region change in the dashboard; you get a new key for it.
 `baseUrl`, `region`, `COMPLYEDGE_API_URL`, and `COMPLYEDGE_REGION` only choose
-which host to call. They do not move the account. Precedence, highest first:
+which host to call. They do not change the account's region. Precedence, highest first:
 `baseUrl` / `COMPLYEDGE_API_URL`, then `region` / `COMPLYEDGE_REGION`, then
 the key prefix, then EU. A key presented to the other region's stack is
 refused with `401 {"error":"wrong_region","use":"<host>"}` before any lookup.
+
+The region is where your prompts and audit records are processed and stored.
+It does not decide which laws are checked: the `jurisdiction` field on each
+check does. No general law requires either region. US law does not require US
+storage, and GDPR allows transfers outside the EU with safeguards such as
+standard contractual clauses (Chapter V). Choose the region your own contracts
+or customers ask for.
 
 ## `check(text, context?)`
 
@@ -151,7 +157,30 @@ await ce.check(userPrompt, {
   direction: "prompt",     // "prompt" (user input) or "output" (model output)
   jurisdiction: "EU",
   agentId: "hr-screening",
-  userRole: "recruiter",   // recorded for audit attribution
+  userId: "emp_12345",     // who the agent acts for
+  userRole: "recruiter",   // their role
+  sessionId: "conv_abc",   // the conversation, run or job
+});
+```
+
+`userId`, `userRole` and `sessionId` are written on the audit record as
+`user_id`, `user_role` and `session_id`. Leave them out and those columns stay
+Never send a credential in these fields ('userId', 'userRole', 'sessionId'): a login token, session cookie, JWT or
+API key would sit in every audit record and export. If your session id doubles
+as a login token, send a hash of it (for example the first 16 hex characters of
+its SHA-256). ComplyEdge replaces any token- or key-shaped value with
+`redacted:` plus a hash before the record is written.
+
+blank in your audit export. For an agent that always acts for the same person,
+set them once on the client:
+
+```typescript
+const ce = new ComplyEdgeClient({
+  apiKey: process.env.COMPLYEDGE_API_KEY!,
+  agentId: "hr-screening",
+  userId: "emp_12345",
+  userRole: "recruiter",
+  sessionId: runId,
 });
 ```
 
@@ -181,6 +210,9 @@ try {
 }
 ```
 
+When the OpenAI request sets `user`, the middleware records it as `userId`.
+Role and session come from the client defaults.
+
 `openai` is an optional peer dependency. Install it only if you use the middleware.
 
 ## Pre-deployment assessment
@@ -198,8 +230,9 @@ console.log(assessment.euAiActCategory); // "employment-workers"
 ## `detectSensitivity(text, context?)`
 
 Legacy sensitivity detection (`POST /v1/sensitivity/detect`), kept for existing
-callers. It runs the TrustLint and LLM pipeline, not OPA, and does **not** write
-the Article 12 audit trail. Use `check()` for runtime enforcement.
+callers. It runs the TrustLint and LLM pipeline, not OPA, and writes an audit
+record with the same `userId`, `userRole` and `sessionId` attribution. Use
+`check()` for runtime enforcement.
 
 ## Errors
 

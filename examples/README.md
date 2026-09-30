@@ -34,6 +34,17 @@ agent = Agent(
 
 See [`openai-agents/`](openai-agents/) for complete integration examples.
 
+## Capability Probe
+
+Check what ComplyEdge actually blocks (Article 5 practices and prompt injection in content an agent
+reads) and where it stops, offline with `opa` or live against your tenant:
+
+```bash
+python capability-probe/probe.py
+```
+
+See [`capability-probe/`](capability-probe/) for the cases and the known gaps.
+
 ## Environment Setup
 
 ```bash

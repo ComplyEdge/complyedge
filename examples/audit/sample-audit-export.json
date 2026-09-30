@@ -28,21 +28,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "48c10175-924f-4d8c-972f-d5712084f844",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:02:48.524704+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 110,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "8d340a88c6eb396b4aca79a9e67b1ad1e24d61b7e85d091588b451e5b163e8f7",
       "timestamp": "2026-08-15T15:02:48.524704+00:00",
       "ts": "2026-08-15T15:02:48.524704+00:00",
-      "ttl": 1802358168,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -59,8 +55,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:02:48.524704+00:00#48c10175-924f-4d8c-972f-d5712084f844",
-      "chain_link": "bb9c780cb555adae346351eeb37deb6f073eb31c3aadb6e7e2213b1449194751"
+      "chain_link": "7c8bedd5476b4ba82c01ce4bd60e501072a53aad9bf36caa82145d0c58be7b89"
     },
     {
       "action": "block",
@@ -85,21 +80,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "04a5c159-00c7-41e3-ae42-38c3d4625c33",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:02:50.482688+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 71,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "d5774b26a3750ef67c6662d395963c6ed6b8bd31beb1befaffeb59762aa5bb13",
       "timestamp": "2026-08-15T15:02:50.482688+00:00",
       "ts": "2026-08-15T15:02:50.482688+00:00",
-      "ttl": 1802358170,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -116,8 +107,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:02:50.482688+00:00#04a5c159-00c7-41e3-ae42-38c3d4625c33",
-      "chain_link": "948c3f9b124fec7f4115874bfbe29afb8b5f4081f865e8bb3c00d1398424ca8c"
+      "chain_link": "402ac4182325ee58b6122f554f5620ac48f23b73705241183ec946ce1a0a5173"
     },
     {
       "action": "allow",
@@ -138,28 +128,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "4f2bf612-38eb-4bd5-a594-38dbd0bd8e56",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:02:52.388429+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 143,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "3f79909de4b09009dd3e753dbacffd07a4e6adb0a3c16e5512b415361d574062",
       "timestamp": "2026-08-15T15:02:52.388429+00:00",
       "ts": "2026-08-15T15:02:52.388429+00:00",
-      "ttl": 1802358172,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:02:52.388429+00:00#4f2bf612-38eb-4bd5-a594-38dbd0bd8e56",
-      "chain_link": "a7b753b2ca5478d426a5f5ed9bd9cb173d328d441c964dd6ba20b07a141f182f"
+      "chain_link": "c3dbe1dd79a56f01d4c02a2395e54299cefaa7061fd1287ff003bee4588b8c1b"
     },
     {
       "action": "block",
@@ -184,21 +169,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "6bd92661-875c-4129-b805-79b962e660a3",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:27.723561+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 92,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "697303cb4466050d976cfa72cb1d8476049641549b59be0d41a3297a407192fd",
       "timestamp": "2026-08-15T15:04:27.723561+00:00",
       "ts": "2026-08-15T15:04:27.723561+00:00",
-      "ttl": 1802358267,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -215,8 +196,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:04:27.723561+00:00#6bd92661-875c-4129-b805-79b962e660a3",
-      "chain_link": "394d323b34fac1e18dc27968cae5b45cb856af5afc5b2f6ac3e001e33699c44b"
+      "chain_link": "767d691dc28d60f5d00274d4e4f3ad8f4c43ee2d87e2d972fd788c21d2ddaf6e"
     },
     {
       "action": "block",
@@ -241,21 +221,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "437cf2c3-56d2-4ebd-b1fe-750c078d220d",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:28.998908+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 76,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "944869734b4cfb9e659d08c6bff83100731e7c007fdb44c9fd3266a051c98bd9",
       "timestamp": "2026-08-15T15:04:28.998908+00:00",
       "ts": "2026-08-15T15:04:28.998908+00:00",
-      "ttl": 1802358268,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -280,8 +256,7 @@
         }
       ],
       "violations_count": 2,
-      "sk": "EVENT#2026-08-15T15:04:28.998908+00:00#437cf2c3-56d2-4ebd-b1fe-750c078d220d",
-      "chain_link": "59b1f7cdcd85b4547ad5886769f0f1fa4b05bef22c609a9c89c81af2b0da5f7b"
+      "chain_link": "1f83027a27a803085db408e83917f1ca638fc3f68927485d52be2bc71620d2a0"
     },
     {
       "action": "block",
@@ -306,21 +281,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "fde51b2c-3a59-45be-9d59-010f13460b0d",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:30.304093+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 52,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "aaf93337b4d72db6c3ccacfc905c845a0a88471a28a5f46e002a57c5f506e8cb",
       "timestamp": "2026-08-15T15:04:30.304093+00:00",
       "ts": "2026-08-15T15:04:30.304093+00:00",
-      "ttl": 1802358270,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -337,8 +308,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:04:30.304093+00:00#fde51b2c-3a59-45be-9d59-010f13460b0d",
-      "chain_link": "2df04c0e0880b1fc8d6c70c9f13d9daf6d9a8ef86296b59c122a6be70e0d3231"
+      "chain_link": "1a25a62c2949ec9d8d27ab0318249fa1ffe06b65747f9fb0596b3da0463a5615"
     },
     {
       "action": "block",
@@ -363,21 +333,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "82881d6b-f165-4299-86f5-a8401b246e4e",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:31.593787+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 61,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "9c21bc9f53f70402c3970a5eece508a2e294490f126b3e84743cc5a2b41c1ddb",
       "timestamp": "2026-08-15T15:04:31.593787+00:00",
       "ts": "2026-08-15T15:04:31.593787+00:00",
-      "ttl": 1802358271,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -394,8 +360,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:04:31.593787+00:00#82881d6b-f165-4299-86f5-a8401b246e4e",
-      "chain_link": "171318a075264e3a1e450131200b0ccf6252e3914339e0af2a54bae5e83224ad"
+      "chain_link": "eba14fb48a2e87a2d6abe84c65f5251fe2cd0e35010ad063c71f6ae93e252ccd"
     },
     {
       "action": "block",
@@ -420,21 +385,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "dfee9093-9d2a-49c7-9350-24e41f8d6f05",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:32.926985+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 69,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "82a9265b69a620eec46fb1137592806d247c2e39e6e54f986708dd8ebd11ae55",
       "timestamp": "2026-08-15T15:04:32.926985+00:00",
       "ts": "2026-08-15T15:04:32.926985+00:00",
-      "ttl": 1802358272,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -459,8 +420,7 @@
         }
       ],
       "violations_count": 2,
-      "sk": "EVENT#2026-08-15T15:04:32.926985+00:00#dfee9093-9d2a-49c7-9350-24e41f8d6f05",
-      "chain_link": "52dd01b90e57b764906216372ab22c430a48f582f9a611098550702cbca7be83"
+      "chain_link": "88ec6608d163a1fa0e7d5c250c9ce2b18a2e3cfec35405a4fc3816946557687c"
     },
     {
       "action": "allow",
@@ -481,28 +441,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "b62635f3-e303-458b-ad84-fc878ea176b2",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:34.215369+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 59,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "77f6b66dd31cc739d88151af17712834ef107a8af072d8c5ecdf6346eaf81796",
       "timestamp": "2026-08-15T15:04:34.215369+00:00",
       "ts": "2026-08-15T15:04:34.215369+00:00",
-      "ttl": 1802358274,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:34.215369+00:00#b62635f3-e303-458b-ad84-fc878ea176b2",
-      "chain_link": "49fb6024ed6c0b31a3cd246ef3a534f3870019f88ee05a15c805aaea09a38791"
+      "chain_link": "6cb7034a904589c3a384d876d071368e139b3bdb9683f9006e732f0964295984"
     },
     {
       "action": "allow",
@@ -523,28 +478,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "36ca624a-9f10-49a4-9ee5-f10a2415d194",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:35.746242+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 128,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "e8bf2d0393da17f2f70eed03d95751de3df2850798e6df3e5393441be6691fc5",
       "timestamp": "2026-08-15T15:04:35.746242+00:00",
       "ts": "2026-08-15T15:04:35.746242+00:00",
-      "ttl": 1802358275,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:35.746242+00:00#36ca624a-9f10-49a4-9ee5-f10a2415d194",
-      "chain_link": "25391be7dc5a7e4a925b0630da246fba4be1d56f7f414675dae01bef34aa2103"
+      "chain_link": "427888bab69cf8108f72c97dc0ba3c046167f62f0010fe4c3ffe19abf7650586"
     },
     {
       "action": "allow",
@@ -565,28 +515,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "83d1f4fe-d659-46fa-b17c-5021c9627685",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:37.087333+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 67,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "92e16784e501ebfd833161a92cc68a9359670228b5af273553c174351abd8076",
       "timestamp": "2026-08-15T15:04:37.087333+00:00",
       "ts": "2026-08-15T15:04:37.087333+00:00",
-      "ttl": 1802358277,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:37.087333+00:00#83d1f4fe-d659-46fa-b17c-5021c9627685",
-      "chain_link": "77ed0a6b6609536f96405c309a49ff0a8b11dc96ba51cf2c6939f185f2f4f08c"
+      "chain_link": "7f215e04f1ecbe8dde3298c2dcca89e1edacdd4851ba49d32b37927d84089c68"
     },
     {
       "action": "block",
@@ -611,21 +556,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "aa71ad83-093b-4d35-8fc8-1f12a76d6792",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:38.411717+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 44,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "2dd65a79b3d9293658af889d83e81085f3d187c15c56b303ea260e938c96c2cb",
       "timestamp": "2026-08-15T15:04:38.411717+00:00",
       "ts": "2026-08-15T15:04:38.411717+00:00",
-      "ttl": 1802358278,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -642,8 +583,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:04:38.411717+00:00#aa71ad83-093b-4d35-8fc8-1f12a76d6792",
-      "chain_link": "4127f78e04bdf0054759ac2314b4d207e2029f672f30edc21426cf8a2b47507f"
+      "chain_link": "71680517e8ea7922b6f0e7e6fecb3a4be36b611478ffaefc6d6d0a75f81a0775"
     },
     {
       "action": "allow",
@@ -664,28 +604,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "66ced61f-5512-45e3-ab3e-2ca56b017425",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:39.824831+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 51,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "f1dacc6e07a5bf8e7937050f2888533ea529b3d90cb62481162470e26d6254b4",
       "timestamp": "2026-08-15T15:04:39.824831+00:00",
       "ts": "2026-08-15T15:04:39.824831+00:00",
-      "ttl": 1802358279,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:39.824831+00:00#66ced61f-5512-45e3-ab3e-2ca56b017425",
-      "chain_link": "c12d22cae96481a5cdb1916f746362ec4c0ec2b494b698460a6a8060640f76e1"
+      "chain_link": "28c45b843cda21e914b9ae27a5e8ea03350a2811969e940de9f2e08beaf3e267"
     },
     {
       "action": "allow",
@@ -706,28 +641,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "bb574eaa-8e8b-4e02-ae51-c952cfc95a0f",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:41.141304+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 73,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "e607bd0cd880534e737172e4561e92590cc036a0d85d6a88ba3d4d7869224145",
       "timestamp": "2026-08-15T15:04:41.141304+00:00",
       "ts": "2026-08-15T15:04:41.141304+00:00",
-      "ttl": 1802358281,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:41.141304+00:00#bb574eaa-8e8b-4e02-ae51-c952cfc95a0f",
-      "chain_link": "059486b5e21e0e26c339423bf176fa962e00443659a9a367d4ebe6b01cfc9e9e"
+      "chain_link": "506c6093b945839f336436f429e7b6bf75be6e6a68fc158c765d824b40277d6f"
     },
     {
       "action": "block",
@@ -752,21 +682,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "c5fe8c28-1c54-4540-aa75-416245974ddb",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:43.419710+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 75,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "981a29628f10cdd71f28216cec6bf9afac10bca782ad00c5dbd101abc26fb8c2",
       "timestamp": "2026-08-15T15:04:43.419710+00:00",
       "ts": "2026-08-15T15:04:43.419710+00:00",
-      "ttl": 1802358283,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -783,8 +709,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:04:43.419710+00:00#c5fe8c28-1c54-4540-aa75-416245974ddb",
-      "chain_link": "7e36d3d8ca338e48c249736f2ca45156735bcd548336290b20d746f7da8a1c4f"
+      "chain_link": "a6712e420754d7ba20fc4cd5f8a732f88e9daab203b5c4a5c0c3a26c523f137f"
     },
     {
       "action": "allow",
@@ -805,28 +730,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "b7c28640-c8cc-468e-acc1-6daf5a24bb8a",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:44.713566+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 62,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "8f9c98243492eb346291f4e397d0a85d10d191eea42abcbcfe72bbaa87d564d6",
       "timestamp": "2026-08-15T15:04:44.713566+00:00",
       "ts": "2026-08-15T15:04:44.713566+00:00",
-      "ttl": 1802358284,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:44.713566+00:00#b7c28640-c8cc-468e-acc1-6daf5a24bb8a",
-      "chain_link": "767b4c1790ba708c9eccbe60d89b2062938fb302f90a011b35060f297d0ecf2e"
+      "chain_link": "d4167778ef537533b4dfb519fea980d383e4b5b4e80cae954fc1bfd66df30399"
     },
     {
       "action": "block",
@@ -851,21 +771,17 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "6656dfa8-f880-4a31-957b-f501cbff5dec",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:46.066749+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 69,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "a6ef185bdeb489f3bdbaf607fb76a28a18d449427e83cfc2c226cccd09d6e352",
       "timestamp": "2026-08-15T15:04:46.066749+00:00",
       "ts": "2026-08-15T15:04:46.066749+00:00",
-      "ttl": 1802358286,
       "user_role": null,
       "version": "v1",
       "violation_detected": true,
@@ -882,8 +798,7 @@
         }
       ],
       "violations_count": 1,
-      "sk": "EVENT#2026-08-15T15:04:46.066749+00:00#6656dfa8-f880-4a31-957b-f501cbff5dec",
-      "chain_link": "d6dfdb7e4a34219a2b6d637556891487198da62a04a5f635dd50b82e3fc1ebfe"
+      "chain_link": "d7cd714dd4bf72591dbebfb0065ae744055f2af6d0f0ce9dda07c46d790f61a3"
     },
     {
       "action": "allow",
@@ -904,28 +819,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "86d949b0-eed2-41cb-bd7c-82958f7c9abc",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:47.427807+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 67,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "8b744bcfbd3c476115c48763ffee1b3bfe8bcd2c2f6ca3d38af9f93cb1d563a2",
       "timestamp": "2026-08-15T15:04:47.427807+00:00",
       "ts": "2026-08-15T15:04:47.427807+00:00",
-      "ttl": 1802358287,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:47.427807+00:00#86d949b0-eed2-41cb-bd7c-82958f7c9abc",
-      "chain_link": "d1ba9c8569eb5f54a43608386269d0e6f82df1c52deaf47c9ae529cc006bb32f"
+      "chain_link": "5d0d623c442f38eddfe9cefb791589eadb7f9c672ff055ac3fb91f4489c6e223"
     },
     {
       "action": "allow",
@@ -946,28 +856,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "f12858d1-540a-4235-8959-ce841650c45e",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:48.717723+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 97,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "7163a8b71508d495076eaa5ac094b37a88c56741f5d575c221d3e797b88359e4",
       "timestamp": "2026-08-15T15:04:48.717723+00:00",
       "ts": "2026-08-15T15:04:48.717723+00:00",
-      "ttl": 1802358288,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:48.717723+00:00#f12858d1-540a-4235-8959-ce841650c45e",
-      "chain_link": "5fc05a17a678cd15d12aeeb3b20e7ccebeba47d965c312cbe548fb96dd4fbc46"
+      "chain_link": "cb8e9c8281bc295617c95f480ed25352ad773b9037494d4d1561b53e56dcb4ae"
     },
     {
       "action": "allow",
@@ -988,28 +893,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "92b888ed-b481-473c-8d07-c1eadb8aba98",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:50.074148+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 61,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "75def048ccb6ada7e0166214f9ad749cc70c8dc3ffd2af590e8135b4a0b8cac6",
       "timestamp": "2026-08-15T15:04:50.074148+00:00",
       "ts": "2026-08-15T15:04:50.074148+00:00",
-      "ttl": 1802358290,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:50.074148+00:00#92b888ed-b481-473c-8d07-c1eadb8aba98",
-      "chain_link": "23a5c9503af3c33cba648532d883083b1d02e3b90ffbe650e5497bed7f76cb5e"
+      "chain_link": "9fcf69ce3426422a37ca380b3899fe3213b6130b9db30d81c251251d6252a71d"
     },
     {
       "action": "allow",
@@ -1030,28 +930,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "f28d4f8b-db22-472a-a96d-f51b1cdac1c9",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:51.357153+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 59,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "de9cc887aa34b34250cd1b4b8cae10a6b1048d6a4870fc8d0fb2db6b60d346c5",
       "timestamp": "2026-08-15T15:04:51.357153+00:00",
       "ts": "2026-08-15T15:04:51.357153+00:00",
-      "ttl": 1802358291,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:51.357153+00:00#f28d4f8b-db22-472a-a96d-f51b1cdac1c9",
-      "chain_link": "b9f2edbb230aec1418c9ad037755a118bebfb8dc42a1dbe5652082ba4a7041cd"
+      "chain_link": "d466410ff8f45c2f276508736f3031d4b70eb4d5a95c42dafc747a2e44256f7f"
     },
     {
       "action": "allow",
@@ -1072,28 +967,23 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "084d609d-9ac4-4c3a-a1af-6bf24a537174",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:52.645384+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 70,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "527236525c99f54bca5b34e8fafe47a8534d1a316171115d544324f8b6100e9d",
       "timestamp": "2026-08-15T15:04:52.645384+00:00",
       "ts": "2026-08-15T15:04:52.645384+00:00",
-      "ttl": 1802358292,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:52.645384+00:00#084d609d-9ac4-4c3a-a1af-6bf24a537174",
-      "chain_link": "01ee4b6b62e8ed807a1afaffbb6890513440f758331fb344e471dbbb4d9919d6"
+      "chain_link": "83ebcff8f432ead273735cd62eccfcf3e53dc55609edf2a19f373cb6ff1f83fc"
     },
     {
       "action": "allow",
@@ -1114,31 +1004,26 @@
       "direction": "output",
       "engine_path": "opa",
       "event_id": "dac79dbf-c446-40e6-8afa-bcd86b7bcc48",
-      "gsi1_pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
-      "gsi1_sk": "2026-08-15T15:04:53.965152+00:00",
       "jurisdiction": "EU",
       "jurisdictions": [
         "EU"
       ],
       "latency_ms": 68,
       "model_used": null,
-      "pk": "TENANT#00000000-0000-4000-8000-0000000000ce",
       "schema_version": "v1",
       "tenant_id": "00000000-0000-4000-8000-0000000000ce",
       "text_hash": "8a01c931a83b82576888c6467c75fc36c3b4113e460e660711600f4303511f5d",
       "timestamp": "2026-08-15T15:04:53.965152+00:00",
       "ts": "2026-08-15T15:04:53.965152+00:00",
-      "ttl": 1802358293,
       "user_role": null,
       "version": "v1",
       "violation_detected": false,
       "violation_ids": [],
       "violations_count": 0,
-      "sk": "EVENT#2026-08-15T15:04:53.965152+00:00#dac79dbf-c446-40e6-8afa-bcd86b7bcc48",
-      "chain_link": "db22e102e690fa962a9d46575fff6e6bdd9caf63905c19e74c20f7fde4d568fc"
+      "chain_link": "73d585212e7c98614d6e11f1d473b960829a522557a8d0d024405536ee0cb9ad"
     }
   ],
-  "chain_head": "db22e102e690fa962a9d46575fff6e6bdd9caf63905c19e74c20f7fde4d568fc",
+  "chain_head": "73d585212e7c98614d6e11f1d473b960829a522557a8d0d024405536ee0cb9ad",
   "chain_algorithm": "sha256-v1",
   "note": "23 events from a live production /v1/check + /v1/audit/export run after EV-01 (rule-corpus bundle_digest binding) shipped. tenant_id, api_key_id, user_id and session_id redacted; chain rebuilt with production build_hash_chain over the redacted events so the published file verifies."
 }

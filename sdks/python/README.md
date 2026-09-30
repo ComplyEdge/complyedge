@@ -95,6 +95,36 @@ else:
         print(f"{v.rule_id}: {v.citation}")
 ```
 
+### Record who each check acts for
+
+Every audit record has `user_id`, `user_role` and `session_id`. They are filled
+only when you send them; leave them out and those columns are blank in your
+audit export.
+
+```python
+# Per call
+ce.check(text, user_id="emp_12345", user_role="recruiter", session_id="conv_abc")
+
+# Client defaults for an agent that always acts for the same person
+ce = ComplyEdge(api_key=api_key, user_id="emp_12345", user_role="recruiter", session_id=run_id)
+
+# Decorator: a dict, or a zero-argument function read on every call
+@compliance_check(jurisdiction="EU",
+                  attribution=lambda: {"user_id": current_user.id, "session_id": request_id})
+def answer(prompt: str) -> str:
+    ...
+```
+
+`ComplyEdgeClient.check_compliance()` and the async client take the same three
+keyword arguments; they override the same keys in `context`. Use a stable
+identifier from your own system, not an email address: it is stored as sent.
+
+Never send a credential in these fields: a login token, session cookie, JWT or
+API key would sit in every audit record and export. If your session id doubles
+as a login token, send a hash of it (for example the first 16 hex characters of
+its SHA-256). ComplyEdge replaces any token- or key-shaped value with
+`redacted:` plus a hash before the record is written.
+
 ### Try a case without recording it
 
 `sandbox=True` calls `POST /v1/sandbox/check`: the same rules, the same tenant
@@ -149,13 +179,19 @@ never disagree. Email is your sign-in and cannot be changed from the dashboard.
 
 ## Regions
 
-Two regions, one home per account. A new account is created in the EU
-(`eu.api.complyedge.io`) and its key starts with `ce_eu_`. An account that
-support has moved to the US uses `api.complyedge.io` and a key that starts
-with `ce_`. The SDK reads the prefix and picks the host. You cannot switch
-region yourself. Email support@complyedge.io. A move issues a new key.
+Two regions, one home per account, chosen when you create your API key: EU
+(`eu.api.complyedge.io`, key prefix `ce_eu_`) or US (`api.complyedge.io`, key
+prefix `ce_`). The SDK reads the prefix and picks the host. To change the
+region later, use Request a region change in the dashboard; you get a new key for it.
 `base_url`, `region`, `COMPLYEDGE_API_URL`, and `COMPLYEDGE_REGION` only
-choose which host to call. They do not move the account.
+choose which host to call. They do not change the account's region.
+
+The region is where your prompts and audit records are processed and stored.
+It does not decide which laws are checked: the `jurisdiction` field on each
+check does. No general law requires either region. US law does not require US
+storage, and GDPR allows transfers outside the EU with safeguards such as
+standard contractual clauses (Chapter V). Choose the region your own contracts
+or customers ask for.
 
 ```python
 ce = ComplyEdge(api_key="ce_eu_...")   # -> https://eu.api.complyedge.io

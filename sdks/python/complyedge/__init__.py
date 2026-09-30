@@ -58,17 +58,19 @@ from tenacity import (
     wait_exponential,
 )
 
-__version__ = "0.2.19"
+__version__ = "0.2.20"
 
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
 
 # ComplyEdge runs two regions. A tenant lives in exactly one of them.
 # The key says which host to call. It does not move the account.
-#   ce_eu_  -> EU (eu.api.complyedge.io). Every new account.
-#   ce_     -> US (api.complyedge.io). Only after support moves the account.
-# No key, or a key with neither prefix, goes to EU. The US stack creates no
-# new tenants. Setting COMPLYEDGE_API_URL does not change the account's home.
+#   ce_eu_  -> EU (eu.api.complyedge.io).
+#   ce_     -> US (api.complyedge.io).
+# The region is chosen when the API key is created (EU preselected); changing
+# it later goes through support and issues a new key. No key, or a key with
+# neither prefix, goes to EU. Setting COMPLYEDGE_API_URL does not change the
+# account's home.
 Region = Literal["us", "eu"]
 
 REGION_BASE_URLS: dict[str, str] = {
@@ -227,6 +229,66 @@ class ComplianceError(Exception):
         self.retryable = retryable
 
 
+# The retry decorators wait at most this long between attempts
+# (wait_exponential max=10). A 429 that asks for longer cannot clear inside
+# the retry budget, so retrying it only adds delay and doomed requests.
+_RETRY_MAX_WAIT_SECONDS = 10.0
+
+
+def _status_is_retryable(response: httpx.Response) -> bool:
+    """5xx always; 429 only when the server's wait fits the retry budget.
+
+    The daily check cap (error "rate_limit_exceeded") resets at 00:00 UTC, so
+    it is never retried: three attempts over ~14s only delayed the caller and
+    sent two more requests that were certain to be refused. Older API builds
+    sent that 429 an ISO timestamp in Retry-After, so the error code is
+    checked first and an unparseable Retry-After is treated as "not soon".
+    """
+    status = response.status_code
+    if 500 <= status < 600:
+        return True
+    if status != 429:
+        return False
+    try:
+        detail = response.json().get("detail")
+    except Exception:
+        detail = None
+    if isinstance(detail, dict) and detail.get("error") == "rate_limit_exceeded":
+        return False
+    retry_after = response.headers.get("Retry-After")
+    if retry_after is None:
+        return True
+    try:
+        return float(retry_after) <= _RETRY_MAX_WAIT_SECONDS
+    except ValueError:
+        return False
+
+
+#: The user attribution fields the API records on every audit entry
+#: (AuditLogEntry.user_id / user_role / session_id). They reach the record
+#: only through the request's `context`; a caller that sends none leaves those
+#: audit columns blank on every row.
+ATTRIBUTION_FIELDS = ("user_id", "user_role", "session_id")
+
+
+def _attribution_context(
+    context: dict[str, Any] | None,
+    **attribution: str | None,
+) -> dict[str, Any] | None:
+    """Merge explicit attribution into `context`; explicit values win.
+
+    None means "not given" and never overwrites a value already in context.
+    Returns None when there is nothing to send, so the request body is
+    unchanged for callers who pass no attribution.
+    """
+    merged = dict(context or {})
+    for key in ATTRIBUTION_FIELDS:
+        value = attribution.get(key)
+        if value is not None:
+            merged[key] = str(value)
+    return merged or None
+
+
 def _allowed_from_payload(data: dict[str, Any]) -> bool:
     """Missing ``allowed`` is a block, never a pass.
 
@@ -283,6 +345,9 @@ class ComplyEdge:
         jurisdiction: str | None = None,
         base_url: str | None = None,
         region: Region | None = None,
+        user_id: str | None = None,
+        user_role: str | None = None,
+        session_id: str | None = None,
     ):
         """
         Initialize ComplyEdge client.
@@ -290,6 +355,10 @@ class ComplyEdge:
         Args:
             api_key: Your ComplyEdge API key
             agent_id: Default agent identifier
+            user_id: Default person the agent acts for, recorded on every
+                audit entry. Per-call values in check() override it.
+            user_role: Default role of that person (e.g. 'support_agent').
+            session_id: Default conversation, run or job identifier.
             jurisdiction: Regulatory jurisdiction (e.g., 'EU', 'US')
             base_url: API base URL (overrides region and key inference)
             region: "us" or "eu". Defaults to the region encoded in the API
@@ -300,6 +369,9 @@ class ComplyEdge:
         self.api_key = api_key
         self.agent_id = agent_id
         self.jurisdiction = jurisdiction
+        self.user_id = user_id
+        self.user_role = user_role
+        self.session_id = session_id
         self.base_url = resolve_base_url(api_key, base_url, region)
 
         self._client = httpx.Client(
@@ -340,6 +412,9 @@ class ComplyEdge:
         jurisdiction: str | None = None,
         direction: str = "output",
         sandbox: bool = False,
+        user_id: str | None = None,
+        user_role: str | None = None,
+        session_id: str | None = None,
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -347,6 +422,11 @@ class ComplyEdge:
         Args:
             text: Text to check
             agent_id: Agent identifier (uses default if not provided)
+            user_id: Person the agent acts for (uses the client default if not
+                provided). Recorded on the audit entry.
+            user_role: That person's role (uses the client default if not provided).
+            session_id: Conversation, run or job identifier (uses the client
+                default if not provided).
             jurisdiction: Regulatory jurisdiction (uses default if not provided)
             sandbox: Evaluate without recording (POST /v1/sandbox/check). Same
                 verdict, no audit entry, no usage, no rate-limit count. For
@@ -375,6 +455,14 @@ class ComplyEdge:
             "direction": direction,
             "use_semantic_fallback": False,
         }
+        context = _attribution_context(
+            None,
+            user_id=user_id if user_id is not None else self.user_id,
+            user_role=user_role if user_role is not None else self.user_role,
+            session_id=session_id if session_id is not None else self.session_id,
+        )
+        if context:
+            request_data["context"] = context
 
         try:
             response = self._client.post(_check_path(sandbox), json=request_data)
@@ -414,12 +502,12 @@ class ComplyEdge:
             except Exception:
                 error_detail = str(e)
 
-            # 429 and 5xx are transient; 4xx client errors are not and must
-            # not burn the retry budget.
+            # 5xx and short 429s are transient; 4xx client errors and the
+            # daily cap are not and must not burn the retry budget.
             status = e.response.status_code
             raise ComplianceError(
                 f"API error ({status}): {error_detail}",
-                retryable=status == 429 or 500 <= status < 600,
+                retryable=_status_is_retryable(e.response),
             ) from e
 
         except httpx.RequestError as e:
@@ -500,6 +588,9 @@ def is_safe(
     jurisdiction: str | None = None,
     base_url: str | None = None,
     region: Region | None = None,
+    user_id: str | None = None,
+    user_role: str | None = None,
+    session_id: str | None = None,
 ) -> bool:
     """
     Global convenience function to check if text is safe.
@@ -527,6 +618,9 @@ def is_safe(
         jurisdiction=jurisdiction,
         base_url=base_url,
         region=region,
+        user_id=user_id,
+        user_role=user_role,
+        session_id=session_id,
     )
     try:
         return client.is_safe(text)
@@ -542,6 +636,9 @@ def check(
     base_url: str | None = None,
     region: Region | None = None,
     sandbox: bool = False,
+    user_id: str | None = None,
+    user_role: str | None = None,
+    session_id: str | None = None,
 ) -> ComplianceResult:
     """
     Global convenience function to check text compliance.
@@ -574,6 +671,9 @@ def check(
         jurisdiction=jurisdiction,
         base_url=base_url,
         region=region,
+        user_id=user_id,
+        user_role=user_role,
+        session_id=session_id,
     )
     try:
         return client.check(text, sandbox=sandbox)
@@ -692,6 +792,9 @@ class ComplyEdgeClient:
         use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
         sandbox: bool = False,
+        user_id: str | None = None,
+        user_role: str | None = None,
+        session_id: str | None = None,
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -702,6 +805,11 @@ class ComplyEdgeClient:
             jurisdiction: Regulatory jurisdiction (e.g., 'EU', 'US', 'US-CA')
             direction: Whether this is a prompt or output
             context: Additional context for evaluation
+            user_id: Person the agent acts for; recorded on the audit entry.
+                Overrides context["user_id"].
+            user_role: That person's role. Overrides context["user_role"].
+            session_id: Conversation, run or job identifier. Overrides
+                context["session_id"].
             use_semantic_fallback: Enable LLM-based Layer 2 evaluation for ambiguous
                 cases. Defaults to False (OPA fast-path only, ~73ms median). Set True
                 to add 2-5s LLM deepening on cases OPA passes.
@@ -727,6 +835,9 @@ class ComplyEdgeClient:
                 else str(direction),
                 "use_semantic_fallback": use_semantic_fallback,
             }
+            context = _attribution_context(
+                context, user_id=user_id, user_role=user_role, session_id=session_id
+            )
             if context:
                 request_data["context"] = context
 
@@ -777,12 +888,12 @@ class ComplyEdgeClient:
             except Exception:
                 pass
 
-            # 429 and 5xx are transient and worth a retry; 4xx client errors
-            # are not and must not burn the retry budget.
+            # 5xx and short 429s are transient; 4xx client errors and the
+            # daily cap are not and must not burn the retry budget.
             status = e.response.status_code
             raise ComplianceError(
                 f"API error ({status}): {error_detail}",
-                retryable=status == 429 or 500 <= status < 600,
+                retryable=_status_is_retryable(e.response),
             ) from e
 
         except httpx.RequestError as e:
@@ -885,6 +996,9 @@ class AsyncComplyEdgeClient:
         use_semantic_fallback: bool = False,
         raise_on_violation: bool = False,
         sandbox: bool = False,
+        user_id: str | None = None,
+        user_role: str | None = None,
+        session_id: str | None = None,
     ) -> ComplianceResult:
         """Async version of check_compliance."""
         try:
@@ -897,6 +1011,9 @@ class AsyncComplyEdgeClient:
                 else str(direction),
                 "use_semantic_fallback": use_semantic_fallback,
             }
+            context = _attribution_context(
+                context, user_id=user_id, user_role=user_role, session_id=session_id
+            )
             if context:
                 request_data["context"] = context
 
@@ -947,12 +1064,12 @@ class AsyncComplyEdgeClient:
             except Exception:
                 pass
 
-            # 429 and 5xx are transient and worth a retry; 4xx client errors
-            # are not and must not burn the retry budget.
+            # 5xx and short 429s are transient; 4xx client errors and the
+            # daily cap are not and must not burn the retry budget.
             status = e.response.status_code
             raise ComplianceError(
                 f"API error ({status}): {error_detail}",
-                retryable=status == 429 or 500 <= status < 600,
+                retryable=_status_is_retryable(e.response),
             ) from e
 
         except httpx.RequestError as e:

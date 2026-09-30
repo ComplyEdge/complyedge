@@ -22,7 +22,7 @@ export {
   regionFromApiKey,
   resolveBaseUrl,
 } from "./client";
-export type { Region } from "./client";
+export type { Region, AttributionFields } from "./client";
 export { withCompliance, ComplianceError } from "./openai-middleware";
 export type {
   ComplyEdgeConfig,

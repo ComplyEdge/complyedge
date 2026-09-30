@@ -47,6 +47,18 @@ BENCHMARK_RESULTS_DIR = REPO_ROOT / "scripts" / "benchmark" / "results"
 
 DEFAULT_API_BASE_URL = "https://eu.api.complyedge.io"
 
+#: Default live identity: the shared test tenant (support@complyedge.io, EU),
+#: written by scripts/customer/ensure_test_tenant.py. Live checks record audit
+#: rows, and before 2026-09-29 they landed on whatever tenant a stray key named.
+TEST_TENANT_KEY_FILE = Path.home() / ".complyedge" / "test-tenant" / "support_at_complyedge.io.eu-central-1.key"
+
+
+def _test_tenant_key() -> str:
+    try:
+        return TEST_TENANT_KEY_FILE.read_text().strip()
+    except OSError:
+        return ""
+
 
 #: Key prefixes that are only valid against a local or dev deployment. A key
 #: like this must never be used to assert PRODUCTION behaviour.
@@ -69,9 +81,13 @@ def api_key(api_base_url: str) -> str:
     is a misconfiguration, and it skips with a message saying which of the two
     to change.
     """
-    key = os.getenv("COMPLYEDGE_API_KEY", "")
+    key = os.getenv("COMPLYEDGE_API_KEY", "") or _test_tenant_key()
     if not key:
-        pytest.skip("COMPLYEDGE_API_KEY not set — live tests skipped")
+        pytest.skip(
+            "No key: set COMPLYEDGE_API_KEY, or run "
+            "scripts/customer/ensure_test_tenant.py --apply to create the shared "
+            f"test tenant key at {TEST_TENANT_KEY_FILE}. Live tests skipped."
+        )
 
     is_production_target = "complyedge.io" in api_base_url  # either region
     is_non_production_key = key.lower().startswith(NON_PRODUCTION_KEY_PREFIXES)

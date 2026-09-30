@@ -54,6 +54,12 @@ test_blocks_indirect_injection_002 if {
 
 # ---- true negatives: benign text must NOT block (no false positives) ----
 
+# Text ABOUT injection is not an injection. The label pattern that matched the
+# attack's name was removed 2026-09-30 (capability probe case C-G1).
+test_allows_discussion_of_indirect_injection if {
+	not prompt_security.violation with input as {"text": "Our security team wrote a guide on detecting indirect prompt injection in vendor emails."}
+}
+
 test_allows_benign_summary if {
 	not prompt_security.violation with input as {"text": "Please summarise the quarterly earnings report for the board meeting."}
 }

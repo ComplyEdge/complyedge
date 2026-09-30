@@ -46,7 +46,7 @@ export function resolveSandboxBaseUrl(apiKey: string, override?: string): string
   if (override) return override.replace(/\/+$/, "");
   const fromEnv = (process.env.COMPLYEDGE_API_URL || "").trim();
   if (fromEnv) return fromEnv.replace(/\/+$/, "");
-  // A new account is EU (ce_eu_). A US account, after support moves it, uses ce_.
+  // An EU account's key is ce_eu_; a US account's key is ce_ (region picked at sign-up).
   // Unknown prefix goes to EU. COMPLYEDGE_API_URL picks a host and does not move the account.
   return apiKey.startsWith("ce_") && !apiKey.startsWith("ce_eu_")
     ? REGION_BASE_URLS.us

@@ -2,6 +2,12 @@
 #
 # Benchmark: PS_INDIRECT_INJECTION_002
 # Also covers the classic "ignore previous instructions" shape.
+#
+# Changed 2026-09-30 (agent): removed the bare label pattern
+# "indirect prompt injection". It matched the NAME of the attack, so text about
+# injection ("a guide on detecting indirect prompt injection in vendor emails")
+# was blocked as an injection. The benchmark prompt still blocks on the
+# override pattern below. Pending Leo re-sign-off per RULE_STANDARD §5.
 
 package complyedge.prompt_security.indirect_injection
 
@@ -15,7 +21,6 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"indirect\\s+prompt\\s+injection",
 		"(ignore|disregard|forget|override|bypass)\\s+(the\\s+|all\\s+|any\\s+|your\\s+|previous\\s+|prior\\s+|above\\s+)+(instructions?|prompts?|directives?|rules?|constraints?|guidelines?|system\\s+prompt)",
 		"unrestricted\\s+assistant\\s+with\\s+no\\s+guidelines",
 		"act\\s+as\\s+an\\s+unrestricted\\s+assistant",

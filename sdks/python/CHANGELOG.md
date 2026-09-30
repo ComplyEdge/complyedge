@@ -14,6 +14,17 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.20] - 2026-09-29
+
+### Added
+- `user_id`, `user_role` and `session_id` on `ComplyEdge` (client defaults and per `check()` call), on the module-level `check()` / `is_safe()`, on `ComplyEdgeClient.check_compliance()` and the async client; `attribution=` on `@compliance_check` / `ComplianceConfig` (a dict, or a function read on every call) and on `create_compliance_guardrail()` (a dict, or a function given the run context). They are recorded on the audit entry; before, the simple client and the decorator could not send them, so those export columns were always blank.
+
+### Fixed
+- A 429 is retried only when the server's wait fits the retry budget. The daily check cap (`rate_limit_exceeded`, resets 00:00 UTC) and the 60-second sandbox limit now raise `ComplianceError` on the first attempt instead of retrying three times over about 14 seconds. Short 429s and 5xx errors still retry.
+
+### Changed
+- Docs only. The region (EU or US) is chosen when you create your API key; to change it later, contact support. This corrects the 0.2.19 note that a US host is only for an account support has moved: US accounts can be created at sign-up.
+
 ## [0.2.19] - 2026-09-26
 
 ### Changed

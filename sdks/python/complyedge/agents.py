@@ -27,13 +27,13 @@ Usage:
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any
 
 from . import ComplyEdge
 
 # No default host here: ComplyEdge() resolves it (base_url > COMPLYEDGE_API_URL
-# > region > API-key prefix > US). Pinning a host at import time would send a
+# > region > API-key prefix > EU). Pinning a host at import time would send a
 # ce_eu_ key to the US stack.
 _DEFAULT_BASE_URL: str | None = None
 
@@ -86,6 +86,7 @@ def create_compliance_guardrail(
     rule_type: str | None = None,
     jurisdiction: str | None = None,
     agent_id: str = "default",
+    attribution: Mapping[str, Any] | Callable[[Any], Mapping[str, Any] | None] | None = None,
     **_unused: Any,
 ) -> Callable:
     """
@@ -108,6 +109,12 @@ def create_compliance_guardrail(
         agent_id: Filed on every audit row so the dashboard can attribute
             checks to the agent that made them. Previously discarded, which
             recorded every guardrail check as agent "default".
+        attribution: Who each check acts for, recorded on the audit entry as
+            user_id / user_role / session_id. A dict for a fixed identity, or
+            a function called on every check with the guardrail's run context
+            (``ctx``, None when called directly), e.g.
+            ``lambda ctx: {"user_id": ctx.context.user_id, "session_id": ctx.context.run_id}``.
+            Without it those audit columns are blank.
 
     Returns:
         A guardrail compatible with OpenAI Agents and other frameworks
@@ -146,7 +153,17 @@ def create_compliance_guardrail(
             text_to_check = input_data
 
         try:
-            result = ce.check(text_to_check, direction=check_direction)
+            if callable(attribution):
+                attr = attribution(ctx) or {}
+            else:
+                attr = attribution or {}
+            result = ce.check(
+                text_to_check,
+                direction=check_direction,
+                user_id=attr.get("user_id"),
+                user_role=attr.get("user_role"),
+                session_id=attr.get("session_id"),
+            )
 
             output_info = {
                 "rules": rules_list,
