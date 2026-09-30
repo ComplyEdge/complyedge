@@ -47,15 +47,17 @@ BENCHMARK_RESULTS_DIR = REPO_ROOT / "scripts" / "benchmark" / "results"
 
 DEFAULT_API_BASE_URL = "https://eu.api.complyedge.io"
 
-#: Default live identity: the shared test tenant (support@complyedge.io, EU),
-#: written by scripts/customer/ensure_test_tenant.py. Live checks record audit
-#: rows, and before 2026-09-29 they landed on whatever tenant a stray key named.
-TEST_TENANT_KEY_FILE = Path.home() / ".complyedge" / "test-tenant" / "support_at_complyedge.io.eu-central-1.key"
+#: Fallback live identity when COMPLYEDGE_API_KEY is unset: a dedicated test
+#: tenant's key in ~/.complyedge/test-tenant/*.key (one file, mode 0600). Live
+#: checks record audit rows, so they belong on a tenant kept for testing, never
+#: on whatever tenant a stray key names.
+TEST_TENANT_KEY_DIR = Path.home() / ".complyedge" / "test-tenant"
 
 
 def _test_tenant_key() -> str:
     try:
-        return TEST_TENANT_KEY_FILE.read_text().strip()
+        files = sorted(TEST_TENANT_KEY_DIR.glob("*.key"))
+        return files[0].read_text().strip() if files else ""
     except OSError:
         return ""
 
@@ -84,9 +86,8 @@ def api_key(api_base_url: str) -> str:
     key = os.getenv("COMPLYEDGE_API_KEY", "") or _test_tenant_key()
     if not key:
         pytest.skip(
-            "No key: set COMPLYEDGE_API_KEY, or run "
-            "scripts/customer/ensure_test_tenant.py --apply to create the shared "
-            f"test tenant key at {TEST_TENANT_KEY_FILE}. Live tests skipped."
+            "No key: set COMPLYEDGE_API_KEY to a test tenant's key, or put that "
+            f"key in {TEST_TENANT_KEY_DIR}/<name>.key. Live tests skipped."
         )
 
     is_production_target = "complyedge.io" in api_base_url  # either region
