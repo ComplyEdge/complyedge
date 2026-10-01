@@ -14,6 +14,11 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.21] - 2026-10-01
+
+### Fixed
+- `bundle_version` on a check result is `"unknown"` when the API response omits it. It used to fall back to `"opa-rego-v1"`, a value the API no longer reports; the API now derives `bundle_version` from the rule-corpus digest.
+
 ## [0.2.20] - 2026-09-29
 
 ### Added

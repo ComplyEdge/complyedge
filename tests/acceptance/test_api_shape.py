@@ -9,11 +9,14 @@ Claims verified:
   - Social-scoring prompt → allowed=False, rule_id="rego-art5-1c-001"
   - severity="critical", confidence=1.0
   - rule_description starts with "Regulation (EU) 2024/1689, Article 5(1)(c)"
-  - bundle_version="opa-rego-v1", engine_path="opa"
+  - bundle_version="sha256:<first 12 hex of bundle_digest>", engine_path="opa"
+  - bundle_digest is a 64-hex SHA-256 of the rule corpus
   - audit_logged=True
   - Safe prompt → allowed=True, violations=[]
 """
 from __future__ import annotations
+
+import re
 
 import pytest
 
@@ -79,8 +82,12 @@ class TestTopLevelFields:
         assert isinstance(violation_response["violations"], list)
 
     def test_has_bundle_version(self, violation_response):
-        # Claim: "bundle_version": "opa-rego-v1"
-        assert violation_response.get("bundle_version") == "opa-rego-v1"
+        # Claim: "bundle_version": "sha256:<12 hex>", the prefix of "bundle_digest".
+        # The label changes whenever the rules change, so the test checks its
+        # shape and its tie to the digest, never a literal value.
+        digest = violation_response.get("bundle_digest")
+        assert isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest)
+        assert violation_response.get("bundle_version") == f"sha256:{digest[:12]}"
 
     def test_has_engine_path_opa(self, violation_response):
         # Claim: "engine_path": "opa"

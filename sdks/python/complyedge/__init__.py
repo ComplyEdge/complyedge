@@ -58,7 +58,7 @@ from tenacity import (
     wait_exponential,
 )
 
-__version__ = "0.2.20"
+__version__ = "0.2.21"
 
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
@@ -486,7 +486,7 @@ class ComplyEdge:
                 allowed=_allowed_from_payload(data),
                 violations=violations,
                 latency_ms=data.get("latency_ms", 0),
-                bundle_version=data.get("bundle_version", "opa-rego-v1"),
+                bundle_version=data.get("bundle_version", "unknown"),
                 evaluated_rules=data.get("evaluated_rules", []),
                 text_hash=data.get("text_hash", ""),
                 timestamp=data.get("timestamp"),
@@ -862,7 +862,7 @@ class ComplyEdgeClient:
                 allowed=_allowed_from_payload(data),
                 violations=violations,
                 latency_ms=data.get("latency_ms", 0),
-                bundle_version=data.get("bundle_version", "opa-rego-v1"),
+                bundle_version=data.get("bundle_version", "unknown"),
                 evaluated_rules=data.get("evaluated_rules", []),
                 text_hash=data.get("text_hash", ""),
                 timestamp=data.get("timestamp"),
@@ -1038,7 +1038,7 @@ class AsyncComplyEdgeClient:
                 allowed=_allowed_from_payload(data),
                 violations=violations,
                 latency_ms=data.get("latency_ms", 0),
-                bundle_version=data.get("bundle_version", "opa-rego-v1"),
+                bundle_version=data.get("bundle_version", "unknown"),
                 evaluated_rules=data.get("evaluated_rules", []),
                 text_hash=data.get("text_hash", ""),
                 timestamp=data.get("timestamp"),

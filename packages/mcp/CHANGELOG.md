@@ -11,6 +11,14 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-10-01
+
+### Changed
+- Depends on `trustlint` ^2.1.2, so the bundled corpus is 63 rules (Colorado AI Act SB205 removed; it was not the enacted text). The package description now says 63.
+
+### Docs
+- Region: a `ce_eu_` key belongs to an EU account and a `ce_` key to a US account; the region is chosen at sign-up. `COMPLYEDGE_API_URL` picks a host and does not move the account.
+
 ## [0.2.1] - 2026-09-25
 
 ### Changed

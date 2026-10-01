@@ -48,15 +48,21 @@ BENCHMARK_RESULTS_DIR = REPO_ROOT / "scripts" / "benchmark" / "results"
 DEFAULT_API_BASE_URL = "https://eu.api.complyedge.io"
 
 #: Fallback live identity when COMPLYEDGE_API_KEY is unset: a dedicated test
-#: tenant's key in ~/.complyedge/test-tenant/*.key (one file, mode 0600). Live
-#: checks record audit rows, so they belong on a tenant kept for testing, never
-#: on whatever tenant a stray key names.
+#: tenant's key for the TARGET region, ~/.complyedge/test-tenant/
+#: <name>.<region>.key (mode 0600). Live checks record audit rows, so they
+#: belong on a tenant kept for testing, never on whatever tenant a stray key
+#: names. A key only authenticates on its home region, so the file is picked
+#: by the region of the API base URL.
 TEST_TENANT_KEY_DIR = Path.home() / ".complyedge" / "test-tenant"
 
 
-def _test_tenant_key() -> str:
+def _target_region(api_base_url: str) -> str:
+    return "eu-central-1" if "eu.api." in api_base_url else "us-west-2"
+
+
+def _test_tenant_key(api_base_url: str = DEFAULT_API_BASE_URL) -> str:
     try:
-        files = sorted(TEST_TENANT_KEY_DIR.glob("*.key"))
+        files = sorted(TEST_TENANT_KEY_DIR.glob(f"*.{_target_region(api_base_url)}.key"))
         return files[0].read_text().strip() if files else ""
     except OSError:
         return ""
@@ -83,7 +89,7 @@ def api_key(api_base_url: str) -> str:
     is a misconfiguration, and it skips with a message saying which of the two
     to change.
     """
-    key = os.getenv("COMPLYEDGE_API_KEY", "") or _test_tenant_key()
+    key = os.getenv("COMPLYEDGE_API_KEY", "") or _test_tenant_key(api_base_url)
     if not key:
         pytest.skip(
             "No key: set COMPLYEDGE_API_KEY to a test tenant's key, or put that "
