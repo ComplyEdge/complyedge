@@ -25,10 +25,10 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:credit\\s+scor|creditworthiness|loan\\s+approv|loan\\s+decision)",
-		"ai.*(?:insurance\\s+pricing|insurance\\s+risk\\s+assess|underwrit)",
-		"ai.*(?:welfare|social\\s+benefit|benefits?\\s+eligibility)",
-		"ai.*(?:emergency\\s+(?:response|dispatch|services?)\\s+(?:routing|triage))",
+		"\\bai\\b.*(?:credit\\s+scor|creditworthiness|loan\\s+approv|loan\\s+decision)",
+		"\\bai\\b.*(?:insurance\\s+pricing|insurance\\s+risk\\s+assess|underwrit)",
+		"\\bai\\b.*(?:welfare|social\\s+benefit|benefits?\\s+eligibility)",
+		"\\bai\\b.*(?:emergency\\s+(?:response|dispatch|services?)\\s+(?:routing|triage))",
 		"automated\\s+(?:credit|loan|insurance)\\s+(?:decision|approv|underwrit)",
 	]
 

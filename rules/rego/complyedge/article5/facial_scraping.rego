@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 5(1)(e): Facial Scraping
 #
+# Building or expanding a facial recognition database by untargeted scraping
+# of facial images from the internet or CCTV footage. Prohibited.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 5(1)(e)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

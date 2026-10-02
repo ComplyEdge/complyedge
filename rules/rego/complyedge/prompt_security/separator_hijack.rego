@@ -1,5 +1,9 @@
 # ComplyEdge — Prompt-injection / IPI: Indirect injection — separator/context hijack
 #
+# Fake separators, system markers or role tags inside a text ("<system>", "###
+# new instructions") that try to start a new context and take over the AI's
+# instructions.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

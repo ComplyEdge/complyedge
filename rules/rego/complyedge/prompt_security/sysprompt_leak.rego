@@ -1,5 +1,8 @@
 # ComplyEdge — Prompt-injection / IPI: Exfiltration — system-prompt leak
 #
+# Text that tries to make an AI reveal its system prompt, hidden instructions
+# or configuration.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

@@ -1,5 +1,9 @@
 # ComplyEdge — Article 15 robustness: labeled indirect injection / instruction override (IPI)
 #
+# Fake separators, system markers or role tags inside a text ("<system>", "###
+# new instructions") that try to start a new context and take over the AI's
+# instructions.
+#
 # Benchmark: PS_INDIRECT_INJECTION_002
 # Also covers the classic "ignore previous instructions" shape.
 #

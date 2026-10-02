@@ -33,7 +33,7 @@ model_classification_pattern_match if {
 	patterns := [
 		"gpai.*(?:no|without|lack).*classif",
 		"general[\\- ]?purpose.*model.*(?:no|without).*classif",
-		"(?:unclassified|unregistered).*(?:gpai|general[\\- ]?purpose.*ai)",
+		"(?:unclassified|unregistered).*(?:gpai|general[\\- ]?purpose.*\\bai)",
 		"deploy.*(?:gpai|foundation[\\- ]?model).*(?:no|without).*(?:classif|categori)",
 		"(?:skip|bypass|omit).*model.*classif",
 	]

@@ -1,5 +1,9 @@
 # ComplyEdge — EU AI Act Article 15(5): Cybersecurity
 #
+# A high-risk AI system left without cybersecurity protection against attacks
+# such as data poisoning, model evasion or adversarial inputs, or an
+# instruction to skip that protection.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 15(5)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

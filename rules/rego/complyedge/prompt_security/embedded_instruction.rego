@@ -1,5 +1,8 @@
 # ComplyEdge — Article 15 robustness: embedded indirect instruction (IPI)
 #
+# An instruction hidden in content an AI processes (a document, email, page or
+# tool result) that tells it to ignore its user and do something else.
+#
 # Benchmark: PS_INDIRECT_EMBEDDED_001
 
 package complyedge.prompt_security.embedded_instruction

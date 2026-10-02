@@ -36,9 +36,9 @@ deepfake_disclosure_pattern_match if {
 		# Catches prompts that use "match/replicate voice and likeness" without disclosing AI origin
 		"(?:creat|match|replicate).*(?:voice|likeness).*without.*disclos",
 		# Catches "publish without disclosing that the appearance is AI-generated"
-		"publish.*without.*disclos.*ai[\\-]?generat",
+		"publish.*without.*disclos.*\\bai[\\-]?generat",
 		# Catches "AI-generated appearance" disclosed after the fact
-		"appearance.*ai[\\-]?generat.*without.*disclos",
+		"appearance.*\\bai[\\-]?generat.*without.*disclos",
 	]
 
 	text := lower(input.text)

@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 13: Transparency
 #
+# Supplying a high-risk AI system to deployers without the instructions for
+# use and transparency information Article 13 requires.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 13
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

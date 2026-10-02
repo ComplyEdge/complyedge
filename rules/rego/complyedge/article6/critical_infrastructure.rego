@@ -25,11 +25,11 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:power\\s+grid|electricity|water\\s+supply|gas\\s+distribution|traffic\\s+management|transport\\s+infrastructure)",
-		"(?:power\\s+grid|water\\s+supply|gas|traffic|transport)\\s+(?:management|control|optimization)\\s+(?:ai|ml|model)",
-		"critical\\s+infrastructure\\s+(?:ai|ml|system)",
-		"smart\\s+grid\\s+(?:ai|control|optimization)",
-		"traffic\\s+control\\s+(?:ai|automation)",
+		"\\bai\\b.*(?:power\\s+grid|electricity|water\\s+supply|gas\\s+distribution|traffic\\s+management|transport\\s+infrastructure)",
+		"(?:power\\s+grid|water\\s+supply|gas|traffic|transport)\\s+(?:management|control|optimization)\\s+(?:\\bai|ml|model)",
+		"critical\\s+infrastructure\\s+(?:\\bai|ml|system)",
+		"smart\\s+grid\\s+(?:\\bai|control|optimization)",
+		"traffic\\s+control\\s+(?:\\bai|automation)",
 	]
 
 	text := lower(input.text)

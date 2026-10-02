@@ -258,3 +258,33 @@ test_aggregator_rules_evaluated_lists_all_eleven if {
 		"text": "harmless text",
 	}
 }
+
+# "ai" was matched as a substring, so "maintenance", "explain", "said" and
+# "training" opened an Annex III match. It must be the word AI.
+test_essential_services_allows_ai_inside_other_words if {
+	not essential_services.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Fixed: maintenance banner overlapped the credit score widget in the demo dashboard",
+	}
+}
+
+test_law_enforcement_allows_ai_inside_other_words if {
+	not law_enforcement.violation with input as {
+		"jurisdiction": "EU",
+		"text": "The detective said the polygraph result was inadmissible in the old trial",
+	}
+}
+
+test_essential_services_still_blocks_ai_credit_scoring if {
+	essential_services.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Use AI for credit scoring of every loan applicant",
+	}
+}
+
+test_essential_services_still_blocks_ai_hyphenated if {
+	essential_services.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Our AI-powered engine handles welfare eligibility for applicants",
+	}
+}

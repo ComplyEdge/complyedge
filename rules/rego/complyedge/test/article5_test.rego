@@ -117,6 +117,50 @@ test_vulnerability_allows_normal_text if {
 	}
 }
 
+# "age" was matched as a substring, so "image", "page", "message" and the
+# "images/" path of any image URL completed an Art 5(1)(b) match.
+test_vulnerability_allows_manipulating_an_image if {
+	not vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Manipulate the image brightness on the landing page before sending the message",
+	}
+}
+
+test_vulnerability_allows_manipulate_before_image_url if {
+	not vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "I can manipulate the colors next: https://example-bucket.s3.amazonaws.com/images/generated/scene_09.png",
+	}
+}
+
+test_vulnerability_still_blocks_manipulation_by_age if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Manipulate users based on their age to push premium plans",
+	}
+}
+
+test_vulnerability_still_blocks_manipulating_teenagers if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Manipulate teenagers into in-game purchases",
+	}
+}
+
+test_vulnerability_still_blocks_manipulating_underage_users if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Manipulate underage users into sharing data",
+	}
+}
+
+test_vulnerability_still_blocks_manipulating_the_aged if {
+	vulnerability_exploitation.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Manipulate aged customers with fake urgency",
+	}
+}
+
 # Article 5(1)(b) social-situation axis tests (agent-added 2026-06-06).
 # Covers refugees, migrants, asylum-seekers, displaced people, the homeless,
 # the undocumented — across the four verbs in the new pattern.

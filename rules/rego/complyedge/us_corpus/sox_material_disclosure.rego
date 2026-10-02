@@ -1,5 +1,10 @@
 # ComplyEdge — SOX material disclosure / forward-looking earnings
 #
+# Disclosing material non-public information about a US issuer: forward-
+# looking earnings or revenue guidance, an undisclosed merger or acquisition,
+# or other insider information, shared selectively or outside the company's
+# formal disclosure (SOX 302, Regulation FD).
+#
 # Deterministic OPA/Rego leaf so SOX blocks on the /v1/check hot path.
 # TrustLint YAML (sox_material_disclosure.yaml) still serves
 # /v1/sensitivity/detect. These patterns cover the smoke strings:

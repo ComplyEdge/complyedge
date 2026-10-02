@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 50(3): Emotion Notification
 #
+# Deploying an emotion recognition or biometric categorisation system without
+# informing the people exposed to it.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 50(3)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

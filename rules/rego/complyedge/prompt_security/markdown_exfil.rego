@@ -1,5 +1,9 @@
 # ComplyEdge — Prompt-injection / IPI: Exfiltration — markdown-image channel
 #
+# Text that makes an AI emit a markdown image or link whose URL carries data
+# (a token, key or conversation content) to an outside server when the reply
+# renders.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

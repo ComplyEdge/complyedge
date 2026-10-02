@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 9: Risk Management
 #
+# Placing or running a high-risk AI system with no risk management system
+# across its lifecycle, or an instruction to skip or bypass risk management.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 9
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

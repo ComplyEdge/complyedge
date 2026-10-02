@@ -1,5 +1,9 @@
 # ComplyEdge — EU AI Act Article 16: Provider Obligations
 #
+# Placing a high-risk AI system on the EU market or putting it into service
+# without CE marking, conformity assessment, an EU declaration of conformity
+# or registration.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 16
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

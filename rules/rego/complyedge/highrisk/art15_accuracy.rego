@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 15(1): Accuracy
 #
+# Releasing or running a high-risk AI system without testing or declaring its
+# accuracy, or an instruction to skip accuracy validation.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 15(1)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

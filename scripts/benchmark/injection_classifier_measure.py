@@ -126,10 +126,15 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
     ap.add_argument("--concurrency", type=int, default=4)
+    ap.add_argument("--max-usd", type=float, default=5.0, help="hard cap on this run's model spend")
     ap.add_argument("--only", choices=["cases", "gap", "prompt_security", "safe_harbor", "long"], help="measure one set")
     args = ap.parse_args()
     structlog.configure(processors=[_capture_usage])
-    report = asyncio.run(_run(args.model, args.concurrency, args.only))
+    import llm_budget
+
+    # llm_utils refuses calls with no bound budget; this run gets its own cap.
+    with llm_budget.bound(llm_budget.run_budget(OUT.stem, args.max_usd)):
+        report = asyncio.run(_run(args.model, args.concurrency, args.only))
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
     for r in report["rows"]:

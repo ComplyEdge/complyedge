@@ -25,12 +25,12 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:recruitment|hiring|cv\\s+screening|resume\\s+screening|candidate\\s+screening)",
-		"ai.*(?:performance\\s+evaluation|employee\\s+monitoring|promotion\\s+decision)",
-		"ai.*(?:termination|firing|task\\s+allocation|worker\\s+monitoring)",
-		"hiring\\s+ai|ai\\s+hir(?:ing|e)",
-		"applicant\\s+(?:scoring|ranking|filter)\\s+(?:ai|ml|system)",
-		"workforce\\s+(?:analytics|optimization)\\s+(?:ai|ml)",
+		"\\bai\\b.*(?:recruitment|hiring|cv\\s+screening|resume\\s+screening|candidate\\s+screening)",
+		"\\bai\\b.*(?:performance\\s+evaluation|employee\\s+monitoring|promotion\\s+decision)",
+		"\\bai\\b.*(?:termination|firing|task\\s+allocation|worker\\s+monitoring)",
+		"hiring\\s+ai|\\bai\\s+hir(?:ing|e)",
+		"applicant\\s+(?:scoring|ranking|filter)\\s+(?:\\bai|ml|system)",
+		"workforce\\s+(?:analytics|optimization)\\s+(?:\\bai|ml)",
 	]
 
 	text := lower(input.text)

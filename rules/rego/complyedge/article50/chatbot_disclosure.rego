@@ -27,11 +27,15 @@ violation if {
 chatbot_disclosure_pattern_match if {
 	patterns := [
 		"chatbot.*(?:no|without|lack).*disclos",
-		"ai[\\- ]?assistant.*(?:no|without).*(?:disclos|inform)",
+		"\\bai[\\- ]?assistant.*(?:no|without).*(?:disclos|inform)",
 		"(?:virtual|conversational)[\\- ]?agent.*(?:no|without).*disclos",
 		"(?:impersonat|pretend).*human.*(?:chat|convers)",
-		"(?:hide|conceal|mask).*(?:ai|bot).*(?:identity|nature)",
-		"chatbot.*(?:pose|posing).*(?:as|human)",
+		# Whole words only. Unbounded, "ai" matched inside an S3 access key
+		# (AKIAI...) and "nature" inside "Signature=", so any agent reply that
+		# said "mask" before a presigned image URL was blocked as Art 50(1).
+		"\\b(?:hide|conceal|mask).*\\b(?:ai|\\w*bots?)\\b.*\\b(?:identity|nature)\\b",
+		# "pose" matched inside "purpose" and "as" inside "has".
+		"chatbot.*\\b(?:pose[sd]?|posing)\\b.*\\b(?:as|human)\\b",
 	]
 
 	text := lower(input.text)

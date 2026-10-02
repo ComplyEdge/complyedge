@@ -1,5 +1,9 @@
 # ComplyEdge — Prompt-injection / IPI: Exfiltration — training-data extraction
 #
+# Text that tries to make a model leak its training data, including the
+# divergence attack: asking it to repeat a word or phrase forever until its
+# output drifts into memorised training text.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

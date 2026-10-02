@@ -1,5 +1,8 @@
 # ComplyEdge — Prompt-injection / IPI: Direct injection — instruction override
 #
+# Text that tells an AI to ignore, forget or override its previous
+# instructions and follow new ones.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

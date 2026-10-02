@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 15(4): Robustness
 #
+# Releasing a high-risk AI system with no robustness testing, redundancy or
+# fail-safe design, or an instruction to remove them.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 15(4)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

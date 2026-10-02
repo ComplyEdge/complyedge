@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 27: Fria
 #
+# A deployer putting a high-risk AI system into use without first carrying out
+# the fundamental rights impact assessment Article 27 requires.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 27
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

@@ -26,12 +26,12 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:predictive\\s+polic|crime\\s+predict|recidivism\\s+predict)",
-		"ai.*(?:suspect\\s+identif|profile\\s+suspect|lie\\s+detect|polygraph)",
-		"ai.*(?:evidence\\s+assess|reliab.*evidence)",
+		"\\bai\\b.*(?:predictive\\s+polic|crime\\s+predict|recidivism\\s+predict)",
+		"\\bai\\b.*(?:suspect\\s+identif|profile\\s+suspect|lie\\s+detect|polygraph)",
+		"\\bai\\b.*(?:evidence\\s+assess|reliab.*evidence)",
 		"law\\s+enforcement\\s+ai",
-		"ai\\s+(?:assist|aid).*(?:investig|prosecut)",
-		"crime\\s+analytics\\s+(?:ai|ml|model)",
+		"\\bai\\s+(?:assist|aid).*(?:investig|prosecut)",
+		"crime\\s+analytics\\s+(?:\\bai|ml|model)",
 	]
 
 	text := lower(input.text)

@@ -30,9 +30,9 @@ pattern_match if {
 		"biometric[\\- ]identification\\s+system",
 		"facial\\s+recognition\\s+system",
 		"deploy.*facial\\s+recognition",
-		"gait\\s+analysis\\s+(?:system|ai)",
-		"voice\\s+identification\\s+(?:system|ai)",
-		"iris\\s+scan(?:ning)?\\s+(?:system|ai)",
+		"gait\\s+analysis\\s+(?:system|\\bai)",
+		"voice\\s+identification\\s+(?:system|\\bai)",
+		"iris\\s+scan(?:ning)?\\s+(?:system|\\bai)",
 		"remote\\s+biometric\\s+identification",
 		"post[\\- ]remote\\s+biometric",
 	]

@@ -1,5 +1,8 @@
 # ComplyEdge — Prompt-injection / IPI: Tool-call hijack / exfiltration
 #
+# Text that tries to make an AI call a tool (http, email, file, payment) to
+# send data out or take an action its user did not ask for.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

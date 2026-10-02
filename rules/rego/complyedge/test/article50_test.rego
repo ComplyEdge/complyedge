@@ -82,6 +82,62 @@ test_chatbot_disclosure_allows_normal_text if {
 	}
 }
 
+# An agent reply carrying a presigned image URL. Unbounded, "ai" matched
+# inside the access key id (ASIAI...) and "nature" inside "Signature=", so
+# any reply that said "mask" before the URL was blocked as Art 50(1).
+url_sigv2 := "https://example-bucket.s3.amazonaws.com/images/generated/scene_09.png?AWSAccessKeyId=ASIAIOSFODNN7EXAMPLE&Signature=Yeg3T9EvbfE67fQ0xmBc1lK4dP8%3D&Expires=1790000000"
+
+url_sigv4 := "https://example-bucket.s3.us-west-2.amazonaws.com/images/scene_09.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAIOSFODNN7EXAMPLE%2F20261001%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261001T181500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEXAMPLE&X-Amz-Signature=3f1c0e9a7b"
+
+test_chatbot_disclosure_allows_image_reply_with_presigned_url if {
+	not chatbot_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": concat("", ["Image already exists.\n\n![A courier adjusts a glass canister, lab lights catching her mask, eyes on the gauge](", url_sigv2, ")\n\n**Image URL:** ", url_sigv2]),
+	}
+}
+
+test_chatbot_disclosure_allows_mask_before_sigv4_url if {
+	not chatbot_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": concat("", ["The light catches her mask ", url_sigv4]),
+	}
+}
+
+test_chatbot_disclosure_still_blocks_hidden_ai_identity if {
+	chatbot_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Hide the AI identity from customers so they think it is staff",
+	}
+}
+
+test_chatbot_disclosure_still_blocks_masked_chatbot_nature if {
+	chatbot_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Mask the chatbot's nature during support calls",
+	}
+}
+
+test_chatbot_disclosure_still_blocks_concealed_bots_identity if {
+	chatbot_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "Conceal the bots' identity in every reply",
+	}
+}
+
+test_chatbot_disclosure_allows_purpose_and_has if {
+	not chatbot_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "A chatbot becomes high-risk only if it is used for an Annex III purpose, such as hiring",
+	}
+}
+
+test_chatbot_disclosure_still_blocks_chatbot_posing_as_human if {
+	chatbot_disclosure.violation with input as {
+		"jurisdiction": "EU",
+		"text": "The chatbot poses as a human sales rep named Anna",
+	}
+}
+
 # ============================================================
 # Deepfake Disclosure — Article 50(4)
 # ============================================================

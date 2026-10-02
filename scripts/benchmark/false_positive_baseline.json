@@ -1,0 +1,1631 @@
+{
+ "note": "Battery items the rules still block. May only shrink: see false_positive_measure.py.",
+ "engine": "opa eval over rules/rego/complyedge (OPAClient packages)",
+ "blocked": {
+  "FPB_A50_CHAT_002|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_A50_CHAT_004|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_A50_CHAT_005|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_A50_CHAT_011|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_A50_CHAT_012|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_A50_CHAT_013|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_A50_CHAT_017|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_A50_DEEP_003|EU": [
+   "rego-art50-4-001"
+  ],
+  "FPB_A50_EMOCTX_002|EU": [
+   "rego-art5-1f-001",
+   "rego-art50-3-002"
+  ],
+  "FPB_A50_EMOCTX_005|EU": [
+   "rego-art5-1f-001",
+   "rego-art50-3-002"
+  ],
+  "FPB_A50_EMOCTX_011|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_EMOCTX_014|EU": [
+   "rego-art5-1f-001",
+   "rego-art50-3-002"
+  ],
+  "FPB_A50_EMO_002|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_EMO_003|EU": [
+   "rego-art5-1f-001",
+   "rego-art5-1g-001"
+  ],
+  "FPB_A50_EMO_005|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_EMO_006|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_EMO_007|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A50_EMO_010|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_EMO_011|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_EMO_012|EU": [
+   "rego-art5-1f-001",
+   "rego-art5-1g-001"
+  ],
+  "FPB_A50_EMO_014|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_EMO_016|EU": [
+   "rego-art5-1f-001",
+   "rego-art5-1g-001"
+  ],
+  "FPB_A50_EMO_017|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A50_GPAI_005|EU": [
+   "rego-art50-2-001"
+  ],
+  "FPB_A50_GPAI_006|EU": [
+   "rego-art50-2-001"
+  ],
+  "FPB_A50_GPAI_007|EU": [
+   "rego-art50-2-001"
+  ],
+  "FPB_A50_GPAI_017|EU": [
+   "rego-art50-2-001"
+  ],
+  "FPB_A50_PIT_013|EU": [
+   "rego-art50-4-002"
+  ],
+  "FPB_A50_WMK_014|EU": [
+   "rego-art50-2-002"
+  ],
+  "FPB_A5_BC_001|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_002|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_003|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_004|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_005|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_006|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_008|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_009|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_010|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_011|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_A5_BC_012|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_001|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_002|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_003|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_004|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_005|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_006|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_007|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_008|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_009|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_010|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_011|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_EM_013|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_A5_FS_001|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_002|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_004|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_005|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_008|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_009|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_012|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_013|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_FS_015|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_A5_PP_001|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_002|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_003|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_004|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_006|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_007|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_008|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_009|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_010|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_011|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_012|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_013|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_014|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_PP_015|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A5_RB_001|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_002|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_003|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_004|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_005|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A5_RB_006|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_007|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_008|EU": [
+   "rego-art5-1h-001",
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A5_RB_009|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_010|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_011|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_RB_013|EU": [
+   "rego-art5-1h-001"
+  ],
+  "FPB_A5_SM_001|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_002|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_003|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_004|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_005|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_006|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_007|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_008|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_010|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_011|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_012|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_013|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SM_014|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_A5_SS_001|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_002|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_003|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_004|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_005|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_006|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_007|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_008|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_009|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_010|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_011|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_012|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_013|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_014|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_SS_015|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_A5_VE_001|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_002|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_003|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_004|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_005|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_006|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_007|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_008|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_009|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_010|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_011|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_012|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_013|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A5_VE_014|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_A6_BIO_002|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_BIO_003|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_BIO_004|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_BIO_005|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_BIO_008|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_BIO_009|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_BIO_010|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_BIO_012|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_A6_CREDIT_005|EU": [
+   "rego-art6-annex3-5-001",
+   "rego-art6-annex3-5b-001"
+  ],
+  "FPB_A6_CREDIT_006|EU": [
+   "rego-art6-annex3-5b-001"
+  ],
+  "FPB_A6_CREDIT_012|EU": [
+   "rego-art6-annex3-5-001",
+   "rego-art6-annex3-5b-001"
+  ],
+  "FPB_A6_DEROG_001|EU": [
+   "rego-art6-3-001"
+  ],
+  "FPB_A6_DEROG_003|EU": [
+   "rego-art6-3-001"
+  ],
+  "FPB_A6_DEROG_004|EU": [
+   "rego-art6-3-001"
+  ],
+  "FPB_A6_DEROG_005|EU": [
+   "rego-art6-3-001"
+  ],
+  "FPB_A6_EDU_006|EU": [
+   "rego-art6-annex3-3-001"
+  ],
+  "FPB_A6_EMP_008|EU": [
+   "rego-art6-annex3-4-001"
+  ],
+  "FPB_A6_INFRA_003|EU": [
+   "rego-art6-annex3-2-001"
+  ],
+  "FPB_A6_INFRA_006|EU": [
+   "rego-art6-annex3-2-001"
+  ],
+  "FPB_A6_INFRA_010|EU": [
+   "rego-art6-annex3-2-001"
+  ],
+  "FPB_A6_INS_003|EU": [
+   "rego-art6-annex3-5c-001"
+  ],
+  "FPB_A6_INS_011|EU": [
+   "rego-art6-annex3-5c-001"
+  ],
+  "FPB_A6_LAW_001|EU": [
+   "rego-art6-annex3-6-001"
+  ],
+  "FPB_A6_LAW_004|EU": [
+   "rego-art6-annex3-6-001"
+  ],
+  "FPB_A6_LAW_005|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_A6_LAW_008|EU": [
+   "rego-art6-annex3-6-001"
+  ],
+  "FPB_A6_LAW_012|EU": [
+   "rego-art6-annex3-6-001"
+  ],
+  "FPB_A6_MIG_009|EU": [
+   "rego-art6-annex3-7-001"
+  ],
+  "FPB_CT_AUDIT_002|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_EXPLAIN_001|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_CT_EXPLAIN_003|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_EXPLAIN_004|EU": [
+   "rego-art5-1f-001",
+   "rego-art50-3-002"
+  ],
+  "FPB_CT_EXPLAIN_005|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_CT_EXPLAIN_006|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_CT_EXPLAIN_007|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_CT_EXPLAIN_009|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_CT_EXPLAIN_010|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_CT_EXPLAIN_011|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_CT_EXPLAIN_013|EU": [
+   "rego-art6-annex3-5-001",
+   "rego-art6-annex3-5b-001"
+  ],
+  "FPB_CT_EXPLAIN_019|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_CT_FAQ_002|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_FAQ_003|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_CT_FAQ_008|EU": [
+   "rego-gpai-53-2-001"
+  ],
+  "FPB_CT_MEMO_002|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_MEMO_004|EU": [
+   "rego-art50-2-001"
+  ],
+  "FPB_CT_MODELCARD_001|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_MODELCARD_002|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_CT_NEGATION_001|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_CT_NEGATION_002|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_CT_NEGATION_003|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_CT_NEGATION_004|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_NEGATION_005|EU": [
+   "rego-art50-1-001"
+  ],
+  "FPB_CT_NEGATION_006|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_CT_NEGATION_008|EU": [
+   "rego-art50-2-001"
+  ],
+  "FPB_CT_NEGATION_009|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_CT_NEWS_001|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_NEWS_008|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_CT_POLICY_002|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_POLICY_004|EU": [
+   "rego-art5-1a-001",
+   "rego-art5-1b-001",
+   "rego-art5-1c-001",
+   "rego-art5-1d-001",
+   "rego-art5-1f-001",
+   "rego-art5-1g-001",
+   "rego-art6-annex3-1-001",
+   "rego-art6-annex3-6-001"
+  ],
+  "FPB_CT_QUIZ_001|EU": [
+   "rego-art5-1c-001"
+  ],
+  "FPB_CT_QUIZ_002|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_QUIZ_004|EU": [
+   "rego-art5-1e-001"
+  ],
+  "FPB_CT_REFUSAL_003|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_REFUSAL_005|EU": [
+   "rego-art5-1d-001"
+  ],
+  "FPB_CT_REFUSAL_006|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_CT_REFUSAL_007|EU": [
+   "rego-art5-1b-001"
+  ],
+  "FPB_CT_REFUSAL_011|EU": [
+   "rego-art5-1a-001"
+  ],
+  "FPB_CT_REFUSAL_012|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_CT_RISK_001|EU": [
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_TRAINING_001|EU": [
+   "rego-art5-1c-001",
+   "rego-art5-1f-001"
+  ],
+  "FPB_CT_TRAINING_006|EU": [
+   "rego-art5-1g-001"
+  ],
+  "FPB_CT_VENDORQ_001|EU": [
+   "rego-art5-1c-001",
+   "rego-art5-1f-001",
+   "rego-art5-1g-001"
+  ],
+  "FPB_CT_VENDORQ_006|EU": [
+   "rego-art6-annex3-1-001"
+  ],
+  "FPB_GPAI_CLS_001|EU": [
+   "rego-gpai-51-001"
+  ],
+  "FPB_GPAI_CLS_003|EU": [
+   "rego-gpai-51-001"
+  ],
+  "FPB_GPAI_CLS_004|EU": [
+   "rego-gpai-51-001"
+  ],
+  "FPB_GPAI_CLS_010|EU": [
+   "rego-gpai-51-001"
+  ],
+  "FPB_GPAI_CPY_005|EU": [
+   "rego-gpai-53c-001"
+  ],
+  "FPB_GPAI_CPY_008|EU": [
+   "rego-gpai-53c-001"
+  ],
+  "FPB_GPAI_CPY_011|EU": [
+   "rego-gpai-53c-001"
+  ],
+  "FPB_GPAI_DWN_001|EU": [
+   "rego-gpai-53b-001"
+  ],
+  "FPB_GPAI_DWN_002|EU": [
+   "rego-gpai-53b-001"
+  ],
+  "FPB_GPAI_DWN_004|EU": [
+   "rego-gpai-53b-001"
+  ],
+  "FPB_GPAI_DWN_005|EU": [
+   "rego-gpai-53b-001"
+  ],
+  "FPB_GPAI_DWN_007|EU": [
+   "rego-gpai-53b-001"
+  ],
+  "FPB_GPAI_DWN_009|EU": [
+   "rego-gpai-53b-001"
+  ],
+  "FPB_GPAI_OSS_006|EU": [
+   "rego-gpai-53-2-001"
+  ],
+  "FPB_GPAI_RSK_002|EU": [
+   "rego-art55-1b-001"
+  ],
+  "FPB_GPAI_RSK_008|EU": [
+   "rego-art55-1b-001"
+  ],
+  "FPB_GPAI_SYS_002|EU": [
+   "rego-gpai-55-001"
+  ],
+  "FPB_GPAI_SYS_003|EU": [
+   "rego-gpai-55-001"
+  ],
+  "FPB_GPAI_SYS_004|EU": [
+   "rego-gpai-55-001"
+  ],
+  "FPB_GPAI_SYS_006|EU": [
+   "rego-gpai-55-001"
+  ],
+  "FPB_GPAI_TDOC_002|EU": [
+   "rego-gpai-53a-001"
+  ],
+  "FPB_GPAI_TDOC_003|EU": [
+   "rego-gpai-53a-001"
+  ],
+  "FPB_GPAI_TDOC_010|EU": [
+   "rego-gpai-53a-001"
+  ],
+  "FPB_GPAI_TSUM_002|EU": [
+   "rego-art53-1d-001",
+   "rego-gpai-53c-001"
+  ],
+  "FPB_HR_ART10_001|EU": [
+   "rego-art10-001"
+  ],
+  "FPB_HR_ART10_002|EU": [
+   "rego-art10-001"
+  ],
+  "FPB_HR_ART10_006|EU": [
+   "rego-art10-001"
+  ],
+  "FPB_HR_ART10_007|EU": [
+   "rego-art10-001"
+  ],
+  "FPB_HR_ART10_011|EU": [
+   "rego-art10-001"
+  ],
+  "FPB_HR_ART11_004|EU": [
+   "rego-gpai-53a-001"
+  ],
+  "FPB_HR_ART13_001|EU": [
+   "rego-art13-001"
+  ],
+  "FPB_HR_ART13_003|EU": [
+   "rego-art13-001"
+  ],
+  "FPB_HR_ART13_004|EU": [
+   "rego-art13-001"
+  ],
+  "FPB_HR_ART13_005|EU": [
+   "rego-art13-001"
+  ],
+  "FPB_HR_ART13_009|EU": [
+   "rego-art13-001"
+  ],
+  "FPB_HR_ART14_001|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_002|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_003|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_004|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_005|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_008|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_009|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_010|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART14_012|EU": [
+   "rego-art14-001"
+  ],
+  "FPB_HR_ART15ACC_002|EU": [
+   "rego-art15-1-001"
+  ],
+  "FPB_HR_ART15ACC_003|EU": [
+   "rego-art15-1-001"
+  ],
+  "FPB_HR_ART15ACC_004|EU": [
+   "rego-art15-1-001"
+  ],
+  "FPB_HR_ART15ACC_005|EU": [
+   "rego-art15-1-001"
+  ],
+  "FPB_HR_ART15ACC_008|EU": [
+   "rego-art15-1-001"
+  ],
+  "FPB_HR_ART15ACC_009|EU": [
+   "rego-art15-1-001"
+  ],
+  "FPB_HR_ART15ACC_011|EU": [
+   "rego-art15-1-001"
+  ],
+  "FPB_HR_ART15CYB_001|EU": [
+   "rego-art15-5-001"
+  ],
+  "FPB_HR_ART15CYB_002|EU": [
+   "rego-art15-5-001"
+  ],
+  "FPB_HR_ART15CYB_003|EU": [
+   "rego-art15-5-001"
+  ],
+  "FPB_HR_ART15CYB_006|EU": [
+   "rego-art15-5-001"
+  ],
+  "FPB_HR_ART15CYB_008|EU": [
+   "rego-art15-5-001"
+  ],
+  "FPB_HR_ART15ROB_004|EU": [
+   "rego-art15-4-001"
+  ],
+  "FPB_HR_ART15ROB_005|EU": [
+   "rego-art15-4-001"
+  ],
+  "FPB_HR_ART15ROB_008|EU": [
+   "rego-art15-4-001"
+  ],
+  "FPB_HR_ART15ROB_012|EU": [
+   "rego-art15-4-001"
+  ],
+  "FPB_HR_ART16_003|EU": [
+   "rego-art16-001"
+  ],
+  "FPB_HR_ART26_004|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_HR_ART26_004|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_HR_ART27_002|EU": [
+   "rego-art27-001"
+  ],
+  "FPB_HR_ART27_005|EU": [
+   "rego-art27-001"
+  ],
+  "FPB_HR_ART27_008|EU": [
+   "rego-art27-001"
+  ],
+  "FPB_HR_ART27_009|EU": [
+   "rego-art27-001"
+  ],
+  "FPB_HR_ART4_003|EU": [
+   "rego-art4-001"
+  ],
+  "FPB_HR_ART4_004|EU": [
+   "rego-art4-001"
+  ],
+  "FPB_HR_ART9_001|EU": [
+   "rego-art9-001"
+  ],
+  "FPB_HR_ART9_003|EU": [
+   "rego-art9-001"
+  ],
+  "FPB_HR_ART9_004|EU": [
+   "rego-art9-001"
+  ],
+  "FPB_HR_ART9_009|EU": [
+   "rego-art9-001"
+  ],
+  "FPB_HR_ART9_011|EU": [
+   "rego-art9-001"
+  ],
+  "FPB_PS_AIAD_001|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_001|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_002|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_002|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_003|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_003|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_004|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_004|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_005|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_005|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_006|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_006|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_007|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_007|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_009|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_009|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_010|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_010|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_011|EU": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_AIAD_011|US": [
+   "rego-art15-ipi-004"
+  ],
+  "FPB_PS_EMBI_001|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_001|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_002|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_002|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_003|EU": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_003|US": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_004|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_004|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_005|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_005|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_006|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_006|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_008|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_008|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_009|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_009|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_011|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_EMBI_011|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_001|EU": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_001|US": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_002|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_002|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_003|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_003|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_004|EU": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_004|US": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_006|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_006|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_007|EU": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_007|US": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_008|EU": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_008|US": [
+   "rego-art15-ipi-003",
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_009|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_009|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_011|EU": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IEMB_011|US": [
+   "rego-art15-ipi-003"
+  ],
+  "FPB_PS_IINJ_001|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_001|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_002|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_002|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_003|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_003|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_004|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_004|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_005|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_005|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_007|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_007|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_008|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_008|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_009|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_009|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_011|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_IINJ_011|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_MDEX_001|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_001|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_002|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_002|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_003|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_003|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_004|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_004|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_005|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_005|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_007|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_007|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_008|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_008|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_009|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_009|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_010|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_010|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_011|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_011|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_012|EU": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_MDEX_012|US": [
+   "rego-art15-ipi-007"
+  ],
+  "FPB_PS_OVRD_001|EU": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_001|US": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_002|EU": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_002|US": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_003|EU": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_003|US": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_004|EU": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_004|US": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_005|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_005|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_006|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_006|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_008|EU": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_008|US": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_009|EU": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_009|US": [
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_010|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_010|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_012|EU": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_OVRD_012|US": [
+   "rego-art15-ipi-008",
+   "rego-art15-ipi-009"
+  ],
+  "FPB_PS_ROLE_001|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_001|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_002|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_002|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_003|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_003|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_004|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_004|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_005|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_005|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_008|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_008|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_009|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_009|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_011|EU": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_ROLE_011|US": [
+   "rego-art15-ipi-001"
+  ],
+  "FPB_PS_SAFE_001|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_001|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_002|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_002|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_003|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_003|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_005|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_005|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_006|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_006|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_007|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_007|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_008|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_008|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_009|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_009|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_010|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_010|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_011|EU": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SAFE_011|US": [
+   "rego-art15-ipi-002"
+  ],
+  "FPB_PS_SEPH_001|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_001|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_002|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_002|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_003|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_003|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_004|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_004|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_005|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_005|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_006|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_006|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_008|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_008|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_010|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_010|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_012|EU": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SEPH_012|US": [
+   "rego-art15-ipi-008"
+  ],
+  "FPB_PS_SOX_003|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_007|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_008|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_009|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_012|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_013|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_014|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_021|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_022|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SOX_024|US": [
+   "rego-sox-302-001"
+  ],
+  "FPB_PS_SYSP_001|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_001|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_002|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_002|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_003|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_003|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_004|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_004|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_005|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_005|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_006|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_006|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_007|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_007|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_008|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_008|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_010|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_010|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_011|EU": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_SYSP_011|US": [
+   "rego-art15-ipi-005"
+  ],
+  "FPB_PS_TOOL_001|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_001|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_002|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_002|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_003|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_003|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_004|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_004|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_005|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_005|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_006|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_006|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_007|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_007|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_008|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_008|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_010|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_010|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_011|EU": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TOOL_011|US": [
+   "rego-art15-ipi-010"
+  ],
+  "FPB_PS_TRNX_001|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_001|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_002|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_002|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_003|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_003|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_004|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_004|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_005|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_005|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_006|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_006|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_007|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_007|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_009|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_009|US": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_010|EU": [
+   "rego-art15-ipi-006"
+  ],
+  "FPB_PS_TRNX_010|US": [
+   "rego-art15-ipi-006"
+  ]
+ },
+ "must_block_gaps": [
+  "A50_CHATBOT_001",
+  "A50_CHATBOT_002",
+  "A50_EMOTION_TRANSPARENCY_001",
+  "A50_SYNTHETIC_MEDIA_001",
+  "A5_BIOMETRIC_CATEGORISATION_001",
+  "A5_EMOTION_WORKPLACE_001",
+  "A5_FACIAL_SCRAPING_001",
+  "A5_PREDICTIVE_POLICING_001",
+  "BIPA_BIOMETRIC_001",
+  "CCPA_OPTOUT_001",
+  "COPPA_CHILD_001",
+  "EDGE_BILINGUAL_HIPAA_001",
+  "EDGE_HYPOTHETICAL_FRAMING_001",
+  "GPAI_DOWNSTREAM_001",
+  "HIPAA_MINIMUM_NECESSARY_001",
+  "HIPAA_PHI_DISCLOSURE_001",
+  "HIPAA_PHI_INPUT_001",
+  "SOX_404_INTERNAL_CONTROL_001",
+  "SOX_802_RECORDS_001",
+  "SOX_MATERIAL_001",
+  "TCPA_SMS_OPTIN_001"
+ ]
+}

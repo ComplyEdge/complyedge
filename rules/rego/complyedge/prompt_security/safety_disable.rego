@@ -1,5 +1,8 @@
 # ComplyEdge — Prompt-injection / IPI: Direct injection — safety-filter disable
 #
+# Text that tries to make an AI disable or ignore its safety filters, content
+# policy or guidelines.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

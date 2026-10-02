@@ -1,5 +1,9 @@
 # ComplyEdge — Prompt-injection / IPI: Direct injection — role hijack / jailbreak
 #
+# Text that tries to make an AI drop its role or rules by assigning it a new
+# persona with no restrictions ("you are now DAN", "pretend you have no
+# rules"), whether a user types it or it sits in content the AI reads.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

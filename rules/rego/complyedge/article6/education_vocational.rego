@@ -25,12 +25,12 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:student\\s+admission|admissions\\s+screening|admit\\s+student)",
-		"ai.*(?:grading|automated\\s+grading|exam\\s+scoring|test\\s+scoring)",
-		"ai.*(?:assess|evaluate)\\s+student",
-		"automated\\s+(?:grading|assessment|admissions?)\\s+(?:system|ai|tool)",
+		"\\bai\\b.*(?:student\\s+admission|admissions\\s+screening|admit\\s+student)",
+		"\\bai\\b.*(?:grading|automated\\s+grading|exam\\s+scoring|test\\s+scoring)",
+		"\\bai\\b.*(?:assess|evaluate)\\s+student",
+		"automated\\s+(?:grading|assessment|admissions?)\\s+(?:system|\\bai|tool)",
 		"educational\\s+ai\\s+(?:assess|grad|admiss)",
-		"vocational\\s+(?:admission|placement)\\s+(?:ai|ml|system)",
+		"vocational\\s+(?:admission|placement)\\s+(?:\\bai|ml|system)",
 	]
 
 	text := lower(input.text)

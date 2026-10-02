@@ -26,8 +26,8 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:life|health)\\s+insurance.*(?:risk\\s+assess|pricing|underwrit)",
-		"(?:automat\\w*|ai[\\- ]?(?:based|driven)).*(?:life|health)\\s+insurance.*(?:premium|pricing|risk)",
+		"\\bai\\b.*(?:life|health)\\s+insurance.*(?:risk\\s+assess|pricing|underwrit)",
+		"(?:automat\\w*|\\bai[\\- ]?(?:based|driven)).*(?:life|health)\\s+insurance.*(?:premium|pricing|risk)",
 		"(?:insurance\\s+risk\\s+assess|insurance\\s+pricing).*natural\\s+person.*(?:life|health)",
 		"(?:life|health)\\s+insurance\\s+(?:underwrit|pricing)\\s+(?:model|system).*without\\s+(?:high[\\- ]?risk|conformity|fria)",
 	]

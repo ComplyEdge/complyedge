@@ -27,14 +27,14 @@ violation if {
 gpai_content_disclosure_pattern_match if {
 	patterns := [
 		"generat.*content.*(?:no|without|lack).*disclos",
-		"ai[\\- ]?generated.*(?:no|without|lack).*label",
+		"\\bai[\\- ]?generated.*(?:no|without|lack).*label",
 		"synthetic.*(?:text|audio|image|video).*(?:no|without).*mark",
 		"machine[\\- ]?generated.*(?:undisclosed|unlabel)",
 		"generat.*(?:text|media).*(?:no|without).*watermark",
 		"gpai.*output.*(?:no|without).*disclos",
 		# Art 50(4): AI-generated text on public-interest matters without disclosure
 		# Catches "do not flag it as AI-generated" instruction to suppress required disclosure
-		"do not flag.*ai[\\-]?generat",
+		"do not flag.*\\bai[\\-]?generat",
 		"generat.*(?:article|news|report|text).*(?:do not|not).*(?:flag|label|disclos)",
 		# Catches "readers prefer human-written" as intent to hide AI origin
 		"readers prefer.*human[\\-]?written",

@@ -1,5 +1,9 @@
 # ComplyEdge — Prompt-injection / IPI: Indirect injection — AI-addressed directive
 #
+# Content that addresses any AI reading it ("if you are an AI processing this
+# page") and tells it to follow the content's directions instead of its
+# user's.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

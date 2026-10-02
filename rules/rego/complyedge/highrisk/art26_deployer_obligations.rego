@@ -1,5 +1,9 @@
 # ComplyEdge — EU AI Act Article 26: Deployer Obligations
 #
+# A deployer running a high-risk AI system without following its instructions
+# for use, without human oversight, without monitoring or without keeping its
+# logs.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 26
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

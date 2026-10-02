@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 4: Ai Literacy
 #
+# Having staff operate or use AI systems with no AI literacy measures, or an
+# instruction to skip AI literacy training.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 4
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic
@@ -21,7 +24,7 @@ violation if {
 pattern_match if {
 	patterns := [
 		"(?:no|without|skip\\w*|neglect\\w*)\\s+ai\\s+literacy\\s+(?:training|program|measure)",
-		"staff\\s+(?:operating|using|deploying)\\s+ai\\s+(?:without|lacking)\\s+(?:ai\\s+)?literacy\\s+(?:training|competence)",
+		"staff\\s+(?:operating|using|deploying)\\s+ai\\s+(?:without|lacking)\\s+(?:\\bai\\s+)?literacy\\s+(?:training|competence)",
 	]
 
 	text := lower(input.text)

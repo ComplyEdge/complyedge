@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 55(1)(c): Incident Reporting
 #
+# A provider of a general-purpose AI model with systemic risk failing to
+# track, document or report serious incidents to the AI Office.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 55(1)(c)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic
@@ -20,7 +23,7 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"(?:no|without|disable\\w*|skip)\\s+(?:serious\\s+incident|incident)\\s+(?:tracking|reporting|report)\\s+(?:for|to)\\s+(?:gpai|ai\\s+office|model)",
+		"(?:no|without|disable\\w*|skip)\\s+(?:serious\\s+incident|incident)\\s+(?:tracking|reporting|report)\\s+(?:for|to)\\s+(?:gpai|\\bai\\s+office|model)",
 		"(?:fail|neglect|omit)\\w*\\s+to\\s+(?:track|report|document)\\s+serious\\s+incident",
 	]
 

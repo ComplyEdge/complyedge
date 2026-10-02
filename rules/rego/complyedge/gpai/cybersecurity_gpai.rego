@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 55(1)(d): Cybersecurity Gpai
 #
+# A general-purpose AI model with systemic risk, or its physical
+# infrastructure, left without adequate cybersecurity protection.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 55(1)(d)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

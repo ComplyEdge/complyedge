@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 52: Sr Designation
 #
+# A provider of a general-purpose AI model that meets the systemic-risk
+# threshold failing to notify the Commission or the AI Office.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 52
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic
@@ -20,8 +23,8 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"(?:gpai|general[\\-\\s]purpose\\s+ai|foundation)\\s+model\\s+(?:with\\s+)?systemic\\s+risk\\s+(?:without|no)\\s+(?:notif|inform)\\w*\\s+(?:the\\s+)?(?:ai\\s+office|commission)",
-		"(?:fail|omit|neglect)\\w*\\s+to\\s+notify\\s+(?:the\\s+)?(?:ai\\s+office|commission)\\s+(?:of\\s+)?systemic\\s+risk",
+		"(?:gpai|general[\\-\\s]purpose\\s+ai|foundation)\\s+model\\s+(?:with\\s+)?systemic\\s+risk\\s+(?:without|no)\\s+(?:notif|inform)\\w*\\s+(?:the\\s+)?(?:\\bai\\s+office|commission)",
+		"(?:fail|omit|neglect)\\w*\\s+to\\s+notify\\s+(?:the\\s+)?(?:\\bai\\s+office|commission)\\s+(?:of\\s+)?systemic\\s+risk",
 	]
 
 	text := lower(input.text)

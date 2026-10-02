@@ -27,10 +27,10 @@ violation if {
 synthetic_media_watermark_pattern_match if {
 	patterns := [
 		"synthetic[\\- ]?media.*(?:no|without|lack).*watermark",
-		"ai[\\- ]?generated.*(?:image|video|audio).*(?:no|without).*watermark",
+		"\\bai[\\- ]?generated.*(?:image|video|audio).*(?:no|without).*watermark",
 		"deepfake.*(?:no|without).*watermark",
 		"generat.*(?:image|video|audio).*(?:unwatermark|no.*watermark)",
-		"(?:strip|remov|bypass).*watermark.*(?:ai|synthetic|generat)",
+		"(?:strip|remov|bypass).*watermark.*(?:\\bai|synthetic|generat)",
 	]
 
 	text := lower(input.text)

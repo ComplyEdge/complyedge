@@ -1,5 +1,10 @@
 # ComplyEdge — EU AI Act Article 10: Data Governance
 #
+# Training, validation or test data for a high-risk AI system that is
+# knowingly biased, unrepresentative, incomplete or unexamined, or an
+# instruction to train or ship on such data without the data governance
+# Article 10 requires.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 10
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

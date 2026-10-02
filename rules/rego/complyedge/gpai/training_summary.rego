@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 53(1)(d): Training Summary
 #
+# A general-purpose AI model released without the publicly available,
+# sufficiently detailed summary of its training content.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 53(1)(d)
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic

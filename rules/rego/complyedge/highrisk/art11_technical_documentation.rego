@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 11: Technical Documentation
 #
+# Placing or running a high-risk AI system without the technical documentation
+# of Annex IV, or an instruction to skip or omit that documentation.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 11
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic
@@ -21,7 +24,7 @@ violation if {
 pattern_match if {
 	patterns := [
 		"high[\\-\\s]?risk\\s+ai\\s+(?:system\\s+)?(?:without|no|lacking)\\s+technical\\s+documentation",
-		"(?:no|without|skip\\w*|missing)\\s+(?:annex\\s+iv\\s+)?technical\\s+documentation\\s+(?:for\\s+)?(?:high[\\-\\s]?risk|ai\\s+system)",
+		"(?:no|without|skip\\w*|missing)\\s+(?:annex\\s+iv\\s+)?technical\\s+documentation\\s+(?:for\\s+)?(?:high[\\-\\s]?risk|\\bai\\s+system)",
 	]
 
 	text := lower(input.text)

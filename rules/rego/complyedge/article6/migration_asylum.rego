@@ -25,10 +25,10 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:visa\\s+(?:application|decision|approv)|visa\\s+processing)",
-		"ai.*(?:asylum|migration|refugee)\\s+(?:application|claim|risk|decision)",
-		"ai.*(?:border\\s+control|customs|immigration\\s+(?:control|processing))",
-		"ai.*(?:travel\\s+document|residence\\s+permit)\\s+(?:verif|authent|decision)",
+		"\\bai\\b.*(?:visa\\s+(?:application|decision|approv)|visa\\s+processing)",
+		"\\bai\\b.*(?:asylum|migration|refugee)\\s+(?:application|claim|risk|decision)",
+		"\\bai\\b.*(?:border\\s+control|customs|immigration\\s+(?:control|processing))",
+		"\\bai\\b.*(?:travel\\s+document|residence\\s+permit)\\s+(?:verif|authent|decision)",
 		"automated\\s+(?:visa|asylum|migration|border)\\s+(?:decision|processing|screening)",
 	]
 

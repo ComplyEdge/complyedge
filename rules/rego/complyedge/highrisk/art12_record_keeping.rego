@@ -1,5 +1,8 @@
 # ComplyEdge — EU AI Act Article 12: Record Keeping
 #
+# A high-risk AI system that does not log its events automatically, or an
+# instruction to disable, skip or turn off its logs or record-keeping.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 12
 # Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
 # Condition type: deterministic
@@ -20,7 +23,7 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"(?:no|without|disable\\w*|bypass|skip\\w*|turn\\s+off)\\s+(?:logging|logs|event\\s+log|audit\\s+log|record[\\-\\s]?keeping)\\s+(?:for|on|in)\\s+(?:high[\\-\\s]?risk\\s+ai|ai\\s+system)",
+		"(?:no|without|disable\\w*|bypass|skip\\w*|turn\\s+off)\\s+(?:logging|logs|event\\s+log|audit\\s+log|record[\\-\\s]?keeping)\\s+(?:for|on|in)\\s+(?:high[\\-\\s]?risk\\s+ai|\\bai\\s+system)",
 		"high[\\-\\s]?risk\\s+ai\\s+(?:system\\s+)?(?:without|no)\\s+automatic\\s+(?:event\\s+)?logging",
 	]
 

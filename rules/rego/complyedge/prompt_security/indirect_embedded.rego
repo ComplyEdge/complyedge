@@ -1,5 +1,8 @@
 # ComplyEdge — Prompt-injection / IPI: Indirect injection — embedded instruction
 #
+# An instruction hidden in content an AI processes (a document, email, page or
+# tool result) that tells it to ignore its user and do something else.
+#
 # Deterministic OPA/Rego leaf so this indirect/direct prompt-injection pattern
 # blocks on the /v1/check hot path (previously YAML/TrustLint only, retired from
 # /v1/check). Pattern ported verbatim from the vetted universal YAML corpus.

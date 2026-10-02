@@ -27,8 +27,8 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:creditworthiness|credit\\s+scor\\w*|credit\\s+rating)",
-		"(?:automat\\w*|ai[\\- ]?(?:based|driven)).*(?:loan\\s+approv|loan\\s+decision|credit\\s+decision)",
+		"\\bai\\b.*(?:creditworthiness|credit\\s+scor\\w*|credit\\s+rating)",
+		"(?:automat\\w*|\\bai[\\- ]?(?:based|driven)).*(?:loan\\s+approv|loan\\s+decision|credit\\s+decision)",
 		"(?:evaluate|assess|establish).*credit(?:worthiness|\\s+score).*natural\\s+person",
 		"credit\\s+scoring\\s+(?:model|system|engine).*without\\s+(?:high[\\- ]?risk|conformity|fria)",
 	]

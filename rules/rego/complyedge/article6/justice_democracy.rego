@@ -25,11 +25,11 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"ai.*(?:sentencing|judicial\\s+decision|bail\\s+decision|parole\\s+decision)",
-		"ai.*(?:court|case)\\s+(?:dispos|outcome|prediction)",
-		"ai.*(?:election|voting|ballot)\\s+(?:influence|target|micro[\\- ]target)",
-		"ai.*(?:democratic|referendum)\\s+(?:process|interference)",
-		"ai\\s+(?:voter|electorate)\\s+(?:profil|target|micro[\\- ]target)",
+		"\\bai\\b.*(?:sentencing|judicial\\s+decision|bail\\s+decision|parole\\s+decision)",
+		"\\bai\\b.*(?:court|case)\\s+(?:dispos|outcome|prediction)",
+		"\\bai\\b.*(?:election|voting|ballot)\\s+(?:influence|target|micro[\\- ]target)",
+		"\\bai\\b.*(?:democratic|referendum)\\s+(?:process|interference)",
+		"\\bai\\s+(?:voter|electorate)\\s+(?:profil|target|micro[\\- ]target)",
 		"judicial\\s+ai\\s+(?:assist|aid|research)",
 	]
 
