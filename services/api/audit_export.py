@@ -205,7 +205,12 @@ def normalize_event(value: Any) -> Any:
     if isinstance(value, UUID):
         return str(value)
     if isinstance(value, dict):
-        return {k: normalize_event(v) for k, v in value.items()}
+        # Sorted: DynamoDB does not keep the key order of a stored map, so the
+        # same art12_purposes object came back as ref/purpose in one row and
+        # purpose/ref in the next (4 orders in 8 events, Leo, 2026-10-06), and
+        # the CSV wrote different text for identical content. The chain is
+        # unaffected: canonical_event_json already hashes with sort_keys.
+        return {k: normalize_event(value[k]) for k in sorted(value)}
     if isinstance(value, (list, tuple)):
         return [normalize_event(v) for v in value]
     if isinstance(value, (set, frozenset)):
