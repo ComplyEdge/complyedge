@@ -245,7 +245,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 **Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, two LLM judges run in parallel after the rules pass, and either can block: a prompt-injection classifier that judges by meaning against the Article 15 `prompt_security` categories (a block is `llm-art15-ipi-*`, carries the Article 15 citation, and must quote the injected text from the request) and a general LLM review. If either cannot answer, the request is denied. Off by default since v0.2.2. Adds 2–5s latency per request.
 
-Security products protect AI from bad actors. **ComplyEdge blocks EU AI Act violations at runtime: and logs a cited record on every decision.**
+Security products protect AI from bad actors. **ComplyEdge blocks EU AI Act violations at runtime: and logs a cited record on every decision.** The record is kept outside your AI system, so it is evidence your system did not write about itself.
 
 ## Benchmark
 
