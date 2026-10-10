@@ -30,7 +30,7 @@ def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-That's it. Every input and output is checked against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations are blocked before they reach the user, with legal citation, rule ID, and timestamp on every check.
+That's it. Every input and output is checked against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations are blocked before they reach the user. Every check gets a rule ID, timestamp and text hash; every block also gets its legal citation. With the default `fail_mode="open"`, an API outage lets traffic through unchecked and unrecorded; use `fail_mode="closed"` to block instead.
 
 Classifiers (`eu-ai-act-*` MCPs) score the *system*. ComplyEdge denies *this* prompt or output now. Article 50 here is unlabeled or deceptive use, not C2PA watermarking.
 
