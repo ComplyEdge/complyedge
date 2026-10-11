@@ -6,7 +6,7 @@
 
 **Offline Node.js compliance linter for AI agents** — scans text against the bundled ComplyEdge rule corpus using Tier 1 regex patterns. No API key required.
 
-Catches EU AI Act, SOX, HIPAA, GDPR, COPPA, and PCI DSS violations before they reach production.
+Flags text that matches EU AI Act, SOX, HIPAA, GDPR, COPPA and PCI DSS rules before it ships.
 
 ## Hosted API vs. Offline Linter
 

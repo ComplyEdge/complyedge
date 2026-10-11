@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dw/@complyedge/mcp)](https://www.npmjs.com/package/@complyedge/mcp)
 [![license](https://img.shields.io/npm/l/@complyedge/mcp)](https://github.com/ComplyEdge/complyedge/blob/main/LICENSE)
 
-EU AI Act Article 5 and Article 50 runtime deny via TrustLint, offline. Classifiers (`eu-ai-act-*`) score the *system*; this server denies *this* prompt or output. Article 50 here is unlabeled or deceptive use, not C2PA.
+Offline checks of prompts and answers against the ComplyEdge rule corpus (EU AI Act Article 5 and Article 50, and more), with the article citation when a rule fires. It checks *this* prompt or output; it does not classify your system.
 
 ```bash
 npx -y @complyedge/mcp
@@ -56,7 +56,7 @@ reveal. Both keys work until you revoke, so nothing has to go dark in between.
   Rego, and it is not the hosted runtime enforcement path — use
   [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk) for
   `POST /v1/check` and the Article 12 audit trail.
-- Findings are technical compliance evidence, not legal advice, not a legal
+- Findings are rule matches, not legal advice, not a legal
   opinion, and not a regulatory classification of an AI system.
 - The corpus is bundled at build time. It is current as of the release you
   install, not a live regulatory feed.

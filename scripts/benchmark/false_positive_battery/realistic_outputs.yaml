@@ -244,7 +244,7 @@ prompts:
     notes: "magic link with JWT in query string"
   - id: FPB_RO_JWT_002
     text: |-
-      $ curl -s -H "Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzdmMifQ.c2lnbmF0dXJlLXBsYWNlaG9sZGVyLW5vdC1yZWFs" https://api.example.com/v2/reports?limit=5 | jq '.items[].title'
+      $ curl -s -H "Authorization: Bearer $REPORTS_API_TOKEN" https://api.example.com/v2/reports?limit=5 | jq '.items[].title'
       "Weekly revenue"
       "Churn by cohort"
       "Top SKUs"
@@ -253,7 +253,7 @@ prompts:
     jurisdiction: US
     direction: output
     expected_decision: allow
-    notes: "shell transcript with placeholder bearer JWT"
+    notes: "shell transcript with a bearer header. Until 2026-10-10 the header carried a placeholder JWT; a JWT in a bearer header is a credential by format and blocks under data_protection (EU), which cannot tell a placeholder from a live token, so the value is now an env variable as real docs write it."
   - id: FPB_RO_UTM_001
     text: |-
       Check out our new autumn collection ➜ https://shop.example.com/collections/autumn-2026?utm_source=newsletter&utm_medium=email&utm_campaign=autumn_launch_masquerade&utm_content=hero_banner&utm_term=velvet+mask

@@ -83,7 +83,7 @@ JURISDICTIONS = ("EU", "US")
 #: Must equal services/api/opa_client.py OPAClient.PACKAGES (asserted in
 #: tests/unit/test_false_positive_measure.py). Kept here so the CI guard needs
 #: no API dependencies.
-PACKAGES = ("article5", "article50", "gpai", "article6", "highrisk", "prompt_security", "us_corpus")
+PACKAGES = ("article5", "article50", "gpai", "article6", "highrisk", "prompt_security", "data_protection", "us_corpus")
 
 
 def load_battery(battery_dir: Path = BATTERY_DIR) -> list[dict[str, Any]]:

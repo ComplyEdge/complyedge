@@ -252,7 +252,7 @@ def create_mcp() -> FastMCP:
     mcp = FastMCP(
         "complyedge",
         instructions=(
-            "ComplyEdge TrustLint — offline compliance check tools. "
+            "ComplyEdge TrustLint: offline compliance check tools. "
             "Use check_compliance, list_rules, or scan_prompt. No API key required. "
             "sandbox_check tries a case against your hosted enforcement without "
             "recording it; it needs your API key as Authorization: Bearer on the "

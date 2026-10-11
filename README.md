@@ -4,11 +4,11 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Smithery](https://img.shields.io/badge/Smithery-listed-6b46c1)](https://smithery.ai/servers/complyedge/complyedge)
 
-EU AI Act Article 5 and Article 50 runtime deny for AI agents. The platform enforces in production, on every request — and the same discipline is available to your agent as an **MCP server** that checks and scans the text you pass it, offline, with an article citation on every finding. Classifiers (`eu-ai-act-*`) score the *system*; ComplyEdge denies *this* prompt or output. Article 50 here is unlabeled or deceptive use, not C2PA.
+ComplyEdge checks every request before it reaches your AI and every answer before your user, blocks the ones that break a rule, and records each decision outside your AI system, with the legal citation when a rule fires. Prompt injection, Article 5 practices and, on EU checks through the hosted API, personal data and secrets (email, phone, IBAN, card and national ID numbers, API keys, private keys) are blocked; Article 50, GPAI and high-risk rules flag text that describes a missing control. The same rules are available to your agent as an **MCP server** that checks the text you pass it, offline, with an article citation on every finding. It checks *this* prompt or output; it does not classify your system.
 
-Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server** — a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
+Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server**, a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
 
-**Article 5 is already law.** GPAI fines have applied since 2 August 2026. Your AI is either compliant right now, or it isn't.
+**Your system prompt says no and the model does it anyway. Customer data and API keys end up in the prompt.** ComplyEdge blocks it before it lands. If an auditor, a regulator or a large customer ever asks what your AI blocked, you have a record of every check, not just logs.
 
 > What does your compliance tool tell a regulator when it blocks a request? A probability score?
 >
@@ -18,7 +18,7 @@ Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP s
 
 ComplyEdge TrustLint is an MCP server built on the official [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) (`mcp>=1.9`). It gives an agent article-cited compliance checks instead of a probability score, and it runs fully offline: no API key, no network call, rules evaluated from the bundled YAML corpus.
 
-**Tools** (the server exposes MCP tools only — no resources, no prompts; all are read-only and idempotent):
+**Tools** (the server exposes MCP tools only: no resources, no prompts; all are read-only and idempotent):
 
 | Tool | What it does |
 |---|---|
@@ -27,7 +27,7 @@ ComplyEdge TrustLint is an MCP server built on the official [MCP Python SDK](htt
 | `scan_prompt` | Pre-generation prompt scan. Returns `SAFE` or `RISK_DETECTED` before the model is called. |
 | `sandbox_check` | Optional, with your API key: hosted enforcement in sandbox mode (`POST /v1/sandbox/check`). Your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. Returns `BLOCKED`/`ALLOWED` with rule ID and article citation. Never evidence. |
 
-**Local (stdio)** — for Claude Desktop, Cursor, MCP Inspector, or any MCP host:
+**Local (stdio)**: for Claude Desktop, Cursor, MCP Inspector, or any MCP host:
 
 ```bash
 pip install 'complyedge[mcp]'
@@ -107,7 +107,7 @@ host because those accounts live in the US. The SDK reads the key and calls that
 host. To move an existing account, use Request a region change in the dashboard.
 Support moves the account and issues a new key.
 Setting an API URL does not move the account.
-The region is where your prompts and audit records are processed and stored.
+The region is where checks run and audit records are stored; prompt text is never stored, only its SHA-256 hash.
 It does not decide which laws are checked: the `jurisdiction` field on each
 check does. No general law requires either region. US law does not require US
 storage, and GDPR allows transfers outside the EU with safeguards such as
@@ -123,7 +123,7 @@ or customers ask for.
 | **Horizon** | [trust.complyedge.io/horizon](https://trust.complyedge.io/horizon) |
 
 Each AI Trust Center is generated from that project's real audit trail: enforcement status, check
-volume, and the EU AI Act articles enforced at runtime. (GitHub proxies and caches images, so the
+volume, and the EU AI Act articles its traffic is checked against. (GitHub proxies and caches images, so the
 seal above can lag; the AI Trust Center is always current.)
 
 Embed one on your own project: [Enforcement Seal docs](https://complyedge.io/docs/trust-badge.html).
@@ -142,7 +142,7 @@ def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-Three lines. Every AI input and output evaluated against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations blocked before they reach the user: with article citation, rule ID, and timestamp on every decision.
+Three lines. Every AI input and output evaluated against the EU AI Act rule corpus (Article 5, Article 50, GPAI). Violations blocked before they reach the user. Every decision gets a rule ID, timestamp and text hash; every block also gets its legal citation.
 
 Set `COMPLYEDGE_API_KEY` to your key. The decorator activates by default; to disable without removing the key (e.g., in CI), set `COMPLYEDGE_ENABLED=false`.
 
@@ -198,7 +198,7 @@ sdks/python/          Python SDK (@compliance_check decorator, CLI)
   └ complyedge/mcp_server.py   MCP server (stdio): check_compliance, list_rules, scan_prompt
 packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
 rules/regulations/    63 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
-rules/rego/           64 leaf OPA/Rego policies + 7 package aggregators
+rules/rego/           75 leaf OPA/Rego policies + 8 package aggregators
 rules/schemas/        Rule validation schema
 rules/scripts/        Schema validator (`validate_rules.py`)
 examples/             Usage examples (decorators, OpenAI Agents)
@@ -208,9 +208,9 @@ tests/                Rule validation + acceptance tests
 
 ## Rules
 
-63 YAML rules + 64 deterministic leaf OPA/Rego policies (+ 7 package aggregators) across 4 jurisdictions.
+63 YAML rules + 75 deterministic leaf OPA/Rego policies (+ 8 package aggregators) across 4 jurisdictions.
 
-**What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf decides by matching the evaluated text (no LLM on the hot path). For 21 of them the text *is* the regulated act — Article 5 prohibited practices, Article 15 prompt-injection resilience, one US disclosure control — so a block prevents the act and the citation on the decision is load-bearing. The other 43 fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
+**What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf decides by matching the evaluated text (no LLM on the hot path). For 32 of them the text *is* the regulated act (Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and secrets matched by format and checksum, one US disclosure control) so a block prevents the act and the citation on the decision is load-bearing. The other 43 fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
@@ -241,11 +241,11 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1, Deterministic (hot path):** 64 leaf OPA/Rego policies (+ 7 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation on every decision. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1, Deterministic (hot path):** 75 leaf OPA/Rego policies (+ 8 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation when a rule fires. (TrustLint applies the same regex corpus offline for CI use.)
 
 **Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, two LLM judges run in parallel after the rules pass, and either can block: a prompt-injection classifier that judges by meaning against the Article 15 `prompt_security` categories (a block is `llm-art15-ipi-*`, carries the Article 15 citation, and must quote the injected text from the request) and a general LLM review. If either cannot answer, the request is denied. Off by default since v0.2.2. Adds 2–5s latency per request.
 
-Security products protect AI from bad actors. **ComplyEdge blocks EU AI Act violations at runtime: and logs a cited record on every decision.** The record is kept outside your AI system, so it is evidence your system did not write about itself.
+Security products protect AI from bad actors. **ComplyEdge blocks requests and answers that break a rule, and records every decision, with the legal citation when a rule fires.** The record is kept outside your AI system, so it is evidence your system did not write about itself.
 
 ## Benchmark
 

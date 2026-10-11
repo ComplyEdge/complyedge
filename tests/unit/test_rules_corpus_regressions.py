@@ -216,6 +216,7 @@ class TestRegoCitationsMatchTheRegulationCorpus:
         return sorted((ROOT / "rules/rego/complyedge").rglob("*.rego"))
 
     def test_rego_citation_equals_its_regulation_sibling(self):
+        import json as _json
         import re as _re
 
         ymap = self._yaml_citations()
@@ -241,7 +242,9 @@ class TestRegoCitationsMatchTheRegulationCorpus:
                 # No unambiguous sibling: not covered by the corpus, and not
                 # something this test can invent an answer for.
                 continue
-            if cands[0][1] != m.group(1):
+            # Compare the decoded string value (Rego strings use JSON escapes),
+            # so a verbatim quote containing " still matches the corpus.
+            if cands[0][1] != _json.loads(f'"{m.group(1)}"'):
                 drifted.append(f.name)
         assert not drifted, (
             "Rego citations no longer quote their regulation corpus sibling "

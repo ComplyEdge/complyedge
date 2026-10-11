@@ -4,7 +4,7 @@
 
 ## Why this document exists
 
-Every leaf policy in the corpus **detects** by matching a regular expression against `input.text` (plus `input.jurisdiction`). **All 64 of 64.** One rule, `article5/biometric_categorisation.rego`, additionally reads inputs that can only ever *suppress* a match, the Article 5(1)(g) carve-outs, and never uses them to detect one. That follows from the architecture: no LLM runs on the hot path, so the deterministic layer can only reason about the text in front of it, and it is a hard limit on what a decision proves.
+Every leaf policy in the corpus **detects** by matching a regular expression against `input.text` (plus `input.jurisdiction`). **All 75 of 75.** One rule, `article5/biometric_categorisation.rego`, additionally reads inputs that can only ever *suppress* a match, the Article 5(1)(g) carve-outs, and never uses them to detect one. That follows from the architecture: no LLM runs on the hot path, so the deterministic layer can only reason about the text in front of it, and it is a hard limit on what a decision proves.
 
 For some obligations that limit costs nothing: a request to socially score citizens *is* the prohibited practice, so blocking the text prevents the act. For others it is decisive: no text matcher can establish whether a quality management system, an Annex IV technical file, a human-oversight assignment or a FRIA exists. Stating which rule is which, in public, is cheaper than letting a reviewer discover it by opening one file.
 
@@ -12,16 +12,16 @@ For some obligations that limit costs nothing: a request to socially score citiz
 
 | | Leaves |
 |---|---:|
-| **content_inspecting**: the text is, or asks for, the regulated act | **21** |
+| **content_inspecting**: the text is, or asks for, the regulated act | **32** |
 | **assertion_matching**: the text describes a state the engine cannot verify | **43** |
-| Total leaf policies | 64 |
-| Package aggregators (no legal condition of their own) | 7 |
+| Total leaf policies | 75 |
+| Package aggregators (no legal condition of their own) | 8 |
 
 Broken down by why each rule lands where it does:
 
 | Basis | Leaves |
 |---|---:|
-| `regulated_act_in_text`: the evaluated text is, or asks for, the regulated act | 21 |
+| `regulated_act_in_text`: the evaluated text is, or asks for, the regulated act | 32 |
 | `absent_control_asserted`: fires on a phrase asserting a control is missing | 32 |
 | `domain_of_use_described`: labels a described use case against an Annex III domain | 11 |
 
@@ -60,6 +60,24 @@ The attack is the text. "Ignore all previous instructions", a jailbreak persona,
 | `sysprompt_leak.rego` | `rego-art15-ipi-005` | `regulated_act_in_text` |
 | `tool_hijack.rego` | `rego-art15-ipi-010` | `regulated_act_in_text` |
 | `training_extract.rego` | `rego-art15-ipi-006` | `regulated_act_in_text` |
+
+### `data_protection`: 11 leaves, all `content_inspecting`
+
+The leak is the text. A valid IBAN, card number, national ID, API key or private key in a prompt is personal data or a credential on its way to the model; in an answer, on its way to a user. Each leaf matches a format and, where the format has one, its checksum (IBAN mod 97, Luhn, ISO 7064, the Dutch eleven test, the Spanish and Italian control characters, the French NIR key). EU jurisdiction only. The record stores the rule, never the matched value.
+
+| Rule | Rule ID | Basis |
+|---|---|---|
+| `api_key.rego` | `rego-gdpr32-1-001` | `regulated_act_in_text` |
+| `card_pan.rego` | `rego-gdpr5-1c-004` | `regulated_act_in_text` |
+| `email.rego` | `rego-gdpr5-1c-001` | `regulated_act_in_text` |
+| `iban.rego` | `rego-gdpr5-1c-003` | `regulated_act_in_text` |
+| `national_id_de.rego` | `rego-gdpr5-1c-005` | `regulated_act_in_text` |
+| `national_id_es.rego` | `rego-gdpr5-1c-007` | `regulated_act_in_text` |
+| `national_id_fr.rego` | `rego-gdpr5-1c-006` | `regulated_act_in_text` |
+| `national_id_it.rego` | `rego-gdpr5-1c-009` | `regulated_act_in_text` |
+| `national_id_nl.rego` | `rego-gdpr5-1c-008` | `regulated_act_in_text` |
+| `phone.rego` | `rego-gdpr5-1c-002` | `regulated_act_in_text` |
+| `private_key.rego` | `rego-gdpr32-1-002` | `regulated_act_in_text` |
 
 ### `us_corpus`: 1 leaves, all `content_inspecting`
 
@@ -142,16 +160,18 @@ Articles 4, 9-16, 26 and 27 require documents, processes and assignments to EXIS
 
 ## What this means for a claim
 
-Safe to say: the corpus deterministically inspects **Article 5 prohibited practices, Article 15 prompt-injection resilience, and one US disclosure control**: 21 policies where the evaluated text is the regulated conduct, each carrying the operative article text and emitting a cited, hash-chained record.
+Safe to say: the corpus deterministically inspects **Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and credentials in the text (GDPR Articles 5 and 32), and one US disclosure control**: 32 policies where the evaluated text is the regulated conduct, each carrying its legal citation and emitting a decision record (tamper-evident on the Enterprise export).
+
+Not safe to say for data protection: that it finds "any personal data". It finds the formats it names (email, phone, IBAN, card number, five national IDs, vendor API keys, private keys), each with its checksum where one exists. Names, postal addresses and health details are not formats and are not matched.
 
 Not safe to say: that the corpus "covers the high-risk requirements", or that a rule count is evidence of coverage. The Article 4/9-16/26/27, Chapter V and Annex III policies fire on descriptions. They are useful for triage and for catching an operator who states an absent control in writing. They do not establish the underlying fact, and their silence is not a compliance finding.
 
 ## Reproduce
 ```bash
 find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
-  | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 64 leaves
+  | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 75 leaves
 find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
-  | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  7 aggregators
+  | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  8 aggregators
 ```
 
 Drift is enforced by `tests/unit/test_corpus_evidence_classification.py`.

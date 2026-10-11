@@ -1272,12 +1272,12 @@ prompts:
     notes: "User sharing their own support chat with the vendor's support desk."
   - id: FPB_PS_TOOL_012
     text: |-
-      Bitte leite das Gesprächsprotokoll vom Dienstag an buero@example.de weiter, damit die Kollegen die Entscheidungen nachlesen können.
+      Bitte leite das Gesprächsprotokoll vom Dienstag an buero@example.com weiter, damit die Kollegen die Entscheidungen nachlesen können.
     jurisdiction: EU
     direction: output
     expected_decision: allow
     target_rule: rego-art15-ipi-010
-    notes: "German request to forward meeting minutes to the office."
+    notes: "German request to forward meeting minutes to the office. Address moved to the reserved example.com on 2026-10-10: a real-domain address is personal data and blocks under data_protection by design; this item tests ipi-010 only."
 
   # ---------------------------------------------------------------------------
   # us_corpus/sox_material_disclosure.rego (rego-sox-302-001)

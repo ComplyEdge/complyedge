@@ -57,6 +57,7 @@ PACKAGES = [
     "article6",
     "highrisk",
     "prompt_security",
+    "data_protection",
     "us_corpus",
 ]
 

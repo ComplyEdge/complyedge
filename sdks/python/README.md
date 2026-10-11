@@ -1,6 +1,6 @@
 # ComplyEdge Python SDK
 
-Runtime EU AI Act Article 5 and Article 50 enforcement. Open source.
+Check every AI request and answer against EU AI Act rules, block what breaks one, and record each decision outside your AI system, with the legal citation when a rule fires. Open source.
 
 ## Choose the Right Package
 
@@ -57,7 +57,7 @@ The decorator reads your API key from the `COMPLYEDGE_API_KEY` environment varia
 
 | Value | What the hosted API enforces deterministically |
 |---|---|
-| `EU` | EU AI Act (Article 5, Article 6 high-risk, Article 50, GPAI Articles 51–55) + prompt-injection detection |
+| `EU` | EU AI Act: Article 5 blocked; Article 6 high-risk, Article 50 and GPAI Articles 51–55 flag text describing a missing control; plus prompt-injection detection |
 | `US`, `US-*` | SOX §302 material disclosure + prompt-injection detection |
 
 HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA and GDPR rules run offline in TrustLint (`pip install trustlint`), not on the hosted `/v1/check` path.

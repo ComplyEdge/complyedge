@@ -35,9 +35,9 @@
 #
 # REPRODUCE the census this file is checked against:
 #   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
-#     | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 64 leaves
+#     | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 75 leaves
 #   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
-#     | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  7 aggregators
+#     | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  8 aggregators
 #
 # Enforced by tests/unit/test_corpus_evidence_classification.py, which fails if
 # a leaf is added, removed, renamed, or classified content_inspecting while its
@@ -52,22 +52,26 @@
 
 version: 1
 corpus:
-  leaves: 64
-  aggregators: 7
-  files_total: 71
+  leaves: 75
+  aggregators: 8
+  files_total: 83
 
 totals:
-  content_inspecting: 21
+  content_inspecting: 32
   assertion_matching: 43
 
 by_basis:
-  regulated_act_in_text: 21
+  regulated_act_in_text: 32
   absent_control_asserted: 32
   domain_of_use_described: 11
 
 by_group:
   article5: {leaves: 8, content_inspecting: 8, assertion_matching: 0}
   prompt_security: {leaves: 12, content_inspecting: 12, assertion_matching: 0}
+  # data_protection (2026-10-10): the text IS the leak. A valid IBAN, card
+  # number or private key in the text is personal data or a credential
+  # leaving to the model, so blocking it prevents the act.
+  data_protection: {leaves: 11, content_inspecting: 11, assertion_matching: 0}
   us_corpus: {leaves: 1, content_inspecting: 1, assertion_matching: 0}
   article50: {leaves: 7, content_inspecting: 0, assertion_matching: 7}
   article6: {leaves: 11, content_inspecting: 0, assertion_matching: 11}
@@ -336,6 +340,61 @@ rules:
     group: highrisk
     classification: assertion_matching
     basis: absent_control_asserted
+  - file: data_protection/api_key.rego
+    rule_id: rego-gdpr32-1-001
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/card_pan.rego
+    rule_id: rego-gdpr5-1c-004
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/email.rego
+    rule_id: rego-gdpr5-1c-001
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/iban.rego
+    rule_id: rego-gdpr5-1c-003
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/national_id_de.rego
+    rule_id: rego-gdpr5-1c-005
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/national_id_es.rego
+    rule_id: rego-gdpr5-1c-007
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/national_id_fr.rego
+    rule_id: rego-gdpr5-1c-006
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/national_id_it.rego
+    rule_id: rego-gdpr5-1c-009
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/national_id_nl.rego
+    rule_id: rego-gdpr5-1c-008
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/phone.rego
+    rule_id: rego-gdpr5-1c-002
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
+  - file: data_protection/private_key.rego
+    rule_id: rego-gdpr32-1-002
+    group: data_protection
+    classification: content_inspecting
+    basis: regulated_act_in_text
   - file: prompt_security/ai_addressed.rego
     rule_id: rego-art15-ipi-004
     group: prompt_security
