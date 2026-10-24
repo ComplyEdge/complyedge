@@ -14,6 +14,8 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.22] - 2026-10-23
+
 ### Added
 - `ReceiptJournal` / `receipt_journal=` on `ComplyEdge`: optional append-only JSONL of check linkage (`event_id`, `text_hash`, digests, timestamps). Never stores the prompt or answer. Sandbox checks are skipped. Pairing text still uses `verify_input` against the caller's own copy.
 - `bundle_digest` on check results: the SHA-256 digest of the rule set that decided, the same value as the audit entry and the ADCR record's `rule_set.digest`. `None` when the API does not return it.
@@ -115,6 +117,7 @@ Matching numbers would imply a parity that does not exist.
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.22]: https://pypi.org/project/complyedge/0.2.22/
 [0.2.21]: https://pypi.org/project/complyedge/0.2.21/
 [0.2.20]: https://pypi.org/project/complyedge/0.2.20/
 [0.2.19]: https://pypi.org/project/complyedge/0.2.19/

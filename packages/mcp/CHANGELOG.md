@@ -11,9 +11,11 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-10-23
+
 ### Fixed
 - The server now always loads the rule corpus this release bundles (63 rules with
-  `trustlint` 2.1.2). It used to call `TrustLintEngine()` with no directory, so
+  `trustlint` 2.2.0). It used to call `TrustLintEngine()` with no directory, so
   trustlint loaded `~/.trustlint/rules` first (the cache `trustlint update`
   writes), then any `rules/regulations` folder above the working directory, and
   the bundled rules only last. Anyone with an older cache ran an older corpus,
@@ -167,6 +169,7 @@ came back clean now returns violations.
   Runs via `npx` with no Python runtime and no API key.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/mcp
+[0.2.3]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.3
 [0.2.2]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.2
 [0.2.1]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.1
 [0.2.0]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.0

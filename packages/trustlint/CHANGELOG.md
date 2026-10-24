@@ -18,6 +18,8 @@ that does not exist.
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-10-23
+
 ### Changed
 - npm description states 63 rules (was 64). Dropped the `prompt-security` and `security` keywords and the `Topic :: Security` classifier; the README leads with the audit record and points to the hosted check for it.
 
@@ -148,6 +150,7 @@ the source moved on. Published to restore the npm distribution.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/trustlint
+[2.2.0]: https://www.npmjs.com/package/trustlint/v/2.2.0
 [2.1.2]: https://www.npmjs.com/package/trustlint/v/2.1.2
 [2.1.1]: https://www.npmjs.com/package/trustlint/v/2.1.1
 [2.1.0]: https://www.npmjs.com/package/trustlint/v/2.1.0

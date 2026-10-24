@@ -68,7 +68,7 @@ export function resolveBaseUrl(opts: {
 // Keep in sync with package.json. Hardcoding it here meant the User-Agent
 // silently reported a stale version after every release bump, which is the
 // one field support uses to tell which client a customer is actually on.
-const SDK_VERSION = "0.2.6";
+const SDK_VERSION = "0.2.7";
 
 /** The audit record's user attribution, in the API's field names. */
 export interface AttributionFields {

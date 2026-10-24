@@ -16,6 +16,8 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.7] - 2026-10-23
+
 ### Added
 - `ReceiptJournal` / `receiptJournalPath` on `ComplyEdgeConfig`: optional append-only JSONL of check linkage (`eventId`, `textHash`, digests, timestamps). Never stores the prompt or answer. Sandbox checks are skipped. Pairing text still uses `verifyInput` against the caller's own copy.
 - `bundleDigest` on check results: the SHA-256 digest of the rule set that decided, the same value as the audit entry and the ADCR record's `rule_set.digest`. `undefined` when the API does not return it.
@@ -137,6 +139,7 @@ imply a parity that does not exist.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/typescript
+[0.2.7]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.7
 [0.2.6]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.6
 [0.2.5]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.5
 [0.2.4]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.4

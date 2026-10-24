@@ -5,7 +5,7 @@ MCP Bundle (`.mcpb`) for desktop clients. The server runs on your machine over
 stdio. Run it with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uvx --from 'complyedge[mcp]==0.2.21' -- python -m complyedge.mcp_server
+uvx --from 'complyedge[mcp]==0.2.22' -- python -m complyedge.mcp_server
 ```
 
 ## Tools
@@ -25,7 +25,7 @@ Claude Desktop, Cursor and other clients that launch a stdio server:
   "mcpServers": {
     "complyedge": {
       "command": "uvx",
-      "args": ["--from", "complyedge[mcp]==0.2.21", "--", "python", "-m", "complyedge.mcp_server"],
+      "args": ["--from", "complyedge[mcp]==0.2.22", "--", "python", "-m", "complyedge.mcp_server"],
       "env": { "COMPLYEDGE_API_KEY": "ce_..." }
     }
   }
