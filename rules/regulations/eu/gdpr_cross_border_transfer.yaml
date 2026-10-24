@@ -7,6 +7,26 @@ description: >-
   Chapter V are met, ensuring the level of protection is not undermined.
   Transfers require adequacy decisions, appropriate safeguards, or specific
   derogations. GDPR Articles 44-49.
+
+
+  Layer 1 detects: transfer data or personal data to, outside, abroad,
+  overseas or internationally, then without or lacking adequacy, a safeguard
+  or authorization, with nothing between; cross-border (also "cross border")
+  transfer or data transfer without or lacking adequacy, a safeguard, SCC or
+  BCR; export, send or transmit data or personal data, optionally "to", then
+  "third country" or outside EU, EEA or Europe, with no article, then without
+  or lacking; "no" followed by adequacy decision, standard contractual clause
+  or clauses, SCC, BCR or binding corporate rule or rules, anywhere;
+  unauthorized or unlawful international or cross-border transfer or data
+  transfer; international transfer or data transfer without or lacking legal
+  basis, a safeguard or compliance; and data to, sent to or stored in "third
+  country" or a non-EU or non-EEA country, with no article, then without or
+  lacking. It matches wording, not meaning: it misses the practice told in
+  other words ("Copy the customer database to our server in Brazil; we have no
+  contract with them."), and it fires on lawful text that uses these words
+  ("Japan has an adequacy decision, so no SCC is needed for the Tokyo
+  office.") and on text that only names the practice. Whether a text does the
+  practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -29,6 +49,8 @@ conditions:
 severity: high
 category: privacy
 source:
+  eli: http://data.europa.eu/eli/reg/2016/679/art_44/oj
+  provision_label: 'Regulation (EU) 2016/679, Articles 44 to 49'
   regulation: GDPR
   article: Articles 44-49
   url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
@@ -46,16 +68,21 @@ source:
     persons guaranteed by this Regulation is not undermined.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 20,000,000 or 4% of worldwide annual turnover
+    eu_enforcement: >-
+      Administrative fines up to EUR 20,000,000 or, for an undertaking, up to 4%
+      of the total worldwide annual turnover of the preceding financial year,
+      whichever is higher (Article 83(5), point (c)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — GDPR Articles 44-49 require that any transfer of personal data
-    to a third country or international organisation complies with Chapter V
-    requirements. Transfers without adequacy decisions, appropriate safeguards
-    (SCCs, BCRs), or valid derogations are prohibited. Penalties: up to
-    EUR 20M or 4% of global revenue.
+    BLOCKED: GDPR Articles 44 to 49 require that any transfer of personal data
+    to a third country or international organisation complies with the
+    conditions of Chapter V. Transfers without an adequacy decision, appropriate
+    safeguards (such as SCCs or BCRs), or a valid derogation are not permitted.
+    Penalties: administrative fines up to EUR 20,000,000 or, for an undertaking,
+    up to 4% of the total worldwide annual turnover of the preceding financial
+    year, whichever is higher (Article 83(5), point (c)).
   suggestion: >-
     Before transferring personal data outside the EU/EEA, ensure one of the
     following legal mechanisms is in place: (1) an adequacy decision by the
@@ -73,3 +100,7 @@ tags:
 - scc
 - bcr
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

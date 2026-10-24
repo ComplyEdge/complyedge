@@ -8,29 +8,31 @@ Email **support@complyedge.io** with:
 
 - a description of the issue and its impact,
 - steps to reproduce (a prompt, request, or rule that misbehaves),
-- the affected version (`pip show complyedge` / `pip show trustlint`).
-
-We acknowledge reports within 72 hours and aim to ship a fix or mitigation
-within 14 days for confirmed issues. We will credit reporters who wish to be
-named once a fix is released.
+- the affected package and version (`pip show complyedge`, `pip show trustlint`,
+  or `npm ls @complyedge/sdk @complyedge/mcp trustlint`).
 
 ## Scope
 
-In scope:
+Reports are accepted for:
 
-- The `complyedge` Python SDK and the `trustlint` offline linter.
-- The OPA/Rego policies and YAML rule corpus in this repository.
+- The packages built from this repository: the `complyedge` Python SDK (PyPI),
+  the `@complyedge/sdk` TypeScript SDK (npm), the `@complyedge/mcp` MCP server
+  (npm), and the `trustlint` offline linter (PyPI and npm).
+- The audit-export verifier in `services/api/` (`audit_export.py` and the
+  modules it imports).
+- The OPA/Rego policies and YAML rule set in this repository.
+- The hosted ComplyEdge service (the API, the dashboard and the hosted MCP
+  server). Its code is not in this repository; report issues with it through
+  the same private channel above.
+
+Not a security report:
+
 - Rule **misclassification** (a prompt that should block but passes, or vice
-  versa): open an issue with the prompt and expected decision; this is a
-  correctness bug, not a security report.
-
-Out of scope:
-
-- The hosted API backend and infrastructure (report those to
-  support@complyedge.io directly).
-- Denial-of-service via deliberately oversized inputs.
+  versa): open an issue with the prompt and the expected decision. This is a
+  correctness bug.
+- Denial of service through deliberately oversized inputs.
 
 ## Supported Versions
 
-We support the latest released version of each package on PyPI. Older versions
-do not receive security backports: pin to the latest release.
+Fixes land in the latest released version of each package, on PyPI and on npm.
+Older versions do not receive security backports: upgrade to the latest release.

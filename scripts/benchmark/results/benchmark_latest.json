@@ -156,7 +156,7 @@
     },
     {
       "provider_id": "hugging_face",
-      "provider_name": "Hugging Face (first-party models \u2014 SmolLM3 / SmolLM family)",
+      "provider_name": "Hugging Face (first-party models, SmolLM3 / SmolLM family)",
       "model_class": "open_weights",
       "systemic_risk_threshold": false,
       "verification_status": "needs_review",
@@ -463,7 +463,7 @@
   "summary": {
     "total_scored": 12,
     "total_pending": 0,
-    "avg_compliance_pct": 53.0,
+    "avg_compliance_pct": 53.1,
     "best": "google",
     "worst": "xai"
   }

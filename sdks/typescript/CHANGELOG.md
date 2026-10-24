@@ -10,13 +10,38 @@ existed; 0.2.1 is reconstructed from its commits, and anything not evidenced
 there is left out rather than guessed at.
 
 The Python SDK (`complyedge` on PyPI) is versioned independently. Version
-numbers are deliberately not kept level between the two — they are separate
+numbers are deliberately not kept level between the two: they are separate
 implementations with different capability surfaces, so matching numbers would
 imply a parity that does not exist.
 
 ## [Unreleased]
 
-## [0.2.6] - 2026-09-29
+### Added
+- `ReceiptJournal` / `receiptJournalPath` on `ComplyEdgeConfig`: optional append-only JSONL of check linkage (`eventId`, `textHash`, digests, timestamps). Never stores the prompt or answer. Sandbox checks are skipped. Pairing text still uses `verifyInput` against the caller's own copy.
+- `bundleDigest` on check results: the SHA-256 digest of the rule set that decided, the same value as the audit entry and the ADCR record's `rule_set.digest`. `undefined` when the API does not return it.
+- `client.verifyInput(eventId, text)`: resolves `true` when the audit record `eventId` was a decision about exactly `text`. It calls `POST /v1/audit/verify`; the comparison runs server-side because the record's hash is keyed with the account's own key, which never leaves ComplyEdge. The text is used for that request only and is not stored or logged. Resolves `false` when the text differs or the account's key was destroyed; an unknown `eventId` rejects (404). Needs an API version that serves `/v1/audit/verify`.
+- `textHashAlg` on check results: `"hmac-sha256-1"` when `textHash` is the keyed commitment (HMAC-SHA-256 under the account's key over `commitment:` and the text), `undefined` on responses from an API that still returns a plain SHA-256.
+- `decisionContext` on `ComplianceContext`: the audit record fields only the caller knows (deciding system version, purpose, data categories, legal basis, references), sent to `check()` as `decision_context` and written to the record as ADCR 0.1.0 fields. Omitted when not given; a check without it is decided and recorded, but its record does not meet ADCR class Record.
+- `decisionContext` option on `withCompliance()`, sent with every check the middleware makes.
+- `DecisionContext` type: `decision_mode`, `notice`, `explanation_inputs`, `withheld` and `escrow_ref`, which the API requires when `subject` is set (`escrow_ref` when `withheld` is true).
+- `direction: "action"`: an action the AI system is about to take.
+
+### Changed
+- README: the record comes first. Store the `eventId` from every check next to your own copy of the text and prove the pair later with `verifyInput`; ComplyEdge never stores the prompt or the answer.
+- Package keywords: dropped `guardrails` and `llm-security`, added `audit-record` and `verifiable-ai-decisions`.
+- Package description rewritten around the decision record (was "EU AI Act runtime enforcement SDK: OPA/Rego policy checks, Article 12 audit trails, risk assessment, and OpenAI middleware.").
+- `DecisionContext`: `deciding_system`, `purpose_ref` and `data_categories` are required in the type, as the API requires them whenever the object is sent.
+
+### Fixed
+- `withCompliance()` accepts a class instance such as `new OpenAI()`. Its type bound was `Record<string, unknown>`, which a class instance does not satisfy, so the README example did not compile.
+- README: `enginePath` values are `opa`, `llm`, `hybrid`, `fallback_block` and `trustlint`; `ruleDescription` is the rule's legal citation; the `wrong_region` body is `{"detail":{"error":"wrong_region","use":...}}`.
+
+### Docs
+- `sandbox` option: sandbox calls do not count against the plan's daily limit
+  but have their own caps (60 a minute, 1,000 a day); the README and the type
+  comment used to say "no rate-limit count". No code change.
+
+## [0.2.6] - 2026-09-30
 
 ### Added
 - `userId` and `sessionId` on `ComplianceContext`, and `userId` / `userRole` / `sessionId` client defaults on `ComplyEdgeConfig`. `check()` and `detectSensitivity()` send all three in `context`, recorded on the audit entry. The OpenAI middleware records the request's `user` as `userId`.
@@ -44,7 +69,7 @@ imply a parity that does not exist.
 ### Added
 - `sandbox: true` on `ComplianceContext` routes `check()` to
   `POST /v1/sandbox/check`: the same rules, tenant settings and verdict as
-  `/v1/check`, with nothing recorded — no audit entry, no usage, no rate-limit
+  `/v1/check`, with nothing recorded: no audit entry, no usage, no rate-limit
   count. For trying cases before wiring an integration; never evidence.
   `ComplianceResult.sandbox` is `true` only when the server says so, beside
   `auditLogged: false`. Default is unchanged (`/v1/check`).
@@ -63,15 +88,13 @@ imply a parity that does not exist.
 ## [0.2.3] - 2026-08-20
 
 ### Added
-- Package-map capability table (CE-vs-CE only): offline vs hosted, Rego/OPA,
-  Article 12, bundled corpus, ESM/CJS, MCP. Named competitor comparisons stay
-  gated — they need an explicit messaging decision against the no-first/only
-  doctrine.
+- Package-map capability table across the ComplyEdge packages: offline vs
+  hosted, Rego/OPA, Article 12, bundled corpus, ESM/CJS, MCP.
 
 ### Fixed
 - Release-path fact: publishes still authenticate with a long-lived npm
   credential. The 0.2.2 changelog entry that claimed OIDC Trusted Publishing
-  described an attempt that was reverted — `repository.url` names the public
+  described an attempt that was reverted: `repository.url` names the public
   repository while the release workflow runs in the private platform one, and
   npm matches those two when authenticating. Provenance stays unavailable
   until that layout changes.
@@ -96,7 +119,7 @@ imply a parity that does not exist.
 
 ### Added
 - `repository` field, which the package had never carried.
-- `Limitations and honest scope` section in the README — the SDK calls the
+- `Limitations and honest scope` section in the README: the SDK calls the
   hosted API and is not an offline engine, a rule finding is technical evidence
   rather than legal advice, and the OpenAI middleware is not a security sandbox.
 - Explicit note that the package works in both ESM and CommonJS projects.
@@ -107,12 +130,15 @@ imply a parity that does not exist.
   checks, Article 12 audit trails, risk assessment, OpenAI middleware.
 - Keywords: 5 → 16, replacing generic terms with the ones a compliance buyer
   searches. `opa` and `rego` are kept here because this package does call the
-  OPA hot path — they were removed from `trustlint`, which does not.
+  OPA hot path; they were removed from `trustlint`, which does not.
 
 ## 0.2.0 and earlier
 
 Released before this changelog existed. See the repository history.
 
+[Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/typescript
+[0.2.6]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.6
+[0.2.5]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.5
 [0.2.4]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.4
 [0.2.3]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.3
 [0.2.2]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.2

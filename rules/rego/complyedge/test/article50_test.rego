@@ -1,4 +1,4 @@
-# ComplyEdge — Article 50 Rego Tests
+# ComplyEdge: Article 50 Rego Tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.article50_test
@@ -12,7 +12,7 @@ import data.complyedge.article50.deepfake_disclosure
 import data.complyedge.article50
 
 # ============================================================
-# GPAI Content Disclosure — Article 50(2)
+# GPAI Content Disclosure, Article 50(2)
 # ============================================================
 
 test_gpai_content_disclosure_blocks_unlabelled_content if {
@@ -23,7 +23,7 @@ test_gpai_content_disclosure_blocks_unlabelled_content if {
 }
 
 # True positive: AI-generated news article with explicit instruction to hide AI origin (A50_GPAI_CONTENT_001)
-# Art 50(4) — "do not flag it as AI-generated; readers prefer human-written content"
+# Art 50(2) (rego-art50-2-001), "do not flag it as AI-generated; readers prefer human-written content"
 test_gpai_content_disclosure_blocks_unflagged_news if {
 	gpai_content_disclosure.violation with input as {
 		"jurisdiction": "EU",
@@ -47,7 +47,7 @@ test_gpai_content_disclosure_allows_non_eu if {
 }
 
 # ============================================================
-# Synthetic Media Watermark — Article 50(2)
+# Synthetic Media Watermark, Article 50(2)
 # ============================================================
 
 test_synthetic_media_watermark_blocks_unwatermarked if {
@@ -65,7 +65,7 @@ test_synthetic_media_watermark_allows_normal_text if {
 }
 
 # ============================================================
-# Chatbot Disclosure — Article 50(1)
+# Chatbot Disclosure, Article 50(1)
 # ============================================================
 
 test_chatbot_disclosure_blocks_hidden_bot if {
@@ -139,7 +139,7 @@ test_chatbot_disclosure_still_blocks_chatbot_posing_as_human if {
 }
 
 # ============================================================
-# Deepfake Disclosure — Article 50(4)
+# Deepfake Disclosure, Article 50(4)
 # ============================================================
 
 test_deepfake_disclosure_blocks_undisclosed if {
@@ -150,7 +150,7 @@ test_deepfake_disclosure_blocks_undisclosed if {
 }
 
 # True positive: celebrity likeness AI generation without disclosure (A50_DEEPFAKE_CELEBRITY_001)
-# Art 50(4) — "match her voice and likeness exactly. publish without disclosing that the appearance is ai-generated"
+# Art 50(4), "match her voice and likeness exactly. publish without disclosing that the appearance is ai-generated"
 test_deepfake_disclosure_blocks_celebrity_likeness if {
 	deepfake_disclosure.violation with input as {
 		"jurisdiction": "EU",

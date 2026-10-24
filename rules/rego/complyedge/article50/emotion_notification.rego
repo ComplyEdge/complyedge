@@ -1,18 +1,38 @@
-# ComplyEdge — EU AI Act Article 50(3): Emotion Notification
+# ComplyEdge: EU AI Act Article 50(3): Emotion Notification
 #
 # Deploying an emotion recognition or biometric categorisation system without
 # informing the people exposed to it.
 #
+# Layer 1 detects: as adjacent words, "emotion recognition" or "biometric
+# categorisation" (or "categorization"), optionally followed by "system", then
+# without, lacking or no, then a word beginning notice, notif, disclosure or
+# inform ("emotion recognition without notice"); and deploy, use or run (any
+# ending) then "emotion recognition", optionally "on", then users, people or
+# persons, then "without" informing, telling or notice. It matches wording,
+# not meaning: it misses the practice told in other words, it fires on text
+# that only names it, and it fires even where the Article 50(3) exception for
+# systems permitted by law to detect, prevent or investigate criminal offences
+# applies ("Under the warrant and national criminal procedure law,
+# investigators may run the biometric categorisation without notice to the
+# suspect."). Whether a text deploys the system without informing the people
+# exposed, and whether the exception applies, is judged in Layer 2.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 50(3)
-# Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
+# Recital: 132: natural persons should be notified when they are exposed to AI systems that, by processing their biometric data, can identify or infer their emotions or intentions or assign them to specific categories
+# Penalty: up to EUR 15M or 3% of total worldwide annual turnover, whichever is higher (Article 99(4), point (g))
+# Effective: 2026-08-02
 # Condition type: deterministic
 # Enforcement layer: layer1
 # Status: approved
-# Approved by: Leo Celis on 2026-07-09 (agent authoring)
+# Approved by: Leo Celis on 2026-10-22 (via agent review per §5.1 amendment v1.1)
+# ELI: http://data.europa.eu/eli/reg/2024/1689/art_50/par_3/oj
+# Provision: Regulation (EU) 2024/1689, Article 50(3)
 
 package complyedge.article50.emotion_notification
 
 import rego.v1
+
+import data.complyedge.shared.normalize
 
 default violation := false
 
@@ -23,11 +43,11 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"(?:emotion\\s+recognition|biometric\\s+categori[sz]ation)\\s+(?:system\\s+)?(?:without|lacking|no)\\s+(?:notice|notif|disclosure|inform)",
+		"(?:emotion\\s+recognition|biometric\\s+categori[sz]ation)\\s+(?:system\\s+)?\\b(?:without|lacking|no)\\s+(?:notice|notif|disclosure|inform)",
 		"(?:deploy|use|run)\\w*\\s+emotion\\s+recognition\\s+(?:on\\s+)?(?:users|people|persons)\\s+without\\s+(?:informing|telling|notice)",
 	]
 
-	text := lower(input.text)
+	text := lower(normalize.text)
 	some pattern in patterns
 	regex.match(pattern, text)
 }

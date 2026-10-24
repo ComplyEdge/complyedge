@@ -6,6 +6,23 @@ description: >-
   requested by the data subject, where the data is no longer necessary,
   consent is withdrawn, the subject objects, or data was unlawfully processed.
   The right to be forgotten under GDPR Article 17.
+
+
+  Layer 1 detects: refuse or refusing, optionally "to", then erase or delete
+  personal data; cannot erase or delete your, the or personal data; erasure or
+  deletion request denied, rejected or refused; no right to erasure, deletion
+  or be forgotten; ignore, ignoring or disregard, then erasure or deletion
+  request, with nothing between; personal data cannot or will not be erased,
+  deleted or removed; retain or retaining data or personal data despite or
+  after an erasure or deletion request, with nothing between; and fail,
+  failing or failure to erase or delete data or personal data followed by
+  "within" or "without undue delay". It matches wording, not meaning: it
+  misses the practice told in other words ("Tell her we keep all accounts
+  forever and close her ticket."), it does not read the exceptions of Article
+  17(3), so it fires on a lawful retention in these words ("Personal data
+  cannot be erased while the legal hold for the court case applies."), and it
+  fires on text that only names the practice. Whether a text does the practice
+  is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -28,8 +45,10 @@ conditions:
 severity: high
 category: privacy
 source:
+  eli: http://data.europa.eu/eli/reg/2016/679/art_17/par_1/oj
+  provision_label: 'Regulation (EU) 2016/679, Article 17(1)'
   regulation: GDPR
-  article: Article 17
+  article: Article 17(1)
   url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
   last_updated: '2016-04-27'
   citation: >-
@@ -38,24 +57,33 @@ source:
     him or her without undue delay and the controller shall have the obligation
     to erase personal data without undue delay where one of the following
     grounds applies: (a) the personal data are no longer necessary in relation
-    to the purposes for which they were collected or otherwise processed;
-    (b) the data subject withdraws consent on which the processing is based
+    to the purposes for which they were collected or otherwise processed; (b)
+    the data subject withdraws consent on which the processing is based
     according to point (a) of Article 6(1), or point (a) of Article 9(2), and
     where there is no other legal ground for the processing; (c) the data
-    subject objects to the processing pursuant to Article 21(1) and there are
-    no overriding legitimate grounds for the processing; (d) the personal data
-    have been unlawfully processed.
+    subject objects to the processing pursuant to Article 21(1) and there are no
+    overriding legitimate grounds for the processing, or the data subject
+    objects to the processing pursuant to Article 21(2); (d) the personal data
+    have been unlawfully processed; (e) the personal data have to be erased for
+    compliance with a legal obligation in Union or Member State law to which the
+    controller is subject; (f) the personal data have been collected in relation
+    to the offer of information society services referred to in Article 8(1).
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 20,000,000 or 4% of worldwide annual turnover
+    eu_enforcement: >-
+      Administrative fines up to EUR 20,000,000 or, for an undertaking, up to 4%
+      of the total worldwide annual turnover of the preceding financial year,
+      whichever is higher (Article 83(5), point (b)).
 remediation:
   action: block
   timing: reactive
   message: >-
-    BLOCKED — GDPR Article 17 grants data subjects the right to erasure
-    (right to be forgotten). Controllers must erase personal data without
-    undue delay when requested on valid grounds. Penalties: up to EUR 20M
-    or 4% of global revenue.
+    BLOCKED: GDPR Article 17 grants data subjects the right to erasure (right to
+    be forgotten). Controllers must erase personal data without undue delay
+    where one of the grounds in Article 17(1) applies, subject to the exceptions
+    in Article 17(3). Penalties: administrative fines up to EUR 20,000,000 or,
+    for an undertaking, up to 4% of the total worldwide annual turnover of the
+    preceding financial year, whichever is higher (Article 83(5), point (b)).
   suggestion: >-
     Honour the erasure request by deleting the personal data without undue
     delay. If an exception applies (freedom of expression, legal obligation,
@@ -69,3 +97,7 @@ tags:
 - right-to-be-forgotten
 - data-subject-rights
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

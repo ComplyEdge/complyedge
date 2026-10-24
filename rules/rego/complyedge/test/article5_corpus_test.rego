@@ -1,4 +1,4 @@
-# ComplyEdge — article5 new-rule tests
+# ComplyEdge: article5 new-rule tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.article5_corpus_test

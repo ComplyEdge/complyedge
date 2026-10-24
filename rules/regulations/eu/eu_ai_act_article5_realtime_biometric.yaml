@@ -7,6 +7,21 @@ description: >-
   the EU AI Act, with narrow exceptions (targeted search for specific victims,
   imminent threat prevention, suspect identification for serious crimes) that
   require judicial authorization.
+
+
+  Layer 1 detects: real-time (or "real time", "realtime") biometric, also with
+  "remote" in between; live facial recognition; real-time face ID,
+  identification or matching; public space face or biometric ID,
+  identification, scanning or matching; mass facial recognition; crowd facial
+  scanning, ID or identification; real-time gait recognition or ID; and
+  real-time voice identification or biometrics. It matches wording, not
+  meaning: it does not read whether the space is publicly accessible, whether
+  the purpose is law enforcement, or the exceptions of Article 5(1)(h)(i) to
+  (iii) and their authorisation, so it fires on an authorised use written in
+  these words ("Under the judge's authorisation, police may use real-time
+  biometric identification at the station to find the abducted child."), and
+  on text that only names the practice, such as a refusal. Whether a text does
+  the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -19,43 +34,55 @@ conditions:
     except in narrowly defined circumstances with judicial authorization.
   model: gpt-4
 - type: regex
-  value: (real[- ]?time\s+(remote\s+)?biometric|live\s+facial[- ]?recognition|real[- ]?time\s+face\s+(id|identif|match)|public\s+space\s+(face|biometric)\s+(id|identif|scan|match)|mass\s+facial[- ]?recognition|crowd\s+facial[- ]?(scan|id|identif)|real[- ]?time\s+gait\s+(recognition|id)|real[- ]?time\s+voice\s+(identif|biometric))
+  value: (real[-\s]?time\s+(remote\s+)?biometric|live\s+facial[-\s]?recognition|real[-\s]?time\s+face\s+(id|identif|match)|public\s+space\s+(face|biometric)\s+(id|identif|scan|match)|mass\s+facial[-\s]?recognition|crowd\s+facial[-\s]?(scan|id|identif)|real[-\s]?time\s+gait\s+(recognition|id)|real[-\s]?time\s+voice\s+(identif|biometric))
   flags: i
 severity: critical
 category: prohibited_practice
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_5/par_1/pnt_h/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 5(1)(h)'
   regulation: EU AI Act
   article: Article 5(1)(h)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 5(1)(h): The use of real-time remote
+    Regulation (EU) 2024/1689, Article 5(1)(h): the use of 'real-time' remote
     biometric identification systems in publicly accessible spaces for the
     purposes of law enforcement, unless and in so far as such use is strictly
-    necessary for one of the following objectives: (i) the targeted search
-    for specific victims of abduction, trafficking in human beings or sexual
+    necessary for one of the following objectives: (i) the targeted search for
+    specific victims of abduction, trafficking in human beings or sexual
     exploitation of human beings, as well as the search for missing persons;
     (ii) the prevention of a specific, substantial and imminent threat to the
     life or physical safety of natural persons or a genuine and present or
-    genuine and foreseeable threat of a terrorist attack; (iii) the
-    localisation or identification of a person suspected of having committed
-    a criminal offence referred to in Annex II, for the purposes of conducting
-    a criminal investigation, prosecution or execution of a criminal penalty.
+    genuine and foreseeable threat of a terrorist attack; (iii) the localisation
+    or identification of a person suspected of having committed a criminal
+    offence, for the purpose of conducting a criminal investigation or
+    prosecution or executing a criminal penalty for offences referred to in
+    Annex II and punishable in the Member State concerned by a custodial
+    sentence or a detention order for a maximum period of at least four years.
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 5(1)(h) prohibits real-time remote biometric
-    identification in publicly accessible spaces. Narrow exceptions exist for
-    law enforcement with judicial authorization (targeted victim search,
-    imminent threat prevention, serious crime suspect identification), but
-    these are not general-purpose use cases. Penalties: up to €35M or 7% of
-    global revenue.
+    BLOCKED: EU AI Act Article 5(1)(h) prohibits the use of 'real-time' remote
+    biometric identification systems in publicly accessible spaces for the
+    purposes of law enforcement, unless strictly necessary for one of three
+    objectives: the targeted search for specific victims or missing persons; the
+    prevention of a specific, substantial and imminent threat to life or
+    physical safety or of a terrorist attack; or the localisation or
+    identification of a suspect of an Annex II offence punishable by at least
+    four years. Each use needs prior authorisation by a judicial authority or an
+    independent administrative authority whose decision is binding (Article
+    5(3)). Penalties: administrative fines up to EUR 35,000,000 or, for an
+    undertaking, up to 7% of its total worldwide annual turnover for the
+    preceding financial year, whichever is higher (Article 99(3)); for SMEs,
+    including start-ups, whichever is lower (Article 99(6)).
   suggestion: >-
-    Replace with post-event biometric analysis with appropriate legal basis,
-    or use non-biometric identification methods. If a narrow Article 5(1)(h)
-    exception applies, consult legal counsel about judicial authorization
-    requirements before deployment.
+    For law enforcement use, confirm that one of the Article 5(1)(h) objectives
+    applies and that prior authorisation under Article 5(3) has been granted
+    before deployment, or use non-biometric identification methods. Processing
+    of biometric data for purposes other than law enforcement is governed by
+    Article 9 of Regulation (EU) 2016/679.
 version: 1.0.0
 tags:
 - eu-ai-act
@@ -65,3 +92,7 @@ tags:
 - real-time
 - proactive
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

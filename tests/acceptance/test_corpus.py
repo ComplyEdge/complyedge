@@ -2,9 +2,9 @@
 OFFLINE — Validates static claims about the rule corpus and SDK defaults.
 No API key required.
 
-Claims verified:
-  - "19 Rego policies covering EU AI Act Article 5, Article 50, and GPAI"
-  - "53 YAML regulation definitions spanning EU, US, global, and universal rules"
+Claims verified (as the launch post states them today):
+  - "75 deterministic leaf Rego policies plus 8 package aggregators"
+  - "63 YAML regulation definitions spanning EU, US, global, and universal rules"
   - "EU covers Articles 4–27, 50, 53, GPAI, GDPR"
   - "US covers HIPAA, SOX, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA"
   - "Plus PCI DSS and prompt injection detection"
@@ -28,12 +28,14 @@ from conftest import REPO_ROOT, RULES_REGO_DIR, RULES_REGULATIONS_DIR, SDK_DIR
 
 
 class TestRegoCorpus:
-    """Validates the 19 production Rego policies mentioned in the launch post."""
+    """Validates the Rego corpus: 75 leaf policies plus 8 package aggregators."""
 
     @pytest.fixture(scope="class")
     def prod_rego_files(self) -> list[Path]:
         all_rego = list(RULES_REGO_DIR.rglob("*.rego"))
-        return [f for f in all_rego if "test" not in f.parts]
+        # shared/ holds helper modules imported by the policies (normalize.rego),
+        # not policies: it has no citation or violation of its own.
+        return [f for f in all_rego if "test" not in f.parts and "shared" not in f.parts]
 
     def test_production_rego_leaf_count_meets_moat(self, prod_rego_files):
         # public claim is leaf-basis (≥50). Aggregators are not leaves.
@@ -119,7 +121,7 @@ class TestRegoCorpus:
 
 
 class TestYamlCorpus:
-    """Validates the 53 YAML regulation definitions mentioned in the launch post."""
+    """Validates the 63 YAML regulation definitions."""
 
     @pytest.fixture(scope="class")
     def yaml_files(self) -> list[Path]:

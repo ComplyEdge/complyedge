@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ComplyEdgeClient } from "../client";
+import { ReceiptJournal } from "../receiptJournal";
 
 // Mock axios
 vi.mock("axios", () => ({
@@ -11,8 +12,9 @@ vi.mock("axios", () => ({
 }));
 
 import axios from "axios";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 describe("ComplyEdgeClient", () => {
   let client: ComplyEdgeClient;
@@ -146,6 +148,41 @@ describe("ComplyEdgeClient", () => {
       // appears only in the synthetic DD sample and must not leak into the SDK.
       expect(result.textHash).toMatch(/^[a-f0-9]{64}$/);
       expect(result.timestamp).toBe("2026-07-22T20:30:00+00:00");
+      // No alg on a pre-2026-10-13 response: that hash is a plain SHA-256.
+      expect(result.textHashAlg).toBeUndefined();
+    });
+
+    it("surfaces textHashAlg for a keyed hash", async () => {
+      mockPost.mockResolvedValue({
+        data: {
+          event_id: "e",
+          allowed: true,
+          violations: [],
+          text_hash: "0aa4e756f4df3933cc48373c6338499228d50078cacbbdd9dde925221d2b02c5",
+          text_hash_alg: "hmac-sha256-1",
+        },
+      });
+      const result = await client.check("Score users based on their social behavior");
+      expect(result.textHashAlg).toBe("hmac-sha256-1");
+    });
+
+    it("surfaces bundleDigest, the digest of the rule set that decided", async () => {
+      const digest = "42dfbd5ac9adccdc4052d6fdcb88bded9281dcccf961ba31171b235505104e34";
+      mockPost.mockResolvedValue({
+        data: { event_id: "e", allowed: false, violations: [], bundle_digest: digest },
+      });
+      const result = await client.check("Score users based on their social behavior");
+      expect(result.bundleDigest).toBe(digest);
+      mockPost.mockResolvedValue({ data: { event_id: "e", allowed: true, violations: [] } });
+      expect((await client.check("x")).bundleDigest).toBeUndefined();
+    });
+
+    it("verifyInput posts the event and text to /v1/audit/verify", async () => {
+      mockPost.mockResolvedValue({ data: { event_id: "e1", match: true, text_hash_alg: "hmac-sha256-1" } });
+      await expect(client.verifyInput("e1", "the text")).resolves.toBe(true);
+      expect(mockPost).toHaveBeenCalledWith("/v1/audit/verify", { event_id: "e1", text: "the text" });
+      mockPost.mockResolvedValue({ data: { event_id: "e1", match: false } });
+      await expect(client.verifyInput("e1", "other")).resolves.toBe(false);
     });
 
     it("tolerates an API response without the evidence fields", async () => {
@@ -240,6 +277,23 @@ describe("ComplyEdgeClient", () => {
       );
     });
 
+    it("sends decisionContext as decision_context, and nothing when not given", async () => {
+      mockPost.mockResolvedValue({ data: { event_id: "e", allowed: true, violations: [] } });
+      const decisionContext = {
+        deciding_system: { version: "gpt-5.4-2026-08-01" },
+        purpose_ref: "purpose:support-replies",
+        data_categories: ["contact"],
+      };
+      await client.check("test", { direction: "action", decisionContext });
+      expect(mockPost).toHaveBeenCalledWith(
+        "/v1/check",
+        expect.objectContaining({ direction: "action", decision_context: decisionContext })
+      );
+      await client.check("test");
+      const body = mockPost.mock.calls[mockPost.mock.calls.length - 1][1];
+      expect(JSON.parse(JSON.stringify(body))).not.toHaveProperty("decision_context");
+    });
+
     it("includes processing time", async () => {
       mockPost.mockResolvedValue({ data: { event_id: "e", allowed: true, violations: [] } });
 
@@ -307,5 +361,72 @@ describe("ComplyEdgeClient", () => {
       expect(result.requiredDisclosures).toContain("Disclosure 1");
       expect(result.estimatedDeadline).toBe("2027-12-02");
     });
+  });
+});
+
+describe("ReceiptJournal", () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "ce-receipt-"));
+  });
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it("writes linkage and refuses text fields", () => {
+    const path = join(dir, "r.jsonl");
+    const journal = new ReceiptJournal(path);
+    journal.appendResult({
+      eventId: "e-1",
+      allowed: true,
+      status: "safe",
+      violations: [],
+      latencyMs: 1,
+      bundleVersion: "x",
+      evaluatedRules: [],
+      enginePath: "opa",
+      auditLogged: true,
+      sandbox: false,
+      textHash: "abc",
+      textHashAlg: "hmac-sha256-1",
+      bundleDigest: "deadbeef",
+      timestamp: "2026-10-16T12:00:00Z",
+      jurisdiction: "EU",
+      processingTimeMs: 1,
+    });
+    const row = journal.get("e-1");
+    expect(row?.textHash).toBe("abc");
+    expect(row?.bundleDigest).toBe("deadbeef");
+    expect(readFileSync(path, "utf8")).not.toContain("prompt body");
+    expect(() => journal.append({ eventId: "e", text: "prompt body" })).toThrow(
+      /refuses/
+    );
+  });
+
+  it("auto-appends from client.check when receiptJournalPath is set", async () => {
+    const path = join(dir, "auto.jsonl");
+    const mockPost = vi.fn().mockResolvedValue({
+      data: {
+        event_id: "auto-1",
+        allowed: true,
+        violations: [],
+        text_hash: "hh",
+        audit_logged: true,
+      },
+    });
+    vi.mocked(axios.create).mockReturnValue({
+      post: mockPost,
+    } as unknown as ReturnType<typeof axios.create>);
+    const client = new ComplyEdgeClient({
+      apiKey: "k",
+      baseUrl: "https://test.api.complyedge.io",
+      receiptJournalPath: path,
+    });
+    await client.check("secret prompt text");
+    const raw = readFileSync(path, "utf8");
+    expect(raw).toContain("auto-1");
+    expect(raw).not.toContain("secret prompt text");
   });
 });

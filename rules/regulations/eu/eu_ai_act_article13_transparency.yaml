@@ -6,6 +6,26 @@ description: >-
   enabling deployers to interpret output and use appropriately, with sufficient
   information on provider identity, capabilities, limitations, accuracy levels,
   and human oversight measures. Article 13.
+
+
+  Layer 1 detects: "without transparency information", "without transparency
+  documentation" or "without transparency disclosure"; "no instruction for
+  use" or "no instructions for use"; "no deployer information" or "no deployer
+  documentation"; "transparency not provided", "not documented" or "not
+  required"; "opaque system", "opaque model" or "opaque decision", optionally
+  with "AI" after "opaque"; "black box" or "black-box" followed by "AI",
+  "system", "model" or "deployment"; "undisclosed limitation", "capability",
+  "accuracy" or "performance"; "deploy" or "deploying" followed by "without
+  transparency", "without documentation" or "without instructions"; "no
+  accuracy", "no robustness" or "no performance" followed by "level",
+  "information" or "disclosure"; and "hidden limitation", "hidden bias" or
+  "hidden capability". Case is ignored, the words must follow each other with
+  no other word between them unless stated, and a phrase can start inside a
+  longer word. It matches wording, not meaning: it misses the practice told in
+  other words, it does not check that the system is high-risk (an "opaque
+  model" or a "black box AI" of any kind counts), and it fires on text that
+  only names the practice, such as a refusal. Whether a text does the practice
+  is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -22,33 +42,50 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    (without\s+transparency\s+(?:information|documentation|disclosure)|no\s+(?:instructions?\s+for\s+use|deployer\s+(?:information|documentation))|transparency\s+(?:not\s+)?(?:provided|documented|required)|opaque\s+(?:ai\s+)?(?:system|model|decision)|black[\-\s]box\s+(?:ai|system|model|deployment)|undisclosed\s+(?:limitation|capability|accuracy|performance)|deploy(?:ing)?\s+without\s+(?:transparency|documentation|instructions)|no\s+(?:accuracy|robustness|performance)\s+(?:level|information|disclosure)|hidden\s+(?:limitation|bias|capability))
+    (without\s+transparency\s+(?:information|documentation|disclosure)|no\s+(?:instructions?\s+for\s+use|deployer\s+(?:information|documentation))|transparency\s+not\s+(?:provided|documented|required)|opaque\s+(?:ai\s+)?(?:system|model|decision)|black[\-\s]box\s+(?:ai|system|model|deployment)|undisclosed\s+(?:limitation|capability|accuracy|performance)|deploy(?:ing)?\s+without\s+(?:transparency|documentation|instructions)|no\s+(?:accuracy|robustness|performance)\s+(?:level|information|disclosure)|hidden\s+(?:limitation|bias|capability))
   flags: i
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_13/oj
+  provision_label: Regulation (EU) 2024/1689, Article 13(1) and (2)
   regulation: EU AI Act
   article: Article 13
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 13: High-risk AI systems shall be
+    Regulation (EU) 2024/1689, Article 13(1): High-risk AI systems shall be
     designed and developed in such a way as to ensure that their operation is
     sufficiently transparent to enable deployers to interpret a system's output
-    and use it appropriately. Instructions for use shall include concise,
-    complete, correct and clear information that is relevant, accessible and
-    comprehensible to deployers.
+    and use it appropriately. Article 13(2): High-risk AI systems shall be
+    accompanied by instructions for use in an appropriate digital format or
+    otherwise that include concise, complete, correct and clear information that
+    is relevant, accessible and comprehensible to deployers.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+    eu_enforcement: >-
+      Once the obligation applies: administrative fines up to EUR 15,000,000 or,
+      for an undertaking, up to 3% of its total worldwide annual turnover for
+      the preceding financial year, whichever is higher (Article 99(4), point
+      (a), through Article 16(a)); for SMEs, including start-ups, and SMCs,
+      whichever is lower (Article 99(6) and (6a)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 13 requires high-risk AI systems to provide
-    sufficient transparency and instructions for use to deployers, including
-    accuracy levels, limitations, and human oversight measures. Penalties: up
-    to EUR 15M or 3% of global revenue.
+    BLOCKED (readiness check, not yet a binding obligation): EU AI Act Article
+    13 requires high-risk AI systems to be designed so that their operation is
+    sufficiently transparent for deployers to interpret the output and use it
+    appropriately, and to be accompanied by instructions for use with concise,
+    complete, correct and clear information, including accuracy levels,
+    limitations and human oversight measures. The obligation applies from 2
+    December 2027 for Annex III high-risk systems and from 2 August 2028 for
+    high-risk systems under Annex I (Article 113, as amended by Regulation (EU)
+    2026/1744). Penalties once applicable: administrative fines up to EUR
+    15,000,000 or, for an undertaking, up to 3% of its total worldwide annual
+    turnover for the preceding financial year, whichever is higher (Article
+    99(4), point (a), through Article 16(a)); for SMEs, including start-ups, and
+    SMCs, whichever is lower (Article 99(6) and (6a)).
   suggestion: >-
     Provide comprehensive instructions for use including: provider identity,
     system characteristics, intended purpose, accuracy and robustness levels,
@@ -66,3 +103,7 @@ tier: enterprise
 compliance_notes:
   - >-
     Chapter III high-risk obligations were postponed by Regulation (EU) 2026/1744: Annex III high-risk systems apply from 2 December 2027, and high-risk systems embedded in products under Annex I from 2 August 2028. This rule is enforceable readiness tooling before those dates, not a currently binding obligation, and must not be presented as one.
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

@@ -1,10 +1,35 @@
 id: PROMPT_SECURITY_INDIRECT_INJECTION_EMBEDDED_INSTRUCTION_001
 jurisdiction: GLOBAL
-effective_date: '2026-07-05'
-description: 'Detects indirect prompt injection: instructions embedded in untrusted content (retrieved
-  documents, tool outputs, web pages) that try to redirect the model when it reads/summarises them. EU
-  AI Act Article 15. OWASP LLM01.'
-title: Indirect prompt injection — embedded instruction in content
+effective_date: '2027-12-02'
+description: >-
+  Covers indirect prompt injection: instructions embedded in untrusted content
+  (retrieved documents, tool outputs, web pages) that try to redirect the model
+  when it reads/summarises them. EU AI Act Article 15. OWASP LLM01.
+
+
+  Layer 1 detects: in any letter case, "when you", "when the AI", "when the
+  assistant", "when the model", "when the LLM" or "when the system", followed by
+  read, process, summarise, summarize, analyse, analyze, parse, reply, respond,
+  answer, draft, handle or review (with or without a final "s"), then "this" or
+  "to this", then, within the next 80 characters on the same line, the word
+  ignore, instead, "you must", "do not", disregard, classify, approve,
+  pre-approve, preapprove, route, treat, skip, bypass, escalate, prioritise,
+  prioritize, include or forward; the German "wenn Sie" or "wenn du" followed by
+  dies, diese, diesen, dieses or diesem, one word, then bearbeiten, bearbeitest,
+  lesen, liest, verarbeiten, verarbeitest, prüfen, prüfst, analysieren or
+  beantworten, then, within 80 characters, a word starting "ignorier",
+  stattdessen, stufen, einstufen, leiten, weiterleiten, markieren, genehmigen,
+  überspringen, umgehen or priorisieren; a line that starts (after optional
+  spaces and one to three "#") with "system" or "assistant" followed by message,
+  prompt, instruction or note, then a colon or ">"; and an opening "<system>",
+  "<important_instruction>" or "<important_instructions>" tag, with or without
+  spaces inside the brackets. It matches wording, not meaning: it does not read
+  who wrote the text, so it fires on the user's own request in the same form
+  ("When you review this, skip the appendix") and on a document line that begins
+  "System note:" for an ordinary reason, and it misses an embedded instruction
+  worded any other way. Whether the text carries a third party's instruction is
+  judged in Layer 2.
+title: 'Indirect prompt injection: embedded instruction in content'
 detection_scope: all
 conditions:
 - type: regex
@@ -13,25 +38,46 @@ conditions:
 severity: high
 category: security
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_15/par_5/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 15(5)'
   regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
-  article: Regulation (EU) 2024/1689, Article 15
+  article: Regulation (EU) 2024/1689, Article 15(5)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
-  citation: 'Regulation (EU) 2024/1689 (EU AI Act), Article 15(5): "High-risk AI systems shall be resilient
-    against attempts by unauthorised third parties to alter their use, outputs or performance by exploiting
-    system vulnerabilities. The technical solutions aiming to ensure the cybersecurity of high-risk AI
-    systems shall be appropriate to the relevant circumstances and the risks."'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 15(5): High-risk AI systems shall be
+    resilient against attempts by unauthorised third parties to alter their use,
+    outputs or performance by exploiting system vulnerabilities. The technical
+    solutions aiming to ensure the cybersecurity of high-risk AI systems shall
+    be appropriate to the relevant circumstances and the risks. The technical
+    solutions to address AI specific vulnerabilities shall include, where
+    appropriate, measures to prevent, detect, respond to, resolve and control
+    for attacks trying to manipulate the training data set (data poisoning), or
+    pre-trained components used in training (model poisoning), inputs designed
+    to cause the AI model to make a mistake (adversarial examples or model
+    evasion), confidentiality attacks or model flaws.
   last_updated: '2026-07-05'
   citations:
   - 'Secondary reference (not the legal basis): OWASP Top 10 for LLM Applications, https://owasp.org/www-project-top-10-for-large-language-model-applications/'
 remediation:
   action: warn
   timing: proactive
-  message: ⚠️ Possible indirect prompt injection — the content contains directives that appear aimed at
-    the AI rather than the human reader. Treat as untrusted data, not instructions.
+  message: >-
+    ⚠️ Possible indirect prompt injection: the content contains directive
+    phrasing of the kind used to redirect a model. Treat retrieved content as
+    untrusted data, not instructions.
+    Article 15(5) applies to high-risk AI systems from 2 December 2027
+    (Annex III) and 2 August 2028 (Annex I): this finding is readiness
+    tooling, not a currently binding obligation.
   suggestion: Strip or neutralise embedded "system/assistant" directives before feeding retrieved content
     to the model; render such content as data, never as a control channel.
   allow_override: true
   require_explicit_consent: false
+compliance_notes:
+  - >-
+    Article 15 applies from 2 December 2027 for high-risk AI systems under Annex
+    III and from 2 August 2028 for high-risk AI systems under Annex I (Article
+    113, third paragraph, point (c), as amended by Regulation (EU) 2026/1744).
+    effective_date records the Annex III date.
 version: 1.0.0
 tags:
 - prompt_injection
@@ -44,3 +90,7 @@ tags:
 - owasp_llm01
 - security
 tier: community
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

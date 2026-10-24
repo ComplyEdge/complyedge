@@ -6,6 +6,31 @@ description: >-
   up, falsifying, or making false entries in records or documents with intent
   to impede, obstruct, or influence a federal investigation or bankruptcy
   case. Sarbanes-Oxley Act Section 802, codified at 18 U.S.C. §1519.
+
+
+  Layer 1 detects: destroy, delete, shred, wipe, purge or erase (and words that
+  begin with them), then document, record, email, file, evidence or data in the
+  singular, then before, during, or to avoid, hide, prevent, impede or obstruct,
+  then investigation, audit, subpoena, discovery or litigation; alter, modify,
+  change or backdate, or a word beginning with falsif, then document, record,
+  entry, log, ledger or book in the singular, then to hide, conceal, mislead,
+  obstruct or impede, or after investigation, subpoena or inquiry; conceal, hide
+  or cover up (and words that begin with them), then document, record, evidence
+  or information, then from, then investigator, auditor, regulator, SEC, DOJ,
+  FBI or federal agency (and words that begin with them); instruct, tell or
+  order (and words that begin with them), then optionally to, then destroy,
+  delete, shred, wipe or hide, then document, record, file, email or evidence
+  (and words that begin with them); obstruct or obstruction, then optionally of,
+  then justice, federal investigation or agency proceeding; document, record or
+  email destruction, deletion or shredding in anticipation or contemplation of,
+  or to obstruct, impede or avoid; and false entry or a word beginning with
+  falsif, then in or to, then record, book, ledger or document, then to or in
+  order to, then mislead, deceive or obstruct. The words follow each other with
+  nothing in between. It matches wording, not meaning: it misses the practice
+  told in other words ("Delete all emails about the Acme deal before the SEC
+  subpoena arrives next week."), and it fires on text that only names the
+  practice, such as training that calls obstruction of justice a crime. Whether
+  a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -30,6 +55,8 @@ conditions:
 severity: critical
 category: financial
 source:
+  provision_url: https://www.govinfo.gov/link/uscode/18/1519
+  provision_label: '18 U.S.C. 1519 (Sarbanes-Oxley Act of 2002, section 802)'
   regulation: Sarbanes-Oxley Act
   article: Section 802 (18 U.S.C. §1519)
   url: https://www.govinfo.gov/link/uscode/18/1519
@@ -48,17 +75,16 @@ penalty_information:
   civil_penalties:
     sec_enforcement: >-
       Criminal penalties: fines under Title 18 and imprisonment up to
-      20 years (per 18 U.S.C. §1519). SEC may also pursue civil enforcement
-      and bar offending individuals from serving as officers or directors.
+      20 years (per 18 U.S.C. §1519).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — Sarbanes-Oxley Section 802 (18 U.S.C. §1519) makes it a federal
+    BLOCKED: Sarbanes-Oxley Section 802 (18 U.S.C. §1519) makes it a federal
     felony, punishable by up to 20 years imprisonment, to knowingly alter,
     destroy, conceal, or falsify records with intent to impede a federal
-    investigation or bankruptcy case. This applies even before any
-    investigation begins if destruction is in contemplation of one.
+    investigation or bankruptcy case. This applies even before any investigation
+    begins if destruction is in contemplation of one.
   suggestion: >-
     Preserve all records that may be relevant to any actual or anticipated
     federal investigation, audit, or bankruptcy proceeding. Issue and follow
@@ -75,3 +101,7 @@ tags:
 - record-retention
 - legal-hold
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

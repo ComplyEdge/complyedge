@@ -1,6 +1,6 @@
 # Contributing to ComplyEdge
 
-ComplyEdge checks every AI request and answer at runtime, blocks the ones that break a rule, and records every decision, with the legal citation when a rule fires. The corpus is what makes enforcement possible: and it only compounds if people outside the core team add rules. Each rule you contribute is a legal artifact, traceable to an exact article, paragraph, and sub-paragraph, that could appear in a regulator's audit trail or an external compliance review. This guide explains how.
+ComplyEdge checks AI decisions against open rules tied to the law, and edits ADCR, the open rulebook for AI decision records. Every AI decision it checks is recorded, and when a rule fires the record names that rule and the law behind it; the rules in `rules/` are what those records cite, and they only get better if people outside the core team review and add to them. Each rule you contribute is a legal artifact, traceable to an exact article, paragraph and point, that can appear in an audit record an auditor or a data protection officer reads. This guide explains how.
 
 > **The strict format spec lives in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md).** This file is the front door: process, expectations, and the 5-step rule-writing workflow. RULE_STANDARD.md is the law.
 
@@ -22,7 +22,8 @@ You do **not** need to be a Rego expert. You need to understand the legal standa
 - New rules for uncovered Article 5, Article 50, or GPAI (Articles 51–55) clauses.
 - Improvements to existing rule conditions: more precise, fewer false positives.
 - New test cases for existing rules: both passing and blocking examples, using realistic AI output text.
-- Citation corrections: wrong sub-paragraph reference, missing recital.
+- Citation corrections: wrong paragraph or point reference, missing recital.
+- Changes to ADCR, the rulebook (what a decision record must contain and prove, a field, a mapping to a provision or a standard): see "Proposing a rulebook change" below.
 
 ## Installing from source
 
@@ -42,7 +43,7 @@ The Python SDK lives at `sdks/python/`; there is no top-level `setup.py`. Runnin
 - Rules without at least four test cases: two true positives (inputs that must trigger a violation), one true negative (legitimate input that must not trigger), and one jurisdiction guard (same violating input with a non-EU jurisdiction: must not trigger).
 - Rules that expand scope beyond the EU AI Act. **External contributions are scoped to EU AI Act Articles 5, 50, and GPAI (Articles 51–55) only.** The repo contains rules for other regulations (GDPR, HIPAA, SOX) built by the core team: those are not open for community contributions in 2026. Scope discipline is what makes the EU AI Act corpus defensible to a regulator.
 - Rules that do not conform to [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md) (mandatory ID format, citation format, header fields, test requirements).
-- PRs without an explicit human approval comment from the contributor (see step 5 below).
+- PRs without the contributor's signed checklist comment (see step 5 below).
 
 > **Bar:** 20 deep rules > 100 shallow checks. Every rule must cite the exact legal clause it enforces.
 
@@ -66,17 +67,26 @@ What exact behavior does this clause prohibit or require? The condition must be 
 - Bad: "checks for manipulative language."
 - Good: "detects whether AI output deploys subliminal techniques that distort a person's behaviour in a way that impairs their ability to make an informed decision", Article 5(1)(a).
 
-Community contributions are Layer 1 (Rego) only: deterministic conditions expressible as logic checks. If a clause cannot be reduced to a structural check, it is out of scope for this guide. Mark your rule `Condition type: deterministic`. If a clause has both a detectable structural component and an interpretive component, write the Rego for the structural part and mark it `Condition type: hybrid`: the core team handles the interpretive layer. When in doubt, open a GitHub Discussion before writing code.
+Community contributions are Layer 1 (Rego) only: deterministic conditions expressible as logic checks. If a clause cannot be reduced to a structural check, it is out of scope for this guide. Mark your rule `Condition type: deterministic`. If a clause has both a detectable structural component and an interpretive component, write the Rego for the structural part and mark it `Condition type: hybrid`: the core team handles the interpretive layer. When in doubt, open a GitHub Issue titled `Scope question: Article X(Y)(Z)` before writing code.
 
 ### Step 3, Write the rule per RULE_STANDARD.md
 
 Look at an existing rule in the same article as a template. Good reference rules:
 
-- [`rules/rego/complyedge/article5/social_scoring.rego`](rules/rego/complyedge/article5/social_scoring.rego), Article 5(1)(c); good example of condition precision and test coverage. Note: missing some header fields (recital, status, approved_by) per RULE_STANDARD.md worked example: your rule should have all fields populated.
+- [`rules/rego/complyedge/article5/social_scoring.rego`](rules/rego/complyedge/article5/social_scoring.rego), Article 5(1)(c); good example of condition precision, test coverage and a complete header (see the worked example in RULE_STANDARD.md).
 - [`rules/rego/complyedge/article50/deepfake_disclosure.rego`](rules/rego/complyedge/article50/deepfake_disclosure.rego), Article 50 transparency.
 - [`rules/rego/complyedge/gpai/model_classification.rego`](rules/rego/complyedge/gpai/model_classification.rego), Article 51 GPAI.
 
-Naming convention is mandatory: `rego-art{N}-{paragraph}{sub}-{seq}` (e.g. `rego-art5-1c-001`). The header comment block and metadata fields are listed in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md) §2. **All fields are required. None are optional.**
+Naming convention is mandatory. The base form is `rego-art{N}-{paragraph}{sub}-{seq}` (e.g. `rego-art5-1c-001`). The live rule set also uses these forms, each documented in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md) §1:
+
+- `rego-art{N}-{paragraph}-{seq}` when the paragraph has no points (`rego-art50-1-001`)
+- `rego-art{N}-{seq}` when the rule reads the article as a whole (`rego-art12-001`)
+- `rego-art6-annex3-{point}{sub}-{seq}` for Annex III high-risk areas (`rego-art6-annex3-5b-001`)
+- `rego-art15-ipi-{seq}` for the Article 15(5) prompt-injection family (`rego-art15-ipi-001`)
+- `rego-gpai-{N}{sub}-{seq}` for general-purpose AI model obligations (`rego-gpai-53a-001`)
+- `rego-gdpr{N}-{paragraph}{sub}-{seq}` for core-team GDPR rules, and `rego-sox-{section}-{seq}` for core-team US securities disclosure rules (the one rule of that form, `rego-sox-302-001`, covers SEC Regulation FD, 17 CFR 243.100(a); its ID is kept from when it was filed under SOX §302)
+
+Use the next free sequence number; never reuse an ID for a different provision. The header comment block and metadata fields are listed in RULE_STANDARD.md §2. **All fields are required. None are optional.**
 
 ### Step 4, Write test cases
 
@@ -115,14 +125,14 @@ feat(rule): Article X(Y)(Z): one-line description
 
 PR description must include:
 
-1. The legal citation: `Regulation (EU) 2024/1689, Article X, paragraph Y, sub-paragraph (Z)`.
+1. The legal citation, in the shape the rule set uses: `Regulation (EU) 2024/1689, Article X(Y)(Z): <text of the provision>`.
 2. A one-paragraph explanation of what the condition checks and why.
 3. Confirmation that `opa test rules/rego/ -v` passes locally.
 
 **Add a comment on your own PR** with this exact format:
 
 ```
-APPROVED: <your name> <YYYY-MM-DD>: confirmed Article X(Y)(Z) condition and test cases
+CHECKED: <your name> <YYYY-MM-DD>: confirmed Article X(Y)(Z) condition and test cases
 
 Checklist:
 - [x] Legal text read in full (Regulation (EU) 2024/1689, Article X)
@@ -135,13 +145,13 @@ Checklist:
 - [x] Citation is precise (paragraph + sub-paragraph level)
 ```
 
-This is the human approval step. Without it, the PR will not be merged. The reason is that compliance rules carry legal weight: we will not infer your intent from a thumbs-up emoji.
+This is your sign-off as the author. It is not the approval: a rule is approved only by a maintainer named in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md) §5.1, who posts the `APPROVED:` block from §5.2 after reviewing it. Without both comments, the PR will not be merged. The reason is that compliance rules carry legal weight: we will not infer your intent from a thumbs-up emoji.
 
 ---
 
 ## Review process
 
-All rules are reviewed by Leo or Martin before merging.
+All rules are reviewed by the maintainers before merging.
 
 Review criteria:
 
@@ -150,7 +160,19 @@ Review criteria:
 3. Do test cases cover both outcomes? Do they use realistic text?
 4. Does the rule conform to RULE_STANDARD.md (ID format, header fields, citation format)?
 
-Target review time: **5 business days.** If your rule is rejected, you will receive a comment explaining exactly why and what to change. Rejections are not personal: they are an artifact of the legal rigor that makes the corpus useful to diligence reviewers.
+If your rule is rejected, you will receive a comment explaining exactly why and what to change. Rejections are not personal: they come from the legal rigor that makes the rule set useful to the auditors and reviewers who read the records it produces.
+
+---
+
+## Proposing a rulebook change
+
+ADCR, the AI Decision Check Record ([complyedge.io/rulebook](https://complyedge.io/rulebook/)), says what an AI decision record must contain and prove under EU law, and how a third party checks it. It is separate from the rules in `rules/`: those are the rule set ComplyEdge runs, and a record names them by digest. Auditors, certifiers, data protection officers and standards-committee members are the people most likely to spot what the rulebook gets wrong. To propose a change:
+
+1. Open a GitHub Issue titled `Rulebook change: <rule>`, for example `Rulebook change: REC-12`.
+2. Name the clause of law or the audit criterion the change rests on, exactly (instrument, article, paragraph, point), and quote the text you rely on.
+3. Say what the rulebook says today, what it should say, why, and which test vector the change adds or changes. If the change touches a standard (for example ISO/IEC 24970 or prEN 18229-1), name the clause; do not paste text from a paywalled standard.
+
+ADCR is at version 0.1.0, in development, and follows semantic versioning. The decision process is in the rulebook's [governance document](https://complyedge.io/rulebook/0.1.0/GOVERNANCE.md).
 
 ---
 
@@ -158,16 +180,16 @@ Target review time: **5 business days.** If your rule is rejected, you will rece
 
 Contributors are listed in `CONTRIBUTORS.md` (created on first external merge).
 
-Rules you author carry your name in the `Approved by` field of the rule header. If a rule you contributed is cited in a compliance audit or customer compliance report, you will be acknowledged.
+Your name stays on the rules you author through the PR and the commit history. The `Approved by` field in the rule header names the maintainer who approved the rule (RULE_STANDARD.md §5.4).
 
 ---
 
 ## Questions
 
 - **Bug in the engine, the SDK, or the test harness?** Open a GitHub Issue.
-- **Question about rule scope, legal interpretation, or whether your idea fits the corpus?** Open a GitHub Discussion. We answer scope and interpretation questions in public so the next contributor can read the thread.
+- **Question about rule scope, legal interpretation, or whether your idea fits the rule set?** Open a GitHub Issue titled `Scope question: <article or idea>`. We answer scope and interpretation questions in public so the next contributor can read the thread.
 
-Issues are for bugs. Discussions are for legal and scope questions. Please do not mix them.
+Keep one question per issue, and keep scope questions apart from bug reports.
 
 ---
 

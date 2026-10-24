@@ -1,8 +1,30 @@
 id: PCI_DSS_INPUT_001
 jurisdiction: GLOBAL
-effective_date: '2004-12-15'
-description: Proactively detects payment card information in user inputs to prevent
-  PCI DSS violations
+effective_date: '2024-03-31'
+description: >-
+  Covers payment card account data (primary account numbers and card security
+  codes) entered in user inputs, which PCI DSS Requirement 3 (Protect Stored
+  Account Data) requires an entity not to store unprotected. PCI DSS is an
+  industry standard enforced through card-brand and acquirer contracts, not a
+  law.
+
+
+  Layer 1 detects: a card-number format written as one run of digits (13 or 16
+  digits starting with 4; 16 digits starting with 51 to 55; 15 digits starting
+  with 34 or 37; 16 digits starting with 6011 or 65), or written in groups with
+  the same separator, a space or a hyphen, throughout (four groups of four
+  digits starting with 4, 51 to 55, 6011 or 65; or groups of 4, 6 and 5 digits
+  starting with 34 or 37). No checksum is computed: any digit run of that shape
+  fires, a valid card number or not, and other card ranges (Mastercard numbers
+  starting with 2, JCB, Diners, 19-digit cards) are not matched. It also fires
+  on the words credit card, debit card, card number, CVV or CVC; on my card, my
+  credit or my debit; and on the word card followed later on the same line by
+  four digits that end a word. The fragment "expir" in the pattern is bounded as
+  a whole word and does not match expiry or expiration. It matches formats and
+  words, not purpose: it fires on a question about payment methods ("Do you
+  accept credit card payments?") and on a masked reference ("My card ending in
+  1234 was declined."), although the rule lists masked references as an
+  exception. Whether a text holds cardholder data is judged in Layer 2.
 detection_scope: user_input
 # Layer 1 (deterministic regex) conditions. Multi-signal correlation
 # (card number co-occurring with name/address) requires Layer 2 evaluation
@@ -16,23 +38,37 @@ conditions:
   value: \b3[47][0-9]{13}\b
 - type: regex
   value: \b6(?:011|5[0-9]{2})[0-9]{12}\b
+# The same card numbers written in groups of four (Amex 4-6-5) with one
+# separator, a space or a dash, used throughout the number.
 - type: regex
-  value: \b(credit card|debit card|card number|cvv|cvc|expir)\b
+  value: \b4[0-9]{3}([ -])[0-9]{4}\1[0-9]{4}\1[0-9]{4}\b
+- type: regex
+  value: \b5[1-5][0-9]{2}([ -])[0-9]{4}\1[0-9]{4}\1[0-9]{4}\b
+- type: regex
+  value: \b3[47][0-9]{2}([ -])[0-9]{6}\1[0-9]{5}\b
+- type: regex
+  value: \b6(?:011|5[0-9]{2})([ -])[0-9]{4}\1[0-9]{4}\1[0-9]{4}\b
+- type: regex
+  value: \b(credit\scard|debit\scard|card\snumber|cvv|cvc|expir)\b
   flags: i
 - type: regex
-  value: (?i)\b(my card|my credit|my debit|card.*\d{4})\b
+  value: (?i)\b(my\scard|my\scredit|my\sdebit|card.*\d{4})\b
   flags: i
 severity: high
 category: financial
 source:
+  provision_url: https://www.pcisecuritystandards.org/document_library/
+  provision_label: >-
+    PCI DSS v4.0.1, Requirement 3 (Protect Stored Account Data), industry
+    standard, not law; standard text behind PCI SSC licence not read
   # NOT a statute. PCI DSS is a private industry standard published by the PCI
   # Security Standards Council; its text sits behind the SSC's terms, so a
   # verbatim quote is neither available nor licensable here. Labelled as a
   # standard reference so it is not mistaken for an uncited law.
   regulation: PCI DSS (industry standard, not statute)
-  article: Requirement 3.4
+  article: Requirement 3 (Protect Stored Account Data)
   url: https://www.pcisecuritystandards.org/pci_security/
-  last_updated: '2022-03-31'
+  last_updated: '2024-06-11'
 exceptions:
 - condition: Masked card references
   description: References to cards with only last 4 digits (e.g., 'card ending in
@@ -49,7 +85,26 @@ remediation:
   - Contact customer service through our verified payment channels
   allow_override: false
   require_explicit_consent: false
-version: 1.1.0
+compliance_notes:
+- >-
+  effective_date is 31 March 2024, the date PCI DSS v3.2.1 was retired and
+  v4.0 became the only active version (v4.0.1, a limited revision, replaced
+  v4.0 at the end of 2024). The 2004 date previously recorded was the first
+  PCI DSS release, not the version this rule cites.
+- >-
+  No penalty is recorded: PCI DSS sets none of its own. Fines and other
+  consequences come from the card-brand and acquirer contracts, which vary
+  and were not read.
+- >-
+  The requirement number is cited at the level of Requirement 3. The
+  standard's text sits behind the PCI SSC licence terms, which were not
+  accepted for this review, so the sub-requirement numbering was not checked.
+  The requirement's title, "Protect Stored Account Data", was confirmed on
+  2026-10-22 against Verizon's Payment Security Report (2022, the chapter
+  "Requirement 3: Protect stored account data"); the rule makes no claim
+  below that level. Approved as a labelled industry-standard control, not as
+  a reading of the standard's text.
+version: 1.2.0
 tags:
 - pci_dss
 - payment
@@ -58,3 +113,7 @@ tags:
 - proactive
 - security
 tier: community
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

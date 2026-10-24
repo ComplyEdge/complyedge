@@ -23,11 +23,15 @@ export {
   resolveBaseUrl,
 } from "./client";
 export type { Region, AttributionFields } from "./client";
+export { ReceiptJournal } from "./receiptJournal";
+export type { ReceiptEntry } from "./receiptJournal";
 export { withCompliance, ComplianceError } from "./openai-middleware";
 export type {
   ComplyEdgeConfig,
   ComplianceContext,
   ComplianceResult,
+  DecisionContext,
+  ProvisionRef,
   ComplianceViolation,
   SeverityLevel,
   SensitivityResult,

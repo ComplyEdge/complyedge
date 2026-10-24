@@ -1,6 +1,6 @@
 # Capability probe: what ComplyEdge blocks, and where it stops
 
-One script that checks, case by case, the three things ComplyEdge enforces:
+One script that checks, case by case, three of the things ComplyEdge enforces:
 
 1. **Article 5 prohibited practices are blocked, with the article cited.** Emotion recognition at work,
    social scoring and scraping facial images are blocked for EU requests, and each block names its
@@ -8,8 +8,12 @@ One script that checks, case by case, the three things ComplyEdge enforces:
 2. **Prompt injection inside content an agent reads is blocked.** Examples are an email that says "ignore
    all previous instructions", an invoice with a note to "the AI assistant processing this document", and
    a web page telling the agent to use its email tool.
-3. **Every decision leaves a record.** The record names the rule that decided it and stores a SHA-256 of
-   the input, never the text itself (`--live --record`).
+3. **Every decision leaves a record.** When a rule fires, the record names it; every record stores a keyed hash
+   (HMAC-SHA-256 under your account's own key) of the input, never the text itself. The probe confirms the
+   binding with `/v1/audit/verify` and that no plain SHA-256 of the input appears (`--live --record`).
+
+The probe does not cover the rest of the rule set: on EU checks the personal data and credentials
+rules (GDPR Articles 5(1)(c) and 32(1)), the Article 50 and GPAI rules, and on US checks the SOX rule.
 
 Controls check the other direction. Ordinary text must pass, text that only talks *about* prompt
 injection must pass, and so must Article 5 text sent with a US jurisdiction, because Article 5 is EU law.

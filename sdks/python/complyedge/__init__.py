@@ -144,6 +144,7 @@ class DirectionType(str, Enum):
 
     PROMPT = "prompt"  # Input from user to AI
     OUTPUT = "output"  # Output from AI to user
+    ACTION = "action"  # An action the AI system is about to take
 
 
 @dataclass
@@ -168,19 +169,30 @@ class ComplianceResult:
     latency_ms: int
     bundle_version: str
     evaluated_rules: list[str]
-    # SHA-256 of the evaluated text and the UTC instant of evaluation, both
-    # byte-identical to this event's Article 12 audit entry. Lets a caller bind
-    # the decision to its exact input without a second API call. Defaulted so
-    # older API responses that omit them still deserialize.
+    # Keyed hash (HMAC-SHA-256 under the account's own key) of the evaluated
+    # text and the UTC instant of evaluation, both byte-identical to this
+    # event's Article 12 audit entry. The key never leaves ComplyEdge, so the
+    # hash cannot be reversed by hashing guesses; check a text against it with
+    # verify_input(). Defaulted so older API responses still deserialize.
     text_hash: str = ""
     timestamp: str | None = None
+    # "hmac-sha256-1" (HMAC over "commitment:" + the text). None on responses
+    # from an API deployed before the keyed hash, whose text_hash is a plain
+    # SHA-256.
+    text_hash_alg: str | None = None
+    # SHA-256 digest of the rule set that decided, byte-identical to the audit
+    # entry's bundle_digest and to the ADCR record's rule_set.digest; the rule
+    # set's page is https://complyedge.io/rule-set/<digest>/. None on responses
+    # from an API that does not return it.
+    bundle_digest: str | None = None
     # Hot-path provenance from /v1/check. Defaulted so older mocks / API
     # responses that omit them still deserialize. Mapped in every check()
     # path — dropping these was the contract gap that left CI blind.
     engine_path: str = ""
     audit_logged: bool = False
     # True when the decision came from /v1/sandbox/check: same verdict, no
-    # audit entry, no usage, no rate-limit count. Never evidence.
+    # audit entry, no usage, no count against the plan's daily limit (own
+    # caps: 60 a minute, 1,000 a day). Never evidence.
     sandbox: bool = False
 
     @property
@@ -302,8 +314,8 @@ def _allowed_from_payload(data: dict[str, Any]) -> bool:
 
 def _check_path(sandbox: bool) -> str:
     """/v1/sandbox/check evaluates with the tenant's real rules and settings
-    but records nothing: no audit entry, no usage, no daily rate-limit count.
-    For trying cases, never for production traffic."""
+    but records nothing: no audit entry, no usage, no count against the plan's daily
+    limit (own caps: 60 a minute, 1,000 a day). For trying cases, never for production traffic."""
     return "/v1/sandbox/check" if sandbox else "/v1/check"
 
 
@@ -348,6 +360,7 @@ class ComplyEdge:
         user_id: str | None = None,
         user_role: str | None = None,
         session_id: str | None = None,
+        receipt_journal: str | os.PathLike[str] | None = None,
     ):
         """
         Initialize ComplyEdge client.
@@ -365,6 +378,9 @@ class ComplyEdge:
                 key prefix (ce_eu_ -> EU, ce_ -> US), else EU. A region or
                 base_url argument picks a host and does not move the account.
                 See resolve_base_url().
+            receipt_journal: Optional path to an append-only JSONL file of
+                check linkage (event_id, text_hash, digests). Never stores
+                the prompt. See ``complyedge.receipt_journal.ReceiptJournal``.
         """
         self.api_key = api_key
         self.agent_id = agent_id
@@ -373,6 +389,11 @@ class ComplyEdge:
         self.user_role = user_role
         self.session_id = session_id
         self.base_url = resolve_base_url(api_key, base_url, region)
+        self._receipt_journal = None
+        if receipt_journal is not None:
+            from complyedge.receipt_journal import ReceiptJournal
+
+            self._receipt_journal = ReceiptJournal(receipt_journal)
 
         self._client = httpx.Client(
             base_url=self.base_url,
@@ -384,12 +405,15 @@ class ComplyEdge:
             },
         )
 
-    def is_safe(self, text: str) -> bool:
+    def is_safe(
+        self, text: str, decision_context: dict[str, Any] | None = None
+    ) -> bool:
         """
         Check if text is safe to use (no compliance violations).
 
         Args:
             text: Text to check
+            decision_context: ADCR decision context for the record (see check()).
 
         Returns:
             True if safe, False if blocked
@@ -399,7 +423,7 @@ class ComplyEdge:
                 print("Safe to use")
         """
         try:
-            result = self.check(text)
+            result = self.check(text, decision_context=decision_context)
             return result.safe
         except Exception:
             # Conservative: assume unsafe if check fails
@@ -415,6 +439,7 @@ class ComplyEdge:
         user_id: str | None = None,
         user_role: str | None = None,
         session_id: str | None = None,
+        decision_context: dict[str, Any] | None = None,
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -427,10 +452,16 @@ class ComplyEdge:
             user_role: That person's role (uses the client default if not provided).
             session_id: Conversation, run or job identifier (uses the client
                 default if not provided).
+            decision_context: What you know about the decision that ComplyEdge
+                cannot, written to the audit record as ADCR 0.1.0 fields.
+                Optional; when sent, the API requires deciding_system.version,
+                purpose_ref and data_categories (use [] when none). Without it
+                the check runs, but its record does not meet ADCR class Record.
             jurisdiction: Regulatory jurisdiction (uses default if not provided)
             sandbox: Evaluate without recording (POST /v1/sandbox/check). Same
-                verdict, no audit entry, no usage, no rate-limit count. For
-                trying cases; the result is never evidence.
+                verdict, no audit entry, no usage, no count against the plan's
+                daily limit (own caps: 60 a minute, 1,000 a day). For trying cases; the
+                result is never evidence.
             direction: "prompt" for text going INTO the model, "output" for text
                 coming out. This was previously hard-coded to "output", so every
                 input check the decorator ran was filed in the Article 12 audit
@@ -463,6 +494,8 @@ class ComplyEdge:
         )
         if context:
             request_data["context"] = context
+        if decision_context:
+            request_data["decision_context"] = decision_context
 
         try:
             response = self._client.post(_check_path(sandbox), json=request_data)
@@ -481,7 +514,7 @@ class ComplyEdge:
                 for v in data.get("violations", [])
             ]
 
-            return ComplianceResult(
+            result = ComplianceResult(
                 event_id=data["event_id"],
                 allowed=_allowed_from_payload(data),
                 violations=violations,
@@ -489,11 +522,16 @@ class ComplyEdge:
                 bundle_version=data.get("bundle_version", "unknown"),
                 evaluated_rules=data.get("evaluated_rules", []),
                 text_hash=data.get("text_hash", ""),
+                text_hash_alg=data.get("text_hash_alg"),
+                bundle_digest=data.get("bundle_digest"),
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
                 audit_logged=_audit_logged_from_payload(data),
                 sandbox=data.get("sandbox") is True,
             )
+            if self._receipt_journal is not None:
+                self._receipt_journal.append_result(result)
+            return result
 
         except httpx.HTTPStatusError as e:
             try:
@@ -569,6 +607,33 @@ class ComplyEdge:
         except httpx.RequestError as e:
             raise ComplianceError(f"Request failed: {str(e)}")
 
+    def verify_input(self, event_id: str, text: str) -> bool:
+        """True when the audit record ``event_id`` was a decision about exactly ``text``.
+
+        The record's text_hash is keyed with the account's key, which never
+        leaves ComplyEdge, so the comparison runs server-side
+        (POST /v1/audit/verify). The text is used for that request only: it is
+        not stored and not logged. False also when the account's key was
+        destroyed (crypto-shred). An unknown event_id raises ComplianceError.
+        """
+        try:
+            response = self._client.post(
+                "/v1/audit/verify", json={"event_id": event_id, "text": text}
+            )
+            response.raise_for_status()
+            return response.json().get("match") is True
+        except httpx.HTTPStatusError as e:
+            try:
+                error_detail = e.response.json().get("detail", str(e))
+            except Exception:
+                error_detail = str(e)
+            raise ComplianceError(
+                f"API error ({e.response.status_code}): {error_detail}",
+                retryable=_status_is_retryable(e.response),
+            ) from e
+        except httpx.RequestError as e:
+            raise ComplianceError(f"Request failed: {str(e)}", retryable=True) from e
+
     def close(self):
         """Close the HTTP client."""
         self._client.close()
@@ -591,6 +656,7 @@ def is_safe(
     user_id: str | None = None,
     user_role: str | None = None,
     session_id: str | None = None,
+    decision_context: dict[str, Any] | None = None,
 ) -> bool:
     """
     Global convenience function to check if text is safe.
@@ -602,6 +668,8 @@ def is_safe(
         jurisdiction: Regulatory jurisdiction
         base_url: API base URL (overrides region and key inference)
         region: "us" or "eu"; defaults to the key's region prefix, else EU
+        decision_context: ADCR decision context for the record (see
+            ComplyEdge.check). Optional.
 
     Returns:
         True if safe, False if blocked
@@ -623,7 +691,7 @@ def is_safe(
         session_id=session_id,
     )
     try:
-        return client.is_safe(text)
+        return client.is_safe(text, decision_context=decision_context)
     finally:
         client.close()
 
@@ -639,6 +707,7 @@ def check(
     user_id: str | None = None,
     user_role: str | None = None,
     session_id: str | None = None,
+    decision_context: dict[str, Any] | None = None,
 ) -> ComplianceResult:
     """
     Global convenience function to check text compliance.
@@ -651,7 +720,10 @@ def check(
         base_url: API base URL (overrides region and key inference)
         region: "us" or "eu"; defaults to the key's region prefix, else EU
         sandbox: Evaluate without recording (same verdict, no audit entry,
-            no usage, no rate-limit count). For trying cases only.
+            no usage, no count against the plan's daily limit; own caps:
+            60 a minute, 1,000 a day). For trying cases only.
+        decision_context: ADCR decision context for the record (see
+            ComplyEdge.check). Optional.
 
     Returns:
         ComplianceResult with detailed information
@@ -676,7 +748,7 @@ def check(
         session_id=session_id,
     )
     try:
-        return client.check(text, sandbox=sandbox)
+        return client.check(text, sandbox=sandbox, decision_context=decision_context)
     finally:
         client.close()
 
@@ -795,6 +867,7 @@ class ComplyEdgeClient:
         user_id: str | None = None,
         user_role: str | None = None,
         session_id: str | None = None,
+        decision_context: dict[str, Any] | None = None,
     ) -> ComplianceResult:
         """
         Check text for compliance violations.
@@ -810,13 +883,17 @@ class ComplyEdgeClient:
             user_role: That person's role. Overrides context["user_role"].
             session_id: Conversation, run or job identifier. Overrides
                 context["session_id"].
+            decision_context: Record fields only you know (deciding system
+                version, purpose, data categories, ...), written to the audit
+                record as ADCR 0.1.0 fields. See the API reference.
             use_semantic_fallback: Enable LLM-based Layer 2 evaluation for ambiguous
                 cases. Defaults to False (OPA fast-path only, ~73ms median). Set True
                 to add 2-5s LLM deepening on cases OPA passes.
             raise_on_violation: Raise ComplianceError if violations are found
             sandbox: Evaluate without recording (POST /v1/sandbox/check). Same
-                verdict, no audit entry, no usage, no rate-limit count. For
-                trying cases; the result is never evidence.
+                verdict, no audit entry, no usage, no count against the plan's
+                daily limit (own caps: 60 a minute, 1,000 a day). For trying cases; the
+                result is never evidence.
 
         Returns:
             ComplianceResult with decision and any violations
@@ -840,6 +917,8 @@ class ComplyEdgeClient:
             )
             if context:
                 request_data["context"] = context
+            if decision_context:
+                request_data["decision_context"] = decision_context
 
             response = self.client.post(_check_path(sandbox), json=request_data)
             response.raise_for_status()
@@ -865,6 +944,8 @@ class ComplyEdgeClient:
                 bundle_version=data.get("bundle_version", "unknown"),
                 evaluated_rules=data.get("evaluated_rules", []),
                 text_hash=data.get("text_hash", ""),
+                text_hash_alg=data.get("text_hash_alg"),
+                bundle_digest=data.get("bundle_digest"),
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
                 audit_logged=_audit_logged_from_payload(data),
@@ -999,6 +1080,7 @@ class AsyncComplyEdgeClient:
         user_id: str | None = None,
         user_role: str | None = None,
         session_id: str | None = None,
+        decision_context: dict[str, Any] | None = None,
     ) -> ComplianceResult:
         """Async version of check_compliance."""
         try:
@@ -1016,6 +1098,8 @@ class AsyncComplyEdgeClient:
             )
             if context:
                 request_data["context"] = context
+            if decision_context:
+                request_data["decision_context"] = decision_context
 
             response = await self.client.post(_check_path(sandbox), json=request_data)
             response.raise_for_status()
@@ -1041,6 +1125,8 @@ class AsyncComplyEdgeClient:
                 bundle_version=data.get("bundle_version", "unknown"),
                 evaluated_rules=data.get("evaluated_rules", []),
                 text_hash=data.get("text_hash", ""),
+                text_hash_alg=data.get("text_hash_alg"),
+                bundle_digest=data.get("bundle_digest"),
                 timestamp=data.get("timestamp"),
                 engine_path=data.get("engine_path", ""),
                 audit_logged=_audit_logged_from_payload(data),
@@ -1162,6 +1248,8 @@ else:
 
 
 # Export public API
+from complyedge.receipt_journal import ReceiptEntry, ReceiptJournal
+
 __all__ = [
     # Simple interface (recommended)
     "ComplyEdge",
@@ -1176,6 +1264,9 @@ __all__ = [
     "ComplianceError",
     "SeverityLevel",
     "DirectionType",
+    # Local check linkage; never stores prompt text
+    "ReceiptJournal",
+    "ReceiptEntry",
     # Decorator interface
     "compliance_check",
     "ComplianceConfig",

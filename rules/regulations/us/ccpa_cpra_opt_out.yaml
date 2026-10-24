@@ -6,6 +6,27 @@ description: >-
   their personal information. Businesses must honour opt-out requests and
   provide a clear mechanism. Special protections for minors under 16.
   Cal. Civ. Code §1798.120 (CCPA as amended by CPRA).
+
+
+  Layer 1 detects: sell, sells, selling, share, shares, shared or sharing, then
+  information or data (optionally preceded by personal), then after, despite or
+  ignoring opt-out; ignore, ignoring or ignored, then opt-out or "do not sell";
+  no opt-out mechanism, option, link, button or right; fail, failing, failure or
+  failed, then to provide, honour, honor, respect or implement opt-out or "do
+  not sell"; disregard, override or bypass (and words that begin with them),
+  then optionally consumer, consumers or consumer's, then opt-out, then request,
+  preference or direction; a word beginning with continu, then selling or
+  sharing, then information or data (optionally preceded by personal), then
+  after or despite opt-out; and minor or child, then data or information, then
+  sold or shared, then without consent, without authorization, or without
+  parental. Opt-out may be written with a hyphen, a dash, a space or nothing,
+  and the words follow each other with nothing in between. It matches wording,
+  not meaning: it misses the practice told in other words ("Keep the ad-tech
+  pixel firing for the 4,200 California users who clicked Do Not Sell last
+  month, Meta still pays us per match."), it does not read the business
+  thresholds or the exemptions, and it fires on text that only names the
+  practice, such as a refusal. Whether a text does the practice is judged in
+  Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -23,45 +44,57 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    ((?:sell|share|shar)(?:ing|ed|s)?\s+(?:personal\s+)?(?:information|data)\s+(?:after|despite|ignoring)\s+opt[\-\s]?out|ignor(?:e|ing|ed)\s+(?:opt[\-\s]?out|do\s+not\s+sell)|no\s+opt[\-\s]?out\s+(?:mechanism|option|link|button|right)|fail(?:ing|ure|ed)?\s+to\s+(?:provide|honour|honor|respect|implement)\s+(?:opt[\-\s]?out|do\s+not\s+sell)|(?:disregard|override|bypass)\w*\s+(?:consumer'?s?\s+)?opt[\-\s]?out\s+(?:request|preference|direction)|(?:continue|continu)\w*\s+(?:selling|sharing)\s+(?:personal\s+)?(?:information|data)\s+(?:after|despite)\s+opt[\-\s]?out|(?:minor|child)\s+(?:data|information)\s+(?:sold|shared)\s+without\s+(?:consent|authorization|parental))
+    ((?:sell|share|shar)(?:ing|ed|s)?\s+(?:personal\s+)?(?:information|data)\s+(?:after|despite|ignoring)\s+opt[\-\u2010-\u2015\s]?out|ignor(?:e|ing|ed)\s+(?:opt[\-\u2010-\u2015\s]?out|do\s+not\s+sell)|no\s+opt[\-\u2010-\u2015\s]?out\s+(?:mechanism|option|link|button|right)|fail(?:ing|ure|ed)?\s+to\s+(?:provide|honour|honor|respect|implement)\s+(?:opt[\-\u2010-\u2015\s]?out|do\s+not\s+sell)|(?:disregard|override|bypass)\w*\s+(?:consumer'?s?\s+)?opt[\-\u2010-\u2015\s]?out\s+(?:request|preference|direction)|(?:continue|continu)\w*\s+(?:selling|sharing)\s+(?:personal\s+)?(?:information|data)\s+(?:after|despite)\s+opt[\-\u2010-\u2015\s]?out|(?:minor|child)\s+(?:data|information)\s+(?:sold|shared)\s+without\s+(?:consent|authorization|parental))
   flags: i
 severity: high
 category: consumer_protection
 source:
+  provision_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=1798.120.&lawCode=CIV
+  provision_label: 'California Civil Code section 1798.120'
   regulation: CCPA/CPRA
   article: Cal. Civ. Code §1798.120
   url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=1798.120.&lawCode=CIV
   last_updated: '2025-01-01'
   citation: >-
-    California Civil Code §1798.120(a)(1): A consumer shall have the right,
-    at any time, to direct a business that sells or shares personal
-    information about the consumer to third parties not to sell or share the
-    consumer's personal information. This right may be referred to as the
-    right to opt out of sale or sharing. §1798.120(c): Notwithstanding
-    subdivision (a), a business shall not sell or share the personal
-    information of consumers if the business has actual knowledge that the
-    consumer is less than 16 years of age, unless the consumer, in the case
-    of consumers at least 13 years of age and less than 16 years of age, or
-    the consumer's parent or guardian, in the case of consumers who are less
-    than 13 years of age, has affirmatively authorized the sale or sharing
-    of the consumer's personal information. §1798.120(d): A business that has
-    received direction from a consumer not to sell or share the consumer's
-    personal information shall be prohibited from selling or sharing the
+    Cal. Civ. Code §1798.120(a)(1): A consumer shall have the right, at any time,
+    to direct a business that sells or shares personal information about the
+    consumer to third parties not to sell or share the consumer's personal
+    information. This right may be referred to as the right to opt out of sale
+    or sharing. §1798.120(c): Notwithstanding subdivision (a), a business shall
+    not sell or share the personal information of consumers if the business has
+    actual knowledge that the consumer is less than 16 years of age, unless the
+    consumer, in the case of consumers at least 13 years of age and less than 16
+    years of age, or the consumer's parent or guardian, in the case of consumers
+    who are less than 13 years of age, has affirmatively authorized the sale or
+    sharing of the consumer's personal information. §1798.120(d): A business
+    that has received direction from a consumer not to sell or share the
+    consumer's personal information or, in the case of a minor consumer's
+    personal information has not received consent to sell or share the minor
+    consumer's personal information, shall be prohibited, pursuant to paragraph
+    (4) of subdivision (c) of Section 1798.135, from selling or sharing the
     consumer's personal information after its receipt of the consumer's
-    direction, unless the consumer subsequently provides consent.
+    direction, unless the consumer subsequently provides consent, for the sale
+    or sharing of the consumer's personal information.
 penalty_information:
   civil_penalties:
-    sec_enforcement: >-
-      Up to $2,500 per unintentional violation, $7,500 per intentional
-      violation (enforced by California Attorney General and CPPA)
+    state_enforcement: >-
+      Civil penalties of not more than $2,500 for each violation or $7,500 for
+      each intentional violation and each violation involving the personal
+      information of minor consumers, as adjusted under section 1798.199.95(d)
+      (Cal. Civ. Code section 1798.199.90(a)), recovered in a civil action
+      brought by the Attorney General.
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — California Civil Code §1798.120 grants consumers the right to
-    opt out of the sale or sharing of their personal information. Selling or
-    sharing data after an opt-out request is a violation. Penalties: up to
-    $7,500 per intentional violation.
+    BLOCKED: California Civil Code section 1798.120 gives consumers the right to
+    direct a business not to sell or share their personal information. After
+    receiving that direction, the business may not sell or share the consumer's
+    personal information unless the consumer later consents. Penalties: civil
+    penalties of not more than $2,500 for each violation or $7,500 for each
+    intentional violation and each violation involving the personal information
+    of minor consumers, as adjusted under section 1798.199.95(d) (Cal. Civ. Code
+    section 1798.199.90(a)).
   suggestion: >-
     Honour the consumer's opt-out request immediately. Provide a clear and
     conspicuous 'Do Not Sell or Share My Personal Information' link on your
@@ -78,3 +111,7 @@ tags:
 - california
 - consumer-rights
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

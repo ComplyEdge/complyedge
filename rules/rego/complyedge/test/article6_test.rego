@@ -1,7 +1,8 @@
-# ComplyEdge — Article 6 / Annex III Rego Tests
+# ComplyEdge: Article 6 / Annex III Rego Tests
 # Run with: opa test rules/rego/ -v
 #
-# Covers each of the 8 Annex III sub-rules + the aggregator. Per sub-rule:
+# Covers the 8 Annex III point sub-rules + the aggregator, which imports 11
+# sub-rules (the other 3 are tested in corpus_depth_t3_test.rego). Per sub-rule:
 # one positive case that should trip the regex, one positive case that
 # proves coverage of a second pattern variant, and one negative case
 # (non-EU jurisdiction or innocuous text) that should NOT trip.
@@ -21,7 +22,7 @@ import data.complyedge.article6.law_enforcement
 import data.complyedge.article6.migration_asylum
 
 # ============================================================
-# Annex III §1 — Biometric Identification
+# Annex III §1, Biometric Identification
 # ============================================================
 
 test_biometric_identification_blocks_facial_recognition_system if {
@@ -46,7 +47,7 @@ test_biometric_identification_allows_non_eu if {
 }
 
 # ============================================================
-# Annex III §2 — Critical Infrastructure
+# Annex III §2, Critical Infrastructure
 # ============================================================
 
 test_critical_infrastructure_blocks_power_grid_ai if {
@@ -71,7 +72,7 @@ test_critical_infrastructure_allows_unrelated if {
 }
 
 # ============================================================
-# Annex III §3 — Education and Vocational Training
+# Annex III §3, Education and Vocational Training
 # ============================================================
 
 test_education_blocks_admissions_ai if {
@@ -96,7 +97,7 @@ test_education_allows_unrelated if {
 }
 
 # ============================================================
-# Annex III §4 — Employment and Workers
+# Annex III §4, Employment and Workers
 # ============================================================
 
 test_employment_blocks_cv_screening if {
@@ -121,7 +122,7 @@ test_employment_allows_non_eu if {
 }
 
 # ============================================================
-# Annex III §5 — Essential Services
+# Annex III §5, Essential Services
 # ============================================================
 
 test_essential_services_blocks_credit_scoring if {
@@ -146,7 +147,7 @@ test_essential_services_allows_unrelated if {
 }
 
 # ============================================================
-# Annex III §6 — Law Enforcement
+# Annex III §6, Law Enforcement
 # ============================================================
 
 test_law_enforcement_blocks_predictive_policing if {
@@ -171,7 +172,7 @@ test_law_enforcement_allows_unrelated if {
 }
 
 # ============================================================
-# Annex III §7 — Migration, Asylum, Border Control
+# Annex III §7, Migration, Asylum, Border Control
 # ============================================================
 
 test_migration_blocks_visa_decision if {
@@ -196,7 +197,7 @@ test_migration_allows_unrelated if {
 }
 
 # ============================================================
-# Annex III §8 — Justice and Democratic Processes
+# Annex III §8, Justice and Democratic Processes
 # ============================================================
 
 test_justice_blocks_sentencing_ai if {
@@ -221,7 +222,7 @@ test_justice_allows_unrelated if {
 }
 
 # ============================================================
-# Aggregator — article6 package
+# Aggregator, article6 package
 # ============================================================
 
 test_aggregator_violation_when_any_subrule_trips if {

@@ -5,24 +5,23 @@ Substantiates the public "<100ms p99 (Layer 1)" claim with a reproducible
 artifact. Layer 1 is the deterministic path: the OPA/Rego policy
 bundle plus the TrustLint regex engine, with NO LLM. This benchmark measures
 both in isolation, mirroring the production query path from
-``services/api/opa_client.py`` (OPA runs as a long-lived server — the same
+``services/api/opa_client.py`` (OPA runs as a long-lived server, the same
 `opa run --server --bundle rules/rego` invocation as
-``services/api/opa_supervisor.py`` — and each request POSTs to the six
-aggregator packages ``complyedge/{article5,article50,gpai,article6,highrisk,
-prompt_security}/result``).
+``services/api/opa_supervisor.py``, and each request POSTs to every
+aggregator package in ``PACKAGES`` below, ``complyedge/<package>/result``).
 
 It reports two OPA figures:
-  * ``opa_per_request_sequential`` — sum of the six package queries done
+  * ``opa_per_request_sequential``: sum of all the package queries done
     serially. Conservative upper bound; production never pays this.
-  * ``opa_single_package`` — one package query. The production path issues all
-    six in parallel (``evaluate()`` uses ``asyncio.gather``), so realized
+  * ``opa_single_package``: one package query. The production path issues all
+    of them in parallel (``evaluate()`` uses ``asyncio.gather``), so realized
     latency tracks the single-package figure, not the sequential sum.
 
 Usage:  python3 scripts/benchmark/layer1_latency.py [--iterations N]
 Writes: scripts/benchmark/results/layer1_latency_latest.json
         scripts/benchmark/results/layer1_latency_badge.md
 
-Local reproducible microbenchmark — NOT prod telemetry. Production Layer-1
+Local reproducible microbenchmark, NOT prod telemetry. Production Layer-1
 latency is tracked per request via the ``opa_latency_ms`` field emitted to
 CloudWatch (see services/api/main.py).
 """
@@ -162,7 +161,7 @@ def _query(base_url: str, pkg: str, body: bytes) -> None:
 def bench_opa(iterations: int) -> dict:
     opa = shutil.which("opa")
     if not opa:
-        raise SystemExit("opa binary not found on PATH — cannot benchmark Layer-1 OPA")
+        raise SystemExit("opa binary not found on PATH; cannot benchmark Layer-1 OPA")
     port = _free_port()
     addr = f"127.0.0.1:{port}"
     base_url = f"http://{addr}"
@@ -232,11 +231,8 @@ def bench_trustlint(iterations: int) -> dict:
         from trustlint.engine import TrustLintEngine  # type: ignore
     except Exception as e:  # pragma: no cover
         return {"error": f"trustlint engine import failed: {e}"}
-    # Force the live dev corpus. TrustLintEngine's default resolution checks
-    # ~/.trustlint/rules/ FIRST — if that's ever been populated (e.g. by a
-    # `trustlint` CLI bootstrap, see leocelis/ivd's check.sh), it silently
-    # shadows this repo's rules/regulations/ with a possibly-stale public
-    # release snapshot, understating rules_loaded and skewing the benchmark.
+    # Pass this repo's corpus explicitly, so the benchmark always measures the
+    # rules in rules/regulations/ and never another copy found on the machine.
     eng = TrustLintEngine(rules_dir=str(REPO / "rules" / "regulations"))
     text = SAMPLE_INPUT["input"]["text"]
     for _ in range(20):
@@ -295,10 +291,14 @@ def main() -> None:
     # Realized Layer-1 hot-path p99: parallel OPA (≈ single package) + regex engine.
     layer1_p99 = round(single_p99 + tl_p99, 3)
 
+    # The receipt generated_at uses the audit record timestamp format (UTC, Z).
+    sys.path.insert(0, str(REPO / "services" / "api"))
+    from adcr_record import utc_timestamp
+
     out = {
         "benchmark": "layer1_latency",
         "kind": "local_reproducible_microbenchmark",
-        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_at": utc_timestamp(datetime.now(UTC)),
         "iterations": args.iterations,
         "note": (
             "Local reproducible microbenchmark of the deterministic hot path "
@@ -328,9 +328,9 @@ def main() -> None:
         f"_Layer-1 deterministic hot path (OPA/Rego + TrustLint regex, no LLM) · "
         f"{args.iterations} iterations · {out['generated_at']}_\n\n"
         f"- OPA single-package p99 (parallel path): {single_p99} ms\n"
-        f"- OPA 6-package sequential p99 (conservative): {seq_p99} ms\n"
+        f"- OPA {len(PACKAGES)}-package sequential p99 (conservative): {seq_p99} ms\n"
         f"- TrustLint regex p99: {tl_p99} ms\n"
-        f"- **Realized Layer-1 hot-path p99: {layer1_p99} ms** — <100ms claim: {verdict}\n"
+        f"- **Realized Layer-1 hot-path p99: {layer1_p99} ms**. <100ms claim: {verdict}\n"
     )
     (RESULTS / "layer1_latency_badge.md").write_text(badge)
     print(badge)

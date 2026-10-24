@@ -14,12 +14,34 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+### Added
+- `ReceiptJournal` / `receipt_journal=` on `ComplyEdge`: optional append-only JSONL of check linkage (`event_id`, `text_hash`, digests, timestamps). Never stores the prompt or answer. Sandbox checks are skipped. Pairing text still uses `verify_input` against the caller's own copy.
+- `bundle_digest` on check results: the SHA-256 digest of the rule set that decided, the same value as the audit entry and the ADCR record's `rule_set.digest`. `None` when the API does not return it.
+- `ComplyEdge.verify_input(event_id, text)`: returns `True` when the audit record `event_id` was a decision about exactly `text`. It calls `POST /v1/audit/verify`; the comparison runs server-side because the record's hash is keyed with the account's own key, which never leaves ComplyEdge. The text is used for that request only and is not stored or logged. Returns `False` when the text differs or when the account's key was destroyed; an unknown `event_id` raises `ComplianceError`. Needs an API version that serves `/v1/audit/verify`.
+- `text_hash_alg` on check results: `"hmac-sha256-1"` when `text_hash` is the keyed commitment (HMAC-SHA-256 under the account's key over `commitment:` and the text), `None` on responses from an API that still returns a plain SHA-256.
+- `decision_context` on `ComplyEdge.check()` and on both clients' `check_compliance()`: the audit record fields only the caller knows (deciding system version, purpose, data categories, legal basis, references), written to the record as ADCR 0.1.0 fields. Also on the `@compliance_check` decorator and `ComplianceConfig` (a dict, or a zero-argument callable read on every call), `ComplyEdge.is_safe()` and the global `check()` and `is_safe()`. Optional: a check without it is decided and recorded, but its record does not meet ADCR class Record. When sent, `deciding_system`, `purpose_ref` and `data_categories` are required.
+- `DirectionType.ACTION` (`"action"`): an action the AI system is about to take.
+
+### Changed
+- README: the record comes first. Store the `event_id` from every check next to your own copy of the text and prove the pair later with `verify_input`; ComplyEdge never stores the prompt or the answer. `user_id` and `session_id` are stored as keyed pseudonyms (`p1:...`) by the API.
+- Package metadata: dropped the `Topic :: Security` classifier. This package records compliance evidence; it is not a security control.
+
+### Fixed
+- README: the violation example printed `v.citation`, which does not exist (`rule_description` holds the citation); `fail_mode="closed"` was shown as a decorator argument, which the decorator rejects (use `COMPLYEDGE_FAIL_MODE=closed` or `ComplianceConfig(fail_mode="closed")`); the `wrong_region` body is `{"detail": {"error": "wrong_region", "use": ...}}`.
+- The MCP server (`complyedge-mcp` and the hosted MCP) now loads the rule corpus
+  the installed `trustlint` bundles unless `TRUSTLINT_RULES_DIR` is set. With no
+  directory, trustlint loaded `~/.trustlint/rules` or a `rules/regulations` folder
+  above the working directory first, so an old cache meant an old corpus.
+- Sandbox docs and docstrings: sandbox calls do not count against the plan's
+  daily limit but have their own caps (60 a minute, 1,000 a day); they used to
+  say "no rate-limit count".
+
 ## [0.2.21] - 2026-10-01
 
 ### Fixed
 - `bundle_version` on a check result is `"unknown"` when the API response omits it. It used to fall back to `"opa-rego-v1"`, a value the API no longer reports; the API now derives `bundle_version` from the rule-corpus digest.
 
-## [0.2.20] - 2026-09-29
+## [0.2.20] - 2026-09-30
 
 ### Added
 - `user_id`, `user_role` and `session_id` on `ComplyEdge` (client defaults and per `check()` call), on the module-level `check()` / `is_safe()`, on `ComplyEdgeClient.check_compliance()` and the async client; `attribution=` on `@compliance_check` / `ComplianceConfig` (a dict, or a function read on every call) and on `create_compliance_guardrail()` (a dict, or a function given the run context). They are recorded on the audit entry; before, the simple client and the decorator could not send them, so those export columns were always blank.
@@ -28,7 +50,7 @@ Matching numbers would imply a parity that does not exist.
 - A 429 is retried only when the server's wait fits the retry budget. The daily check cap (`rate_limit_exceeded`, resets 00:00 UTC) and the 60-second sandbox limit now raise `ComplianceError` on the first attempt instead of retrying three times over about 14 seconds. Short 429s and 5xx errors still retry.
 
 ### Changed
-- Docs only. The region (EU or US) is chosen when you create your API key; to change it later, contact support. This corrects the 0.2.19 note that a US host is only for an account support has moved: US accounts can be created at sign-up.
+- Docs only. The region (EU or US) is chosen when you sign up and create your first API key; to change it later, contact support. This corrects the 0.2.19 note that a US host is only for an account support has moved: US accounts can be created at sign-up.
 
 ## [0.2.19] - 2026-09-26
 
@@ -56,14 +78,15 @@ Matching numbers would imply a parity that does not exist.
 - `sandbox=True` on `ComplyEdge.check()`, `ComplyEdgeClient.check_compliance()`,
   `AsyncComplyEdgeClient.check_compliance()` and the module-level `check()`
   routes the call to `POST /v1/sandbox/check`: the same rules, tenant settings
-  and verdict as `/v1/check`, with nothing recorded — no audit entry, no usage,
-  no rate-limit count. For trying cases before wiring an integration; never
+  and verdict as `/v1/check`, with nothing recorded: no audit entry, no usage,
+  no count against the plan's daily limit (sandbox calls have their own caps:
+  60 a minute, 1,000 a day). For trying cases before wiring an integration; never
   evidence. `ComplianceResult.sandbox` is `True` only when the server says so,
   beside `audit_logged=False`. Default is unchanged (`/v1/check`).
 - MCP (`complyedge[mcp]`, `complyedge-mcp` stdio): optional fourth tool
   `sandbox_check`, listed only when `COMPLYEDGE_API_KEY` is set. Calls the
   hosted sandbox through the SDK client (region from the key prefix), returns
-  `BLOCKED` / `ALLOWED` with rule ID and citation, `audit_logged: false`,
+  `BLOCKED` with rule ID and citation or `ALLOWED`, `audit_logged: false`,
   `sandbox: true`; refuses to report a response the server did not mark as
   sandbox. Without the key the server is exactly the three offline tools.
 - Hosted MCP (`mcp.complyedge.io/mcp`): `sandbox_check` is always listed and
@@ -72,7 +95,7 @@ Matching numbers would imply a parity that does not exist.
   never a tool argument, never logged; the hosted server keeps no keys.
   `/health` reports it under `optional_tools`.
 
-## [0.2.17] - 2026-09-17
+## [0.2.17] - 2026-09-23
 
 ### Fixed
 - `create_compliance_guardrail` (the `[agents]` extra) dropped `agent_id`
@@ -90,3 +113,11 @@ Matching numbers would imply a parity that does not exist.
   `https://eu.api.complyedge.io`, `ce_` -> `https://api.complyedge.io`) when
   neither `base_url` nor `COMPLYEDGE_API_URL` is set. Precedence: `base_url`
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
+
+[Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.21]: https://pypi.org/project/complyedge/0.2.21/
+[0.2.20]: https://pypi.org/project/complyedge/0.2.20/
+[0.2.19]: https://pypi.org/project/complyedge/0.2.19/
+[0.2.18]: https://pypi.org/project/complyedge/0.2.18/
+[0.2.17]: https://pypi.org/project/complyedge/0.2.17/
+[0.2.16]: https://pypi.org/project/complyedge/0.2.16/

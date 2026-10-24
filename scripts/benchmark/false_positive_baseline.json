@@ -27,19 +27,16 @@
    "rego-art50-4-001"
   ],
   "FPB_A50_EMOCTX_002|EU": [
-   "rego-art5-1f-001",
-   "rego-art50-3-002"
+   "rego-art5-1f-001"
   ],
   "FPB_A50_EMOCTX_005|EU": [
-   "rego-art5-1f-001",
-   "rego-art50-3-002"
+   "rego-art5-1f-001"
   ],
   "FPB_A50_EMOCTX_011|EU": [
    "rego-art5-1f-001"
   ],
   "FPB_A50_EMOCTX_014|EU": [
-   "rego-art5-1f-001",
-   "rego-art50-3-002"
+   "rego-art5-1f-001"
   ],
   "FPB_A50_EMO_002|EU": [
    "rego-art5-1f-001"
@@ -492,8 +489,7 @@
    "rego-art5-1f-001"
   ],
   "FPB_CT_EXPLAIN_004|EU": [
-   "rego-art5-1f-001",
-   "rego-art50-3-002"
+   "rego-art5-1f-001"
   ],
   "FPB_CT_EXPLAIN_005|EU": [
    "rego-art5-1e-001"
@@ -531,9 +527,6 @@
   ],
   "FPB_CT_MEMO_002|EU": [
    "rego-art5-1f-001"
-  ],
-  "FPB_CT_MEMO_004|EU": [
-   "rego-art50-2-001"
   ],
   "FPB_CT_MODELCARD_001|EU": [
    "rego-art5-1f-001"
@@ -659,9 +652,6 @@
   "FPB_GPAI_DWN_004|EU": [
    "rego-gpai-53b-001"
   ],
-  "FPB_GPAI_DWN_005|EU": [
-   "rego-gpai-53b-001"
-  ],
   "FPB_GPAI_DWN_007|EU": [
    "rego-gpai-53b-001"
   ],
@@ -738,9 +728,6 @@
   "FPB_HR_ART14_001|EU": [
    "rego-art14-001"
   ],
-  "FPB_HR_ART14_002|EU": [
-   "rego-art14-001"
-  ],
   "FPB_HR_ART14_003|EU": [
    "rego-art14-001"
   ],
@@ -756,28 +743,10 @@
   "FPB_HR_ART14_009|EU": [
    "rego-art14-001"
   ],
-  "FPB_HR_ART14_010|EU": [
-   "rego-art14-001"
-  ],
-  "FPB_HR_ART14_012|EU": [
-   "rego-art14-001"
-  ],
-  "FPB_HR_ART15ACC_002|EU": [
-   "rego-art15-1-001"
-  ],
   "FPB_HR_ART15ACC_003|EU": [
    "rego-art15-1-001"
   ],
-  "FPB_HR_ART15ACC_004|EU": [
-   "rego-art15-1-001"
-  ],
   "FPB_HR_ART15ACC_005|EU": [
-   "rego-art15-1-001"
-  ],
-  "FPB_HR_ART15ACC_008|EU": [
-   "rego-art15-1-001"
-  ],
-  "FPB_HR_ART15ACC_009|EU": [
    "rego-art15-1-001"
   ],
   "FPB_HR_ART15ACC_011|EU": [
@@ -798,16 +767,7 @@
   "FPB_HR_ART15CYB_008|EU": [
    "rego-art15-5-001"
   ],
-  "FPB_HR_ART15ROB_004|EU": [
-   "rego-art15-4-001"
-  ],
   "FPB_HR_ART15ROB_005|EU": [
-   "rego-art15-4-001"
-  ],
-  "FPB_HR_ART15ROB_008|EU": [
-   "rego-art15-4-001"
-  ],
-  "FPB_HR_ART15ROB_012|EU": [
    "rego-art15-4-001"
   ],
   "FPB_HR_ART16_003|EU": [
@@ -839,19 +799,10 @@
   "FPB_HR_ART4_004|EU": [
    "rego-art4-001"
   ],
-  "FPB_HR_ART9_001|EU": [
-   "rego-art9-001"
-  ],
-  "FPB_HR_ART9_003|EU": [
-   "rego-art9-001"
-  ],
   "FPB_HR_ART9_004|EU": [
    "rego-art9-001"
   ],
   "FPB_HR_ART9_009|EU": [
-   "rego-art9-001"
-  ],
-  "FPB_HR_ART9_011|EU": [
    "rego-art9-001"
   ],
   "FPB_PS_AIAD_001|EU": [

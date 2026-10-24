@@ -13,9 +13,12 @@ Each scenario mirrors a real fintech / AI company pattern:
   S2 — Social scoring       (citizen trustworthiness system)     → Art 5(1)(c)
   S3 — Bank behavioral loan (credit decision from social data)   → Art 5(1)(c)
 
-  S3 is the "money shot": every EU bank / fintech that scores loan
-  applicants using social media, app usage, or browsing history is
-  exposed under a law that is already in force.
+  S3 is the case lenders ask about: a loan decision built from a social
+  behaviour score. The social-scoring rule blocks text like this. Whether a
+  given lender's practice is prohibited under Art 5(1)(c) depends on the
+  facts (the detrimental treatment must be unjustified or unrelated to the
+  context the data came from); credit scoring as such is an Annex III
+  high-risk use, not a prohibited one.
 
 Usage (no LLM needed — prompts pre-filled):
     pip install complyedge
@@ -91,7 +94,7 @@ SCENARIOS = [
     },
     {
         "id": "S3",
-        "label": "Bank Loan AI — Behavioural Credit Scoring  [MONEY SHOT]",
+        "label": "Bank Loan AI — Behavioural Credit Scoring",
         "expected": "VIOLATION",
         "article": "Article 5(1)(c)",
         "penalty": "€35M or 7% global turnover",
@@ -114,9 +117,9 @@ SCENARIOS = [
             "decision for EU retail banking."
         ),
         "note": (
-            "THE MONEY SHOT — EU AI Act Art 5: 'A bank AI makes credit decisions every hour "
-            "— each one a potential fair lending violation.' Art 5(1)(c). "
-            "Already law since Feb 2 2025. No deadline to wait for."
+            "A loan decision built from a social behaviour score: the social-scoring rule "
+            "(Art 5(1)(c)) blocks this text. Whether a real lender's practice is prohibited "
+            "depends on the facts; credit scoring as such is Annex III high-risk."
         ),
     },
 ]
@@ -270,7 +273,7 @@ def main() -> None:
         print(f"  {c}{sym}{_X}  {r['id']}  {label[:46]:<46}  {r['got']}")
 
     print(f"\n  {_D}Article 5 is in force since Feb 2 2025. No deadline to wait for.{_X}")
-    print(f"  {_D}€35M or 7% of global revenue. One decorator. One line of protection.{_X}")
+    print(f"  {_D}€35M or 7% of global revenue. One decorator puts the check in front of the output.{_X}")
     print()
 
 

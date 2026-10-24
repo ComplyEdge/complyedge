@@ -3,14 +3,14 @@
 """
 ComplyEdge — capability probe
 
-Checks the three things ComplyEdge claims to enforce, case by case, and says
+Checks three of the things ComplyEdge claims to enforce, case by case, and says
 where each claim holds and where it does not:
 
   1. Article 5 prohibited practices are blocked, with the article cited.
   2. Prompt injection hidden in text an agent reads (emails, invoices, web
      pages) is blocked, with the article cited.
-  3. Every decision leaves an audit record naming the rule, with a hash of
-     the input instead of the text itself.                      (--record)
+  3. Every decision leaves an audit record, naming the rule when one fires,
+     with a hash of the input instead of the text itself.                      (--record)
 
 Controls check the other direction: ordinary text, and Article 5 text outside
 the EU, must pass.
@@ -312,6 +312,13 @@ class LiveEngine:
             "jurisdiction": case.jurisdiction,
             "direction": case.direction,
             "use_semantic_fallback": self.semantic,
+            # ADCR 0.1.0: a record meets class Record only with decision_context.
+            # Sandbox accepts the same shape; purpose_ref is an opaque locator, not the text.
+            "decision_context": {
+                "deciding_system": {"version": "capability-probe-1"},
+                "purpose_ref": "capability-probe",
+                "data_categories": [],
+            },
         }
 
     @staticmethod
@@ -332,6 +339,10 @@ class LiveEngine:
 
     def check_recorded(self, case: Case) -> dict:
         return self._request("POST", "/v1/check", self._body(case, "capability-probe"))
+
+    def verify(self, event_id: str, text: str) -> bool:
+        """Server-side check that the record was about exactly this text."""
+        return self._request("POST", "/v1/audit/verify", {"event_id": event_id, "text": text}).get("match") is True
 
     def export_today(self) -> dict:
         today = datetime.now(timezone.utc).date().isoformat()
@@ -402,7 +413,7 @@ def run_cases(engine) -> int:
 
 def run_record(engine: LiveEngine) -> int:
     case = next(c for c in CASES if c.id == RECORD_CASE_ID)
-    print("\n3. Every decision leaves a record naming the rule, with a hash instead of the text")
+    print("\n3. Every decision leaves a record, naming the rule when one fires, with a hash instead of the text")
     resp = engine.check_recorded(case)
     event_id = resp.get("event_id")
     if not resp.get("audit_logged"):
@@ -414,7 +425,10 @@ def run_record(engine: LiveEngine) -> int:
         print(f"  FAIL       event {event_id} not found in today's /v1/audit/export")
         return 1
     record = events[0]
-    expected_hash = hashlib.sha256(case.text.encode()).hexdigest()
+    # The hash is keyed with the account's own key, so nobody outside ComplyEdge
+    # can recompute it, and a plain SHA-256 of the input must never appear: that
+    # one CAN be reversed by hashing guesses. Binding is checked server-side.
+    plain_hash = hashlib.sha256(case.text.encode()).hexdigest()
     checks = [
         ("decision recorded as blocked", record.get("allowed") is False),
         (f"rule {case.rule} named", case.rule in (record.get("violation_ids") or [])),
@@ -422,7 +436,15 @@ def run_record(engine: LiveEngine) -> int:
             f"citation names {case.cites}",
             any(case.cites in (v.get("rule_description") or "") for v in record.get("violations", [])),
         ),
-        ("text_hash is SHA-256 of the input", record.get("text_hash") == expected_hash),
+        (
+            "text_hash is the keyed hash (hmac-sha256-1)",
+            # hmac-sha256-v1: the keyed hash before the commitment domain tag.
+            record.get("text_hash_alg") in ("hmac-sha256-1", "hmac-sha256-v1"),
+        ),
+        ("text_hash matches the /v1/check response", record.get("text_hash") == resp.get("text_hash")),
+        ("text_hash is not a plain SHA-256 of the input", record.get("text_hash") != plain_hash),
+        ("/v1/audit/verify confirms the input", engine.verify(event_id, case.text)),
+        ("/v1/audit/verify rejects another text", not engine.verify(event_id, case.text + " ")),
         ("input text itself not stored", case.text not in json.dumps(record)),
         ("rule bundle digest recorded", bool(record.get("bundle_digest"))),
     ]

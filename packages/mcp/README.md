@@ -4,14 +4,16 @@
 [![npm downloads](https://img.shields.io/npm/dw/@complyedge/mcp)](https://www.npmjs.com/package/@complyedge/mcp)
 [![license](https://img.shields.io/npm/l/@complyedge/mcp)](https://github.com/ComplyEdge/complyedge/blob/main/LICENSE)
 
-Offline checks of prompts and answers against the ComplyEdge rule corpus (EU AI Act Article 5 and Article 50, and more), with the article citation when a rule fires. It checks *this* prompt or output; it does not classify your system.
+Offline checks of prompts and answers against the bundled TrustLint rule set (63 YAML rules: EU AI Act Article 5 and Article 50, and more), with the article citation when a rule fires. It checks *this* prompt or output; it does not classify your system.
+
+Each line is an alternative; pick the one you need.
 
 ```bash
-npx -y @complyedge/mcp
-pip install 'complyedge[mcp]'
-pip install complyedge
-pip install trustlint
-claude mcp add complyedge -- npx -y @complyedge/mcp
+npx -y @complyedge/mcp                               # this MCP server (Node)
+claude mcp add complyedge -- npx -y @complyedge/mcp  # add it to Claude Code
+pip install 'complyedge[mcp]'                        # the same tools as a Python MCP server: complyedge-mcp
+pip install complyedge                               # Python SDK for hosted checks, no MCP server
+pip install trustlint                                # offline linter CLI, no MCP server
 ```
 
 Run offline TrustLint checks from any MCP host with Node.js:
@@ -31,9 +33,9 @@ The server exposes three read-only tools.
 
 | Tool | Returns | Notes |
 |---|---|---|
-| `check_compliance` | `PASS` / `FAIL` with cited findings | Checks already-produced text. Optional `jurisdiction`: `EU`, `US`, `GLOBAL` |
+| `check_compliance` | `PASS` / `FAIL` with cited findings | Checks already-produced text. Optional `jurisdiction` (where the end user is): `EU`, `US`, `GLOBAL`. GLOBAL rules always run |
 | `scan_prompt` | `SAFE` / `RISK_DETECTED` | Checks a candidate prompt before it is sent to a model |
-| `list_rules` | Rule inventory | Discovery only — does not evaluate text |
+| `list_rules` | Rule inventory | Discovery only: does not evaluate text |
 
 ### Optional: hosted sandbox with your API key
 
@@ -42,7 +44,7 @@ appears. Without it the tool is not listed and the server stays fully offline.
 
 | Tool | Returns | Notes |
 |---|---|---|
-| `sandbox_check` | `BLOCKED` / `ALLOWED` with rule ID and article citation | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. One network call per check. Never evidence. An EU account's key is `ce_eu_` and calls `eu.api.complyedge.io`; a US account's key is `ce_` and calls `api.complyedge.io`. The region is chosen when you create your API key. `COMPLYEDGE_API_URL` picks a host and does not change the account's region. To change the region later, use Request a region change in the dashboard. |
+| `sandbox_check` | `BLOCKED` with rule ID and article citation, or `ALLOWED`; an allowed check also lists any rules that matched and model review cleared (`cleared_by_model_review`; model review runs on paid plans only, a free plan never gets a model call) | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, and no count against your plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). One network call per check. Never evidence. An EU account's key is `ce_eu_` and calls `eu.api.complyedge.io`; a US account's key is `ce_` and calls `api.complyedge.io`. The region is your account's, chosen when you sign up and create your first API key. `COMPLYEDGE_API_URL` picks a host and does not change the account's region. To change the region later, use Request a region change in the dashboard. |
 
 Rotating the key: mint the new one with **Rotate key** on the dashboard's API
 Key page (it asks first), update
@@ -52,10 +54,12 @@ reveal. Both keys work until you revoke, so nothing has to go dark in between.
 
 ## Limitations and honest scope
 
-- Tier-1 regex matching over a bundled YAML corpus. It does not evaluate
-  Rego, and it is not the hosted runtime enforcement path — use
+- Tier-1 regex matching over a bundled YAML rule set. It does not evaluate
+  Rego, and it is not the hosted check path. Use
   [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk) for
-  `POST /v1/check` and the Article 12 audit trail.
+  `POST /v1/check` and the audit record (timestamp, keyed text hash, `event_id`,
+  and the rule IDs and citations when a rule fires; see
+  https://complyedge.io/docs/audit-reconciliation.html).
 - Findings are rule matches, not legal advice, not a legal
   opinion, and not a regulatory classification of an AI system.
 - The corpus is bundled at build time. It is current as of the release you
@@ -67,12 +71,11 @@ reveal. Both keys work until you revoke, so nothing has to go dark in between.
 
 ## Links
 
-- [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk) — hosted runtime enforcement and the Article 12 audit trail
-- [`trustlint`](https://www.npmjs.com/package/trustlint) — the same offline engine as a CLI
-- [`complyedge` on PyPI](https://pypi.org/project/complyedge/) — Python MCP server, published under this same registry entry
+- [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk): hosted checks and the audit record (timestamp, keyed text hash, `event_id`, and the rule IDs and citations when a rule fires)
+- [`trustlint`](https://www.npmjs.com/package/trustlint): the same offline engine as a CLI
+- [`complyedge` on PyPI](https://pypi.org/project/complyedge/): Python MCP server, published under this same registry entry
 - GitHub Action: `uses: complyedge/trustlint-action@v1`
-- GOPAL is an OPA library in your process. ComplyEdge is per-request deny + citation + AI Trust Center + MCP.
-- [`trustlint` on PyPI](https://pypi.org/project/trustlint/) — Python linter
-- [Documentation](https://www.complyedge.io/docs) · [Trust portal](https://trust.complyedge.io)
+- [`trustlint` on PyPI](https://pypi.org/project/trustlint/): Python linter
+- [Documentation](https://complyedge.io/docs) · [Trust portal](https://trust.complyedge.io)
 
 <!-- mcp-name: io.github.ComplyEdge/complyedge -->

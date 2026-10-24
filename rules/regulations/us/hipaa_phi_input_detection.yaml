@@ -1,29 +1,50 @@
 id: HIPAA_PHI_INPUT_001
 jurisdiction: US
-effective_date: '1996-08-21'
-description: Proactively detects protected health information in user inputs before
+effective_date: '2003-04-14'
+description: >-
+  Proactively detects protected health information in user inputs before
   processing
+
+
+  Layer 1 detects: my condition, my diagnosis, my medication, my treatment, my
+  symptom or my symptoms; and doctor, physician, hospital, clinic or emergency
+  room followed later on the same line by said, told, prescribed or diagnosed.
+  It has no identifier formats (name, date of birth, record number, diagnosis
+  code). It matches wording, not meaning: it fires on a person's own health
+  talk, which is not information held by a covered entity ("My doctor said I
+  should ask about side effects of metformin, what are the common ones?"), and
+  it misses an export of health records ("Here is the export from our EHR: John
+  Smith, DOB 03/12/1961, MRN 448812, diagnosis E11.9. Summarise his chart for
+  the insurer."). Whether a text holds protected health information is judged in
+  Layer 2.
 detection_scope: user_input
 # Layer 1 (deterministic regex) conditions. Context-gated PHI keyword
 # detection and multi-signal correlation (medical term + age + name) require
-# Layer 2 evaluation — bare condition/medication keywords must not fire
+# Layer 2 evaluation: bare condition/medication keywords must not fire
 # standalone (see exceptions: general health education is out of scope).
 # The personal-context regex below plus the self-contextual provider pattern
 # are the standalone-safe Layer 1 subset.
 conditions:
 - type: regex
-  value: (?i)\b(my (condition|diagnosis|medication|treatment|symptoms?))\b
+  value: (?i)\b(my\s(condition|diagnosis|medication|treatment|symptoms?))\b
   flags: i
 - type: regex
-  value: (?i)\b(doctor|physician|hospital|clinic|emergency room)\b.*\b(said|told|prescribed|diagnosed)\b
+  value: (?i)\b(doctor|physician|hospital|clinic|emergency\sroom)\b.*\b(said|told|prescribed|diagnosed)\b
 severity: high
 category: healthcare
 source:
+  provision_url: https://www.ecfr.gov/current/title-45/section-164.502
+  provision_label: >-
+    45 CFR 164.502(a) (HIPAA Privacy Rule; binds covered entities and business
+    associates only)
   regulation: HIPAA
   article: 45 CFR § 164.502
   url: https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html
   last_updated: '2013-01-25'
-  citation: "45 CFR §164.502(a) Standard. A covered entity or business associate may not use or disclose protected health information, except as permitted or required by this subpart or by subpart C of part 160 of this subchapter. §164.502(b)(1) Minimum necessary applies: When using or disclosing protected health information or when requesting protected health information from another covered entity or business associate, a covered entity or business associate must make reasonable efforts to limit protected health information to the minimum necessary to accomplish the intended purpose of the use, disclosure, or request."
+  citation: >-
+    45 CFR §164.502(a) Standard. A covered entity or business associate may not
+    use or disclose protected health information, except as permitted or
+    required by this subpart or by subpart C of part 160 of this subchapter.
 exceptions:
 - condition: General health education questions
   description: Questions about general health topics without personal details
@@ -32,8 +53,11 @@ exceptions:
 remediation:
   action: proactive_warn
   timing: proactive
-  message: 🏥 You're sharing health information that may be protected under HIPAA.
-    Consider if these details are necessary.
+  message: >-
+    🏥 You're sharing health information. If this service is a HIPAA covered
+    entity or business associate, protected health information may only be used
+    or disclosed as the Privacy Rule permits (45 CFR 164.502(a)). Consider
+    whether these details are necessary.
   suggestion: Try asking general health questions without mentioning specific conditions,
     medications, or personal medical details
   alternatives:
@@ -42,6 +66,10 @@ remediation:
   - 'Seek general guidance: ''What should I discuss with my doctor about...'''
   allow_override: false
   require_explicit_consent: true
+compliance_notes:
+  - >-
+    Covered entities other than small health plans had to comply with the
+    Privacy Rule by April 14, 2003 (45 CFR 164.534(a)).
 version: 1.1.0
 tags:
 - hipaa
@@ -50,3 +78,7 @@ tags:
 - proactive
 - input_protection
 tier: developer
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

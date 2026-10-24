@@ -1,4 +1,4 @@
-# ComplyEdge — Article 5 Rego Tests
+# ComplyEdge: Article 5 Rego Tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.article5_test
@@ -15,7 +15,7 @@ import data.complyedge.article5.subliminal_manipulation
 import data.complyedge.article5.vulnerability_exploitation
 
 # ============================================================
-# Social Scoring — Article 5(1)(c)
+# Social Scoring, Article 5(1)(c)
 # ============================================================
 
 test_social_scoring_blocks_social_credit if {
@@ -54,7 +54,7 @@ test_social_scoring_allows_non_eu if {
 }
 
 # ============================================================
-# Subliminal Manipulation — Article 5(1)(a)
+# Subliminal Manipulation, Article 5(1)(a)
 # ============================================================
 
 test_subliminal_blocks_dark_patterns if {
@@ -86,7 +86,7 @@ test_subliminal_allows_normal_text if {
 }
 
 # ============================================================
-# Vulnerability Exploitation — Article 5(1)(b)
+# Vulnerability Exploitation, Article 5(1)(b)
 # ============================================================
 
 test_vulnerability_blocks_exploiting_elderly if {
@@ -163,7 +163,7 @@ test_vulnerability_still_blocks_manipulating_the_aged if {
 
 # Article 5(1)(b) social-situation axis tests (agent-added 2026-06-06).
 # Covers refugees, migrants, asylum-seekers, displaced people, the homeless,
-# the undocumented — across the four verbs in the new pattern.
+# the undocumented, across the four verbs in the new pattern.
 
 test_vulnerability_blocks_exploiting_refugees if {
 	vulnerability_exploitation.violation with input as {
@@ -224,7 +224,7 @@ test_vulnerability_social_situation_axis_allows_non_eu if {
 }
 
 # ============================================================
-# Biometric Categorisation — Article 5(1)(g)
+# Biometric Categorisation, Article 5(1)(g)
 # ============================================================
 
 test_biometric_blocks_racial_inference if {
@@ -273,7 +273,7 @@ test_biometric_law_enforcement_exception_no_violation if {
 }
 
 test_biometric_law_enforcement_without_lawful_basis_still_violates if {
-	# LE use case alone is NOT sufficient — `lawful_basis: true` is required.
+	# LE use case alone is NOT sufficient, `lawful_basis: true` is required.
 	biometric_categorisation.violation with input as {
 		"jurisdiction": "EU",
 		"text": "Biometric categorisation to infer race for criminal investigation",
@@ -298,11 +298,12 @@ test_biometric_dataset_filtering_exception_no_violation if {
 }
 
 # ============================================================
-# Exemption transparency — a suppressed violation is still a decision
+# Exemption transparency, a suppressed violation is still a decision
 #
-# The carve-outs above are caller-asserted: a request can switch off a
-# critical Article 5 prohibition by supplying two values that this engine
-# does not verify. Before these tests, a suppressed match left NO trace —
+# The carve-outs above depend on values this engine does not verify. The
+# dataset carve-out is switched off by one caller value, `dataset_operation`;
+# the law-enforcement carve-out also needs the service-set
+# `law_enforcement_authorised` (see the authorisation gate below). Before these tests, a suppressed match left NO trace -
 # the record was indistinguishable from a request that never matched at
 # all, so the one decision a regulator is most likely to ask about was the
 # one decision the evidence could not describe. Each entry names the
@@ -423,7 +424,7 @@ test_dataset_operation_exemption_is_recorded if {
 }
 
 # BOTH branches of the assumption, not just the firing one. An exemption is
-# recorded only when it actually SUPPRESSED a match — asserting the fields
+# recorded only when it actually SUPPRESSED a match, asserting the fields
 # on text that never matched must not manufacture an exemption event.
 test_no_exemption_recorded_when_nothing_was_suppressed if {
 	count(biometric_categorisation.exemptions) == 0 with input as {
@@ -466,7 +467,7 @@ test_biometric_base_prohibition_still_fires_when_no_exception_set if {
 }
 
 # ============================================================
-# Emotion Recognition — Article 5(1)(f)
+# Emotion Recognition, Article 5(1)(f)
 # ============================================================
 
 test_emotion_recognition_blocks_workplace_emotion if {
@@ -491,7 +492,7 @@ test_emotion_recognition_allows_normal_text if {
 }
 
 # ============================================================
-# Predictive Policing — Article 5(1)(e)
+# Predictive Policing, Article 5(1)(d)
 # ============================================================
 
 test_predictive_policing_blocks_pre_crime if {
@@ -516,7 +517,7 @@ test_predictive_policing_allows_normal_text if {
 }
 
 # ============================================================
-# Real-time Biometric — Article 5(1)(h)
+# Real-time Biometric, Article 5(1)(h)
 # ============================================================
 
 test_realtime_biometric_blocks_live_facial if {

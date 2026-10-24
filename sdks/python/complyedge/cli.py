@@ -78,7 +78,7 @@ def cli() -> None:
     "--base-url",
     default=None,
     help="API base URL (default: the region your key was issued in: "
-    "ce_eu_ keys use https://eu.api.complyedge.io and ce_ keys use https://api.complyedge.io; the region is chosen when you create your API key. A URL override does not change the account's region)",
+    "ce_eu_ keys use https://eu.api.complyedge.io and ce_ keys use https://api.complyedge.io; the region is chosen when you sign up and create your first API key. A URL override does not change the account's region)",
 )
 def login(api_key: str, base_url: str | None) -> None:
     """Authenticate and store your API key locally.

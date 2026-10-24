@@ -203,8 +203,12 @@ def main() -> int:
             "semantic": _arm_summary(rows, arm, "semantic"),
         }
 
+    # AUD-178: gap measure run_id stamp is ADCR Zulu.
+    sys.path.insert(0, str(REPO / "services" / "api"))
+    from adcr_record import utc_timestamp
+
     report = {
-        "run_id": datetime.now(UTC).isoformat(),
+        "run_id": utc_timestamp(datetime.now(UTC)),
         "base_url": args.base_url,
         "fixture_path": str(FIXTURE.relative_to(REPO)),
         "fixture_count": len(fixtures),

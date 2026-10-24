@@ -1,26 +1,12 @@
 # ComplyEdge Acceptance Tests
 
-These tests verify every claim made in the ComplyEdge public documentation and
-launch articles. They are intentionally written for a **first-time reader**:
-each test clearly states *what it checks* and *which public claim it backs*.
+These tests verify claims from ComplyEdge public documentation. They are
+offline only: no live API calls, no audit-row writes, no email sends.
 
-## Two tiers
-
-| Tier | What | When |
-|------|------|------|
-| **offline** | Corpus files, Rego policies, SDK source, benchmark JSON | Always runs — no credentials needed |
-| **live** | Real API calls with `COMPLYEDGE_API_KEY` | Runs when the env var is set; otherwise tests are skipped |
-
-## Run offline suite only
+## Run
 
 ```bash
 pytest tests/acceptance/ -v
-```
-
-## Run full suite (offline + live)
-
-```bash
-COMPLYEDGE_API_KEY=<your-key> pytest tests/acceptance/ -v
 ```
 
 ## Files
@@ -28,12 +14,14 @@ COMPLYEDGE_API_KEY=<your-key> pytest tests/acceptance/ -v
 | File | What it covers |
 |------|---------------|
 | `test_corpus.py` | Rule/policy counts, SDK defaults, decorator config |
-| `test_api_shape.py` | API response shape, fields, and live enforcement behaviour |
-| `test_latency.py` | Latency numbers from the published benchmark + one live call |
-| `test_decorator.py` | `@compliance_check` decorator behaviour end-to-end |
-| `test_benchmark.py` | Benchmark result integrity (50 prompts, 6 categories, safe-harbor) |
+| `test_latency.py` | Latency numbers from the published benchmark JSON |
+| `test_decorator.py` | `@compliance_check` fail-open behaviour (no live API) |
+| `test_benchmark.py` | Benchmark result integrity |
 
 ## Source of truth
 
-The claims tested here come from:
-- [Launch blog post](https://complyedge.io/blog/why-opa-rego-eu-ai-act.html)
+The claims come from the [launch blog post](https://complyedge.io/blog/why-opa-rego-eu-ai-act.html).
+The tests read the files those claims rest on: the rule corpus under `rules/`
+and the benchmark results under `scripts/benchmark/results/`. Where a test
+pins a number the post no longer prints (the per-category Layer 1 counts), its
+docstring says so.

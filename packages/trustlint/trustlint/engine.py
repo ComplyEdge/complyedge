@@ -62,6 +62,7 @@ class Rule:
     effective_window: Optional[dict] = None  # {starts, ends?, superseded_by?}
     conditional_on: Optional[list] = None  # [{parameter, operator, value, rationale}]
     supersedes: Optional[list] = None
+    detection_scope: str = "all"  # all | user_input | ai_output
 
 
 def _parse_date(value: Any) -> Optional[date]:
@@ -104,6 +105,71 @@ def _compare(actual: Any, op: str, expected: Any) -> bool:
 logger = logging.getLogger(__name__)
 
 
+# Text normalisation, identical to rules/rego/complyedge/shared/normalize.rego and
+# to the TypeScript engine (src/engine.ts). Patterns are matched against the
+# normalised text, so the same words decide the same way whatever whitespace or
+# quote characters they arrive with:
+# - a run of spaces, tabs or Unicode spaces (no-break space and the other
+#   Unicode space separators) becomes one space;
+# - a line break (CR LF, CR, U+0085, U+2028, U+2029) with the spaces around it
+#   becomes one LF, so `.` still stops at a line end and `^`/`$` with the m flag
+#   still see it;
+# - curly quotes become straight quotes;
+# - a Unicode hyphen or dash (U+2010 to U+2015) becomes "-".
+_SPACE_CHARS = "\t\x0b\x0c \u00a0\u1680\u2000-\u200a\u202f\u205f\u3000"
+_LINE_BREAK_RE = re.compile(
+    f"[{_SPACE_CHARS}]*(?:\r\n|[\n\r\u0085\u2028\u2029])[{_SPACE_CHARS}]*"
+)
+_LINE_SPACE_RE = re.compile(f"[{_SPACE_CHARS}]+")
+_SINGLE_QUOTES_RE = re.compile("[\u2018\u2019\u201a\u201b]")
+_DOUBLE_QUOTES_RE = re.compile("[\u201c\u201d\u201e\u201f]")
+_HYPHENS_RE = re.compile("[\u2010-\u2015]")
+
+
+def normalize_text(text: str) -> str:
+    """Normalise whitespace and quote characters before matching."""
+    text = _SINGLE_QUOTES_RE.sub("'", text)
+    text = _DOUBLE_QUOTES_RE.sub('"', text)
+    text = _HYPHENS_RE.sub("-", text)
+    text = _LINE_BREAK_RE.sub("\n", text)
+    return _LINE_SPACE_RE.sub(" ", text)
+
+
+def jurisdiction_applies(rule_jurisdiction: str, requested: Optional[str]) -> bool:
+    """Whether a rule tagged `rule_jurisdiction` applies to an end user in `requested`.
+
+    `requested` is where the end user is. A GLOBAL rule applies everywhere; a
+    rule applies in its own jurisdiction, in any sub-jurisdiction of it (a US
+    rule applies in US-CA) and in any parent of it (a US-CA rule is in scope
+    for a US-wide check). No requested jurisdiction means every rule.
+    """
+    if not requested:
+        return True
+    rule_j = (rule_jurisdiction or "").upper()
+    want = requested.upper()
+    if rule_j == "GLOBAL":
+        return True
+    return rule_j == want or want.startswith(rule_j + "-") or rule_j.startswith(want + "-")
+
+
+#: detection_scope values that apply to each check direction. A rule with no
+#: detection_scope, or `all`, applies to both.
+_SCOPES_FOR_DIRECTION = {
+    "input": {"all", "user_input"},
+    "output": {"all", "ai_output"},
+}
+
+
+def scope_applies(detection_scope: Optional[str], direction: Optional[str]) -> bool:
+    """Whether a rule's detection_scope covers text flowing in `direction`."""
+    if not direction:
+        return True
+    scopes = _SCOPES_FOR_DIRECTION.get(direction.lower())
+    if scopes is None:
+        raise ValueError(f"direction must be 'input' or 'output', got {direction!r}")
+    return (detection_scope or "all").lower() in scopes
+
+
 class TrustLintEngine:
     """Loads YAML rules and evaluates text against Tier 1 regex patterns."""
 
@@ -122,10 +188,11 @@ class TrustLintEngine:
         if rules_dir:
             return Path(rules_dir)
 
-        # Check ~/.trustlint/rules/ first
-        home_rules = Path.home() / ".trustlint" / "rules"
-        if home_rules.exists():
-            return home_rules
+        # ~/.trustlint/rules is deliberately NOT read. `trustlint rules update` used
+        # to fill it from a GitHub release (2026-07, 64 rules including a withdrawn
+        # one) and, read first, it overrode the bundled rule set across every later
+        # upgrade. The bundled rules ship with each release; --rules-dir covers a
+        # custom corpus.
 
         # Walk up from CWD looking for rules/regulations/ (dev-in-repo)
         cwd = Path.cwd()
@@ -176,8 +243,9 @@ class TrustLintEngine:
     def _build_pattern_info(pattern: str, description: str, flags_str: str) -> Optional[dict]:
         """Compile a regex pattern at load time. Skip patterns that fail to compile."""
         flags = 0
-        if "i" in (flags_str or ""):
-            flags |= re.IGNORECASE
+        for letter, flag in (("i", re.IGNORECASE), ("m", re.MULTILINE), ("s", re.DOTALL), ("x", re.VERBOSE)):
+            if letter in (flags_str or ""):
+                flags |= flag
         try:
             compiled = re.compile(pattern, flags)
         except re.error:
@@ -229,6 +297,11 @@ class TrustLintEngine:
         if not citation:
             citations = source.get("citations", [])
             citation = citations[0] if citations else ""
+        if not citation:
+            # Rules that rest on no single legal article (an industry standard,
+            # a detection control) carry provision_label instead, which says so.
+            # Every finding names its source rather than an empty citation.
+            citation = source.get("provision_label", "")
 
         # Extract remediation message
         remediation = data.get("remediation", {})
@@ -253,6 +326,7 @@ class TrustLintEngine:
             effective_window=data.get("effective_window"),
             conditional_on=data.get("conditional_on"),
             supersedes=data.get("supersedes"),
+            detection_scope=str(data.get("detection_scope") or "all"),
         )
 
     @staticmethod
@@ -320,24 +394,34 @@ class TrustLintEngine:
         jurisdiction: Optional[str] = None,
         as_of: Optional[date] = None,
         context: Optional[dict] = None,
+        direction: Optional[str] = None,
     ) -> LintResult:
         """Run Tier-1 checks. ``as_of`` + ``context`` drive dynamic-state
         (sanctions transition) evaluation: a matched rule may be carved out,
-        expired, or in a wind-down window and carry transition guidance."""
+        expired, or in a wind-down window and carry transition guidance.
+
+        ``jurisdiction`` is where the end user is (see jurisdiction_applies).
+        ``direction`` is "input" (text a user sends) or "output" (text the AI
+        produces); a rule whose detection_scope is user_input or ai_output runs
+        only in its direction. None runs every rule."""
         result = LintResult(text=text)
         as_of = as_of or date.today()
         context = context or {}
-        applicable = self.rules
-        if jurisdiction:
-            applicable = [r for r in self.rules if r.jurisdiction.upper() == jurisdiction.upper()]
+        applicable = [
+            r
+            for r in self.rules
+            if jurisdiction_applies(r.jurisdiction, jurisdiction)
+            and scope_applies(r.detection_scope, direction)
+        ]
         result.rules_evaluated = len(applicable)
+        text_to_match = normalize_text(text)
 
         for rule in applicable:
             for pat_info in rule.regex_patterns:
                 compiled = pat_info.get("compiled")
                 if compiled is None:
                     continue  # skip patterns that failed to compile at load time
-                if compiled.search(text):
+                if compiled.search(text_to_match):
                     applies, state, guidance = self._evaluate_temporal_state(
                         rule, as_of, context
                     )

@@ -10,12 +10,11 @@ a truncated or stale artifact, the failure that actually matters) plus the
 number published on the public surfaces, and the latency tests assert a sample
 FLOOR rather than an exact n.
 
-Claims verified:
-  - "60-prompt benchmark corpus"
-  - "7 categories: Article 5, Article 50, GPAI, prompt security, safe harbor,
-    edge cases, US corpus"
-  - "10/10 safe-harbor prompts returned 0 violations (zero false positives)"
-  - "US corpus: all 10 prompts handled by hybrid/Layer 2 (0 on OPA path)"
+Checked in benchmark_latest.json:
+  - 60 prompts in 7 categories: Article 5, Article 50, GPAI, prompt security,
+    safe harbor, edge cases, US corpus
+  - 10 of 10 safe-harbor prompts return no violations (zero false positives)
+  - all 10 US corpus prompts are decided on the hybrid / Layer 2 path
   - Benchmark results file is present and well-formed
   - Every result has the required fields
 """
@@ -193,18 +192,12 @@ class TestSafeHarbor:
 
 class TestCategoryPassRates:
     """
-    Validates the per-category Layer 1 (OPA) numbers from the blog post table.
-
-    Blog table (complyedge.io/blog/why-opa-rego-eu-ai-act.html) — refresh 2026-07-11:
-      Article 5   | 6/10  — OPA catches canonical phrasings (+1 vs May)
-      Article 50  | 4/8   — Pattern coverage grows with community PRs
-      GPAI        | 4/5   —
-      Safe harbor | 10/10 — Zero false positives
-      Edge cases  | 5/7   — (+1 vs May); one non-critical miss remains
-      US corpus   | 0/10  — All require use_semantic_fallback=True
+    Pins the per-category Layer 1 (OPA) counts in benchmark_latest.json, so a
+    change to them is a deliberate change to this file. The launch post no
+    longer prints this table; it reports the overall rates instead.
 
     Layer 1 = prompts in category correctly handled on the OPA path, over category size.
-    Example: Article 5 → 6/10 (6 on OPA path, all passed; 4 routed to Layer 2).
+    Example: Article 5, 6/10 (6 on the OPA path, all passed; 4 routed to Layer 2).
     """
 
     @staticmethod
@@ -254,7 +247,7 @@ class TestUsCorpus:
         ), f"Expected 10 US corpus prompts, found {len(us_results)}"
 
     def test_us_corpus_all_handled_by_hybrid(self, us_results):
-        # Blog: US corpus requires Layer 2 (use_semantic_fallback=True)
+        # The US corpus is decided on Layer 2 (use_semantic_fallback=True).
         non_hybrid = [r["id"] for r in us_results if r.get("engine_path") != "hybrid"]
         assert (
             non_hybrid == []

@@ -1,8 +1,22 @@
-# ComplyEdge — Prompt-injection / IPI: aggregated check
+# ComplyEdge: Prompt-injection / IPI: aggregated check
 #
 # Aggregates the prompt_security leaves and returns a unified result.
-# OPA queries this package at: POST /v1/data/complyedge/prompt_security
+# OPA queries this package at: POST /v1/data/complyedge/prompt_security/result
 # Aggregator carve-out (RULE_STANDARD.md §5.6): no legal condition of its own.
+#
+# Imported rules (each individually subject to §5 sign-off):
+#   - prompt_security.role_hijack           (rego-art15-ipi-001)
+#   - prompt_security.safety_disable        (rego-art15-ipi-002)
+#   - prompt_security.indirect_embedded     (rego-art15-ipi-003)
+#   - prompt_security.embedded_instruction  (rego-art15-ipi-003)
+#   - prompt_security.indirect_injection    (rego-art15-ipi-008)
+#   - prompt_security.ai_addressed          (rego-art15-ipi-004)
+#   - prompt_security.sysprompt_leak        (rego-art15-ipi-005)
+#   - prompt_security.training_extract      (rego-art15-ipi-006)
+#   - prompt_security.markdown_exfil        (rego-art15-ipi-007)
+#   - prompt_security.separator_hijack      (rego-art15-ipi-008)
+#   - prompt_security.instruction_override  (rego-art15-ipi-009)
+#   - prompt_security.tool_hijack           (rego-art15-ipi-010)
 
 package complyedge.prompt_security
 

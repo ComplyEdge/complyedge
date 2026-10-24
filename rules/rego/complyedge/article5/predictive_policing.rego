@@ -1,4 +1,4 @@
-# ComplyEdge — EU AI Act Article 5(1)(d): Predictive Policing
+# ComplyEdge: EU AI Act Article 5(1)(d): Predictive Policing
 #
 # Prohibits AI systems for making risk assessments of natural persons to
 # assess or predict the risk of a natural person committing a criminal
@@ -8,7 +8,7 @@
 # facts directly linked to a criminal activity.
 #
 # Legal citation: Regulation (EU) 2024/1689, Article 5(1)(d)
-# Recital: 42 — presumption of innocence; natural persons should be judged on actual behaviour, not on AI-predicted behaviour based solely on profiling/personality traits
+# Recital: 42: presumption of innocence; natural persons should be judged on actual behaviour, not on AI-predicted behaviour based solely on profiling/personality traits
 # Effective: 2025-02-02
 # Penalty: up to €35M or 7% of global revenue
 # Condition type: deterministic
@@ -19,10 +19,14 @@
 # Citation fix: this rule was previously cited as Art 5(1)(e). In the final
 # adopted text of Regulation (EU) 2024/1689, predictive policing is Art 5(1)(d);
 # Art 5(1)(e) is untargeted scraping of facial images. Corrected 2026-05-16.
+# ELI: http://data.europa.eu/eli/reg/2024/1689/art_5/par_1/pnt_d/oj
+# Provision: Regulation (EU) 2024/1689, Article 5(1)(d)
 
 package complyedge.article5.predictive_policing
 
 import rego.v1
+
+import data.complyedge.shared.normalize
 
 default violation := false
 
@@ -33,14 +37,14 @@ violation if {
 
 predictive_policing_pattern_match if {
 	patterns := [
-		"predictive[\\- ]?policing",
-		"pre[\\- ]?crime",
-		"crime[\\- ]?probability[\\- ]?predict",
-		"individual[\\- ]?criminal[\\- ]?risk",
-		"profiling[\\- ]?based[\\- ]?crime",
+		"predictive[\\-\\s]?policing",
+		"pre[\\-\\s]?crime",
+		"crime[\\-\\s]?probability[\\-\\s]?predict",
+		"individual[\\-\\s]?criminal[\\-\\s]?risk",
+		"profiling[\\-\\s]?based[\\-\\s]?crime",
 	]
 
-	text := lower(input.text)
+	text := lower(normalize.text)
 	some pattern in patterns
 	regex.match(pattern, text)
 }

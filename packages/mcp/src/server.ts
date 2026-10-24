@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
@@ -17,6 +18,17 @@ import { TrustLintEngine, type LintResult, type Rule } from "trustlint";
 // resolves both in this repo and inside node_modules/@complyedge/mcp.
 const VERSION: string = createRequire(import.meta.url)("../package.json").version;
 
+// The rule corpus this release ships: trustlint's dist/rules, beside the
+// trustlint entry point. TrustLintEngine() with no directory loads
+// ~/.trustlint/rules first (the cache `trustlint update` writes), then any
+// rules/regulations folder above the working directory, and its bundled rules
+// only last, so a stale cache could carry rules older than the 63 this package
+// names. Always pass the directory.
+export const BUNDLED_RULES_DIR: string = join(
+  dirname(createRequire(import.meta.url).resolve("trustlint")),
+  "rules"
+);
+
 const TOOL_NAMES = ["check_compliance", "list_rules", "scan_prompt"] as const;
 const JURISDICTIONS = ["EU", "US", "GLOBAL"] as const;
 
@@ -24,7 +36,8 @@ const JURISDICTIONS = ["EU", "US", "GLOBAL"] as const;
 // the hosted API (POST /v1/sandbox/check), so without a key it does not exist
 // and the offline contract of the three tools above is untouched. The hosted
 // sandbox evaluates with the tenant's real rules and settings and records
-// nothing: no audit entry, no usage, no rate-limit count. Never evidence.
+// nothing: no audit entry, no usage, no count against the plan's daily limit
+// (own caps: 60 a minute, 1,000 a day). Never evidence.
 export const SANDBOX_TOOL_NAME = "sandbox_check";
 export const API_KEY_ENV = "COMPLYEDGE_API_KEY";
 // One stack per region; the key prefix says which (same rule as the SDKs).
@@ -56,7 +69,7 @@ export function resolveSandboxBaseUrl(apiKey: string, override?: string): string
 const sandboxTool = {
   name: SANDBOX_TOOL_NAME,
   description:
-    "EU AI Act Article 5 and Article 50. Hosted ComplyEdge enforcement, sandbox mode: the same deterministic rules and tenant settings as production, but NOTHING is recorded : no audit entry, no usage, no rate-limit count. Use it to try a case before wiring an integration or to see what a rule catches; the result is never evidence. Requires COMPLYEDGE_API_KEY (this tool is listed only when it is set) and makes one network call to the ComplyEdge API (POST /v1/sandbox/check). Argument `text` must be non-empty; optional `jurisdiction` defaults to EU. Returns BLOCKED or ALLOWED with rule ID and article citation, engine_path and latency.",
+    "EU AI Act Article 5 and Article 50. Hosted ComplyEdge enforcement, sandbox mode: the same deterministic rules and tenant settings as production, but NOTHING is recorded: no audit entry, no usage, no count against the plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). Use it to try a case before wiring an integration or to see what a rule catches; the result is never evidence. Requires COMPLYEDGE_API_KEY (this tool is listed only when it is set) and makes one network call to the ComplyEdge API (POST /v1/sandbox/check). Argument `text` must be non-empty; optional `jurisdiction` defaults to EU. Returns BLOCKED with rule ID and article citation, or ALLOWED, plus engine_path and latency.",
   inputSchema: {
     type: "object",
     properties: {
@@ -126,6 +139,21 @@ function requireText(args: Arguments, key: string): string {
   return value;
 }
 
+/**
+ * Whether a rule tagged `ruleJurisdiction` applies to an end user in
+ * `requested`: GLOBAL rules everywhere, a rule in its own jurisdiction, its
+ * sub-jurisdictions (US includes US-CA) and its parents. The same rule as
+ * trustlint's jurisdictionApplies, which check_compliance uses through
+ * engine.check.
+ */
+export function ruleAppliesIn(ruleJurisdiction: string, requested?: string): boolean {
+  if (!requested) return true;
+  const rule = (ruleJurisdiction ?? "").toUpperCase();
+  const want = requested.toUpperCase();
+  if (rule === "GLOBAL") return true;
+  return rule === want || want.startsWith(rule + "-") || rule.startsWith(want + "-");
+}
+
 function optionalJurisdiction(args: Arguments): string | undefined {
   const value = args?.jurisdiction;
   if (value === undefined) {
@@ -172,6 +200,8 @@ interface SandboxApiResponse {
   violations?: Array<Record<string, unknown>>;
   engine_path?: string;
   latency_ms?: number;
+  /** Rules that matched and model review cleared; the check is allowed. */
+  overridden_hits?: Array<Record<string, unknown>> | null;
   audit_logged?: unknown;
   sandbox?: unknown;
 }
@@ -210,6 +240,11 @@ async function sandboxCheck(args: Arguments, apiKey: string, options: SandboxOpt
     remediation: (v.reason as string) ?? ""
   }));
   const blocked = data.allowed !== true;
+  // An allowed check can still have matched rules that model review cleared;
+  // "No rule fired" would be false then.
+  const cleared = (data.overridden_hits ?? [])
+    .map((h) => h?.rule_id)
+    .filter((id): id is string => typeof id === "string" && id.length > 0);
   return {
     status: blocked ? "BLOCKED" : "ALLOWED",
     violations,
@@ -217,13 +252,16 @@ async function sandboxCheck(args: Arguments, apiKey: string, options: SandboxOpt
     latency_ms: Math.trunc(data.latency_ms ?? 0),
     audit_logged: false,
     sandbox: true,
+    cleared_by_model_review: cleared,
     message: violations.length
       ? `${violations.length} rule(s) fired. Sandbox: not recorded.`
-      : "No rule fired. Sandbox: not recorded."
+      : cleared.length
+        ? `${cleared.length} rule(s) matched and model review cleared them. Sandbox: not recorded.`
+        : "No rule fired. Sandbox: not recorded."
   };
 }
 
-export function createServer(engine = new TrustLintEngine(), sandbox: SandboxOptions = {}): Server {
+export function createServer(engine = new TrustLintEngine(BUNDLED_RULES_DIR), sandbox: SandboxOptions = {}): Server {
   if (engine.rules.length === 0) {
     throw new Error("TrustLint loaded no bundled rules.");
   }
@@ -254,7 +292,7 @@ export function createServer(engine = new TrustLintEngine(), sandbox: SandboxOpt
       if (name === "list_rules") {
         const jurisdiction = optionalJurisdiction(args);
         const rules = engine.rules
-          .filter((rule: Rule) => !jurisdiction || rule.jurisdiction === jurisdiction)
+          .filter((rule: Rule) => ruleAppliesIn(rule.jurisdiction, jurisdiction))
           .map((rule: Rule) => ({
             id: rule.id,
             title: rule.title,
@@ -266,7 +304,8 @@ export function createServer(engine = new TrustLintEngine(), sandbox: SandboxOpt
       }
 
       if (name === "scan_prompt") {
-        return resultContent(promptPayload(engine.check(requireText(args, "prompt"))));
+        // A prompt is text a user sends: rules scoped to AI output do not run.
+        return resultContent(promptPayload(engine.check(requireText(args, "prompt"), undefined, "input")));
       }
 
       if (name === SANDBOX_TOOL_NAME && apiKey()) {

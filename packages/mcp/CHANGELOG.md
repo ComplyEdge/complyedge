@@ -11,6 +11,20 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+### Fixed
+- The server now always loads the rule corpus this release bundles (63 rules with
+  `trustlint` 2.1.2). It used to call `TrustLintEngine()` with no directory, so
+  trustlint loaded `~/.trustlint/rules` first (the cache `trustlint update`
+  writes), then any `rules/regulations` folder above the working directory, and
+  the bundled rules only last. Anyone with an older cache ran an older corpus,
+  including the pre-2.1.0 prompt-injection rules the 0.2.0 entry describes.
+- `sandbox_check` description: sandbox calls do not count against the plan's
+  daily limit but have their own caps (60 a minute, 1,000 a day); it used to say
+  "no rate-limit count".
+
+### Changed
+- Dropped the `ai-safety` and `prompt-injection` keywords. The README describes the hosted path's output as the audit record (timestamp, keyed text hash, `event_id`, and the rule IDs and citations when a rule fires) instead of "the Article 12 audit trail".
+
 ## [0.2.2] - 2026-10-01
 
 ### Changed
@@ -37,10 +51,11 @@ from memory, and anything not evidenced is left out instead of guessed at.
 ### Added
 - **`sandbox_check`, an optional fourth tool, listed only when
   `COMPLYEDGE_API_KEY` is set.** It calls the hosted
-  `POST /v1/sandbox/check` — the tenant's real deterministic rules and
+  `POST /v1/sandbox/check`: the tenant's real deterministic rules and
   settings, the same verdict as production, and nothing recorded: no audit
-  entry, no usage, no rate-limit count. Returns `BLOCKED` / `ALLOWED` with rule
-  ID and article citation, `audit_logged: false`, `sandbox: true`. The region
+  entry, no usage, no count against the plan's daily limit (sandbox calls have
+  their own caps: 60 a minute, 1,000 a day). Returns `BLOCKED` with rule ID and
+  article citation or `ALLOWED`, `audit_logged: false`, `sandbox: true`. The region
   follows the key prefix (`ce_eu_` -> `eu.api.complyedge.io`);
   `COMPLYEDGE_API_URL` overrides it. The tool refuses to report any response
   the server did not mark `sandbox: true`, and rejects empty text before any
@@ -52,14 +67,14 @@ from memory, and anything not evidenced is left out instead of guessed at.
   `sandbox_check` is the one key-gated exception and says so in its
   description.
 
-## [0.2.0] - 2026-09-05
+## [0.2.0] - 2026-09-07
 
 ### Changed
 - **`trustlint` floor raised from `^2.0.5` to `^2.1.0`.** This is the release
   where the offline injection checks start working at all.
 
   In every published `trustlint` before 2.1.0, all ten `prompt_security` rules
-  loaded from the bundled corpus and **none of them matched** — including the
+  loaded from the bundled corpus and **none of them matched**, including the
   simplest direct-override rule. JavaScript's `RegExp` rejects the corpus's
   inline `(?i)` flag prefix, so each pattern threw at compile time and a silent
   `catch` turned "will not compile" into "never matches". `scan_prompt` and
@@ -73,7 +88,7 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ### Note
 No code in this package changed. The version moves to 0.2.0 rather than 0.1.6
-because the observable behaviour changes substantially — text that previously
+because the observable behaviour changes substantially: text that previously
 came back clean now returns violations.
 
 ## [0.1.5] - 2026-08-26
@@ -84,16 +99,16 @@ came back clean now returns violations.
   treatment. Added the regulation nouns the bundled corpus actually covers
   (`gdpr`, `hipaa`, `sox`, `pci-dss`, `coppa`), the two EU AI Act articles it
   cites in findings (`article-5`, `article-50`), and the terms describing how
-  it runs (`mcp-server`, `offline`, `prompt-scanning`, `prompt-injection` -- the corpus
-  carries nine `PROMPT_SECURITY` rules for injection and exfiltration).
+  it runs (`mcp-server`, `offline`, `prompt-scanning`, `prompt-injection`; the corpus
+  carries ten `PROMPT_SECURITY` rules for injection and exfiltration).
 - Description rewritten to name the corpus size, the specific regulations, and
   the three things this package deliberately does not need: Python, an API key,
   a network call.
 
 ### Removed
-- `audit-trail` keyword. This server has no audit capability -- it holds no
-  state and writes nothing. The Article 12 audit trail belongs to
-  [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk), which
+- `audit-trail` keyword. This server has no audit capability: it holds no
+  state and writes nothing. The audit record of each hosted decision comes
+  from [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk), which
   calls the hosted API, and this package's own README already said so. A
   keyword that advertises a capability the package does not have is the same
   defect as `opa`/`rego` on `trustlint`, removed in that package for the same
@@ -115,7 +130,7 @@ came back clean now returns violations.
 ### Fixed
 - The server reported the wrong version to MCP hosts. `serverInfo.version` was a
   hardcoded string in `server.ts`, so the published 0.1.2 introduced itself as
-  0.1.1 — and the registry entry advertised a third number. It now derives from
+  0.1.1, and the registry entry advertised a third number. It now derives from
   `package.json`.
 
   This was the third occurrence of one defect in this codebase: the TrustLint
@@ -151,6 +166,10 @@ came back clean now returns violations.
   `scan_prompt` and `list_rules` against the bundled offline TrustLint corpus.
   Runs via `npx` with no Python runtime and no API key.
 
+[Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/mcp
+[0.2.2]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.2
+[0.2.1]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.1
+[0.2.0]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.0
 [0.1.5]: https://www.npmjs.com/package/@complyedge/mcp/v/0.1.5
 [0.1.4]: https://www.npmjs.com/package/@complyedge/mcp/v/0.1.4
 [0.1.3]: https://www.npmjs.com/package/@complyedge/mcp/v/0.1.3

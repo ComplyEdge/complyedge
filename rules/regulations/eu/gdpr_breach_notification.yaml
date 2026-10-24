@@ -6,6 +6,24 @@ description: >-
   breach without undue delay and not later than 72 hours after becoming aware,
   unless the breach is unlikely to result in a risk to rights and freedoms.
   GDPR Article 33.
+
+
+  Layer 1 detects: data breach not reported, notified or disclosed; fail,
+  failing or failure to notify, report or disclose a breach or data breach;
+  breach notification not sent, required or made; delay, delaying or delayed
+  breach notification; conceal, hide or cover up, in any form, followed by a
+  breach or data breach, with no "the" between; "72 hours" or "three days"
+  (also singular) followed by breach or notification deadline or requirement
+  not met; no breach or incident notification or reporting process, procedure
+  or plan; and personal data breach without or lacking notification or
+  reporting. It matches wording, not meaning: it misses the practice told in
+  other words ("We found the leak on Monday; keep it quiet and do not tell the
+  regulator."), it does not read the Article 33(1) exception for a breach
+  unlikely to result in a risk, so it fires on a lawful decision in these
+  words ("Breach notification not required: the lost laptop was encrypted, so
+  the breach is unlikely to result in a risk."), and it fires on text that
+  only names the practice. Whether a text does the practice is judged in Layer
+  2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -22,13 +40,15 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    (data\s+breach\s+(?:not\s+)?(?:reported|notified|disclosed)|fail(?:ing|ure)?\s+to\s+(?:notify|report|disclose)\s+(?:a\s+)?(?:data\s+)?breach|breach\s+notification\s+(?:not\s+)?(?:sent|required|made)|delay(?:ing|ed)?\s+breach\s+notification|(?:conceal|hide|cover\s+up)\w*\s+(?:a\s+)?(?:data\s+)?breach|(?:72\s+hours?|three\s+days?)\s+(?:breach|notification)\s+(?:deadline|requirement)\s+(?:not\s+)?met|no\s+(?:breach|incident)\s+(?:notification|reporting)\s+(?:process|procedure|plan)|personal\s+data\s+breach\s+(?:without|lacking)\s+(?:notification|reporting))
+    (data\s+breach\s+not\s+(?:reported|notified|disclosed)|fail(?:ing|ure)?\s+to\s+(?:notify|report|disclose)\s+(?:a\s+)?(?:data\s+)?breach|breach\s+notification\s+not\s+(?:sent|required|made)|delay(?:ing|ed)?\s+breach\s+notification|(?:conceal|hide|cover\s+up)\w*\s+(?:a\s+)?(?:data\s+)?breach|(?:72\s+hours?|three\s+days?)\s+(?:breach|notification)\s+(?:deadline|requirement)\s+not\s+met|no\s+(?:breach|incident)\s+(?:notification|reporting)\s+(?:process|procedure|plan)|personal\s+data\s+breach\s+(?:without|lacking)\s+(?:notification|reporting))
   flags: i
 severity: critical
 category: privacy
 source:
+  eli: http://data.europa.eu/eli/reg/2016/679/art_33/par_1/oj
+  provision_label: 'Regulation (EU) 2016/679, Article 33(1)'
   regulation: GDPR
-  article: Article 33
+  article: Article 33(1)
   url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
   last_updated: '2016-04-27'
   citation: >-
@@ -42,21 +62,29 @@ source:
     accompanied by reasons for the delay.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 10,000,000 or 2% of worldwide annual turnover
+    eu_enforcement: >-
+      Administrative fines up to EUR 10,000,000 or, for an undertaking, up to 2%
+      of the total worldwide annual turnover of the preceding financial year,
+      whichever is higher (Article 83(4), point (a)).
 remediation:
   action: block
   timing: reactive
   message: >-
-    BLOCKED — GDPR Article 33 requires notification of personal data breaches
-    to the supervisory authority within 72 hours. Failure to notify or
-    concealing a breach is a serious violation. Penalties: up to EUR 10M or
-    2% of global revenue.
+    BLOCKED: GDPR Article 33(1) requires the controller to notify a personal
+    data breach to the competent supervisory authority without undue delay and,
+    where feasible, not later than 72 hours after becoming aware of it, unless
+    the breach is unlikely to result in a risk to the rights and freedoms of
+    natural persons. A notification made after 72 hours must give the reasons
+    for the delay. Penalties: administrative fines up to EUR 10,000,000 or, for
+    an undertaking, up to 2% of the total worldwide annual turnover of the
+    preceding financial year, whichever is higher (Article 83(4), point (a)).
   suggestion: >-
-    Immediately notify the competent supervisory authority of the personal
-    data breach, including: nature of the breach, categories and number of
-    affected data subjects, likely consequences, and measures taken or
-    proposed to mitigate the breach. If notification exceeds 72 hours,
-    provide reasons for the delay.
+    Notify the competent supervisory authority of the personal data breach
+    without undue delay, including: nature of the breach, categories and
+    approximate number of data subjects and records concerned, likely
+    consequences, and measures taken or proposed. If notification is made after
+    72 hours, give the reasons for the delay. If you conclude the breach is
+    unlikely to result in a risk, document that assessment (Article 33(5)).
 version: 1.0.0
 tags:
 - gdpr
@@ -65,3 +93,7 @@ tags:
 - 72-hours
 - supervisory-authority
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

@@ -5,6 +5,26 @@ description: >-
   Requires high-risk AI systems to be designed for effective human oversight,
   enabling human operators to understand capabilities, monitor operation,
   interpret output, and intervene or interrupt via a stop mechanism. Article 14.
+
+
+  Layer 1 detects: "without human oversight"; "no human oversight",
+  "supervision", "review", "intervention" or "control"; "human oversight not
+  implemented", "not required", "not provided" or "not possible"; "fully
+  autonomous" followed by "without" or "lacking" and then "human" or
+  "oversight"; "no stop button", "no kill switch", "no override mechanism" or
+  "no intervention capability"; "cannot override", "intervene", "interrupt" or
+  "stop", optionally followed by "the", then "AI", "system" or "model";
+  "automation bias not addressed", "not mitigated" or "not considered";
+  "unsupervised decision", "operation" or "deployment", optionally with "AI"
+  after "unsupervised"; and "deploy" or "deploying", optionally followed by
+  "AI", then "without human", "without oversight" or "without supervision".
+  Case is ignored, the words must follow each other with no other word between
+  them unless stated, and a phrase can start inside a longer word. It matches
+  wording, not meaning: it misses the practice told in other words
+  ("Auto-reject candidates who score below 40 and send the rejection email
+  right away, nobody needs to look at them."), it does not check that the
+  system is high-risk, and it fires on text that only names the practice, such
+  as a refusal. Whether a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -21,35 +41,51 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    (without\s+human\s+oversight|no\s+human\s+(?:oversight|supervision|review|intervention|control)|human\s+oversight\s+(?:not\s+)?(?:implemented|required|provided|possible)|fully\s+autonomous\s+(?:without|lacking)\s+(?:human|oversight)|no\s+(?:stop\s+button|kill\s+switch|override\s+mechanism|intervention\s+capability)|cannot\s+(?:override|intervene|interrupt|stop)\s+(?:the\s+)?(?:ai|system|model)|automation\s+bias\s+(?:not\s+)?(?:addressed|mitigated|considered)|unsupervised\s+(?:ai\s+)?(?:decision|operation|deployment)|deploy(?:ing)?\s+(?:ai\s+)?without\s+(?:human|oversight|supervision))
+    (without\s+human\s+oversight|no\s+human\s+(?:oversight|supervision|review|intervention|control)|human\s+oversight\s+not\s+(?:implemented|required|provided|possible)|fully\s+autonomous\s+(?:without|lacking)\s+(?:human|oversight)|no\s+(?:stop\s+button|kill\s+switch|override\s+mechanism|intervention\s+capability)|cannot\s+(?:override|intervene|interrupt|stop)\s+(?:the\s+)?(?:ai|system|model)|automation\s+bias\s+not\s+(?:addressed|mitigated|considered)|unsupervised\s+(?:ai\s+)?(?:decision|operation|deployment)|deploy(?:ing)?\s+(?:ai\s+)?without\s+(?:human|oversight|supervision))
   flags: i
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_14/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 14(1) and (2)'
   regulation: EU AI Act
   article: Article 14
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 14: High-risk AI systems shall be
+    Regulation (EU) 2024/1689, Article 14(1): High-risk AI systems shall be
     designed and developed in such a way, including with appropriate
     human-machine interface tools, that they can be effectively overseen by
-    natural persons during the period in which they are in use. Human oversight
-    shall aim to prevent or minimise the risks to health, safety or fundamental
-    rights that may emerge when a high-risk AI system is used in accordance
-    with its intended purpose or under conditions of reasonably foreseeable
-    misuse.
+    natural persons during the period in which they are in use. Article 14(2):
+    Human oversight shall aim to prevent or minimise the risks to health, safety
+    or fundamental rights that may emerge when a high-risk AI system is used in
+    accordance with its intended purpose or under conditions of reasonably
+    foreseeable misuse, in particular where such risks persist despite the
+    application of other requirements set out in this Section.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+    eu_enforcement: >-
+      Once the obligation applies: administrative fines up to EUR 15,000,000 or,
+      for an undertaking, up to 3% of its total worldwide annual turnover for
+      the preceding financial year, whichever is higher (Article 99(4), point
+      (a), through Article 16(a)); for SMEs, including start-ups, and SMCs,
+      whichever is lower (Article 99(6) and (6a)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 14 requires human oversight for high-risk AI
-    systems, including the ability to understand, monitor, interpret, override,
-    and interrupt system operation. Penalties: up to EUR 15M or 3% of global
-    revenue.
+    BLOCKED (readiness check, not yet a binding obligation): EU AI Act Article
+    14 requires high-risk AI systems to be designed so that they can be
+    effectively overseen by natural persons, including the ability to
+    understand, monitor, interpret, override and interrupt the system through a
+    stop button or similar procedure. The obligation applies from 2 December
+    2027 for Annex III high-risk systems and from 2 August 2028 for high-risk
+    systems under Annex I (Article 113, as amended by Regulation (EU)
+    2026/1744). Penalties once applicable: administrative fines up to EUR
+    15,000,000 or, for an undertaking, up to 3% of its total worldwide annual
+    turnover for the preceding financial year, whichever is higher (Article
+    99(4), point (a), through Article 16(a)); for SMEs, including start-ups, and
+    SMCs, whichever is lower (Article 99(6) and (6a)).
   suggestion: >-
     Implement human oversight measures: ensure operators can understand system
     capabilities, remain aware of automation bias, interpret outputs correctly,
@@ -66,3 +102,7 @@ tier: enterprise
 compliance_notes:
   - >-
     Chapter III high-risk obligations were postponed by Regulation (EU) 2026/1744: Annex III high-risk systems apply from 2 December 2027, and high-risk systems embedded in products under Annex I from 2 August 2028. This rule is enforceable readiness tooling before those dates, not a currently binding obligation, and must not be presented as one.
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

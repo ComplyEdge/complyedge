@@ -23,6 +23,8 @@ export interface Rule {
   citation: string;
   remediationMessage: string;
   regexPatterns: RulePattern[];
+  /** all | user_input | ai_output */
+  detectionScope: string;
 }
 
 export interface Violation {
@@ -90,6 +92,12 @@ function parseRuleFile(filePath: string): Rule | null {
     const citations = source.citations ?? [];
     citation = citations[0] ?? "";
   }
+  if (!citation) {
+    // Rules that rest on no single legal article (an industry standard, a
+    // detection control) carry provision_label instead, which says so. Every
+    // finding names its source rather than an empty citation.
+    citation = source.provision_label ?? "";
+  }
 
   const remediation = data.remediation ?? {};
   let remediationMsg = "";
@@ -110,7 +118,67 @@ function parseRuleFile(filePath: string): Rule | null {
     citation,
     remediationMessage: remediationMsg,
     regexPatterns: patterns,
+    detectionScope: String(data.detection_scope ?? "all"),
   };
+}
+
+// Text normalisation, identical to rules/rego/complyedge/shared/normalize.rego and
+// to the Python engine (trustlint/engine.py). Patterns are matched against the
+// normalised text, so the same words decide the same way whatever whitespace or
+// quote characters they arrive with:
+// - a run of spaces, tabs or Unicode spaces (no-break space and the other
+//   Unicode space separators) becomes one space;
+// - a line break (CR LF, CR, U+0085, U+2028, U+2029) with the spaces around it
+//   becomes one LF, so `.` still stops at a line end and `^`/`$` with the m flag
+//   still see it;
+// - curly quotes become straight quotes;
+// - a Unicode hyphen or dash (U+2010 to U+2015) becomes "-".
+const SPACE_CHARS = "\\t\\x0b\\x0c \\u00a0\\u1680\\u2000-\\u200a\\u202f\\u205f\\u3000";
+const LINE_BREAK_RE = new RegExp(
+  `[${SPACE_CHARS}]*(?:\\r\\n|[\\n\\r\\u0085\\u2028\\u2029])[${SPACE_CHARS}]*`,
+  "g"
+);
+const LINE_SPACE_RE = new RegExp(`[${SPACE_CHARS}]+`, "g");
+
+export function normalizeText(text: string): string {
+  return text
+    .replace(/[\u2018\u2019\u201a\u201b]/g, "'")
+    .replace(/[\u201c\u201d\u201e\u201f]/g, '"')
+    .replace(/[\u2010-\u2015]/g, "-")
+    .replace(LINE_BREAK_RE, "\n")
+    .replace(LINE_SPACE_RE, " ");
+}
+
+/**
+ * Whether a rule tagged `ruleJurisdiction` applies to an end user in
+ * `requested`. GLOBAL rules apply everywhere; a rule applies in its own
+ * jurisdiction, in any sub-jurisdiction of it (a US rule applies in US-CA) and
+ * in any parent of it (a US-CA rule is in scope for a US-wide check). No
+ * requested jurisdiction means every rule. Same rule as the Python engine.
+ */
+export function jurisdictionApplies(ruleJurisdiction: string, requested?: string): boolean {
+  if (!requested) return true;
+  const rule = (ruleJurisdiction ?? "").toUpperCase();
+  const want = requested.toUpperCase();
+  if (rule === "GLOBAL") return true;
+  return rule === want || want.startsWith(rule + "-") || rule.startsWith(want + "-");
+}
+
+export type Direction = "input" | "output";
+
+const SCOPES_FOR_DIRECTION: Record<Direction, string[]> = {
+  input: ["all", "user_input"],
+  output: ["all", "ai_output"],
+};
+
+/** Whether a rule's detection_scope covers text flowing in `direction`. */
+export function scopeApplies(detectionScope: string | undefined, direction?: string): boolean {
+  if (!direction) return true;
+  const scopes = SCOPES_FOR_DIRECTION[direction.toLowerCase() as Direction];
+  if (!scopes) {
+    throw new Error(`direction must be 'input' or 'output', got '${direction}'`);
+  }
+  return scopes.includes((detectionScope || "all").toLowerCase());
 }
 
 /**
@@ -161,15 +229,11 @@ function resolveRulesDir(rulesDir?: string): string | null {
     return fs.existsSync(rulesDir) ? rulesDir : null;
   }
 
-  // Check ~/.trustlint/rules/
-  const homeRules = path.join(
-    process.env.HOME ?? process.env.USERPROFILE ?? "",
-    ".trustlint",
-    "rules"
-  );
-  if (fs.existsSync(homeRules)) {
-    return homeRules;
-  }
+  // ~/.trustlint/rules is deliberately NOT read. `trustlint rules update` used to
+  // fill it from a GitHub release (2026-07, 64 rules including a withdrawn one)
+  // and, read first, it overrode the bundled rule set across every later
+  // upgrade. The bundled rules ship with each release; --rules-dir covers a
+  // custom corpus. Same order as the Python engine.
 
   // Walk up from CWD looking for rules/regulations/
   let dir = process.cwd();
@@ -229,13 +293,17 @@ export class TrustLintEngine {
     }
   }
 
-  check(text: string, jurisdiction?: string): LintResult {
-    let applicable = this.rules;
-    if (jurisdiction) {
-      applicable = this.rules.filter(
-        (r) => r.jurisdiction.toUpperCase() === jurisdiction.toUpperCase()
-      );
-    }
+  /**
+   * `jurisdiction` is where the end user is (see jurisdictionApplies).
+   * `direction` is "input" (text a user sends) or "output" (text the AI
+   * produces); a rule scoped to user_input or ai_output runs only in its
+   * direction. Omitted runs every rule.
+   */
+  check(text: string, jurisdiction?: string, direction?: string): LintResult {
+    const applicable = this.rules.filter(
+      (r) => jurisdictionApplies(r.jurisdiction, jurisdiction) && scopeApplies(r.detectionScope, direction)
+    );
+    const textToMatch = normalizeText(text);
 
     const violations: Violation[] = [];
 
@@ -243,7 +311,7 @@ export class TrustLintEngine {
       for (const pat of rule.regexPatterns) {
         try {
           const regex = new RegExp(pat.pattern, pat.flags);
-          if (regex.test(text)) {
+          if (regex.test(textToMatch)) {
             violations.push({
               ruleId: rule.id,
               title: rule.title,

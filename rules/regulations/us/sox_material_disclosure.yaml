@@ -1,27 +1,69 @@
 id: SOX_HYBRID_MATERIAL_DISCLOSURE_001
 jurisdiction: US
-title: Hybrid SOX Material Information Disclosure Prevention
-description: Multi-tier hybrid detection system combining regex pre-screening with
-  LLM semantic analysis to prevent material information disclosure violations under
-  Sarbanes-Oxley Act. Provides optimal balance of speed, accuracy, and regulatory
-  defensibility.
+title: SOX / Regulation FD material information disclosure review
+description: >-
+  Covers possible disclosure of material nonpublic information about an
+  issuer, which Regulation FD (17 CFR 243.100) governs.
+
+
+  Layer 1 detects: the risk-flag patterns of the first tier only: guidance,
+  forecast, expect, project, anticipate, plan or target (or with an s) followed
+  later on the same line by increase, decrease, grow, decline, achieve, reach or
+  deliver; Q1 to Q4, quarter or earnings, then will, should, likely, expect or
+  expected, then be, show, deliver or report; material or significant, then at
+  most one word, then impact, change, development, event, transaction, contract,
+  deal, acquisition or merger; revenue, earnings, profit, loss, margin, EBITDA
+  or cash flow followed later on the same line by increase, decrease, grow,
+  decline, outperform or underperform; insider, non-public, confidential,
+  privileged, unreported or internal information, data, knowledge, numbers,
+  projections, estimates or forecasts; internal, confidential or non-public
+  projections, estimates, forecasts, models or analysis; acquisition, merger,
+  joint venture or strategic partnership and upcoming, planned, pending,
+  undisclosed, material or about on the same line, in either order; ahead of,
+  behind, below, above, exceed, beat, miss, outperform or underperform, then at
+  most one word, then expectations, estimates (not after analyst or market),
+  guidance, consensus or projections; isn't, not or doesn't, then reflected,
+  captured or included, then in or by current, public, existing or published
+  guidance, estimates, projections or forecasts; expect, anticipate, project,
+  forecast, estimate, predict, likely or probable followed later on the same
+  line by earnings, revenue, growth, performance, results, margin or
+  profitability; intend, plan, believe, target, goal or objective followed later
+  on the same line by quarter, year, fiscal, annual, guidance or outlook; and
+  the words outlook, prospects, future performance, expected trends, anticipated
+  results or going forward. The safe bypass patterns and the materiality,
+  escalation and timing conditions in this file are not run. It matches wording,
+  not meaning: it does not read who receives the text or whether the information
+  is already public, so it fires on a public filing and on a disclosure under a
+  confidentiality agreement ("Under the NDA you signed, here is our draft: we
+  expect revenue to grow 10% next year."), and it misses material news told in
+  other words ("Heads up for your fund: we have signed a confidential letter of intent
+  to acquire Contoso; the announcement is in two weeks."). Whether a text is a
+  selective disclosure of material nonpublic information is judged in Layer 2.
 category: financial
-effective_date: '2002-07-30'
+effective_date: '2000-10-23'
 source:
-  article: 15 U.S.C. §7241(a)(2)
-  regulation: Sarbanes-Oxley Act of 2002
-  title: Sarbanes-Oxley Act of 2002, Sections 302, 404, 906, 807
-  url: https://www.congress.gov/bill/107th-congress/house-bill/3763
+  provision_url: https://www.ecfr.gov/current/title-17/section-243.100
+  provision_label: 17 CFR 243.100(a) (Regulation FD)
+  article: 17 CFR 243.100(a)
+  regulation: SEC Regulation FD
+  title: Regulation Fair Disclosure (Regulation FD), 17 CFR Part 243
+  url: https://www.ecfr.gov/current/title-17/section-243.100
   authority: U.S. Securities and Exchange Commission
-  effective_date: '2002-07-30'
+  effective_date: '2000-10-23'
   citations:
   - 15 U.S.C. § 7241 (Section 302) - Corporate responsibility for financial reports
   - 15 U.S.C. § 7262 (Section 404) - Management assessment of internal controls
   - 18 U.S.C. § 1350 (Section 906) - Criminal penalties for corporate officers
-  - 18 U.S.C. § 1520 (Section 807) - Criminal penalties for records destruction
-  - SEC Staff Accounting Bulletin No. 99 - Materiality standard (5% threshold)
+  - 18 U.S.C. § 1520 (Section 802) - Criminal penalties for destruction of corporate audit records
   - SEC Regulation FD - Fair Disclosure requirements
-  citation: "15 U.S.C. §7241(a)(2): based on the officer's knowledge, the report does not contain any untrue statement of a material fact or omit to state a material fact necessary in order to make the statements made, in light of the circumstances under which such statements were made, not misleading."
+  citation: >-
+    17 CFR 243.100(a) (Regulation FD): Whenever an issuer, or any person acting
+    on its behalf, discloses any material nonpublic information regarding that
+    issuer or its securities to any person described in paragraph (b)(1) of
+    this section, the issuer shall make public disclosure of that information
+    as provided in § 243.101(e): (1) Simultaneously, in the case of an
+    intentional disclosure; and (2) Promptly, in the case of a non-intentional
+    disclosure.
 conditions:
 - type: hybrid_detection
   tier1_config:
@@ -217,9 +259,12 @@ remediation:
     tier1_action: allow
     tier2_action: sox_compliance_block
     tier3_action: require_executive_approval
-  message: '⚠️ HYBRID SOX COMPLIANCE PROTECTION: Advanced AI analysis has identified
-    potential material information disclosure risks. This content requires review
-    to ensure Sarbanes-Oxley compliance and prevent criminal penalties.'
+  message: >-
+    ⚠️ SOX / Regulation FD review: this content may disclose material nonpublic
+    information. Under Regulation FD (17 CFR 243.100(a)), an issuer that
+    discloses material nonpublic information to the persons described in
+    243.100(b)(1) must make it public simultaneously for an intentional
+    disclosure, or promptly for a non-intentional one. Review before sharing.
   escalation_contacts:
   - role: CEO
     urgency_threshold: critical
@@ -234,7 +279,7 @@ remediation:
     urgency_threshold: medium
     timing_hours: 6
   alternatives:
-  - Use AI-verified publicly disclosed information only
+  - Use publicly disclosed information only
   - Request Legal team pre-approval for financial discussions
   - Implement semantic analysis for context verification
   - Activate enhanced monitoring during earnings periods
@@ -256,28 +301,31 @@ exceptions:
   - GC
   - CCO
 penalty_information:
-  criminal_penalties:
-    executives:
-      fine_max: $5,000,000
-      imprisonment_max: 20 years
-      statute: 18 U.S.C. § 1350 (Section 906)
-    document_destruction:
-      fine_max: $250,000
-      imprisonment_max: 20 years
-      statute: 18 U.S.C. § 1520 (Section 807)
   civil_penalties:
-    sec_enforcement: Civil monetary penalties and disgorgement
-    private_litigation: Securities fraud class action exposure
-    reputational: Loss of investor confidence and market capitalization
+    sec_enforcement: >-
+      An issuer that fails to comply with Regulation FD is subject to an SEC
+      enforcement action under Exchange Act section 13(a) or 15(d): an
+      administrative cease-and-desist proceeding, or a civil action seeking an
+      injunction and/or civil money penalties (65 FR 51716, 51726). An
+      individual responsible for the violation can be pursued as a cause of it
+      or as an aider and abettor.
+    private_litigation: >-
+      Regulation FD itself creates no private liability: no failure to make a
+      public disclosure required solely by 17 CFR 243.100 is a violation of
+      Rule 10b-5 (17 CFR 243.102). Tipping and insider trading liability under
+      Rule 10b-5 is unaffected (65 FR 51716, 51726).
 compliance_notes:
-- Material information is defined as information that a reasonable investor would
-  consider important in making investment decisions
-- SEC SAB 99 establishes 5% threshold for quantitative materiality assessment
-- Regulation FD prohibits selective disclosure of material information to analysts
-  or institutional investors
-- Section 302 requires CEO/CFO certification of financial reports and internal controls
-- Section 404 mandates management assessment of internal control effectiveness
-- Enhanced penalties apply during earnings blackout periods and quiet periods
+  - >-
+    Material information is defined as information that a reasonable investor
+    would consider important in making investment decisions
+  - >-
+    Regulation FD does not forbid the disclosure itself: an issuer that
+    discloses material nonpublic information to the persons listed in
+    17 CFR 243.100(b)(1) (market professionals, and holders likely to trade on
+    it) must make it public, simultaneously if the disclosure was intentional
+    and promptly if it was not
+  - Section 302 requires CEO/CFO certification of financial reports and internal controls
+  - Section 404 mandates management assessment of internal control effectiveness
 version: 1.0.0
 tags:
 - sox
@@ -287,3 +335,7 @@ tags:
 - proactive
 - criminal-penalties
 tier: developer
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

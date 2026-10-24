@@ -10,8 +10,9 @@ runtime test of model outputs and it is not a legal verdict.
 
 ## 1. Scope
 
-Twelve providers with material EU GPAI exposure that could be verified from
-public sources. One evidence file per provider lives in `providers/<id>.yaml`
+Twelve providers with material EU GPAI exposure and public documentation to
+grade. Every file is `needs_review`: its URLs are cited, but not every one has
+been manually re-confirmed (the `verified` status means all of them have). One evidence file per provider lives in `providers/<id>.yaml`
 and must validate against `scripts/benchmark/provider_schema.yaml`.
 
 ## 2. The six categories
@@ -65,8 +66,9 @@ rest out of 18.
   `stale_evidence`.
 - Files with `verification_status: pending` are excluded from the ranking and
   listed separately. `needs_review` files are ranked, with the flag visible.
-- When a score changes, the rationale says from what, to what, and why.
-  Earlier evidence items stay in the file, so its history is visible.
+- When a score changes, the rationale records the earlier score and the
+  evidence behind the new one. Earlier evidence items stay in the file, so its
+  history is visible.
 
 ## 5. Aggregation and ranking
 
@@ -74,7 +76,8 @@ rest out of 18.
 - `compliance_pct` = aggregate / maximum (15 or 18), to one decimal.
 - **Ranking is by `compliance_pct`, highest first.** Ties break on aggregate
   points, then on `provider_id` alphabetically.
-- The industry average is the mean of the providers' `compliance_pct`.
+- The industry average is the mean of each provider's aggregate / maximum,
+  rounded once to one decimal (not the mean of the rounded `compliance_pct`).
 
 ## 6. Reproduce
 
@@ -101,4 +104,4 @@ missed. Scores move only on public evidence.
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-05-09 | Initial methodology: six categories, 0 to 3 rubric, public-evidence rule, Art 55 N/A below threshold. |
-| 1.1 | 2026-09-24 | Ranking changed from aggregate points to `compliance_pct`, because providers scored out of 15 were ranked below providers with a lower percentage scored out of 18. Scores themselves unchanged by this version. Same day: Art 50(2) evidence re-checked for all twelve providers after the transparency obligations began to apply, and the Art 50(2) application rule in section 3 written down so hosted-surface marking is scored the same way for every provider (data refresh, not a method change). |
+| 1.1 | 2026-09-24 | Ranking changed from aggregate points to `compliance_pct`, because providers scored out of 15 were ranked below providers with a lower percentage scored out of 18. The ranking change itself moved no score. Same day, as a data refresh rather than a method change: Art 50(2) evidence re-checked and updated for seven providers (Amazon, Anthropic, Google, Meta, OpenAI, Stability AI, xAI), which changed six Art 50(2) scores (Anthropic 0 to 2, OpenAI 1 to 2, Stability AI 1 to 2, Amazon 1 to 2, Meta 1 to 2, xAI 0 to 1); the other five provider files were not changed. The Art 50(2) application rule in section 3 was written down so hosted-surface marking is scored the same way for every provider. |

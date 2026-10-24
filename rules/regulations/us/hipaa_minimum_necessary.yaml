@@ -6,6 +6,28 @@ description: >-
   efforts to limit uses, disclosures, and requests of protected health
   information (PHI) to the minimum necessary to accomplish the intended
   purpose. HIPAA Privacy Rule, 45 CFR §164.502(b).
+
+
+  Layer 1 detects: share, disclose, send, transmit, provide or grant access to
+  (and words that begin with them), then entire, full, complete or all, then
+  medical, patient, health or clinical record, with no word between; bulk, mass
+  or wholesale PHI, patient data, medical record or health information
+  disclosure, transfer, sharing or export; request or requesting the entire,
+  full, complete or all medical, patient or health record when, where or but
+  only, just or merely; no or without minimum necessary, need-to-know or
+  role-based assessment, review, determination or access control; everyone, all
+  staff, the entire team or all employees, then has, have or with, then access
+  to or can access, then PHI, patient record, medical record or health
+  information; over-disclosure or excessive disclosure (of) PHI, protected
+  health information or patient data; and sharing or disclosing more PHI or more
+  health information than necessary, required or needed. The words follow each
+  other with nothing in between. It matches wording, not meaning: it misses the
+  practice told in other words ("For the billing dispute, share the entire
+  medical record including psychotherapy notes with the collections agency." has
+  the word "the" between the verb and "entire"), it does not read the treatment
+  and individual-access exceptions, and it fires on text that only names the
+  practice. Whether a use or disclosure goes beyond the minimum necessary is
+  judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -21,39 +43,42 @@ conditions:
     role, (4) blanket access to entire records sets when targeted access
     suffices. Do NOT flag treatment-related disclosures between providers,
     disclosures to the patient, disclosures pursuant to a valid authorization,
-    disclosures required by law, or disclosures to the Secretary — these are
+    disclosures required by law, or disclosures to the Secretary. These are
     statutory exceptions.
   model: gpt-4
 # Context-gated PHI keyword detection (medical record, diagnosis, etc.)
-# requires Layer 2 evaluation — bare keywords must not fire this block-action
+# requires Layer 2 evaluation: bare keywords must not fire this block-action
 # rule standalone. Layer 1 coverage is the excessive-disclosure regex below;
 # broader context lives in the semantic condition above.
 - type: regex
   value: >-
-    ((?:share|disclose|send|transmit|provide|grant\s+access\s+to)\w*\s+(?:entire|full|complete|all)\s+(?:medical|patient|health|clinical)\s+record|(?:bulk|mass|wholesale)\s+(?:PHI|patient\s+data|medical\s+record|health\s+information)\s+(?:disclosure|transfer|sharing|export)|(?:request|requesting)\s+(?:entire|full|complete|all)\s+(?:medical|patient|health)\s+record\s+(?:when|where|but)\s+(?:only|just|merely)|(?:no|without)\s+(?:minimum\s+necessary|need[\-\s]to[\-\s]know|role[\-\s]based)\s+(?:assessment|review|determination|access\s+control)|(?:everyone|all\s+staff|entire\s+team|all\s+employees)\s+(?:has|have|with)\s+(?:access\s+to|can\s+access)\s+(?:PHI|patient\s+record|medical\s+record|health\s+information)|(?:over[\-\s]disclos\w*|excessive\s+disclosure)\s+(?:of\s+)?(?:PHI|protected\s+health\s+information|patient\s+data)|(?:share|disclose)\w*\s+(?:more\s+PHI|more\s+health\s+information)\s+than\s+(?:necessary|required|needed))
+    ((?:share|disclose|send|transmit|provide|grant\s+access\s+to)\w*\s+(?:entire|full|complete|all)\s+(?:medical|patient|health|clinical)\s+record|(?:bulk|mass|wholesale)\s+(?:PHI|patient\s+data|medical\s+record|health\s+information)\s+(?:disclosure|transfer|sharing|export)|(?:request|requesting)\s+(?:entire|full|complete|all)\s+(?:medical|patient|health)\s+record\s+(?:when|where|but)\s+(?:only|just|merely)|\b(?:no|without)\s+(?:minimum\s+necessary|need[\-\u2010-\u2015\s]to[\-\u2010-\u2015\s]know|role[\-\u2010-\u2015\s]based)\s+(?:assessment|review|determination|access\s+control)|(?:everyone|all\s+staff|entire\s+team|all\s+employees)\s+(?:has|have|with)\s+(?:access\s+to|can\s+access)\s+(?:PHI|patient\s+record|medical\s+record|health\s+information)|(?:over[\-\u2010-\u2015\s]disclos\w*|excessive\s+disclosure)\s+(?:of\s+)?(?:PHI|protected\s+health\s+information|patient\s+data)|(?:share|disclose)\w*\s+(?:more\s+PHI|more\s+health\s+information)\s+than\s+(?:necessary|required|needed))
   flags: i
 severity: high
 category: healthcare
 source:
+  provision_url: https://www.ecfr.gov/current/title-45/section-164.502
+  provision_label: '45 CFR 164.502(b) (HIPAA Privacy Rule, minimum necessary)'
   regulation: HIPAA Privacy Rule
   article: 45 CFR §164.502(b)
   url: https://www.ecfr.gov/current/title-45/section-164.502
   last_updated: '2024-04-26'
   citation: >-
     45 CFR §164.502(b)(1) Minimum necessary applies: When using or disclosing
-    protected health information or when requesting protected health
-    information from another covered entity or business associate, a covered
-    entity or business associate must make reasonable efforts to limit
-    protected health information to the minimum necessary to accomplish the
-    intended purpose of the use, disclosure, or request. §164.502(b)(2)
-    Minimum necessary does not apply. This requirement does not apply to:
-    (i) Disclosures to or requests by a health care provider for treatment;
-    (ii) Uses or disclosures made to the individual; (iii) Uses or disclosures
-    made pursuant to an authorization under §164.508; (iv) Disclosures made
-    to the Secretary in accordance with subpart C of part 160 of this
-    subchapter; (v) Uses or disclosures that are required by law; (vi) Uses
-    or disclosures that are required for compliance with applicable
-    requirements of this subchapter.
+    protected health information or when requesting protected health information
+    from another covered entity or business associate, a covered entity or
+    business associate must make reasonable efforts to limit protected health
+    information to the minimum necessary to accomplish the intended purpose of
+    the use, disclosure, or request. §164.502(b)(2) Minimum necessary does not
+    apply. This requirement does not apply to: (i) Disclosures to or requests by
+    a health care provider for treatment; (ii) Uses or disclosures made to the
+    individual, as permitted under paragraph (a)(1)(i) of this section or as
+    required by paragraph (a)(2)(i) of this section; (iii) Uses or disclosures
+    made pursuant to an authorization under § 164.508; (iv) Disclosures made to
+    the Secretary in accordance with subpart C of part 160 of this subchapter;
+    (v) Uses or disclosures that are required by law, as described by §
+    164.512(a); and (vi) Uses or disclosures that are required for compliance
+    with applicable requirements of this subchapter.
 exceptions:
 - condition: Treatment disclosures
   description: >-
@@ -73,20 +98,27 @@ exceptions:
     HIPAA (45 CFR §164.502(b)(2)(v)-(vi))
 penalty_information:
   civil_penalties:
-    sec_enforcement: >-
-      Civil monetary penalties from $100 to $50,000 per violation (up to
-      $1.5 million annually for identical violations) based on culpability
-      tier. Criminal penalties up to $250,000 and 10 years imprisonment for
-      knowing violations with intent to sell or use PHI for personal gain.
+    hhs_enforcement: >-
+      Civil money penalties under 42 U.S.C. 1320d-5(a), as adjusted for
+      inflation in 45 CFR 102.3: from $145 per violation (did not know), $1,461
+      (reasonable cause), $14,602 (willful neglect, corrected) and $73,011
+      (willful neglect, not corrected), up to $73,011 per violation in the first
+      three tiers and $2,190,294 for uncorrected willful neglect, with a
+      calendar-year cap of $2,190,294 for identical violations. Criminal: a fine
+      of not more than $250,000, imprisonment of not more than 10 years, or
+      both, where the offense is committed with intent to sell, transfer, or use
+      individually identifiable health information for commercial advantage,
+      personal gain, or malicious harm (42 U.S.C. 1320d-6(b)(3)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — HIPAA Privacy Rule 45 CFR §164.502(b) requires covered entities
-    and business associates to limit PHI uses, disclosures, and requests to
-    the minimum necessary. Bulk or excessive PHI disclosures violate the
-    minimum necessary standard. Penalties: up to $50,000 per violation and
-    $1.5M annually.
+    BLOCKED: HIPAA Privacy Rule 45 CFR §164.502(b) requires covered entities and
+    business associates to make reasonable efforts to limit protected health
+    information to the minimum necessary for the intended purpose of a use,
+    disclosure, or request, subject to the exceptions in §164.502(b)(2).
+    Penalties: civil money penalties per 45 CFR 102.3, up to $2,190,294 per
+    calendar year for identical violations.
   suggestion: >-
     Limit the PHI shared, requested, or used to only the data fields strictly
     necessary for the specific purpose. Implement role-based access controls,
@@ -103,3 +135,7 @@ tags:
 - healthcare
 - data-minimization
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

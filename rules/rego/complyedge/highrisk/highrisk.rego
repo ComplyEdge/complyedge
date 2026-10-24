@@ -1,11 +1,26 @@
-# ComplyEdge — EU AI Act High-Risk Requirements (Articles 4, 9-16, 26, 27): Aggregated Check
+# ComplyEdge: EU AI Act High-Risk Requirements (Articles 4, 9-16, 26, 27): Aggregated Check
 #
 # Aggregates all sub-rules in this package and returns a unified result.
-# OPA queries this package at: POST /v1/data/complyedge/highrisk
+# OPA queries this package at: POST /v1/data/complyedge/highrisk/result
 #
 # Aggregator carve-out (RULE_STANDARD.md §5.6): imports and combines other
-# rules' violation results — no legal condition of its own. Correctness derives
+# rules' violation results, no legal condition of its own. Correctness derives
 # from the imported sub-rules, each individually subject to §5 sign-off.
+#
+# Imported rules (each individually subject to §5 sign-off):
+#   - highrisk.art10_data_governance          (rego-art10-001)
+#   - highrisk.art11_technical_documentation  (rego-art11-001)
+#   - highrisk.art12_record_keeping           (rego-art12-001)
+#   - highrisk.art13_transparency             (rego-art13-001)
+#   - highrisk.art14_human_oversight          (rego-art14-001)
+#   - highrisk.art15_accuracy                 (rego-art15-1-001)
+#   - highrisk.art15_cybersecurity            (rego-art15-5-001)
+#   - highrisk.art15_robustness               (rego-art15-4-001)
+#   - highrisk.art16_provider_obligations     (rego-art16-001)
+#   - highrisk.art26_deployer_obligations     (rego-art26-001)
+#   - highrisk.art27_fria                     (rego-art27-001)
+#   - highrisk.art4_ai_literacy               (rego-art4-001)
+#   - highrisk.art9_risk_management           (rego-art9-001)
 
 package complyedge.highrisk
 

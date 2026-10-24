@@ -1,13 +1,13 @@
-# ComplyEdge — EU AI Act Article 6 / Annex III: Aggregated High-Risk Classification
+# ComplyEdge: EU AI Act Article 6 / Annex III: Aggregated High-Risk Classification
 #
 # This policy aggregates all Article 6 / Annex III sub-checks and returns a
-# unified result. OPA queries this package at: POST /v1/data/complyedge/article6
+# unified result. OPA queries this package at: POST /v1/data/complyedge/article6/result
 #
 # Aggregator carve-out (RULE_STANDARD.md §5.6): this file imports and combines
-# other rules' violation results — it has no legal condition of its own. Exempt
+# other rules' violation results, it has no legal condition of its own. Exempt
 # from §5 approval headers. Correctness derives from the sub-rules, each of
-# which is individually subject to §5 sign-off (approved Leo Celis 2026-07-03
-# — see sub-rule headers).
+# which is individually subject to §5 sign-off; each sub-rule's own Status and
+# Approved by lines record its state.
 #
 # Imported rules (each individually subject to §5 sign-off):
 #   - article6.biometric_identification  (Annex III §1)

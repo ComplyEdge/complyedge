@@ -1,4 +1,4 @@
-# ComplyEdge — prompt_security (IPI) Rego tests
+# ComplyEdge: prompt_security (IPI) Rego tests
 # Run with: opa test rules/rego/ -v
 #
 # Asserts the aggregator blocks every prompt_security benchmark prompt on the
@@ -93,8 +93,8 @@ test_result_carries_rule_ids if {
 # so breaking either one alone still leaves the aggregator test green.
 #
 # embedded_instruction, separator_hijack and instruction_override had no
-# direct coverage at all. Each is asserted here in isolation — true positive,
-# true negative, and a stable rule_id — so a regression names the rule that
+# direct coverage at all. Each is asserted here in isolation, true positive,
+# true negative, and a stable rule_id, so a regression names the rule that
 # broke instead of silently narrowing what /v1/check blocks.
 
 import data.complyedge.prompt_security.embedded_instruction

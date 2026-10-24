@@ -1,4 +1,4 @@
-# ComplyEdge — GPAI Rego Tests
+# ComplyEdge: GPAI Rego Tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.gpai_test
@@ -13,7 +13,7 @@ import data.complyedge.gpai.downstream_obligations
 import data.complyedge.gpai
 
 # ============================================================
-# Model Classification — Article 51
+# Model Classification, Article 51
 # ============================================================
 
 test_model_classification_blocks_unclassified if {
@@ -31,7 +31,7 @@ test_model_classification_allows_normal_text if {
 }
 
 # ============================================================
-# Copyright Transparency — Article 53(c)
+# Copyright Policy, Article 53(1)(c)
 # ============================================================
 
 test_copyright_transparency_blocks_undisclosed_training if {
@@ -49,7 +49,7 @@ test_copyright_transparency_allows_normal_text if {
 }
 
 # ============================================================
-# Technical Documentation — Article 52
+# Technical Documentation, Article 53(1)(a)
 # ============================================================
 
 test_technical_documentation_blocks_undocumented if {
@@ -67,7 +67,7 @@ test_technical_documentation_allows_normal_text if {
 }
 
 # ============================================================
-# Systemic Risk — Article 55
+# Systemic Risk, Article 55
 # ============================================================
 
 test_systemic_risk_blocks_unassessed if {
@@ -85,7 +85,7 @@ test_systemic_risk_allows_normal_text if {
 }
 
 # ============================================================
-# Downstream Obligations — Article 53(d)
+# Downstream Obligations, Article 53(1)(b)
 # ============================================================
 
 test_downstream_obligations_blocks_no_docs if {

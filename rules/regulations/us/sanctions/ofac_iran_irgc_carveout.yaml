@@ -1,12 +1,22 @@
 id: SANCTIONS_OFAC_IR_IRGC_CARVEOUT_001
 jurisdiction: US
-effective_date: '2026-01-01'
+effective_date: '1995-05-07'
 description: >-
-  Iran-related dealings prohibition that, following a partial delisting, survives
-  ONLY for IRGC-affiliated counterparties and nuclear-program nexus. General Iran
-  dealings are permitted; IRGC-linked dealings remain blocked. Demonstrates the
-  conditional carve-out (conditional_on) sanctions primitive.
-title: OFAC Iran dealings — IRGC-only partial-delisting carve-out
+  Prohibits importing into the United States goods or services of Iranian
+  origin, and exporting, reexporting, selling or supplying goods, technology
+  or services to Iran from the United States or by a U.S. person wherever
+  located, except as authorized. 31 CFR 560.201 and 560.204 (Iranian
+  Transactions and Sanctions Regulations).
+
+
+  Layer 1 detects: Iran, Iranian, Tehran, rial payment, Hormuz transit or Hormuz
+  toll, Persian Gulf, Bank Melli, Bank Saderat, IRGC or Revolutionary Guard.
+  It matches wording, not meaning: it fires on any mention ("Draft a briefing on Iranian
+  history and Persian poetry for our book club."), and it misses a dealing that
+  names other Iranian places ("Import 40 tonnes of pistachios from our grower in
+  Kerman and pay him via the exchange house in Dubai."). Whether a text is a
+  dealing the program prohibits is judged in Layer 2.
+title: 'OFAC Iran: imports from and exports to Iran'
 detection_scope: all
 category: sanctions
 conditions:
@@ -15,47 +25,58 @@ conditions:
     (?i)\b(Iran(?:ian)?|Tehran|rial\s+payment|Hormuz\s+(?:transit|toll)|Persian\s+Gulf|Bank\s+Melli|Bank\s+Saderat|IRGC|Revolutionary\s+Guard)\b
   flags: i
 severity: high
-conditional_on:
-- parameter: counterparty_irgc_status
-  operator: "=="
-  value: true
-  rationale: >-
-    After the partial delisting, OFAC retains the Iran prohibition only for
-    IRGC-affiliated counterparties (and nuclear-program nexus). Dealings with
-    non-IRGC Iranian counterparties are permitted; the prohibition here applies
-    solely when the counterparty is IRGC-affiliated.
 source:
-  regulation: OFAC (US Treasury) Iran sanctions — IRGC designation carve-out
-  article: 31 CFR Part 560 / Executive Order 13224 (IRGC)
+  provision_url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-V/part-560/subpart-B
+  provision_label: '31 CFR 560.201 and 560.204 (Iranian Transactions and Sanctions Regulations)'
+  regulation: OFAC (US Treasury) Iranian Transactions and Sanctions Regulations
+  article: 31 CFR 560.201 and 560.204
   url: https://ofac.treasury.gov/sanctions-programs-and-country-information/iran-sanctions
   citation: >-
-    OFAC administers Iran sanctions under 31 CFR Part 560; the IRGC is designated
-    under EO 13224. A partial delisting lifts general Iran restrictions while
-    retaining them for IRGC-affiliated and nuclear-nexus counterparties. This
-    rule fires only when the caller asserts IRGC affiliation (or leaves it
-    unverified, in which case it applies conservatively pending verification).
-  last_updated: '2026-07-05'
+    31 CFR 560.201: Except as otherwise authorized pursuant to this part, and
+    notwithstanding any contract entered into or any license or permit granted
+    prior to May 7, 1995, the importation into the United States of any goods
+    or services of Iranian origin or owned or controlled by the Government of
+    Iran, other than information and informational materials, is prohibited.
+    31 CFR 560.204: Except as otherwise authorized pursuant to this part, and
+    notwithstanding any contract entered into or any license or permit granted
+    prior to May 7, 1995, the exportation, reexportation, sale, or supply,
+    directly or indirectly, from the United States, or by a United States
+    person, wherever located, of any goods, technology, or services to Iran or
+    the Government of Iran is prohibited.
+  last_updated: '2026-10-22'
 remediation:
   action: block
   timing: proactive
   message: >-
-    🛑 Iran dealing with an IRGC-affiliated counterparty. The Iran prohibition
-    survives the partial delisting only for IRGC-linked and nuclear-nexus
-    counterparties.
+    🛑 Possible OFAC Iran sanctions exposure: this content names Iran, an
+    Iranian bank, the IRGC or an Iran-related route. Screen the dealing before
+    proceeding.
   suggestion: >-
-    If the counterparty is not IRGC-affiliated, assert counterparty_irgc_status
-    = false in the request context to clear the carve-out. CE does not verify
-    affiliation — the assertion is logged for the audit trail.
+    Screen the counterparties against OFAC sanctions lists and check whether
+    the dealing is authorized under 31 CFR Part 560 (for example a general
+    license) before proceeding.
   allow_override: false
   require_explicit_consent: false
-version: 1.0.0
+compliance_notes:
+- >-
+  Bank Melli Iran, Bank Saderat Iran and the Islamic Revolutionary Guard Corps
+  appear on the OFAC SDN list (checked against the public SDN.CSV export on
+  2026-10-22).
+- >-
+  Rule ID kept from an earlier version that modelled an unsourced partial
+  delisting through a counterparty_irgc_status condition, under which a
+  non-IRGC Iranian counterparty was permitted. Sections 560.201 and 560.204
+  prohibit the dealing whatever the counterparty's affiliation, so the
+  condition was removed on 2026-10-22. Text read from eCFR (version of
+  2026-10-01).
+version: 2.0.0
 tags:
 - sanctions
 - ofac
 - iran
 - irgc
-- partial_delisting
-- carve_out
-- conditional_on
-- transition_rule
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

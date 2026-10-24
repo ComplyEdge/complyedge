@@ -1,11 +1,34 @@
 id: EU_AI_ACT_ART4_AI_LITERACY_001
 jurisdiction: EU
-effective_date: '2025-02-02'
+effective_date: '2026-07-27'
 description: >-
-  Requires providers and deployers of AI systems to take measures to ensure a
-  sufficient level of AI literacy of their staff and other persons dealing with
-  the operation and use of AI systems on their behalf. Article 4. Effective 2
-  February 2025.
+  Requires providers and deployers of AI systems to take measures to support the
+  development of AI literacy of their staff and other persons dealing with the
+  operation and use of AI systems on their behalf. Article 4 as replaced by
+  Regulation (EU) 2026/1744, in force from 27 July 2026. It does not require any
+  specific level of AI literacy of any individual.
+
+
+  Layer 1 detects: "no", "without", "skip", "skipping", "bypass" or "omit"
+  (and longer forms) followed by "AI literacy", "AI training", "AI competence"
+  or "staff training"; "deploy", "roll out", "rollout", "provide" or "use"
+  (and longer forms such as "deployed" or "uses") followed by "AI" or
+  "artificial intelligence", then "system" or "tool" (singular), then
+  "without" or "lacking", then "staff", "operator", "user" or "employee", then
+  "training", "literacy", "competence" or "education"; "untrained",
+  "unqualified" or "inexperienced" followed by "staff", "operators", "users"
+  or "employees", then "operating", "using" or "deploying", then "AI" or
+  "artificial intelligence"; "AI literacy" or "Article 4" followed by
+  "obligation" or "requirement" and then "not met", "ignored" or "skipped";
+  and "no AI" or "no artificial intelligence" followed by "training",
+  "education" or "literacy" and then "program", "provided" or "required". Case
+  is ignored, the words must follow each other with no other word between them
+  unless stated, and a phrase can start inside a longer word. It matches
+  wording, not meaning: it misses the practice told in other words ("Roll out
+  the CV ranking copilot to all recruiters on Monday. We are not running any
+  training on how it works, they will figure it out."), and it fires on text
+  that only names the practice, such as a refusal. Whether a text does the
+  practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -24,38 +47,54 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    ((?:no|without|skip|skipping|bypass|omit\w*)\s+(?:AI\s+literacy|AI\s+training|AI\s+competence|staff\s+training)\s+(?:program|requirement|measure|assessment)?|(?:deploy|roll\s*out|provide|use)\w*\s+(?:AI|artificial\s+intelligence)\s+(?:system|tool)\s+(?:without|lacking)\s+(?:staff|operator|user|employee)\s+(?:training|literacy|competence|education)|(?:untrained|unqualified|inexperienced)\s+(?:staff|operators|users|employees)\s+(?:operating|using|deploying)\s+(?:AI|artificial\s+intelligence)|(?:AI\s+literacy|Article\s+4)\s+(?:obligation|requirement)\s+(?:not\s+met|ignored|skipped)|no\s+(?:AI|artificial\s+intelligence)\s+(?:training|education|literacy)\s+(?:program|provided|required))
+    (\b(?:no|without|skip|skipping|bypass|omit\w*)\s+(?:AI\s+literacy|AI\s+training|AI\s+competence|staff\s+training)(?:\s+(?:program|requirement|measure|assessment))?|(?:deploy|roll\s*out|provide|use)\w*\s+(?:AI|artificial\s+intelligence)\s+(?:system|tool)\s+(?:without|lacking)\s+(?:staff|operator|user|employee)\s+(?:training|literacy|competence|education)|(?:untrained|unqualified|inexperienced)\s+(?:staff|operators|users|employees)\s+(?:operating|using|deploying)\s+(?:AI|artificial\s+intelligence)|(?:AI\s+literacy|Article\s+4)\s+(?:obligation|requirement)\s+(?:not\s+met|ignored|skipped)|no\s+(?:AI|artificial\s+intelligence)\s+(?:training|education|literacy)\s+(?:program|provided|required))
   flags: i
 severity: medium
-category: prohibited_practice
+category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_4/oj
+  provision_label: Regulation (EU) 2024/1689, Article 4(1), as replaced by Regulation (EU) 2026/1744
   regulation: EU AI Act
   article: Article 4
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
-  last_updated: '2024-07-12'
+  last_updated: '2026-07-24'
   citation: >-
-    Regulation (EU) 2024/1689, Article 4 (AI literacy): Providers and deployers
-    of AI systems shall take measures to ensure, to their best extent, a
-    sufficient level of AI literacy of their staff and other persons dealing
-    with the operation and use of AI systems on their behalf, taking into
-    account their technical knowledge, experience, education and training and
-    the context the AI systems are to be used in, and considering the persons
-    or groups of persons on whom the AI systems are to be used.
+    Regulation (EU) 2024/1689, Article 4(1), as replaced by Regulation (EU)
+    2026/1744, Article 1, point (5): Providers and deployers of AI systems shall
+    take measures to support the development of AI literacy of their staff and
+    other persons dealing with the operation and use of AI systems on their
+    behalf, taking into account their technical knowledge, experience, education
+    and training and the context the AI systems are to be used in, and
+    considering the persons or groups of persons on whom the AI systems are to
+    be used. This obligation does not require providers or deployers to
+    guarantee any specific level of AI literacy of any individual.
 penalty_information:
   civil_penalties:
-    eu_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover (Article 99)
+    eu_enforcement: >-
+      No fine tier is set by the Regulation: Article 4 is not listed in Article
+      99(3) or 99(4). Member States lay down the rules on penalties under
+      Article 99(1).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 4 requires providers and deployers to ensure a
-    sufficient level of AI literacy of staff and other persons operating AI
-    systems on their behalf. Effective 2 February 2025.
+    BLOCKED: EU AI Act Article 4, as replaced by Regulation (EU) 2026/1744 from
+    27 July 2026, requires providers and deployers of AI systems to take
+    measures to support the development of AI literacy of their staff and other
+    persons operating AI systems on their behalf. It does not require any
+    specific level of AI literacy of any individual.
   suggestion: >-
-    Implement an AI literacy programme proportionate to staff roles, the
-    context of use, and the affected persons or groups. Consider technical
-    knowledge, experience, education and training. Document training records
-    and refresh periodically as systems evolve.
+    Put in place measures that support AI literacy, proportionate to staff
+    roles, the context of use and the persons or groups on whom the AI systems
+    are used, taking into account technical knowledge, experience, education and
+    training. Keep a record of the measures taken.
+compliance_notes:
+  - >-
+    Article 4 first applied from 2 February 2025 in its original wording
+    ("ensure, to their best extent, a sufficient level of AI literacy").
+    Regulation (EU) 2026/1744, Article 1, point (5), replaced it with the text
+    cited here, in force from 27 July 2026 (published OJ L 24.7.2026, entry into
+    force on the third day after publication).
 version: 1.0.0
 tags:
 - eu-ai-act
@@ -65,3 +104,7 @@ tags:
 - providers
 - deployers
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

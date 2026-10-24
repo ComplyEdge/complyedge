@@ -1,44 +1,68 @@
 id: COPPA_CHILD_INPUT_001
 jurisdiction: US
-effective_date: '1998-04-21'
-description: Detects when children under 13 are sharing personal information requiring
-  parental consent
+effective_date: '2000-04-21'
+description: >-
+  Covers input that may contain personal information from a child under 13. The
+  COPPA Rule requires the operator to obtain verifiable parental consent before
+  collecting, using or disclosing personal information from children.
+
+
+  Layer 1 detects: I'm, Im or I am, then an age from 1 to 12 in digits or in
+  words (one to twelve), then year old, years old, yr or yrs; age or born in,
+  then a year from 2013 to 2026; the words elementary, middle school, or grade 1
+  to grade 8; and my school, my teacher, my mom, my dad or my parent. It matches
+  words, not who is writing: it fires when an adult mentions school or family
+  ("Write a lesson plan for a grade 4 fractions class; I am the teacher."), it
+  reads signals of age, not personal information, and the birth-year range is
+  written as the current year and the thirteen years before it (2013 to 2026
+  in 2026); a test fails on 1 January until the range is moved forward. Whether a child is disclosing personal information is
+  judged in Layer 2.
 detection_scope: user_input
 # Layer 1 (deterministic regex) conditions. Multi-signal correlation
 # (age indicator co-occurring with email/name/address) requires Layer 2
 # evaluation and is intentionally not expressed here.
 conditions:
 - type: regex
-  value: (?i)\b(i'?m|i am) (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)
-    (years? old|yr|yrs)\b
+  value: (?i)\b(i'?m|i\sam)\s([1-9]|1[0-2]|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s(years?\sold|yr|yrs)\b
 - type: regex
-  value: (?i)\b(age|born in) (199[5-9]|20[0-1][0-9])\b
+  value: (?i)\b(age|born\sin)\s(20(?:1[3-9]|2[0-6]))\b
 - type: regex
-  value: (?i)\b(elementary|middle school|grade [1-8])\b
+  value: (?i)\b(elementary|middle\sschool|grade\s[1-8])\b
 - type: regex
-  value: (?i)\b(my (school|teacher|mom|dad|parent))\b
+  value: (?i)\b(my\s(school|teacher|mom|dad|parent))\b
   flags: i
 severity: high
 category: privacy
 source:
+  provision_url: https://www.ecfr.gov/current/title-16/section-312.5
+  provision_label: 16 CFR 312.5(a)(1) (COPPA Rule), implementing 15 U.S.C. 6502
   regulation: COPPA
-  article: 15 U.S.C. §§ 6501-6506
+  article: 16 CFR §312.5(a)(1)
   url: https://www.ftc.gov/enforcement/rules/rulemaking-regulatory-reform-proceedings/childrens-online-privacy-protection-rule
   last_updated: '2013-07-01'
-  citation: "15 U.S.C. §6502(b)(1)(A)(ii): to obtain verifiable parental consent for the collection, use, or disclosure of personal information from children."
+  citation: >-
+    16 CFR §312.5(a)(1): An operator is required to obtain verifiable parental
+    consent before any collection, use, or disclosure of personal information
+    from children, including consent to any material change in the collection,
+    use, or disclosure practices to which the parent has previously consented.
+    15 U.S.C. §6502(b)(1)(A)(ii): to obtain verifiable parental consent for the
+    collection, use, or disclosure of personal information from children;
 remediation:
   action: require_consent
   timing: proactive
-  message: 🧒 This appears to be information from someone under 13. COPPA requires
-    parental consent before collecting personal information from children.
+  message: >-
+    🧒 This input may contain personal information from a child under 13. The
+    COPPA Rule (16 CFR 312.5(a)(1)) requires the operator to obtain verifiable
+    parental consent before collecting, using or disclosing personal information
+    from children.
   suggestion: Please have a parent or guardian review this interaction and provide
     consent if appropriate
   alternatives:
   - Ask a parent or guardian to help with this request
-  - Use our child-safe mode that doesn't collect personal information
-  - Visit our educational resources designed for young users
   allow_override: false
   require_explicit_consent: true
+compliance_notes:
+  - The COPPA Rule took effect on April 21, 2000 (64 FR 59888, November 3, 1999).
 version: 1.1.0
 tags:
 - coppa
@@ -47,3 +71,7 @@ tags:
 - proactive
 - input_protection
 tier: developer
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

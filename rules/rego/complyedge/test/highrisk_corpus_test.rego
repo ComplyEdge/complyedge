@@ -1,4 +1,4 @@
-# ComplyEdge — highrisk new-rule tests
+# ComplyEdge: highrisk new-rule tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.highrisk_corpus_test
@@ -182,4 +182,58 @@ test_highrisk_aggregator_fires if {
 
 test_highrisk_aggregator_clean if {
 	not highrisk.violation with input as {"jurisdiction": "EU", "text": "Our assistant summarises customer support tickets and drafts helpful replies."}
+}
+
+# Review 2026-10-21: five patterns made the negation optional, so the
+# affirmative compliant statement matched ("training data representative ...",
+# "accuracy validated ..."). The negation is now required. Each pair below: the
+# review's compliant sentence is allowed (it blocked before the fix), and the
+# negated sentence still blocks.
+
+test_art9_allows_risk_management_implemented if {
+	not art9_risk_management.violation with input as {"jurisdiction": "EU", "text": "Risk management implemented and signed off by the clinical safety officer on 12 May."}
+}
+
+test_art9_blocks_risk_management_not_implemented if {
+	art9_risk_management.violation with input as {"jurisdiction": "EU", "text": "Risk management not implemented for the triage model."}
+}
+
+test_art10_allows_training_data_representative if {
+	not art10_data_governance.violation with input as {"jurisdiction": "EU", "text": "Training data representative of all age groups, per the Article 10(3) review signed off on 4 June."}
+}
+
+test_art10_blocks_training_data_not_representative if {
+	art10_data_governance.violation with input as {"jurisdiction": "EU", "text": "Training data not representative of rural applicants."}
+}
+
+test_art14_allows_human_oversight_implemented if {
+	not art14_human_oversight.violation with input as {"jurisdiction": "EU", "text": "Human oversight implemented: reviewers can halt the scoring system with the stop button."}
+}
+
+test_art14_blocks_human_oversight_not_implemented if {
+	art14_human_oversight.violation with input as {"jurisdiction": "EU", "text": "Human oversight not implemented on the loan approval flow."}
+}
+
+test_art15_accuracy_allows_accuracy_validated if {
+	not art15_accuracy.violation with input as {"jurisdiction": "EU", "text": "Accuracy validated at 94% on the held-out test set; metrics are declared in the instructions for use."}
+}
+
+test_art15_accuracy_blocks_accuracy_not_validated if {
+	art15_accuracy.violation with input as {"jurisdiction": "EU", "text": "Accuracy not validated before release."}
+}
+
+test_art15_robustness_allows_resilient_to_errors if {
+	not art15_robustness.violation with input as {"jurisdiction": "EU", "text": "The robustness test report shows the system is resilient to errors and faults in its inputs."}
+}
+
+test_art15_robustness_blocks_not_resilient_to_errors if {
+	art15_robustness.violation with input as {"jurisdiction": "EU", "text": "The model is not resilient to errors in sensor input."}
+}
+
+# The qualifier after the phrase is optional, so the phrase also fires at the
+# end of a sentence. This did not fire before 2026-10-21: the pattern required
+# a space after "management" even with no qualifier. (Art 15(4) keeps the
+# space: "no redundancy." at the end also ends ordinary climbing advice.)
+test_art9_fires_at_end_of_sentence if {
+	art9_risk_management.violation with input as {"jurisdiction": "EU", "text": "Ship the credit scoring model without risk management."}
 }

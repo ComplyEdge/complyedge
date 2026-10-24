@@ -5,6 +5,30 @@ description: >-
   Requires deployers of emotion recognition systems or biometric categorisation
   systems to inform natural persons exposed thereto of the operation of the
   system, and to process personal data in accordance with GDPR. Article 50(3).
+
+
+  Layer 1 detects: "emotion recognition" or "biometric categorisation" (also
+  "categorization") followed by "without" or "lacking" and then "notice",
+  "disclosure", "consent" or a word starting with "inform"; "deploy", "use" or
+  "operat" (and longer forms) followed by "emotion detection", "emotion
+  recognition" or "emotion analysis", then "without" or "lacking", then a word
+  starting with "inform", "noti" or "disclos"; "covert", "secret", "hidden" or
+  "undisclosed" followed by "emotion recognition", "emotion detection",
+  "emotion analysis" or "emotion monitoring", or by "biometric
+  categorisation", "biometric categorization", "biometric classification" or
+  "biometric analysis"; "emotion recognition" or "emotion detection" followed
+  by "not disclosed", "not notified" or "not informed"; "fail", "failing" or
+  "failure" followed by "to inform", then "person", "persons", "individual",
+  "individuals", "user" or "users", then "of emotion" or "about emotion"; and
+  "biometric analysis" or "biometric processing" followed by "without" or
+  "lacking", then "GDPR compliance" or "data protection compliance". Case is
+  ignored, the words must follow each other with no other word between them
+  unless stated, and a phrase can start inside a longer word. It matches
+  wording, not meaning: it misses the practice when other words come between
+  these ("Deploy emotion recognition on users without informing them during
+  the video calls."), and it does not read the law-enforcement exception: a
+  warrant-authorised "biometric categorisation without notice" fires. Whether
+  a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -21,11 +45,13 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    (emotion\s+recognition\s+(?:without|lacking)\s+(?:notice|disclosure|inform|consent)|biometric\s+categori[sz]ation\s+(?:without|lacking)\s+(?:notice|disclosure|inform|consent)|(?:deploy|use|operat)\w*\s+emotion\s+(?:detection|recognition|analysis)\s+(?:without|lacking)\s+(?:inform|noti|disclos)|(?:covert|secret|hidden|undisclosed)\s+emotion\s+(?:recognition|detection|analysis|monitoring)|(?:covert|secret|hidden|undisclosed)\s+biometric\s+(?:categori[sz]ation|classification|analysis)|emotion\s+(?:recognition|detection)\s+(?:not\s+)?(?:disclosed|notified|informed)|fail(?:ing|ure)?\s+to\s+inform\s+(?:persons?|individuals?|users?)\s+(?:of|about)\s+emotion|biometric\s+(?:analysis|processing)\s+(?:without|lacking)\s+(?:GDPR|data\s+protection)\s+compliance)
+    (emotion\s+recognition\s+(?:without|lacking)\s+(?:notice|disclosure|inform|consent)|biometric\s+categori[sz]ation\s+(?:without|lacking)\s+(?:notice|disclosure|inform|consent)|(?:deploy|use|operat)\w*\s+emotion\s+(?:detection|recognition|analysis)\s+(?:without|lacking)\s+(?:inform|noti|disclos)|(?:covert|secret|hidden|undisclosed)\s+emotion\s+(?:recognition|detection|analysis|monitoring)|(?:covert|secret|hidden|undisclosed)\s+biometric\s+(?:categori[sz]ation|classification|analysis)|emotion\s+(?:recognition|detection)\s+not\s+(?:disclosed|notified|informed)|fail(?:ing|ure)?\s+to\s+inform\s+(?:persons?|individuals?|users?)\s+(?:of|about)\s+emotion|biometric\s+(?:analysis|processing)\s+(?:without|lacking)\s+(?:GDPR|data\s+protection)\s+compliance)
   flags: i
 severity: high
 category: privacy
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_50/par_3/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 50(3)'
   regulation: EU AI Act
   article: Article 50(3)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
@@ -42,15 +68,24 @@ source:
     rights and freedoms of third parties, and in accordance with Union law.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+    eu_enforcement: >-
+      Administrative fines up to EUR 15,000,000 or, for an undertaking, up to 3%
+      of its total worldwide annual turnover for the preceding financial year,
+      whichever is higher (Article 99(4), point (g)); for SMEs, including
+      start-ups, and SMCs, whichever is lower (Article 99(6) and (6a)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 50(3) requires deployers of emotion
-    recognition and biometric categorisation systems to inform exposed
-    persons of the system's operation and process personal data in
-    accordance with GDPR. Penalties: up to EUR 15M or 3% of global revenue.
+    BLOCKED: EU AI Act Article 50(3) requires deployers of emotion recognition
+    and biometric categorisation systems to inform the persons exposed of the
+    operation of the system, and to process personal data in accordance with
+    Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680, as
+    applicable. Penalties: administrative fines up to EUR 15,000,000 or, for an
+    undertaking, up to 3% of its total worldwide annual turnover for the
+    preceding financial year, whichever is higher (Article 99(4), point (g));
+    for SMEs, including start-ups, and SMCs, whichever is lower (Article 99(6)
+    and (6a)).
   suggestion: >-
     Inform all persons exposed to the emotion recognition or biometric
     categorisation system of its operation. Ensure personal data processing
@@ -66,3 +101,7 @@ tags:
 - biometric-categorisation
 - gdpr
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

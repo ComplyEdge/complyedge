@@ -228,7 +228,15 @@ class TestRegoCitationsMatchTheRegulationCorpus:
                 continue
             head_m = _re.search(r"^# Legal citation:\s*(.+)$", txt, _re.M)
             head = head_m.group(1) if head_m else ""
-            art_m = _re.search(r"(Article\s+[0-9]+(?:\([0-9a-z]+\))*)", head)
+            # A qualifier after the paragraph ("second subparagraph", "points
+            # (f) to (i)") is part of the provision: Article 50(4) second
+            # subparagraph is not the deep fake rule's sibling. Pairing them
+            # made the public-interest rule quote the deep fake text
+            # (review of 2026-10-21).
+            art_m = _re.search(
+                r"(Article\s+[0-9]+(?:\([0-9a-z]+\))*(?:,\s*(?:[a-z]+(?: and [a-z]+)? subparagraphs?|points? \([a-z]\)(?: to \([a-z]\))?))?)",
+                head,
+            )
             art = art_m.group(1) if art_m else None
             reg = (
                 "EU AI Act"

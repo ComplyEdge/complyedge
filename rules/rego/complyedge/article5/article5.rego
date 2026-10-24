@@ -1,11 +1,21 @@
-# ComplyEdge — EU AI Act Article 5: Aggregated Check
+# ComplyEdge: EU AI Act Article 5: Aggregated Check
 #
 # Aggregates all sub-rules in this package and returns a unified result.
-# OPA queries this package at: POST /v1/data/complyedge/article5
+# OPA queries this package at: POST /v1/data/complyedge/article5/result
 #
 # Aggregator carve-out (RULE_STANDARD.md §5.6): imports and combines other
-# rules' violation results — no legal condition of its own. Correctness derives
+# rules' violation results, no legal condition of its own. Correctness derives
 # from the imported sub-rules, each individually subject to §5 sign-off.
+#
+# Imported rules (each individually subject to §5 sign-off):
+#   - article5.biometric_categorisation    (rego-art5-1g-001)
+#   - article5.emotion_recognition         (rego-art5-1f-001)
+#   - article5.facial_scraping             (rego-art5-1e-001)
+#   - article5.predictive_policing         (rego-art5-1d-001)
+#   - article5.realtime_biometric          (rego-art5-1h-001)
+#   - article5.social_scoring              (rego-art5-1c-001)
+#   - article5.subliminal_manipulation     (rego-art5-1a-001)
+#   - article5.vulnerability_exploitation  (rego-art5-1b-001)
 
 package complyedge.article5
 

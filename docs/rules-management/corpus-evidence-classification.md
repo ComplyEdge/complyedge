@@ -1,6 +1,6 @@
 # Rego corpus: what each rule actually establishes
 
-**Machine-readable source of truth:** [`corpus-evidence-classification.yaml`](corpus-evidence-classification.yaml). This page restates that file for a human reader; the YAML is authoritative and `tests/unit/test_corpus_evidence_classification.py` fails if the two disagree on any headline number.
+**Machine-readable source of truth:** [`corpus-evidence-classification.yaml`](corpus-evidence-classification.yaml). This page restates that file for a human reader; the YAML is authoritative, and a drift test in the ComplyEdge CI fails if the two disagree on any headline number. The rule ID forms and approval states are explained in [`rules/README.md`](../../rules/README.md).
 
 ## Why this document exists
 
@@ -79,7 +79,7 @@ The leak is the text. A valid IBAN, card number, national ID, API key or private
 | `phone.rego` | `rego-gdpr5-1c-002` | `regulated_act_in_text` |
 | `private_key.rego` | `rego-gdpr32-1-002` | `regulated_act_in_text` |
 
-### `us_corpus`: 1 leaves, all `content_inspecting`
+### `us_corpus`: 1 leaf, all `content_inspecting`
 
 Forward-looking guidance and material non-public information are the disclosure. The text is the regulated act.
 
@@ -160,7 +160,7 @@ Articles 4, 9-16, 26 and 27 require documents, processes and assignments to EXIS
 
 ## What this means for a claim
 
-Safe to say: the corpus deterministically inspects **Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and credentials in the text (GDPR Articles 5 and 32), and one US disclosure control**: 32 policies where the evaluated text is the regulated conduct, each carrying its legal citation and emitting a decision record (tamper-evident on the Enterprise export).
+Safe to say: the corpus deterministically inspects **Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and credentials in the text (GDPR Articles 5 and 32), and one US disclosure control**: 32 policies where the evaluated text is the regulated conduct, each carrying its legal citation and emitting a decision record. Every record joins a per-tenant hash chain as it is written, on every plan; Enterprise adds a completeness attestation and qualified timestamps over the chain.
 
 Not safe to say for data protection: that it finds "any personal data". It finds the formats it names (email, phone, IBAN, card number, five national IDs, vendor API keys, private keys), each with its checksum where one exists. Names, postal addresses and health details are not formats and are not matched.
 
@@ -174,4 +174,4 @@ find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
   | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  8 aggregators
 ```
 
-Drift is enforced by `tests/unit/test_corpus_evidence_classification.py`.
+Drift between this page, the YAML and the corpus is enforced by a test in the ComplyEdge CI.

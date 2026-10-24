@@ -2,12 +2,25 @@ id: EU_AI_ACT_GPAI_DOWNSTREAM_OBLIGATIONS_001
 jurisdiction: EU
 effective_date: '2025-08-02'
 description: >-
-  Requires providers of general-purpose AI models to make available to
-  downstream deployers the technical documentation and sufficient
-  information about the capabilities and limitations of the model, enabling
-  them to comply with their own obligations under the EU AI Act.
-  Article 53(1)(b) mandates transparency towards downstream providers
-  and deployers (minimum content set out in Annex XII).
+  Requires providers of general-purpose AI models to draw up, keep up to date
+  and make available information and documentation to providers of AI systems
+  who intend to integrate the model, enabling them to understand its
+  capabilities and limitations and to comply with their own obligations. Article
+  53(1)(b), minimum content in Annex XII.
+
+
+  Layer 1 detects: one sequence on one line: deploy, distribute, provide,
+  release or ship, in any form, optionally "a" or "the", then GPAI,
+  general-purpose AI, foundation model, large language model or LLM; then
+  within about 40 characters downstream, third party, customer, client or
+  integrator; then within about 20 characters without, lacking or no, then
+  model documentation, documentation, capabilities, limitations or integration
+  guide ("release the foundation model to downstream customers without
+  documentation"). It matches wording, not meaning: it does not read what
+  information integrators actually receive, so it misses the practice told in
+  other words ("Integrators get API keys only; no docs about what the model
+  can't do."), and it fires on text that only names the practice, such as a
+  refusal. Whether a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -24,34 +37,41 @@ conditions:
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_53/par_1/pnt_b/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 53(1)(b)'
   regulation: EU AI Act
   article: Article 53(1)(b)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 53(1)(b): Providers of
-    general-purpose AI models shall draw up, keep up-to-date and make
-    available information and documentation to providers of AI systems
-    who intend to integrate the general-purpose AI model into their AI
-    systems; the information shall enable downstream providers to
-    understand the capabilities and limitations of the GPAI model and to
-    comply with their obligations under this Regulation, and shall
-    contain, at a minimum, the elements set out in Annex XII.
+    Regulation (EU) 2024/1689, Article 53(1)(b): draw up, keep up-to-date and
+    make available information and documentation to providers of AI systems who
+    intend to integrate the general-purpose AI model into their AI systems.
+    Without prejudice to the need to observe and protect intellectual property
+    rights and confidential business information or trade secrets in accordance
+    with Union and national law, the information and documentation shall: (i)
+    enable providers of AI systems to have a good understanding of the
+    capabilities and limitations of the general-purpose AI model and to comply
+    with their obligations pursuant to this Regulation; and (ii) contain, at a
+    minimum, the elements set out in Annex XII;
 remediation:
   action: warn
   timing: proactive
   message: >-
-    WARNING — EU AI Act Article 53(1)(b) requires GPAI model providers
-    to supply downstream deployers with comprehensive documentation about
-    model capabilities, limitations, and integration requirements.
-    Non-compliance may result in penalties of up to EUR 15M or 3% of
-    global annual revenue.
+    WARNING: EU AI Act Article 53(1)(b) requires providers of general-purpose AI
+    models to draw up, keep up to date and make available information and
+    documentation to providers of AI systems who intend to integrate the model,
+    enabling them to understand its capabilities and limitations and containing
+    at least the Annex XII elements. Penalties: fines imposed by the Commission
+    of up to 3% of annual total worldwide turnover in the preceding financial
+    year or EUR 15,000,000, whichever is higher, where the provider
+    intentionally or negligently infringed the Regulation (Article 101(1)).
   suggestion: >-
-    Before distributing a GPAI model to downstream deployers, prepare and
-    provide documentation following Annex XII of the EU AI Act. Include
-    model capabilities, known limitations, intended use cases, performance
-    benchmarks, and integration guidance. Ensure downstream deployers have
-    sufficient information to meet their own EU AI Act obligations.
+    Before making a general-purpose AI model available for integration, prepare
+    documentation for providers of AI systems that integrate it, following Annex
+    XII: capabilities, known limitations, intended tasks, and integration
+    requirements. Intellectual property and trade secrets may be protected in
+    accordance with Union and national law.
 version: 1.0.0
 tags:
 - eu-ai-act
@@ -65,3 +85,9 @@ tier: enterprise
 compliance_notes:
   - >-
     GPAI obligations under Chapter V have applied since 2 August 2025. The 2 August 2026 date is when the Commission's Article 101 fining powers became exercisable, which is an enforcement milestone, not the date the obligation began. Conflating the two overstates when compliance was required.
+  - >-
+    Article 111(3): providers of general-purpose AI models placed on the market before 2 August 2025 must comply by 2 August 2027. Regulation (EU) 2026/1744 does not amend Articles 51 to 55, 101 or 111(3).
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

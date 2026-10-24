@@ -7,6 +7,23 @@ description: >-
   freedoms of natural persons, particularly for automated decision-making,
   large-scale processing of special categories, or systematic monitoring.
   GDPR Article 35.
+
+
+  Layer 1 detects: without impact assessment or without data protection impact
+  assessment; no DPIA or no data protection impact assessment; skip or
+  skipping DPIA or impact assessment; automated or profiling decision
+  (singular) or processing without or lacking DPIA or impact assessment;
+  large-scale (also "large scale") processing or monitoring without or lacking
+  DPIA or assessment; high-risk (also "high risk") processing without or
+  lacking DPIA or impact assessment; fail, failing or failure to conduct,
+  perform or carry out a DPIA or impact assessment; and systematic monitoring
+  without or lacking DPIA or assessment. It matches wording, not meaning: it
+  misses the practice told in other words ("Start the city-wide CCTV face
+  analytics on Monday; the privacy review can come later."), it does not read
+  whether the processing is likely to result in a high risk, so it fires on
+  lawful text in these words ("There is no DPIA requirement for the newsletter
+  sign-up form."), and it fires on text that only names the practice. Whether
+  a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -31,36 +48,48 @@ conditions:
 severity: high
 category: privacy
 source:
+  eli: http://data.europa.eu/eli/reg/2016/679/art_35/par_1/oj
+  provision_label: Regulation (EU) 2016/679, Article 35(1) and (3)
   regulation: GDPR
-  article: Article 35
+  article: Article 35(1) and (3)
   url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
   last_updated: '2016-04-27'
   citation: >-
     Regulation (EU) 2016/679, Article 35(1): Where a type of processing in
     particular using new technologies, and taking into account the nature,
-    scope, context and purposes of the processing, is likely to result in a
-    high risk to the rights and freedoms of natural persons, the controller
-    shall, prior to the processing, carry out an assessment of the impact of
-    the envisaged processing operations on the protection of personal data.
-    Article 35(3): A data protection impact assessment shall in particular be
-    required in the case of: (a) a systematic and extensive evaluation of
-    personal aspects relating to natural persons which is based on automated
-    processing, including profiling, and on which decisions are based that
-    produce legal effects; (b) processing on a large scale of special
-    categories of data; (c) a systematic monitoring of a publicly accessible
-    area on a large scale.
+    scope, context and purposes of the processing, is likely to result in a high
+    risk to the rights and freedoms of natural persons, the controller shall,
+    prior to the processing, carry out an assessment of the impact of the
+    envisaged processing operations on the protection of personal data. Article
+    35(3): A data protection impact assessment referred to in paragraph 1 shall
+    in particular be required in the case of: (a) a systematic and extensive
+    evaluation of personal aspects relating to natural persons which is based on
+    automated processing, including profiling, and on which decisions are based
+    that produce legal effects concerning the natural person or similarly
+    significantly affect the natural person; (b) processing on a large scale of
+    special categories of data referred to in Article 9(1), or of personal data
+    relating to criminal convictions and offences referred to in Article 10; or
+    (c) a systematic monitoring of a publicly accessible area on a large scale.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 10,000,000 or 2% of worldwide annual turnover
+    eu_enforcement: >-
+      Administrative fines up to EUR 10,000,000 or, for an undertaking, up to 2%
+      of the total worldwide annual turnover of the preceding financial year,
+      whichever is higher (Article 83(4), point (a)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — GDPR Article 35 requires a data protection impact assessment
-    (DPIA) before processing that is likely to result in high risk to rights
-    and freedoms. This includes automated profiling, large-scale special
-    category data, and systematic monitoring. Penalties: up to EUR 10M or
-    2% of global revenue.
+    BLOCKED: GDPR Article 35 requires the controller to carry out a data
+    protection impact assessment before processing that is likely to result in a
+    high risk to the rights and freedoms of natural persons. It is required in
+    particular for systematic and extensive automated evaluation, including
+    profiling, on which decisions producing legal or similarly significant
+    effects are based; large-scale processing of special categories of data or
+    criminal-offence data; and large-scale systematic monitoring of a publicly
+    accessible area. Penalties: administrative fines up to EUR 10,000,000 or,
+    for an undertaking, up to 2% of the total worldwide annual turnover of the
+    preceding financial year, whichever is higher (Article 83(4), point (a)).
   suggestion: >-
     Conduct a DPIA before proceeding with the processing. The assessment
     must include: systematic description of processing operations, assessment
@@ -76,3 +105,7 @@ tags:
 - automated-processing
 - profiling
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

@@ -25,6 +25,7 @@
         "US",
         "US-CA", 
         "US-NY",
+        "US-IL",
         "US-TX",
         "US-FL",
         "UK",
@@ -41,8 +42,8 @@
     "description": {
       "type": "string",
       "minLength": 10,
-      "maxLength": 500,
-      "description": "Clear, concise description of what this rule enforces"
+      "maxLength": 4000,
+      "description": "What this rule enforces, in the language of the provision; a deterministic rule ends with a paragraph beginning 'Layer 1 detects:' that states what its patterns match (RULE_STANDARD section 3.1)"
     },
     "conditions": {
       "type": "array",
@@ -644,6 +645,23 @@
         "citation": {
           "type": "string",
           "description": "Full legal citation text for the specific article"
+        },
+        "eli": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^http://data\\.europa\\.eu/eli/[a-z_]+/[0-9]{4}/[0-9]+(/(art|par|pnt|anx)_[0-9a-z]+)*/oj$",
+          "description": "European Legislation Identifier of the provision, Official Journal form (ADCR LAW-02)"
+        },
+        "provision_url": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "^https://",
+          "description": "Official URL of the provision, for law that has no ELI (ADCR LAW-02)"
+        },
+        "provision_label": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "Human-readable name of the provision (ADCR LAW-02)"
         }
       },
       "additionalProperties": false,
@@ -809,6 +827,29 @@
     "title": {
       "type": "string",
       "description": "Human-readable title for the rule"
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "approved_by", "approved_on"],
+      "description": "Named human approval for ADCR LAW-01 / LAW-02 (published on the rule-set pages)",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["draft", "review", "approved"]
+        },
+        "approved_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approved_on": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Date of the named approval; null until the rule is approved"
+        }
+      },
+      "if": {"properties": {"status": {"const": "approved"}}},
+      "then": {"properties": {"approved_on": {"type": "string"}}}
     },
     "penalty_information": {
       "type": "object",

@@ -2,8 +2,21 @@
 #
 # Aggregates the data_protection leaves (personal data and credentials in the
 # text sent to, or returned from, an AI model) and returns a unified result.
-# OPA queries this package at: POST /v1/data/complyedge/data_protection
+# OPA queries this package at: POST /v1/data/complyedge/data_protection/result
 # Aggregator carve-out (RULE_STANDARD.md 5.6): no legal condition of its own.
+#
+# Imported rules (each individually subject to §5 sign-off):
+#   - data_protection.api_key         (rego-gdpr32-1-001)
+#   - data_protection.card_pan        (rego-gdpr5-1c-004)
+#   - data_protection.email           (rego-gdpr5-1c-001)
+#   - data_protection.iban            (rego-gdpr5-1c-003)
+#   - data_protection.national_id_de  (rego-gdpr5-1c-005)
+#   - data_protection.national_id_es  (rego-gdpr5-1c-007)
+#   - data_protection.national_id_fr  (rego-gdpr5-1c-006)
+#   - data_protection.national_id_it  (rego-gdpr5-1c-009)
+#   - data_protection.national_id_nl  (rego-gdpr5-1c-008)
+#   - data_protection.phone           (rego-gdpr5-1c-002)
+#   - data_protection.private_key     (rego-gdpr32-1-002)
 
 package complyedge.data_protection
 

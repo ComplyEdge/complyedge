@@ -15,7 +15,7 @@
  */
 
 import type { ComplyEdgeClient } from "./client";
-import type { ComplianceViolation } from "./types";
+import type { ComplianceViolation, DecisionContext } from "./types";
 
 export class ComplianceError extends Error {
   public violations: ComplianceViolation[];
@@ -32,7 +32,9 @@ export class ComplianceError extends Error {
  * The returned object proxies chat.completions.create() to check
  * user messages before sending to OpenAI.
  */
-export function withCompliance<T extends Record<string, unknown>>(
+// `object`, not Record<string, unknown>: a class instance such as `new OpenAI()`
+// has no index signature, so the narrower bound refused the documented call.
+export function withCompliance<T extends object>(
   openaiClient: T,
   ceClient: ComplyEdgeClient,
   options?: {
@@ -40,6 +42,8 @@ export function withCompliance<T extends Record<string, unknown>>(
     checkOutput?: boolean;
     jurisdiction?: string;
     blockOnViolation?: boolean;
+    /** ADCR decision context sent with every check (see DecisionContext). */
+    decisionContext?: DecisionContext;
   }
 ): T {
   const opts = {
@@ -49,7 +53,7 @@ export function withCompliance<T extends Record<string, unknown>>(
     ...options,
   };
 
-  const chat = openaiClient.chat as Record<string, unknown> | undefined;
+  const chat = (openaiClient as Record<string, unknown>).chat as Record<string, unknown> | undefined;
   if (!chat || !chat.completions) {
     return openaiClient; // Not an OpenAI-shaped client, return as-is
   }
@@ -79,6 +83,7 @@ export function withCompliance<T extends Record<string, unknown>>(
             direction: "prompt",
             jurisdiction: opts.jurisdiction,
             userId,
+            decisionContext: opts.decisionContext,
           });
           if (!result.allowed && opts.blockOnViolation) {
             throw new ComplianceError(
@@ -101,6 +106,7 @@ export function withCompliance<T extends Record<string, unknown>>(
           direction: "output",
           jurisdiction: opts.jurisdiction,
           userId,
+          decisionContext: opts.decisionContext,
         });
         if (!result.allowed && opts.blockOnViolation) {
           throw new ComplianceError(

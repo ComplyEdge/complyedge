@@ -8,6 +8,34 @@ description: >-
   assessment, EU declaration of conformity, CE marking, registration,
   corrective actions, demonstrating conformity on request, and accessibility
   compliance. Article 16.
+
+
+  Layer 1 detects: "place", "placing", "sell", "deploy", "launch" or "release"
+  (and longer forms) followed by "high-risk AI" or "AI system", then "on the
+  EU market", "on EU market", "in the Union" or "in Union", then "without" or
+  "lacking", then "CE marking", "conformity assessment", "EU declaration" or
+  "registration"; "no", "without", "skip", "skipping", "bypass" or "omit" (and
+  longer forms) followed by "CE marking", "conformity assessment", "EU
+  declaration of conformity", "quality management system", "QMS", "provider
+  registration" or "EU database registration"; "high-risk AI" or "AI system"
+  (singular) followed by "without", "lacking" or "missing" and then "provider
+  name", "provider identification", "provider contact", "CE mark" (and longer
+  forms), "conformity assessment", "conformity declaration" or "quality
+  management"; "Article 16", "Art 16", "Art. 16" or "provider obligation"
+  followed by "not met", "ignored", "skipped", "bypass" or "circumvent" (and
+  longer forms); "no", "without", "skip" or "bypass" (and longer forms)
+  followed by "Article 43", "Art 43" or "Art. 43" and then "conformity
+  assessment"; and "provide" or "providing" followed by "high-risk AI", then
+  "without" or "lacking", then "Annex IV", "technical documentation" or "EU
+  declaration". "High-risk" may also be written "high risk". Case is ignored,
+  the words must follow each other with no other word between them unless
+  stated, and a phrase can start inside a longer word. It matches wording, not
+  meaning: it misses the practice told in other words ("Launch the CV
+  screening product in Germany next month and do the conformity assessment
+  afterwards."), it does not check that the system is high-risk (any "AI
+  system" counts, and the "no conformity assessment" forms need no AI system
+  at all), and it fires on text that only names the practice, such as a
+  refusal. Whether a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -33,11 +61,13 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    ((?:place|placing|sell|deploy|launch|release)\w*\s+(?:high[\-\s]risk\s+AI|AI\s+system)\s+(?:on\s+(?:the\s+)?EU\s+market|in\s+(?:the\s+)?Union)\s+(?:without|lacking)\s+(?:CE\s+marking|conformity\s+assessment|EU\s+declaration|registration)|(?:no|without|skip|skipping|bypass|omit\w*)\s+(?:CE\s+marking|conformity\s+assessment|EU\s+declaration\s+of\s+conformity|quality\s+management\s+system|QMS|provider\s+registration|EU\s+database\s+registration)\s+(?:for|on)?\s+(?:high[\-\s]risk\s+AI|AI\s+system)?|(?:high[\-\s]risk\s+AI|AI\s+system)\s+(?:without|lacking|missing)\s+(?:provider\s+(?:name|identification|contact)|CE\s+mark\w*|conformity\s+(?:assessment|declaration)|quality\s+management)|(?:Article\s+16|Art\.?\s+16|provider\s+obligation)\s+(?:not\s+met|ignored|skipped|bypass\w*|circumvent\w*)|(?:no|without|skip\w*|bypass\w*)\s+(?:Article\s+43|Art\.?\s+43)\s+conformity\s+assessment|(?:provide|providing)\s+high[\-\s]risk\s+AI\s+(?:without|lacking)\s+(?:Annex\s+IV|technical\s+documentation|EU\s+declaration))
+    ((?:place|placing|sell|deploy|launch|release)\w*\s+(?:high[\-\s]risk\s+AI|AI\s+system)\s+(?:on\s+(?:the\s+)?EU\s+market|in\s+(?:the\s+)?Union)\s+(?:without|lacking)\s+(?:CE\s+marking|conformity\s+assessment|EU\s+declaration|registration)|\b(?:no|without|skip|skipping|bypass|omit\w*)\s+(?:CE\s+marking|conformity\s+assessment|EU\s+declaration\s+of\s+conformity|quality\s+management\s+system|QMS|provider\s+registration|EU\s+database\s+registration)(?:\s+(?:for|on))?(?:\s+(?:high[\-\s]risk\s+AI|AI\s+system))?|(?:high[\-\s]risk\s+AI|AI\s+system)\s+(?:without|lacking|missing)\s+(?:provider\s+(?:name|identification|contact)|CE\s+mark\w*|conformity\s+(?:assessment|declaration)|quality\s+management)|(?:Article\s+16|Art\.?\s+16|provider\s+obligation)\s+(?:not\s+met|ignored|skipped|bypass\w*|circumvent\w*)|\b(?:no|without|skip\w*|bypass\w*)\s+(?:Article\s+43|Art\.?\s+43)\s+conformity\s+assessment|(?:provide|providing)\s+high[\-\s]risk\s+AI\s+(?:without|lacking)\s+(?:Annex\s+IV|technical\s+documentation|EU\s+declaration))
   flags: i
 severity: high
-category: prohibited_practice
+category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_16/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 16'
   regulation: EU AI Act
   article: Article 16
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
@@ -69,17 +99,29 @@ source:
     Directives (EU) 2016/2102 and (EU) 2019/882.
 penalty_information:
   civil_penalties:
-    eu_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover (Article 99)
+    eu_enforcement: >-
+      Once the obligation applies: administrative fines up to EUR 15,000,000 or,
+      for an undertaking, up to 3% of its total worldwide annual turnover for
+      the preceding financial year, whichever is higher (Article 99(4), point
+      (a)); for SMEs, including start-ups, and SMCs, whichever is lower (Article
+      99(6) and (6a)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 16 requires providers of high-risk AI systems
-    to satisfy a comprehensive compliance checklist before placing the system
-    on the EU market: Section 2 conformity, provider identification, QMS,
-    documentation, logs, conformity assessment, EU declaration, CE marking,
-    registration, corrective actions, demonstrability on request, and
-    accessibility. Penalties: up to EUR 15M or 3% of global turnover.
+    BLOCKED (readiness check, not yet a binding obligation): EU AI Act Article
+    16 requires providers of high-risk AI systems to meet a list of obligations:
+    Section 2 conformity, provider identification, quality management system,
+    documentation, logs, conformity assessment, EU declaration of conformity, CE
+    marking, registration, corrective actions, demonstrating conformity on
+    request, and accessibility. The obligation applies from 2 December 2027 for
+    Annex III high-risk systems and from 2 August 2028 for high-risk systems
+    under Annex I (Article 113, as amended by Regulation (EU) 2026/1744).
+    Penalties once applicable: administrative fines up to EUR 15,000,000 or, for
+    an undertaking, up to 3% of its total worldwide annual turnover for the
+    preceding financial year, whichever is higher (Article 99(4), point (a));
+    for SMEs, including start-ups, and SMCs, whichever is lower (Article 99(6)
+    and (6a)).
   suggestion: >-
     Before placing a high-risk AI system on the EU market or putting it into
     service: (1) verify Section 2 compliance, (2) display provider name and
@@ -103,3 +145,7 @@ tier: enterprise
 compliance_notes:
   - >-
     Chapter III high-risk obligations were postponed by Regulation (EU) 2026/1744: Annex III high-risk systems apply from 2 December 2027, and high-risk systems embedded in products under Annex I from 2 August 2028. This rule is enforceable readiness tooling before those dates, not a currently binding obligation, and must not be presented as one.
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

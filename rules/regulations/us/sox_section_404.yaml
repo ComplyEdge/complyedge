@@ -1,11 +1,31 @@
 id: SOX_SECTION_404_001
 jurisdiction: US
-effective_date: '2004-06-15'
+effective_date: '2004-11-15'
 description: >-
   Requires each annual report to contain an internal control report stating
   management's responsibility for establishing and maintaining adequate
   internal control structure for financial reporting, plus an assessment of
   effectiveness. Sarbanes-Oxley Act Section 404, codified at 15 U.S.C. §7262.
+
+
+  Layer 1 detects: no, without, skip, skipping, bypass, or omit (and words that
+  begin with it), then internal control, ICFR, SOX 404 or 404, then report,
+  assessment, testing, attestation or evaluation; material weakness or
+  significant deficiency or deficiencies, then not disclosed, hidden, or a word
+  beginning with conceal, undisclos or omit; misrepresent, or a word beginning
+  with falsif or overstate, then internal control, ICFR or control
+  effectiveness; circumvent, bypass or override, then internal control, ICFR,
+  SOX or control procedure; internal control, ICFR or SOX 404 assessment or
+  testing not performed, skipped, incomplete or inadequate; management assertion
+  or certification without or lacking basis, testing, documentation or evidence;
+  and annual report or 10-K, then without, lacking or missing, then internal
+  control report, ICFR report or 404 report. The words follow each other with
+  nothing in between. It matches wording, not meaning: it misses the practice
+  told in other words ("File the 10-K without the internal control report this
+  year; nobody reads it." has the word "the" before "internal control report"),
+  it does not read the smaller issuer exemption, and it fires on text that only
+  names the practice, such as a refusal. Whether a report or assessment is
+  missing or misstated is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -25,11 +45,13 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    ((?:no|without|skip|skipping|bypass|omit\w*)\s+(?:internal\s+control|ICFR|SOX\s+404|404)\s+(?:report|assessment|testing|attestation|evaluation)|(?:material\s+weakness|significant\s+deficienc(?:y|ies))\s+(?:not\s+disclosed|hidden|conceal\w*|undisclos\w*|omit\w*)|(?:misrepresent|falsif\w*|overstate\w*)\s+(?:internal\s+control|ICFR|control\s+effectiveness)|(?:circumvent|bypass|override)\s+(?:internal\s+control|ICFR|SOX|control\s+procedure)|(?:internal\s+control|ICFR|SOX\s+404)\s+(?:assessment|testing)\s+(?:not\s+performed|skipped|incomplete|inadequate)|management\s+(?:assertion|certification)\s+(?:without|lacking)\s+(?:basis|testing|documentation|evidence)|(?:annual\s+report|10-K)\s+(?:without|lacking|missing)\s+(?:internal\s+control\s+report|ICFR\s+report|404\s+report))
+    (\b(?:no|without|skip|skipping|bypass|omit\w*)\s+(?:internal\s+control|ICFR|SOX\s+404|404)\s+(?:report|assessment|testing|attestation|evaluation)|(?:material\s+weakness|significant\s+deficienc(?:y|ies))\s+(?:not\s+disclosed|hidden|conceal\w*|undisclos\w*|omit\w*)|(?:misrepresent|falsif\w*|overstate\w*)\s+(?:internal\s+control|ICFR|control\s+effectiveness)|(?:circumvent|bypass|override)\s+(?:internal\s+control|ICFR|SOX|control\s+procedure)|(?:internal\s+control|ICFR|SOX\s+404)\s+(?:assessment|testing)\s+(?:not\s+performed|skipped|incomplete|inadequate)|management\s+(?:assertion|certification)\s+(?:without|lacking)\s+(?:basis|testing|documentation|evidence)|(?:annual\s+report|10-K)\s+(?:without|lacking|missing)\s+(?:internal\s+control\s+report|ICFR\s+report|404\s+report))
   flags: i
 severity: critical
 category: financial
 source:
+  provision_url: https://www.govinfo.gov/link/uscode/15/7262
+  provision_label: '15 U.S.C. 7262 (Sarbanes-Oxley Act of 2002, section 404)'
   regulation: Sarbanes-Oxley Act
   article: Section 404 (15 U.S.C. §7262)
   url: https://www.govinfo.gov/link/uscode/15/7262
@@ -37,21 +59,21 @@ source:
   citation: >-
     15 U.S.C. §7262(a) Rules required: The Commission shall prescribe rules
     requiring each annual report required by section 78m(a) or 78o(d) of this
-    title to contain an internal control report, which shall — (1) state the
+    title to contain an internal control report, which shall- (1) state the
     responsibility of management for establishing and maintaining an adequate
-    internal control structure and procedures for financial reporting; and
-    (2) contain an assessment, as of the end of the most recent fiscal year
-    of the issuer, of the effectiveness of the internal control structure and
-    procedures of the issuer for financial reporting. §7262(b) Internal
-    control evaluation and reporting: With respect to the internal control
-    assessment required by subsection (a), each registered public accounting
-    firm that prepares or issues the audit report for the issuer, other than
-    an issuer that is an emerging growth company (as defined in section 78c
-    of this title), shall attest to, and report on, the assessment made by
-    the management of the issuer. An attestation made under this subsection
-    shall be made in accordance with standards for attestation engagements
-    issued or adopted by the Board. Any such attestation shall not be the
-    subject of a separate engagement.
+    internal control structure and procedures for financial reporting; and (2)
+    contain an assessment, as of the end of the most recent fiscal year of the
+    issuer, of the effectiveness of the internal control structure and
+    procedures of the issuer for financial reporting. §7262(b) Internal control
+    evaluation and reporting: With respect to the internal control assessment
+    required by subsection (a), each registered public accounting firm that
+    prepares or issues the audit report for the issuer, other than an issuer
+    that is an emerging growth company (as defined in section 78c of this
+    title), shall attest to, and report on, the assessment made by the
+    management of the issuer. An attestation made under this subsection shall be
+    made in accordance with standards for attestation engagements issued or
+    adopted by the Board. Any such attestation shall not be the subject of a
+    separate engagement.
 exceptions:
 - condition: Smaller issuer exemption
   description: >-
@@ -66,27 +88,35 @@ exceptions:
 penalty_information:
   civil_penalties:
     sec_enforcement: >-
-      SEC enforcement actions, civil money penalties, disgorgement, officer
-      and director bars. Criminal penalties under Section 906 (18 U.S.C.
-      §1350) for false certifications: up to $5M and 20 years imprisonment
-      for willful violations.
+      In a civil action the SEC may seek an order barring a person from acting
+      as an officer or director of an issuer (15 U.S.C. 78u(d)(2)), civil money
+      penalties (15 U.S.C. 78u(d)(3)), equitable relief (15 U.S.C. 78u(d)(5))
+      and disgorgement (15 U.S.C. 78u(d)(7)). A willful false certification of a periodic report under
+      Section 906 is punishable by a fine of up to $5,000,000, imprisonment of
+      up to 20 years, or both (18 U.S.C. 1350(c)(2)).
 remediation:
   action: sox_compliance_block
   timing: proactive
   message: >-
-    BLOCKED — Sarbanes-Oxley Section 404 (15 U.S.C. §7262) requires annual
-    internal control reports with management assessment of ICFR effectiveness
-    and (for accelerated filers) auditor attestation. Concealing material
-    weaknesses or misrepresenting control effectiveness carries severe
-    SEC and criminal penalties.
+    BLOCKED: Sarbanes-Oxley Section 404 (15 U.S.C. §7262(a)) directs the SEC
+    to require each annual report to contain an internal control report stating
+    management's responsibility for internal control over financial reporting
+    and assessing its effectiveness. Auditor attestation under §7262(b) does not apply to
+    emerging growth companies or to issuers that are neither large accelerated
+    filers nor accelerated filers (§7262(c)).
   suggestion: >-
-    Conduct documented testing of internal controls over financial reporting
-    as of fiscal year-end. Disclose any material weaknesses or significant
-    deficiencies in the internal control report. Ensure management's
-    assessment is supported by sufficient evidence and obtain auditor
-    attestation if you are an accelerated filer. Engage your audit committee
-    and external auditor early.
-version: 1.0.0
+    Conduct documented testing of internal controls over financial reporting as
+    of fiscal year-end. Disclose any material weaknesses or significant
+    deficiencies in the internal control report. Ensure management's assessment
+    is supported by sufficient evidence, and obtain auditor attestation if you
+    are a large accelerated filer or accelerated filer that is not an emerging
+    growth company. Engage your audit committee and external auditor early.
+compliance_notes:
+- >-
+  Remedies checked on 2026-10-22 against 15 U.S.C. 78u(d) and 18 U.S.C. 1350
+  as published by the U.S. Government Publishing Office (govinfo.gov). Cease-and-desist proceedings under Section 21C of the
+  Exchange Act are not listed here because they were not re-read.
+version: 1.1.0
 tags:
 - sox
 - section-404
@@ -95,3 +125,7 @@ tags:
 - financial-reporting
 - material-weakness
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

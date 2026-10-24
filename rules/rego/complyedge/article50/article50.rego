@@ -1,11 +1,20 @@
-# ComplyEdge — EU AI Act Article 50: Aggregated Check
+# ComplyEdge: EU AI Act Article 50: Aggregated Check
 #
 # Aggregates all sub-rules in this package and returns a unified result.
-# OPA queries this package at: POST /v1/data/complyedge/article50
+# OPA queries this package at: POST /v1/data/complyedge/article50/result
 #
 # Aggregator carve-out (RULE_STANDARD.md §5.6): imports and combines other
-# rules' violation results — no legal condition of its own. Correctness derives
+# rules' violation results, no legal condition of its own. Correctness derives
 # from the imported sub-rules, each individually subject to §5 sign-off.
+#
+# Imported rules (each individually subject to §5 sign-off):
+#   - article50.chatbot_disclosure                (rego-art50-1-001)
+#   - article50.deepfake_disclosure               (rego-art50-4-001)
+#   - article50.emotion_notification              (rego-art50-3-001)
+#   - article50.emotion_permitted_context_notice  (rego-art50-3-002)
+#   - article50.gpai_content_disclosure           (rego-art50-2-001)
+#   - article50.public_interest_text              (rego-art50-4-002)
+#   - article50.synthetic_media_watermark         (rego-art50-2-002)
 
 package complyedge.article50
 

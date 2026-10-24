@@ -1,12 +1,24 @@
 id: SANCTIONS_OFAC_DPRK_PRIMORSKY_JV_001
 jurisdiction: US
-effective_date: '2026-01-01'
+effective_date: '2016-03-16'
 description: >-
-  OFAC DPRK secondary-sanctions nexus for Russia–North Korea joint ventures
-  (Primorsky Krai / Rason). A dated regime running through 2030; dealings that
-  touch the JV nexus are prohibited within the window. Demonstrates a
-  forward-dated effective_window sanctions primitive.
-title: OFAC DPRK — Primorsky Krai JV secondary-sanctions nexus
+  Prohibits the exportation or reexportation, directly or indirectly, from the
+  United States or by a U.S. person wherever located, of any goods, services or
+  technology to North Korea, except as licensed. 31 CFR 510.206, implementing
+  Executive Order 13722, Section 3(a)(i).
+
+
+  Layer 1 detects: North Korea, DPRK, Primorsky Krai (a Russian region, so it
+  also fires on Russian dealings with no North Korean party), Rason (optionally followed
+  by SEZ or zone), or joint venture or JV followed within 60 characters of the
+  same sentence by North Korea, DPRK or Pyongyang. It matches wording, not
+  meaning: it fires on any mention
+  ("Summarise today's news article about North Korea's missile test for our
+  newsletter."), and it misses a dealing that names a North Korean party without
+  those words ("Wire $480,000 to Korea Kwangson Banking Corp for the seafood
+  shipment from Chongjin; route it through our Hong Kong account."). Whether a
+  text is a dealing the program prohibits is judged in Layer 2.
+title: 'OFAC North Korea: exports and services to North Korea'
 detection_scope: all
 category: sanctions
 conditions:
@@ -15,38 +27,48 @@ conditions:
     (?i)\b(North\s+Korea|DPRK|Primorsky\s+Krai|Rason(?:\s+(?:SEZ|zone))?|(?:joint\s+venture|JV)\b[^.!?\n]{0,60}?\b(?:North\s+Korea|DPRK|Pyongyang))\b
   flags: i
 severity: high
-effective_window:
-  starts: '2026-01-01'
-  ends: '2030-12-31'
 source:
-  regulation: OFAC (US Treasury) North Korea sanctions — secondary sanctions
-  article: 31 CFR Part 510 / Executive Order 13810
+  provision_url: https://www.ecfr.gov/current/title-31/subtitle-B/chapter-V/part-510/subpart-B/section-510.206
+  provision_label: '31 CFR 510.206 (North Korea Sanctions Regulations)'
+  regulation: OFAC (US Treasury) North Korea Sanctions Regulations
+  article: 31 CFR 510.206 / Executive Order 13722, Section 3(a)(i)
   url: https://ofac.treasury.gov/sanctions-programs-and-country-information/north-korea-sanctions
   citation: >-
-    OFAC administers DPRK sanctions under 31 CFR Part 510 and EO 13810,
-    including secondary sanctions on those facilitating DPRK trade. This rule
-    models the Russia–DPRK Primorsky Krai JV nexus as a forward-dated regime
-    prohibited through the window end date.
-  last_updated: '2026-07-05'
+    31 CFR 510.206(a): The exportation or reexportation, directly or
+    indirectly, from the United States, or by a U.S. person, wherever located,
+    of any goods, services, or technology to North Korea is prohibited.
+    Executive Order 13722 of March 15, 2016, Section 3(a)(i), prohibits the
+    same exportation or reexportation, effective 12:01 a.m. eastern daylight
+    time on March 16, 2016.
+  last_updated: '2026-10-22'
 remediation:
   action: block
   timing: proactive
   message: >-
-    🛑 OFAC DPRK secondary-sanctions nexus (Russia–North Korea Primorsky Krai
-    JV). Prohibited within the effective window; see transition guidance for the
-    window end date.
+    🛑 Possible OFAC North Korea sanctions exposure: this content names North
+    Korea (the DPRK), the Rason zone, Primorsky Krai, or a joint venture with a
+    North Korean party. Screen the counterparties before proceeding.
   suggestion: >-
-    Screen counterparties for DPRK secondary-sanctions exposure. The prohibition
-    applies through the window end date.
+    Screen counterparties against OFAC sanctions lists and the North Korea
+    Sanctions Regulations (31 CFR Part 510) before proceeding.
   allow_override: false
   require_explicit_consent: false
-version: 1.0.0
+compliance_notes:
+- >-
+  Rule ID kept from an earlier version that modelled an unsourced Primorsky
+  Krai joint-venture scenario with an invented 2026 to 2030 effective window.
+  Both were removed on 2026-10-22 and the rule re-grounded on 31 CFR 510.206,
+  read from eCFR (version of 2026-10-01), and Executive Order 13722, read from
+  the Federal Register (81 FR 14943).
+version: 2.0.0
 tags:
 - sanctions
 - ofac
 - dprk
 - north_korea
-- secondary_sanctions
-- effective_window
-- transition_rule
+- exports
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

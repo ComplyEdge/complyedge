@@ -1,7 +1,7 @@
 {
   "name": "@complyedge/sdk",
   "version": "0.2.6",
-  "description": "ComplyEdge TypeScript SDK: check every AI request and answer against EU AI Act rules, block what breaks one, and record each decision with the legal citation when a rule fires. OPA/Rego policy checks plus OpenAI middleware.",
+  "description": "ComplyEdge TypeScript SDK: a verifiable record for every AI decision, with the rule and the law behind it and no prompt or answer stored. OPA/Rego policy checks against open EU AI Act rules, plus OpenAI middleware.",
   "publishConfig": {
     "access": "public"
   },
@@ -12,8 +12,8 @@
     "ai-compliance",
     "compliance",
     "runtime-enforcement",
-    "guardrails",
-    "llm-security",
+    "audit-record",
+    "verifiable-ai-decisions",
     "opa",
     "rego",
     "audit-trail",

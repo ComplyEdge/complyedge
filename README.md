@@ -10,11 +10,11 @@ Every AI call routed through ComplyEdge is checked against rules that cite the l
 
 Each record holds the rules that fired and the article behind each, the exact rule set that decided (`bundle_digest`), the time, a keyed hash of the text and an `event_id`. It is kept outside your AI system, and you keep the text: with the `event_id` you can prove to an auditor, a data protection officer or a certifier which text a record was about, and ComplyEdge never keeps the content. When a rule that covers the act itself fires (Article 5 practices, prompt injection under Article 15(5), and on EU checks personal data and secrets such as email, phone, IBAN, card and national ID numbers, API keys and private keys), the request or answer is blocked and the block is recorded with its citation. Article 50, GPAI and high-risk rules fire on text that describes a missing control, and when one fires the call is blocked and recorded the same way. It checks *this* prompt or output; it does not classify your system. The rules in this repository are the rule set ComplyEdge runs. What a decision record must contain and prove is a separate document, ADCR, the open rulebook: [complyedge.io/rulebook](https://complyedge.io/rulebook/).
 
-The same rules are available to your agent as an **MCP server** that checks the text you pass it, offline, with an article citation on every finding.
+The same rules are available to your agent as an **MCP server** that checks the text you pass it, offline, with a citation on every finding.
 
 Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server**, a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
 
-**When an auditor, a regulator or a large customer asks "which rule decided this, under which law, and can you prove it was this text?", the answer is a record, not a log line.** Each record names the rule and the article, and you can prove which text it was about without sending the text to anyone who did not already have it. The sections "Verify a record" and "The rulebook" below show how.
+**When an auditor, a regulator or a large customer asks "which rule decided this, under which law, and can you prove it was this text?", the answer is a record, not a log line.** When a rule fires, the record names the rule and the article; every record, blocked or allowed, lets you prove which text it was about without sending the text to anyone who did not already have it. The sections "Verify a record" and "The rulebook" below show how.
 
 > What does your compliance tool tell a regulator when it blocks a request? A probability score?
 >
@@ -22,16 +22,16 @@ Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP s
 
 ## MCP Server (Model Context Protocol)
 
-ComplyEdge TrustLint is an MCP server built on the official [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) (`mcp>=1.9`). It gives an agent article-cited compliance checks instead of a probability score, and it runs fully offline: no API key, no network call, rules evaluated from the bundled YAML rule set.
+ComplyEdge TrustLint is an MCP server built on the official [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) (`mcp>=1.9`). It gives an agent cited compliance checks instead of a probability score, and it runs fully offline: no API key, no network call, rules evaluated from the bundled YAML rule set.
 
 **Tools** (the server exposes MCP tools only: no resources, no prompts; all are read-only and idempotent):
 
 | Tool | What it does |
 |---|---|
-| `check_compliance` | Check text against the TrustLint rule set. Returns PASS/FAIL with rule ID, severity, and the article citation behind each finding. |
+| `check_compliance` | Check text against the TrustLint rule set. Returns PASS/FAIL with rule ID, severity, and the citation behind each finding. |
 | `list_rules` | List available rules, filterable by jurisdiction (`EU`, `US`, `Global`, `Universal`). |
 | `scan_prompt` | Pre-generation prompt scan. Returns `SAFE` or `RISK_DETECTED` before the model is called. |
-| `sandbox_check` | Optional, with your API key: hosted enforcement in sandbox mode (`POST /v1/sandbox/check`). Your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, no rate-limit count. Returns `BLOCKED`/`ALLOWED` with rule ID and article citation. Never evidence. |
+| `sandbox_check` | Optional, with your API key: hosted enforcement in sandbox mode (`POST /v1/sandbox/check`). Your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, and no count against your plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). Returns `BLOCKED` with rule ID and article citation, or `ALLOWED`. Never evidence. |
 
 **Local (stdio)**: for Claude Desktop, Cursor, MCP Inspector, or any MCP host:
 
@@ -74,12 +74,14 @@ Server source: [`sdks/python/complyedge/mcp_server.py`](sdks/python/complyedge/m
 
 **Install (coding agents):**
 
+Each line is an alternative; pick the one you need.
+
 ```bash
-pip install complyedge
-pip install trustlint
-pip install 'complyedge[mcp]'
-npx -y @complyedge/mcp
-claude mcp add complyedge -- npx -y @complyedge/mcp
+pip install complyedge                               # Python SDK: hosted checks and the decorator
+pip install 'complyedge[mcp]'                        # plus the Python MCP server: complyedge-mcp
+pip install trustlint                                # offline linter CLI
+npx -y @complyedge/mcp                               # the MCP server on Node, no Python
+claude mcp add complyedge -- npx -y @complyedge/mcp  # add the Node MCP server to Claude Code
 ```
 
 Listing: [smithery.ai/servers/complyedge/complyedge](https://smithery.ai/servers/complyedge/complyedge)
@@ -127,7 +129,7 @@ or customers ask for.
 | **Horizon** | [trust.complyedge.io/horizon](https://trust.complyedge.io/horizon) |
 
 Each AI Trust Center is generated from that project's real audit trail: enforcement status, check
-volume, and the EU AI Act articles its traffic is checked against. (GitHub proxies and caches images, so the
+volume, and the EU AI Act articles the rule set covers, which run on checks sent with an EU jurisdiction. (GitHub proxies and caches images, so the
 seal above can lag; the AI Trust Center is always current.)
 
 Embed one on your own project: [Enforcement Seal docs](https://complyedge.io/docs/trust-badge.html).
@@ -197,14 +199,14 @@ This is compliance evidence, not a security control. It is written for the peopl
 
 The rules in [`rules/`](rules) are the rule set ComplyEdge runs: one rule per legal provision, each with its citation and approval status; [`rules/README.md`](rules/README.md) maps the directories. What a decision record must contain and prove is a separate, open document: ADCR, the AI Decision Check Record, published at [complyedge.io/rulebook](https://complyedge.io/rulebook/) as version 0.1.0, in development, with its schemas, an offline verifier and test vectors. A record names the rule set that decided it by digest. ComplyEdge is ADCR's first implementation. No conformance class is claimed; the gaps are listed field by field in Annex C of the rulebook.
 
-- **Rule IDs.** Every rule has a stable ID that names the provision: `rego-art5-1c-001` is AI Act Article 5(1)(c), first rule. Other forms cover Annex III points (`rego-art6-annex3-5b-001`), the Article 15(5) prompt-injection family (`rego-art15-ipi-001`), GPAI (`rego-gpai-53a-001`), GDPR (`rego-gdpr5-1c-001`) and SOX (`rego-sox-302-001`). The full scheme is in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md).
+- **Rule IDs.** Every rule has a stable ID that names the provision: `rego-art5-1c-001` is AI Act Article 5(1)(c), first rule. Other forms cover Annex III points (`rego-art6-annex3-5b-001`), the Article 15(5) prompt-injection family (`rego-art15-ipi-001`), GPAI (`rego-gpai-53a-001`), GDPR (`rego-gdpr5-1c-001`) and US securities disclosure (`rego-sox-302-001`, which covers SEC Regulation FD, 17 CFR 243.100(a); the ID is kept from when it was filed under SOX §302). The full scheme is in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md).
 - **Citations.** Each rule's `citation` names the instrument and the provision at paragraph and point level, then the text of that provision, for example `Regulation (EU) 2024/1689, Article 5(1)(c): ...`. That string is what goes into the record when the rule fires.
-- **Approval states.** Rego leaf headers carry `Status: approved` (or `review` / `pending re-approval`). YAML rules carry an `approval` object with the same meaning. Only `approved` means a named person signed off. Today all 75 Rego leaves and all 63 YAML rules are approved (136 of 136 in the published rule set).
+- **Approval states.** Rego leaf headers carry `Status: approved` (or `review` / `pending re-approval`). YAML rules carry an `approval` object with the same meaning. Only `approved` means a named person signed off. Today 75 of the 75 Rego leaves and 63 of the 63 YAML rules are approved: 136 of the 136 rule IDs in the published rule set (the 75 Rego leaves carry 73 distinct IDs, because two indirect prompt-injection leaves share the ID of the technique they extend). Most were approved on 2026-10-22 through agent-delegated review (RULE_STANDARD §5.5): an agent ran the §5.2 checklist and the approver authorized the result; each file's approval line says so.
 - **Bundle digest.** Every check response and every record carries `bundle_digest`, a SHA-256 over the rule files that were loaded when the decision was made. It changes whenever any rule changes, so a record names the exact rule set that decided it.
 
 `rule_id` is the citation key: every rule carries its article reference in the rule set (`rego-art5-1c-001` → Article 5(1)(c)), and the full citation text ships with the rule under [`rules/`](rules).
 
-`jurisdiction` is where the end user is, not where your company is based: the EU AI Act applies when an AI system's output is used in the EU, wherever the provider or deployer is established ([Art. 2(1)(c)](https://eur-lex.europa.eu/eli/reg/2024/1689)). Default: `EU`. On the hosted API's deterministic path, `EU` runs the EU AI Act rules, `US` and `US-*` run the SOX §302 disclosure rule, and every check runs prompt-injection detection. The other US rules (HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA) and the GDPR rules run offline in TrustLint, not on the hosted `/v1/check` path. The opt-in Layer 2 (`use_semantic_fallback=True`) adds two LLM judges: a prompt-injection classifier that judges by meaning against the same Article 15 categories and cites them, and a general LLM review. Neither runs the other rules.
+`jurisdiction` is where the end user is, not where your company is based: the EU AI Act applies when an AI system's output is used in the EU, wherever the provider or deployer is established ([Art. 2(1)(c)](https://eur-lex.europa.eu/eli/reg/2024/1689)). Default: `EU`. On the hosted API's deterministic path, `EU` runs the EU AI Act rules and the personal data and secrets rules (citing GDPR Articles 5(1)(c) and 32(1)), `US` and `US-*` run the Regulation FD disclosure rule, and every check runs prompt-injection detection. The other US rules (HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA) and the GDPR YAML rules (consent, data minimisation, DPIA, erasure, breach notification, transfers) run offline in TrustLint, not on the hosted `/v1/check` path. The opt-in Layer 2 (`use_semantic_fallback=True`) adds two LLM judges: a prompt-injection classifier that judges by meaning against the same Article 15 categories and cites them, and a general LLM review. Neither runs the other rules.
 
 ## TrustLint, Offline Linter
 
@@ -214,7 +216,7 @@ No API key required. Scans text against the YAML rule set using regex patterns. 
 pip install trustlint
 
 trustlint check --text "We use social credit scoring to evaluate applicants"
-# → CRITICAL: EU_AI_ACT_ART5_SOCIAL_SCORING_001, Article 5(1)(c)
+# → [CRITICAL] EU_AI_ACT_ART5_SOCIAL_SCORING_001 (add -v for the citation and remediation)
 ```
 
 Exit codes: `0` = pass, `1` = violations found. Designed for CI/CD pipelines. Source: [`packages/trustlint/`](packages/trustlint).
@@ -251,8 +253,8 @@ tests/                Rule validation + acceptance tests
 
 | Jurisdiction | Rules | Regulations |
 |---|---|---|
-| **EU** | 36 YAML | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI + Art 15 IPI (hosted); GDPR (offline, TrustLint) |
-| **US** | 15 YAML | SOX §302 (hosted, US checks); HIPAA, SOX §§404/802, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA (offline, TrustLint) |
+| **EU** | 36 YAML | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI + Art 15 IPI (hosted); GDPR personal data and secrets, Articles 5(1)(c) and 32(1) (hosted, EU checks); other GDPR rules (offline, TrustLint) |
+| **US** | 15 YAML | Regulation FD (hosted, US checks); HIPAA, SOX §§404/802, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA (offline, TrustLint) |
 | **Global** | 1 YAML | PCI DSS |
 | **Universal** | 11 YAML | PII detection, prompt injection (direct + indirect) |
 
@@ -278,11 +280,11 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1, Deterministic (hot path):** 75 leaf OPA/Rego policies (+ 8 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluates in 4.87ms p99 in a local microbenchmark against the current 6-package bundle (`layer1_latency_latest.json`, best of 5 trials, 2026-08-04). End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation when a rule fires. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1, Deterministic (hot path):** 75 leaf OPA/Rego policies (+ 8 package aggregators) evaluate every request, no LLM. The engine (OPA/Rego + TrustLint) evaluated in 1.018ms p99 in a local microbenchmark against the 8-package bundle the API queries (`layer1_latency_latest.json`, one 500-iteration run, 2026-10-21); queried one package after another, the same 8 packages measured 4.055ms p99. End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. Opting into the Layer 2 LLM adds 2–5s on the long tail. Binary pass/block, legal citation when a rule fires. (TrustLint applies the same regex corpus offline for CI use.)
 
-**Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, two LLM judges run in parallel after the rules pass, and either can block: a prompt-injection classifier that judges by meaning against the Article 15 `prompt_security` categories (a block is `llm-art15-ipi-*`, carries the Article 15 citation, and must quote the injected text from the request) and a general LLM review. If either cannot answer, the request is denied. Off by default since v0.2.2. Adds 2–5s latency per request.
+**Layer 2, Interpretive (synchronous, opt-in):** When called with `use_semantic_fallback=True`, two LLM judges run in parallel after the rules pass, and either can block: a prompt-injection classifier that judges by meaning against the Article 15 `prompt_security` categories (a block is `llm-art15-ipi-*`, carries the Article 15 citation, and must quote the injected text from the request) and a general LLM review. If either cannot answer, the request is denied. Off by default. Adds 2–5s latency per request.
 
-**ComplyEdge is compliance evidence, not a security control.** It is written for the auditor, the data protection officer and the certifier who have to judge an AI decision afterwards. Security products protect AI from bad actors; ComplyEdge records every decision with the rule and the law behind it, and blocks a request or answer only when a rule that covers the act itself fires. The record is kept outside your AI system, so it is evidence your system did not write about itself.
+**ComplyEdge is compliance evidence, not a security control.** It is written for the auditor, the data protection officer and the certifier who have to judge an AI decision afterwards. Security products protect AI from bad actors; ComplyEdge records every decision, names the rule and the law behind it when a rule fires, and blocks a request or answer only when a rule that covers the act itself fires. The record is kept outside your AI system, so it is evidence your system did not write about itself.
 
 ## Benchmark
 

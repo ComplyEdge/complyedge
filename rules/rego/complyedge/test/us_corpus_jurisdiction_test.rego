@@ -1,9 +1,10 @@
-# ComplyEdge — US corpus jurisdiction scoping tests
+# ComplyEdge: US corpus jurisdiction scoping tests
 # Run with: opa test rules/rego/ -v
 #
 # `jurisdiction` is where the end user is. A US statute must not block a check
 # made for an EU user, and EU Article 5 must still apply to EU users of a
-# US-based company (EU AI Act Art. 2(1)(c)). Regression, 2026-09-26: the SOX
+# US-based company (EU AI Act Art. 2(1)(a) for a provider placing a system on
+# the EU market, Art. 2(1)(c) where only the output is used in the Union). Regression, 2026-09-26: the SOX
 # rule had no jurisdiction gate and blocked EU traffic.
 
 package complyedge.us_corpus_jurisdiction_test

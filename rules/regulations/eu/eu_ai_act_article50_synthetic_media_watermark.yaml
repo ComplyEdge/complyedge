@@ -4,8 +4,27 @@ effective_date: '2026-08-02'
 description: >-
   Requires synthetic audio, image, or video content to be watermarked and
   disclosed as artificially generated or manipulated. Article 50(2) of the
-  EU AI Act. This rule detects references to generating synthetic media
+  EU AI Act. This rule covers references to generating synthetic media
   without the required watermark/disclosure pipeline.
+
+
+  Layer 1 detects: "generate", "produce", "create", "render", "synthesise" or
+  "synthesize", optionally followed by "synthetic", "AI-generated", "deepfake"
+  or "AI-made", then "image", "video", "audio", "voice", "speech", "face",
+  "photo" or "picture" (singular), then "without", "with no", "no", "skip",
+  "skipping", "bypass" or "bypassing" (the last four optionally followed by
+  "the"), then "watermark", "disclosure", "marker", "C2PA" or "provenance"; "image",
+  "video", "audio" or "voice" (singular) followed by "without", "with no" or
+  "no", optionally "AI", then "watermark", "disclosure" or "marker";
+  "disable", optionally followed by "the", then "watermark", "disclosure",
+  "marker" or "C2PA"; and "strip", optionally followed by "the", then
+  "watermark", "C2PA" or "provenance". Case is ignored, the words must follow
+  each other with no other word between them unless stated, and a phrase can
+  start inside a longer word. It matches wording, not meaning: it misses the
+  practice told in other words or with plural nouns, and it does not read the
+  assistive-editing exception: "Our photo editor upscales the user's own image
+  without watermark because it only performs standard editing." fires. Whether
+  a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -17,35 +36,56 @@ conditions:
     generates synthetic media but omits watermarking.
   model: gpt-4
 - type: regex
-  value: (generate|produce|create|render|synthesi[sz]e)\s+(synthetic|ai[- ]?generated|deepfake|ai[- ]?made)?\s*(image|video|audio|voice|speech|face|photo|picture)\s+(without|with\s+no|skip(ping)?\s+(the\s+)?|bypass(ing)?\s+(the\s+)?|no)\s+(watermark|disclosure|marker|c2pa|provenance)|(image|video|audio|voice)\s+(without|with\s+no|no)\s+(ai[- ]?)?(watermark|disclosure|marker)|disable\s+(the\s+)?(watermark|disclosure|marker|c2pa)|strip\s+(the\s+)?(watermark|c2pa|provenance)
+  value: (generate|produce|create|render|synthesi[sz]e)\s+(synthetic|ai[-\s]?generated|deepfake|ai[-\s]?made)?\s*(image|video|audio|voice|speech|face|photo|picture)\s+(without|with\s+no|skip(ping)?(\s+the)?|bypass(ing)?(\s+the)?|no)\s+(watermark|disclosure|marker|c2pa|provenance)|(image|video|audio|voice)\s+(without|with\s+no|no)\s+(ai[-\s]?)?(watermark|disclosure|marker)|disable\s+(the\s+)?(watermark|disclosure|marker|c2pa)|strip\s+(the\s+)?(watermark|c2pa|provenance)
   flags: i
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_50/par_2/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 50(2)'
   regulation: EU AI Act
   article: Article 50(2)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 50(2): Providers of AI systems,
-    including general purpose AI systems, generating synthetic audio,
-    image, video or text content, shall ensure that the outputs of the
-    AI system are marked in a machine-readable format and detectable as
-    artificially generated or manipulated.
+    Regulation (EU) 2024/1689, Article 50(2): Providers of AI systems, including
+    general-purpose AI systems, generating synthetic audio, image, video or text
+    content, shall ensure that the outputs of the AI system are marked in a
+    machine-readable format and detectable as artificially generated or
+    manipulated. Providers shall ensure their technical solutions are effective,
+    interoperable, robust and reliable as far as this is technically feasible,
+    taking into account the specificities and limitations of various types of
+    content, the costs of implementation and the generally acknowledged state of
+    the art, as may be reflected in relevant technical standards. This
+    obligation shall not apply to the extent the AI systems perform an assistive
+    function for standard editing or do not substantially alter the input data
+    provided by the deployer or the semantics thereof, or where authorised by
+    law to detect, prevent, investigate or prosecute criminal offences.
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 50(2) requires synthetic media (audio,
-    image, video) to be marked in a machine-readable format and detectable
-    as artificially generated. Do not produce or distribute synthetic
-    media without the required watermark/disclosure. Penalties: up to
-    €15M or 3% of global revenue.
+    BLOCKED: EU AI Act Article 50(2) requires providers of AI systems generating
+    synthetic audio, image, video or text content to ensure the outputs are
+    marked in a machine-readable format and detectable as artificially generated
+    or manipulated. The duty is on the provider of the generating system.
+    Systems placed on the market before 2 August 2026 have until 2 December 2026
+    (Article 111(4)). Penalties: administrative fines up to EUR 15,000,000 or,
+    for an undertaking, up to 3% of its total worldwide annual turnover for the
+    preceding financial year, whichever is higher (Article 99(4), point (g));
+    for SMEs, including start-ups, and SMCs, whichever is lower (Article 99(6)
+    and (6a)).
   suggestion: >-
-    Enable your watermarking pipeline (C2PA, SynthID, or equivalent)
-    before generating synthetic media. Do not strip or bypass existing
-    watermarks. For audio, embed a perceptible or imperceptible tag
-    identifying AI origin.
+    Enable a machine-readable marking pipeline (for example C2PA content
+    credentials or a robust watermark) in the generating system before releasing
+    outputs, and do not strip or bypass existing markings.
+compliance_notes:
+  - >-
+    Regulation (EU) 2026/1744 added Article 111(4): providers of AI systems
+    generating synthetic audio, image, video or text content that were placed on
+    the market before 2 August 2026 have until 2 December 2026 to comply with
+    Article 50(2). For those systems the obligation applies from 2 December
+    2026, not 2 August 2026.
 version: 1.0.0
 tags:
 - eu-ai-act
@@ -55,3 +95,7 @@ tags:
 - watermark
 - deepfake
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

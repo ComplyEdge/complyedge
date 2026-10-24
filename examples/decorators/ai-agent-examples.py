@@ -2,8 +2,11 @@
 """
 ComplyEdge Decorator: AI Agent Examples
 
-Shows how to add EU AI Act compliance to any Python function
-with one decorator. Each example uses the jurisdiction= API.
+Shows how to add a ComplyEdge check, and a record of each decision, to any
+Python function with one decorator. Each example uses the jurisdiction= API.
+
+With COMPLYEDGE_API_KEY set, every call is checked and recorded in your audit
+trail. Without it, checking is off and the script says so.
 
 Usage:
     pip install complyedge
@@ -17,7 +20,7 @@ from typing import Dict
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "sdks", "python"))
 
-from complyedge import compliance_check, ComplianceConfig
+from complyedge import ComplianceConfig, ComplianceError, compliance_check
 
 
 # =============================================================================
@@ -53,13 +56,14 @@ def credit_decision_agent(applicant_data: str) -> str:
 
 
 # =============================================================================
-# CROSS-JURISDICTION — US HIPAA, SOX, COPPA, TCPA, BIPA
+# US — on the hosted path the US rule is SOX. HIPAA, COPPA, TCPA, BIPA and the
+# other US rules run offline in TrustLint (pip install trustlint).
 # =============================================================================
 
 @compliance_check(jurisdiction="US", agent_id="customer-service")
 def customer_service_agent(message: str, account: Dict) -> str:
     """
-    Customer service agent checked against US rule corpus (HIPAA, TCPA, BIPA, etc.).
+    Customer service agent checked with jurisdiction="US" (SOX on the hosted path).
     """
     return f"Support response for: {message}"
 
@@ -67,7 +71,8 @@ def customer_service_agent(message: str, account: Dict) -> str:
 @compliance_check(jurisdiction="US", agent_id="medical-info")
 def medical_information_agent(query: str) -> str:
     """
-    Medical information agent — HIPAA minimum-necessary + PHI disclosure rules apply.
+    Medical information agent. The HIPAA rules run offline in TrustLint, not on
+    the hosted /v1/check path, so check this text with trustlint for HIPAA.
     """
     response = f"General information: {query}"
     response += "\n\nDisclaimer: Consult a healthcare professional for medical advice."
@@ -120,36 +125,51 @@ def enterprise_agent(request: str) -> str:
 # DEMO
 # =============================================================================
 
+def _show(label: str, agent, *args) -> None:
+    """Run one agent and print what came back, or the block if a rule fired."""
+    try:
+        print(f"  {label:<8} {agent(*args)[:80]}")
+    except ComplianceError as e:
+        print(f"  {label:<8} BLOCKED: {str(e)[:80]}")
+
+
 def main():
     print("=" * 60)
-    print("ComplyEdge Decorator Examples — EU AI Act + US compliance")
+    print("ComplyEdge Decorator Examples: EU AI Act and US checks")
     print("=" * 60)
 
-    os.environ["COMPLYEDGE_ENABLED"] = "false"  # Demo mode
-    os.environ["COMPLYEDGE_API_KEY"] = "demo_key"
+    live = bool(os.getenv("COMPLYEDGE_API_KEY"))
+    if live:
+        print("COMPLYEDGE_API_KEY is set: every call below goes through /v1/check")
+        print("and writes one record to your audit trail.")
+    else:
+        os.environ["COMPLYEDGE_ENABLED"] = "false"
+        print("No COMPLYEDGE_API_KEY: checking is OFF and nothing is sent.")
+        print("The lines below are the functions' own output, unchecked.")
 
-    print("\n1. EU AI ACT — Article 5, Article 50, GPAI")
+    print("\n1. EU AI ACT")
     print("-" * 40)
+    _show("HR:", hr_screening_agent, "Senior developer, 5 years experience")
+    _show("Content:", content_moderation_agent, "Review this marketing copy")
+    _show("Credit:", credit_decision_agent, "Applicant income 50K, credit score 720")
 
-    print(f"  HR Agent: {hr_screening_agent('Senior developer, 5 years experience')[:80]}")
-    print(f"  Content: {content_moderation_agent('Review this marketing copy')[:80]}")
-    print(f"  Credit:  {credit_decision_agent('Applicant income 50K, credit score 720')[:80]}")
-
-    print("\n2. US COMPLIANCE — HIPAA, SOX, COPPA, TCPA, BIPA")
+    print("\n2. US (SOX on the hosted path)")
     print("-" * 40)
-
-    print(f"  Support: {customer_service_agent('Help with billing', {'tier': 'premium'})[:80]}")
-    print(f"  Medical: {medical_information_agent('Diabetes management info')[:80]}")
+    _show("Support:", customer_service_agent, "Help with billing", {"tier": "premium"})
+    _show("Medical:", medical_information_agent, "Diabetes management info")
 
     print("\n3. INPUT-ONLY / OUTPUT-ONLY")
     print("-" * 40)
-
-    print(f"  Intake:  {intake_agent('Score citizens by social behaviour')[:80]}")
-    print(f"  Output:  {generation_agent('Write a product description')[:80]}")
+    _show("Intake:", intake_agent, "Score citizens by social behaviour")
+    _show("Output:", generation_agent, "Write a product description")
 
     print("\n" + "=" * 60)
-    print("Every agent protected with one line:")
-    print('  @compliance_check(jurisdiction="EU", agent_id="my-agent")')
+    if live:
+        print("The intake request asks for social scoring: with checking on, the")
+        print("Article 5 rule blocks it before the function runs.")
+    else:
+        print("The intake request asks for social scoring and passed because checking")
+        print("is off. Set COMPLYEDGE_API_KEY and run again to see it blocked.")
     print("=" * 60)
 
 

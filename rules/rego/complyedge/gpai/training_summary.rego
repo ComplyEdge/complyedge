@@ -1,18 +1,34 @@
-# ComplyEdge — EU AI Act Article 53(1)(d): Training Summary
+# ComplyEdge: EU AI Act Article 53(1)(d): Training Summary
 #
 # A general-purpose AI model released without the publicly available,
 # sufficiently detailed summary of its training content.
 #
+# Layer 1 detects: as adjacent words, no, without or missing, then "training
+# data summary", "training content summary" or "publicly available summary";
+# and gpai, "general purpose ai" (also "general-purpose ai") or foundation,
+# then "model", then without or no, then "training data summary", "training
+# content summary" or "disclosure of training". It matches wording, not
+# meaning: it misses a release without the summary told in other words, and it
+# fires on text that only names it, such as a refusal. Whether a provider
+# places a model on the market without the public training content summary is
+# judged in Layer 2.
+#
 # Legal citation: Regulation (EU) 2024/1689, Article 53(1)(d)
-# Effective: 2025-02-02 (prohibited) / 2026-08-02 (high-risk & GPAI)
+# Recital: 107: providers should make publicly available a sufficiently detailed summary of the content used for training, generally comprehensive in scope, on the AI Office template (Recital 104: the open-source exception does not reach it)
+# Effective: 2025-08-02 (Article 111(3): providers of general-purpose AI models placed on the market before 2 August 2025 must comply by 2 August 2027. Article 113, third paragraph, point (b), excepts Article 101, so the Commission's fines apply from 2 August 2026. Regulation (EU) 2026/1744 does not amend Articles 51 to 55, 101 or 111(3). The condition does not read either date)
+# Penalty: Article 101(1): fines not exceeding 3 % of their annual total worldwide turnover in the preceding financial year or EUR 15 000 000, whichever is higher
 # Condition type: deterministic
 # Enforcement layer: layer1
 # Status: approved
-# Approved by: Leo Celis on 2026-07-09 (agent authoring)
+# Approved by: Leo Celis on 2026-10-22 (via agent review per §5.1 amendment v1.1)
+# ELI: http://data.europa.eu/eli/reg/2024/1689/art_53/par_1/pnt_d/oj
+# Provision: Regulation (EU) 2024/1689, Article 53(1)(d)
 
 package complyedge.gpai.training_summary
 
 import rego.v1
+
+import data.complyedge.shared.normalize
 
 default violation := false
 
@@ -23,18 +39,18 @@ violation if {
 
 pattern_match if {
 	patterns := [
-		"(?:no|without|missing)\\s+(?:training\\s+(?:data|content)\\s+summary|publicly\\s+available\\s+summary)",
+		"\\b(?:no|without|missing)\\s+(?:training\\s+(?:data|content)\\s+summary|publicly\\s+available\\s+summary)",
 		"(?:gpai|general[\\-\\s]purpose\\s+ai|foundation)\\s+model\\s+(?:without|no)\\s+(?:training\\s+(?:data|content)\\s+summary|disclosure\\s+of\\s+training)",
 	]
 
-	text := lower(input.text)
+	text := lower(normalize.text)
 	some pattern in patterns
 	regex.match(pattern, text)
 }
 
 rule_id := "rego-art53-1d-001"
 
-citation := "Regulation (EU) 2024/1689 (EU AI Act), Article 53(1): Providers of general-purpose AI models shall: (a) draw up and keep up-to-date the technical documentation of the model, including its training and testing process and the results of its evaluation, which shall contain, at a minimum, the information set out in Annex XI for the purpose of providing it, upon request, to the AI Office and the national competent authorities; (b) draw up, keep up-to-date and make available information and documentation to providers of AI systems who intend to integrate the general-purpose AI model into their AI systems. Without prejudice to the need to observe and protect intellectual property rights and confidential business information or trade secrets in accordance with Union and national law, the information and documentation shall: (i) enable providers of AI systems to have a good understanding of the capabilities and limitations of the general-purpose AI model and to comply with their obligations pursuant to this Regulation; and (ii) contain, at a minimum, the elements set out in Annex XII; (c) put in place a policy to comply with Union law on copyright and related rights, and in particular to identify and comply with, including through state-of-the-art technologies, a reservation of rights expressed pursuant to Article 4(3) of Directive (EU) 2019/790; (d) draw up and make publicly available a sufficiently detailed summary about the content used for training of the general-purpose AI model, according to a template provided by the AI Office. Article 53(2): The obligations set out in paragraph 1, points (a) and (b), shall not apply to providers of AI models that are released under a free and open-source licence that allows for the access, usage, modification, and distribution of the model, and whose parameters, including the weights, the information on the model architecture, and the information on model usage, are made publicly available. This exception shall not apply to general-purpose AI models with systemic risks."
+citation := "Regulation (EU) 2024/1689, Article 53(1)(d): Providers of general-purpose AI models shall: ... (d) draw up and make publicly available a sufficiently detailed summary about the content used for training of the general-purpose AI model, according to a template provided by the AI Office."
 severity := "high"
 
 remediation := "Publish a sufficiently detailed summary of the training content per the AI Office template."

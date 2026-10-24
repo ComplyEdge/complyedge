@@ -1,4 +1,4 @@
-# ComplyEdge — gpai new-rule tests
+# ComplyEdge: gpai new-rule tests
 # Run with: opa test rules/rego/ -v
 
 package complyedge.gpai_corpus_test
@@ -91,4 +91,10 @@ test_gpai_aggregator_fires if {
 
 test_gpai_aggregator_clean if {
 	not gpai.violation with input as {"jurisdiction": "EU", "text": "Our assistant summarises customer support tickets and drafts helpful replies."}
+}
+
+# Fires at the end of a sentence too: before 2026-10-21 the pattern required a
+# space after "cybersecurity" even when no qualifier followed.
+test_cybersecurity_gpai_fires_at_end_of_sentence if {
+	cybersecurity_gpai.violation with input as {"jurisdiction": "EU", "text": "We release the systemic-risk model without cybersecurity."}
 }

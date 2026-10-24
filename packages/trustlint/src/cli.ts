@@ -6,13 +6,13 @@
  *   trustlint check <file>          Scan a file for compliance violations
  *   trustlint check --text "..."    Check a string
  *   trustlint rules list            Show all loaded rules
- *   trustlint init                  Create .trustlint.yaml config
  */
 
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { Command } from "commander";
-import { TrustLintEngine, type LintResult, type Rule } from "./engine.js";
+import { jurisdictionApplies, TrustLintEngine, type LintResult, type Rule } from "./engine.js";
+import { scanUrl } from "./scan-url.js";
 
 // Single source of truth for the version: package.json. A hardcoded constant
 // here read 2.0.0 while package.json said 2.0.1, so `trustlint --version`
@@ -93,7 +93,7 @@ const program = new Command();
 
 program
   .name("trustlint")
-  .description("TrustLint — offline compliance linter for AI agents")
+  .description("TrustLint: offline compliance linter for AI agents")
   .version(VERSION)
   .option("--rules-dir <path>", "Path to rules directory");
 
@@ -101,20 +101,29 @@ program
   .command("check [target]")
   .description("Check text or file for compliance violations")
   .option("-t, --text <text>", "Text string to check")
-  .option("-j, --jurisdiction <code>", "Filter rules by jurisdiction (EU, US, GLOBAL)")
+  .option(
+    "-j, --jurisdiction <code>",
+    "Where the end user is (EU, US, US-CA, GLOBAL). Runs that jurisdiction's rules, its sub-jurisdictions (US includes US-CA) and GLOBAL rules."
+  )
+  .option(
+    "--direction <direction>",
+    "input = text a user sends, output = text the AI produces. Rules scoped to user input or AI output then run only in their direction. Default: all rules."
+  )
   .option("-v, --verbose", "Show citations and remediation")
   .action(
     (
       target: string | undefined,
-      opts: { text?: string; jurisdiction?: string; verbose?: boolean }
+      opts: { text?: string; jurisdiction?: string; direction?: string; verbose?: boolean }
     ) => {
+      if (opts.direction && !["input", "output"].includes(opts.direction.toLowerCase())) {
+        console.error(`${RED}Error: --direction must be input or output${RESET}`);
+        process.exit(2);
+      }
       const rulesDir = program.opts().rulesDir;
       const engine = new TrustLintEngine(rulesDir);
 
       if (engine.rules.length === 0) {
-        console.error(
-          `${YELLOW}⚠ No rules loaded. Run 'trustlint init' or use --rules-dir${RESET}`
-        );
+        console.error(`${YELLOW}⚠ No rules loaded. Pass --rules-dir${RESET}`);
         process.exit(2);
       }
 
@@ -128,14 +137,17 @@ program
           process.exit(2);
         }
         inputText = fs.readFileSync(target, "utf-8");
+      } else if (!process.stdin.isTTY) {
+        // Piped input, as the Python CLI accepts: echo "..." | trustlint check
+        inputText = fs.readFileSync(0, "utf-8");
       } else {
         console.error(
-          `${RED}Error: provide --text or a file path${RESET}`
+          `${RED}Error: provide --text, a file path, or pipe stdin${RESET}`
         );
         process.exit(2);
       }
 
-      const result = engine.check(inputText, opts.jurisdiction);
+      const result = engine.check(inputText, opts.jurisdiction, opts.direction);
       printResult(result, opts.verbose ?? false);
 
       if (result.hasCritical) {
@@ -151,7 +163,10 @@ const rulesCmd = program
 rulesCmd
   .command("list")
   .description("List all loaded compliance rules")
-  .option("-j, --jurisdiction <code>", "Filter by jurisdiction")
+  .option(
+    "-j, --jurisdiction <code>",
+    "Rules that apply in this jurisdiction (includes sub-jurisdictions and GLOBAL)"
+  )
   .action((opts: { jurisdiction?: string }) => {
     const rulesDir = program.opts().rulesDir;
     const engine = new TrustLintEngine(rulesDir);
@@ -163,9 +178,7 @@ rulesCmd
 
     let applicable: Rule[] = engine.rules;
     if (opts.jurisdiction) {
-      applicable = engine.rules.filter(
-        (r) => r.jurisdiction.toUpperCase() === opts.jurisdiction!.toUpperCase()
-      );
+      applicable = engine.rules.filter((r) => jurisdictionApplies(r.jurisdiction, opts.jurisdiction));
     }
 
     console.log(`\n${BOLD}Loaded Rules (${applicable.length})${RESET}`);
@@ -195,152 +208,28 @@ rulesCmd
     );
   });
 
-program
-  .command("init")
-  .description("Create a .trustlint.yaml config in the current directory")
-  .option("-f, --force", "Overwrite existing config")
-  .action((opts: { force?: boolean }) => {
-    const configPath = path.join(process.cwd(), ".trustlint.yaml");
-
-    if (fs.existsSync(configPath) && !opts.force) {
-      console.log(
-        `${YELLOW}⚠ .trustlint.yaml already exists. Use --force to overwrite.${RESET}`
-      );
-      return;
-    }
-
-    const configContent = `# TrustLint Configuration
-# See: https://github.com/ComplyEdge/complyedge
-
-# Rules directory (default: auto-detect from repo or ~/.trustlint/rules/)
-# rules_dir: ./rules/regulations
-
-# Default jurisdiction filter (optional)
-# jurisdiction: EU
-
-# Severity threshold — only report violations at this level or above
-# severity_threshold: medium
-
-# Files to check (glob patterns)
-# include:
-#   - "**/*.py"
-#   - "**/*.ts"
-#   - "**/*.yaml"
-
-# Files to skip
-# exclude:
-#   - "node_modules/**"
-#   - ".venv/**"
-`;
-
-    fs.writeFileSync(configPath, configContent, "utf-8");
-    console.log(`${GREEN}✅ Created .trustlint.yaml${RESET}`);
-  });
-
 rulesCmd
   .command("update")
-  .description("Download the latest rule corpus from GitHub releases")
+  .description("Explain how to update the rule set (it ships inside the package)")
   .action(async () => {
     const os = await import("node:os");
-    const { execSync } = await import("node:child_process");
-
+    console.log("The rule set ships inside the trustlint package. To update it:");
+    console.log("  npm install trustlint@latest");
     const homeRules = path.join(os.homedir(), ".trustlint", "rules");
-    const rulesReleaseRepo = "ComplyEdge/complyedge";
-    const apiUrl = `https://api.github.com/repos/${rulesReleaseRepo}/releases/latest`;
-
-    console.log(`${BOLD}Updating rules from GitHub...${RESET}`);
-
-    try {
-      const headers: Record<string, string> = {
-        "User-Agent": "trustlint-cli",
-        Accept: "application/vnd.github.v3+json",
-      };
-      const token = process.env.GITHUB_TOKEN;
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      // Fetch latest release metadata
-      const releaseRes = await fetch(apiUrl, { headers });
-      if (!releaseRes.ok) {
-        throw new Error(`GitHub API returned ${releaseRes.status}`);
-      }
-      const release = (await releaseRes.json()) as {
-        tag_name?: string;
-        tarball_url?: string;
-      };
-      const tag = release.tag_name ?? "unknown";
-      const tarballUrl = release.tarball_url;
-      if (!tarballUrl) {
-        console.error(`${RED}Error: no tarball_url in release${RESET}`);
-        process.exit(2);
-      }
-
-      console.log(`  Latest release: ${tag}`);
-
-      // Download tarball
-      const tarballRes = await fetch(tarballUrl, { headers, redirect: "follow" });
-      if (!tarballRes.ok) {
-        throw new Error(`Tarball download failed: ${tarballRes.status}`);
-      }
-      const tarballBuf = Buffer.from(await tarballRes.arrayBuffer());
-
-      // Write to temp file and extract YAML rules
-      const tmpDir = os.tmpdir();
-      const tmpTar = path.join(tmpDir, "trustlint-rules.tar.gz");
-      fs.writeFileSync(tmpTar, tarballBuf);
-
-      // Ensure destination exists
-      fs.mkdirSync(homeRules, { recursive: true });
-
-      // Extract only rules/regulations/**/*.yaml from the tarball
-      const tmpExtract = path.join(tmpDir, "trustlint-extract");
-      fs.mkdirSync(tmpExtract, { recursive: true });
-      execSync(`tar xzf "${tmpTar}" -C "${tmpExtract}"`, { stdio: "pipe" });
-
-      // Find and copy rule YAML files
-      let copied = 0;
-      function walkDir(dir: string): void {
-        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-          const full = path.join(dir, entry.name);
-          if (entry.isDirectory()) {
-            walkDir(full);
-          } else if (entry.name.endsWith(".yaml")) {
-            const idx = full.indexOf("/rules/regulations/");
-            if (idx !== -1) {
-              const relative = full.slice(idx + "/rules/regulations/".length);
-              const dest = path.join(homeRules, relative);
-              fs.mkdirSync(path.dirname(dest), { recursive: true });
-              fs.copyFileSync(full, dest);
-              copied++;
-            }
-          }
-        }
-      }
-      walkDir(tmpExtract);
-
-      // Cleanup
-      fs.rmSync(tmpTar, { force: true });
-      fs.rmSync(tmpExtract, { recursive: true, force: true });
-
+    if (fs.existsSync(homeRules)) {
       console.log(
-        `${GREEN}✅ Updated ${copied} rules to ~/.trustlint/rules/ (release ${tag})${RESET}`
+        `${DIM}${homeRules} is no longer read (an older copy downloaded by this command); you can delete it.${RESET}`
       );
-    } catch (e) {
-      console.error(
-        `${RED}Error updating rules: ${e instanceof Error ? e.message : e}${RESET}`
-      );
-      process.exit(2);
     }
   });
 
 program
   .command("scan [target]")
-  .description("Run Tier 2 LLM compliance analysis via ComplyEdge API")
+  .description("Run the hosted ComplyEdge check (POST /v1/check), which writes an audit record")
   .option("-t, --text <text>", "Text string to check")
   .option(
     "--api-key <key>",
-    "API key for Tier 2 LLM analysis",
+    "API key for the hosted check (writes an audit record)",
     process.env.COMPLYEDGE_API_KEY
   )
   .action(
@@ -379,7 +268,7 @@ program
       }
 
       try {
-        const response = await fetch("https://eu.api.complyedge.io/v1/check", {
+        const response = await fetch(scanUrl(opts.apiKey), {
           method: "POST",
           headers: {
             Authorization: `Bearer ${opts.apiKey}`,
@@ -404,12 +293,12 @@ program
 
         if (data.allowed) {
           console.log(
-            `\n${GREEN}${BOLD}✅ PASS${RESET} — no violations (${data.latency_ms}ms, API)`
+            `\n${GREEN}${BOLD}✅ PASS${RESET}: no violations (${data.latency_ms}ms, API)`
           );
         } else {
           const violations = data.violations ?? [];
           console.log(
-            `\n${RED}${BOLD}❌ BLOCKED${RESET} — ${violations.length} violation(s) (${data.latency_ms}ms, API)`
+            `\n${RED}${BOLD}❌ BLOCKED${RESET}: ${violations.length} violation(s) (${data.latency_ms}ms, API)`
           );
           for (const v of violations) {
             console.log(

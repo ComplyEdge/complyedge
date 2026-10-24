@@ -1,15 +1,15 @@
 {
   "benchmark": "layer1_latency",
   "kind": "local_reproducible_microbenchmark",
-  "generated_at": "2026-08-04T21:51:24.259645+00:00",
+  "generated_at": "2026-10-21T01:23:50.437599Z",
   "iterations": 500,
   "note": "Local reproducible microbenchmark of the deterministic hot path (OPA/Rego bundle + TrustLint regex, no LLM). Prod latency is tracked per request via opa_latency_ms -> CloudWatch.",
   "environment": {
-    "cpu_count": 8,
-    "load_avg_1m": 6.54,
-    "load_avg_5m": 9.32,
-    "load_avg_15m": 9.14,
-    "load_per_cpu_1m": 0.82,
+    "cpu_count": 10,
+    "load_avg_1m": 1.81,
+    "load_avg_5m": 2.45,
+    "load_avg_15m": 3.0,
+    "load_per_cpu_1m": 0.18,
     "saturated": false,
     "note": "saturated=true means load average exceeded CPU count during the run, so these figures are an upper bound, not the platform's capability. Re-run on an idle host before publishing a headline."
   },
@@ -19,47 +19,45 @@
     "gpai",
     "article6",
     "highrisk",
-    "prompt_security"
+    "prompt_security",
+    "data_protection",
+    "us_corpus"
   ],
-  "trials_run": 5,
+  "trials_run": 1,
   "trial_hotpath_p99_ms": [
-    4.866,
-    5.241,
-    6.675,
-    5.137,
-    5.193
+    1.018
   ],
   "trial_selection": "Reported figures come from the fastest of trials_run complete runs. Contention noise is additive, so the minimum is the best available estimate of uncontended performance on a shared host. Every trial's p99 is listed above so the selection is auditable.",
   "opa": {
-    "opa_version": "Version: 1.18.2",
+    "opa_version": "Version: 1.20.2",
     "opa_per_request_sequential_ms": {
       "n": 500,
-      "p50": 9.551,
-      "p95": 13.053,
-      "p99": 17.529,
-      "mean": 10.263,
-      "max": 123.648
+      "p50": 2.827,
+      "p95": 3.671,
+      "p99": 4.055,
+      "mean": 2.91,
+      "max": 14.204
     },
     "opa_single_package_ms": {
-      "n": 3000,
-      "p50": 1.578,
-      "p95": 2.349,
-      "p99": 3.549,
-      "mean": 1.709,
-      "max": 98.586
+      "n": 4000,
+      "p50": 0.365,
+      "p95": 0.424,
+      "p99": 0.797,
+      "mean": 0.364,
+      "max": 11.788
     }
   },
   "trustlint": {
-    "rules_loaded": 64,
+    "rules_loaded": 63,
     "trustlint_regex_ms": {
       "n": 500,
-      "p50": 0.921,
-      "p95": 1.118,
-      "p99": 1.317,
-      "mean": 0.95,
-      "max": 1.548
+      "p50": 0.212,
+      "p95": 0.219,
+      "p99": 0.221,
+      "mean": 0.213,
+      "max": 0.229
     }
   },
-  "layer1_hotpath_p99_ms_parallel": 4.866,
+  "layer1_hotpath_p99_ms_parallel": 1.018,
   "under_100ms_p99": true
 }

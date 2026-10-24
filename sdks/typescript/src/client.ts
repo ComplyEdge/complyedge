@@ -13,6 +13,7 @@ import type {
   PreDeploymentInput,
   PreDeploymentResult,
 } from "./types";
+import { ReceiptJournal } from "./receiptJournal";
 
 // ComplyEdge runs two regions. A tenant lives in exactly one of them.
 // The key says which host to call. It does not move the account.
@@ -83,6 +84,7 @@ export class ComplyEdgeClient {
   private userId?: string;
   private userRole?: string;
   private sessionId?: string;
+  private receiptJournal?: ReceiptJournal;
 
   constructor(config: ComplyEdgeConfig) {
     const baseUrl = resolveBaseUrl({
@@ -96,6 +98,9 @@ export class ComplyEdgeClient {
     this.userId = config.userId;
     this.userRole = config.userRole;
     this.sessionId = config.sessionId;
+    if (config.receiptJournalPath) {
+      this.receiptJournal = new ReceiptJournal(config.receiptJournalPath);
+    }
 
     this.http = axios.create({
       baseURL: baseUrl,
@@ -152,6 +157,7 @@ export class ComplyEdgeClient {
       direction: context?.direction ?? "output",
       use_semantic_fallback: false,
       context: this.attribution(context),
+      decision_context: context?.decisionContext,
     });
 
     const data = response.data;
@@ -159,7 +165,7 @@ export class ComplyEdgeClient {
     // Missing `allowed` is a block. `!== false` treated a truncated 200 as a pass.
     const allowed = data.allowed === true;
 
-    return {
+    const result: ComplianceResult = {
       eventId: data.event_id || "",
       allowed,
       status: allowed ? "safe" : "violation",
@@ -173,16 +179,20 @@ export class ComplyEdgeClient {
       })),
       latencyMs: data.latency_ms || 0,
       bundleVersion: data.bundle_version || "",
+      bundleDigest: data.bundle_digest ?? undefined,
       evaluatedRules: data.evaluated_rules || [],
       enginePath: data.engine_path || "opa",
       opaLatencyMs: data.opa_latency_ms,
       auditLogged: data.audit_logged === true,
       sandbox: data.sandbox === true,
       textHash: data.text_hash || "",
+      textHashAlg: data.text_hash_alg ?? undefined,
       timestamp: data.timestamp,
       jurisdiction,
       processingTimeMs,
     };
+    this.receiptJournal?.appendResult(result);
+    return result;
   }
 
   /**
@@ -229,6 +239,19 @@ export class ComplyEdgeClient {
       jurisdiction,
       processingTimeMs: Date.now() - start,
     };
+  }
+
+  /**
+   * True when the audit record `eventId` was a decision about exactly `text`.
+   *
+   * The record's textHash is keyed with the account's key, which never leaves
+   * ComplyEdge, so the comparison runs server-side (POST /v1/audit/verify).
+   * The text is used for that request only: not stored, not logged. False also
+   * when the account's key was destroyed. An unknown eventId rejects (404).
+   */
+  async verifyInput(eventId: string, text: string): Promise<boolean> {
+    const response = await this.http.post("/v1/audit/verify", { event_id: eventId, text });
+    return response.data?.match === true;
   }
 
   /**

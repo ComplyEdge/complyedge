@@ -1,10 +1,28 @@
 id: PROMPT_SECURITY_TOOL_CALL_HIJACK_001
 jurisdiction: GLOBAL
-effective_date: '2026-07-05'
-description: 'Detects tool/function-call hijacking: injected instructions that direct an agent to invoke
-  tools for the attacker (forward secrets, send data to an external address, run commands). EU AI Act
-  Article 15. OWASP LLM01 / LLM07.'
-title: Injection — tool / function-call hijacking
+effective_date: '2027-12-02'
+description: >-
+  Covers tool/function-call hijacking: injected instructions that direct an
+  agent to invoke tools for the attacker (forward secrets, send data to an
+  external address, run commands). EU AI Act Article 15. OWASP LLM01 / LLM07.
+
+
+  Layer 1 detects: in any letter case, forward, send, post, transmit,
+  exfiltrate, leak, upload or email, then within 90 characters (no ".", "!", "?"
+  or line break between) "system prompt", credential(s), "API key(s)",
+  secret(s), conversation, "chat history", password or "the above", then within
+  90 more such characters "to" followed by an http or https URL or by an address
+  containing "@"; make, issue, perform or execute "a" or "an" HTTP, HTTPS, GET,
+  POST, curl or fetch "request to" an http or https URL; and call, invoke, use
+  or execute (optionally "the") one word followed by tool, function or API, then
+  "to send", "to forward", "to exfiltrate", "to leak", "to delete" or "to
+  transfer", or "with my" or "with the user's" credential(s) or secret(s). It
+  matches wording, not meaning: it does not read whose data goes where or at
+  whose request, so it fires on the user's own request ("Email the chat history
+  to ana@example.com", "use the email tool to send the invoice"), and it misses
+  a hijack worded any other way. Whether the text directs the agent to act for
+  an attacker is judged in Layer 2.
+title: 'Injection: tool / function-call hijacking'
 detection_scope: all
 conditions:
 - type: regex
@@ -13,25 +31,45 @@ conditions:
 severity: critical
 category: security
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_15/par_5/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 15(5)'
   regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
-  article: Regulation (EU) 2024/1689, Article 15
+  article: Regulation (EU) 2024/1689, Article 15(5)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
-  citation: 'Regulation (EU) 2024/1689 (EU AI Act), Article 15(5): "High-risk AI systems shall be resilient
-    against attempts by unauthorised third parties to alter their use, outputs or performance by exploiting
-    system vulnerabilities. The technical solutions aiming to ensure the cybersecurity of high-risk AI
-    systems shall be appropriate to the relevant circumstances and the risks."'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 15(5): High-risk AI systems shall be
+    resilient against attempts by unauthorised third parties to alter their use,
+    outputs or performance by exploiting system vulnerabilities. The technical
+    solutions aiming to ensure the cybersecurity of high-risk AI systems shall
+    be appropriate to the relevant circumstances and the risks. The technical
+    solutions to address AI specific vulnerabilities shall include, where
+    appropriate, measures to prevent, detect, respond to, resolve and control
+    for attacks trying to manipulate the training data set (data poisoning), or
+    pre-trained components used in training (model poisoning), inputs designed
+    to cause the AI model to make a mistake (adversarial examples or model
+    evasion), confidentiality attacks or model flaws.
   last_updated: '2026-07-05'
   citations:
   - 'Secondary reference (not the legal basis): OWASP Top 10 for LLM Applications, https://owasp.org/www-project-top-10-for-large-language-model-applications/'
 remediation:
   action: block
   timing: proactive
-  message: 🛑 Blocked — this content attempts to hijack the agent's tools/functions to exfiltrate data
-    or act for a third party.
+  message: >-
+    🛑 Blocked: this content matches a pattern of instructions directing an agent
+    to invoke tools to send data externally, forward secrets or run commands.
+    Article 15(5) applies to high-risk AI systems from 2 December 2027
+    (Annex III) and 2 August 2028 (Annex I): this finding is readiness
+    tooling, not a currently binding obligation.
   suggestion: Never let untrusted content trigger tool calls that send data externally. Gate tool invocation
     behind explicit human confirmation for high-risk actions.
   allow_override: false
   require_explicit_consent: false
+compliance_notes:
+  - >-
+    Article 15 applies from 2 December 2027 for high-risk AI systems under Annex
+    III and from 2 August 2028 for high-risk AI systems under Annex I (Article
+    113, third paragraph, point (c), as amended by Regulation (EU) 2026/1744).
+    effective_date records the Annex III date.
 version: 1.0.0
 tags:
 - prompt_injection
@@ -44,3 +82,7 @@ tags:
 - owasp_llm07
 - security
 tier: community
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

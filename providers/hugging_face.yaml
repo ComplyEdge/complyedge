@@ -1,5 +1,5 @@
 provider_id: hugging_face
-provider_name: Hugging Face (first-party models — SmolLM3 / SmolLM family)
+provider_name: Hugging Face (first-party models, SmolLM3 / SmolLM family)
 model_class: open_weights
 systemic_risk_threshold: false
 last_updated: '2026-07-10'

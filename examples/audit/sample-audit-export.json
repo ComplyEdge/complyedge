@@ -1025,5 +1025,5 @@
   ],
   "chain_head": "73d585212e7c98614d6e11f1d473b960829a522557a8d0d024405536ee0cb9ad",
   "chain_algorithm": "sha256-v1",
-  "note": "23 events from a live production /v1/check + /v1/audit/export run after EV-01 (rule-corpus bundle_digest binding) shipped. tenant_id, api_key_id, user_id and session_id redacted; chain rebuilt with production build_hash_chain over the redacted events so the published file verifies."
+  "note": "23 events from a live production /v1/check + /v1/audit/export run after the rule-corpus digest (bundle_digest) binding shipped. tenant_id, api_key_id, user_id and session_id redacted; chain rebuilt with production build_hash_chain over the redacted events so the published file verifies."
 }

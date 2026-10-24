@@ -1,5 +1,5 @@
 id: IL_BIPA_BIOMETRIC_001
-jurisdiction: US
+jurisdiction: US-IL
 effective_date: '2008-10-03'
 description: >-
   Prohibits private entities from collecting, capturing, or otherwise
@@ -7,6 +7,33 @@ description: >-
   obtaining informed written consent. Requires written retention and
   destruction policies. Illinois Biometric Information Privacy Act (BIPA),
   740 ILCS 14/15.
+
+
+  Layer 1 detects: collect (and words that begin with it), then biometric,
+  fingerprint, retina, iris, voiceprint, face geometry or facial recognition,
+  then data, identifier or information, then without or lacking, then consent,
+  written release, authorization or notice; biometric, fingerprint or facial
+  recognition data, identifier or information, then collected, captured,
+  obtained or stored, then without or lacking, then consent, written consent,
+  written release or notification; sell, trade, lease or profit from (and words
+  that begin with them, so sells and traded but not trading), then biometric,
+  fingerprint or facial, then data, identifier or information; the bare phrases
+  no consent, no written release, no retention policy or no destruction policy
+  (optionally no biometric consent), about biometrics or not, with "no" as a
+  word of its own; fail, failing,
+  failure or failed, then to inform, notify, obtain consent or provide notice
+  about, before, for or regarding biometric; and scan, capture or record (and
+  words that begin with them, so captured but not capturing), then face,
+  fingerprint, iris, retina or voice, then without or lacking, then consent,
+  permission or notice. The words follow each other with nothing in between. It
+  matches wording, not meaning: it misses the practice told in other words
+  ("Roll out the face-scan check-in at the Springfield stores on Monday; skip
+  the consent form, it slows the line."; "Sell the facial recognition data to
+  the ad network" has "recognition" between "facial" and "data"), and it fires
+  on a policy that rules the practice out ("Our handbook states we never sell
+  biometric data and we publish our destruction schedule online."). It applies
+  to an end user in Illinois (US-IL) and to a US-wide check, not to another
+  state. Whether a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -17,7 +44,7 @@ conditions:
     the subject in writing that biometric data is being collected or stored;
     (2) informing the subject of the specific purpose and length of term for
     which the data is being used; and (3) receiving a written release from
-    the subject — as required by the Illinois Biometric Information Privacy
+    the subject, as required by the Illinois Biometric Information Privacy
     Act (740 ILCS 14/15). Biometric identifiers include retina or iris scans,
     fingerprints, voiceprints, scans of hand or face geometry. Also detect
     selling, leasing, trading, or profiting from biometric data.
@@ -25,20 +52,22 @@ conditions:
     written consent.
   model: gpt-4
 # Context-gated biometric keyword detection (fingerprint, iris scan, etc.)
-# requires Layer 2 evaluation — bare keywords must not fire this critical
+# requires Layer 2 evaluation: bare keywords must not fire this critical
 # block-action rule standalone. Layer 1 coverage is the consent-violation
 # regex below; broader context lives in the semantic condition above.
 - type: regex
   value: >-
-    (collect\w*\s+(?:biometric|fingerprint|retina|iris|voiceprint|face\s+geometry|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:without|lacking)\s+(?:consent|written\s+release|authorization|notice)|(?:biometric|fingerprint|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:collected|captured|obtained|stored)\s+(?:without|lacking)\s+(?:consent|written\s+consent|written\s+release|notification)|(?:sell|trade|lease|profit\s+from)\w*\s+(?:biometric|fingerprint|facial)\s+(?:data|identifier|information)|no\s+(?:biometric\s+)?(?:consent|written\s+release|retention\s+policy|destruction\s+policy)|fail(?:ing|ure|ed)?\s+to\s+(?:inform|notify|obtain\s+consent|provide\s+notice)\s+(?:about|before|for|regarding)\s+biometric|(?:scan|capture|record)\w*\s+(?:face|fingerprint|iris|retina|voice)\s+(?:without|lacking)\s+(?:consent|permission|notice))
+    (collect\w*\s+(?:biometric|fingerprint|retina|iris|voiceprint|face\s+geometry|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:without|lacking)\s+(?:consent|written\s+release|authorization|notice)|(?:biometric|fingerprint|facial\s+recognition)\s+(?:data|identifier|information)\s+(?:collected|captured|obtained|stored)\s+(?:without|lacking)\s+(?:consent|written\s+consent|written\s+release|notification)|(?:sell|trade|lease|profit\s+from)\w*\s+(?:biometric|fingerprint|facial)\s+(?:data|identifier|information)|\bno\s+(?:biometric\s+)?(?:consent|written\s+release|retention\s+policy|destruction\s+policy)|fail(?:ing|ure|ed)?\s+to\s+(?:inform|notify|obtain\s+consent|provide\s+notice)\s+(?:about|before|for|regarding)\s+biometric|(?:scan|capture|record)\w*\s+(?:face|fingerprint|iris|retina|voice)\s+(?:without|lacking)\s+(?:consent|permission|notice))
   flags: i
 severity: critical
 category: privacy
 source:
+  provision_url: https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57
+  provision_label: '740 ILCS 14/15 (Illinois BIPA)'
   regulation: Illinois BIPA
   article: 740 ILCS 14/15
   url: https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57
-  last_updated: '2024-02-09'
+  last_updated: '2024-08-02'
   citation: >-
     740 ILCS 14/15(a): A private entity in possession of biometric identifiers
     or biometric information must develop a written policy, made available to
@@ -63,25 +92,43 @@ source:
     or a customer's biometric identifier or biometric information.
 penalty_information:
   civil_penalties:
-    sec_enforcement: >-
-      $1,000 per negligent violation, $5,000 per intentional or reckless
-      violation, plus attorney's fees and costs. Per-scan accrual established
-      by Illinois Supreme Court in Cothron v. White Castle (2023).
+    private_right_of_action: >-
+      Liquidated damages of $1,000 per negligent violation and $5,000 per
+      intentional or reckless violation, or actual damages if greater, plus
+      attorney's fees and costs (740 ILCS 14/20(a)). Since Public Act 103-0769
+      (SB 2979, signed 2 August 2024), repeated collection of the same
+      identifier from the same person by the same method is a single violation
+      of Section 15(b), and repeated disclosure to the same recipient a single
+      violation of Section 15(d), with at most one recovery (740 ILCS 14/20(b)
+      and (c)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — The Illinois Biometric Information Privacy Act (740 ILCS 14/15)
-    requires informed written consent before collecting any biometric
-    identifiers or information. Selling or profiting from biometric data is
-    prohibited. Penalties: $1,000-$5,000 per violation with per-scan accrual.
+    BLOCKED: The Illinois Biometric Information Privacy Act (740 ILCS 14/15)
+    requires informed written consent before collecting biometric identifiers or
+    biometric information, and prohibits selling or profiting from them. A
+    prevailing party may recover liquidated damages of $1,000 per negligent
+    violation and $5,000 per intentional or reckless violation (740 ILCS 14/20).
   suggestion: >-
     Before collecting any biometric data: (1) provide written notice that
     biometric identifiers are being collected or stored; (2) state the
     specific purpose and retention period in writing; (3) obtain a written
     release from the individual. Develop and publish a written retention and
     destruction policy. Never sell, lease, or trade biometric data.
-version: 1.1.0
+compliance_notes:
+- >-
+  Legislative findings (740 ILCS 14/5, P.A. 95-994, effective 3 October 2008):
+  biometrics are unlike other unique identifiers because they cannot be
+  changed once compromised, and regulating their collection, use, retention
+  and destruction serves the public welfare, security and safety.
+- >-
+  Sources read on 2026-10-22: ilga.gov refused connections from the review
+  environment, so the official ilga.gov page for 740 ILCS 14 was read in full
+  from the Internet Archive capture of 2025-03-01. Section 15(a) to (e) (P.A.
+  95-994) and Section 20(a) to (c) (P.A. 103-769, eff. 8-2-24) match the
+  citation and penalty text above word for word.
+version: 1.2.0
 tags:
 - bipa
 - illinois
@@ -90,3 +137,7 @@ tags:
 - facial-recognition
 - written-consent
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

@@ -1,11 +1,27 @@
 id: HIPAA_PHI_DISCLOSURE_001
 jurisdiction: US
-effective_date: '1996-08-21'
-description: Protected Health Information (PHI) cannot be disclosed without patient
-  authorization
+effective_date: '2003-04-14'
+description: >-
+  Protected health information (PHI) may be used or disclosed only as the HIPAA
+  Privacy Rule permits or requires, for example for treatment, payment or health
+  care operations (45 CFR 164.506), for the purposes in 45 CFR 164.512, or with
+  a valid authorization (45 CFR 164.508).
+
+
+  Layer 1 detects: disclose, share, transmit or send (alone or with the endings
+  s, d, ed, ing, ted or ting, and also at the end of a longer word), followed
+  anywhere later on the same line by health, medical or patient, then
+  information, data or records. It matches wording, not meaning: it fires on
+  disclosures the rule's own description permits, such as treatment ("Send the
+  patient records to the treating orthopedist for tomorrow's surgery."), and on
+  training about disclosure; it misses a disclosure told in other words ("Email
+  Mr. Gomez's HIV test result to his employer's HR manager, they asked for
+  it."); and it does not read the treatment, payment, operations, 164.512 or
+  authorization exceptions. Whether a disclosure is permitted is judged in Layer
+  2.
 conditions:
 - type: regex
-  value: (disclose|share|transmit|send).*(health|medical|patient) (information|data|records)
+  value: (disclose|share|transmit|send)(?:s|d|ed|ing|ted|ting)?\b.*(health|medical|patient)\s(information|data|records)
   flags: i
 - type: metadata
   key: data_type
@@ -18,6 +34,8 @@ conditions:
 severity: high
 category: healthcare
 source:
+  provision_url: https://www.ecfr.gov/current/title-45/section-164.502
+  provision_label: '45 CFR 164.502(a) (HIPAA Privacy Rule)'
   regulation: HIPAA
   article: 45 CFR § 164.502
   url: https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html
@@ -32,9 +50,19 @@ exceptions:
   description: Reporting to public health authorities as required
 remediation:
   action: block
-  message: HIPAA prohibits disclosure of PHI without patient authorization
-  suggestion: Obtain written patient authorization before disclosing protected health
-    information
+  message: >-
+    HIPAA (45 CFR 164.502(a)) prohibits a covered entity or business associate
+    from using or disclosing protected health information except as the Privacy
+    Rule permits or requires.
+  suggestion: >-
+    Confirm the disclosure is permitted (for example treatment, payment or
+    health care operations under 45 CFR 164.506, or a purpose under 45 CFR
+    164.512), or obtain a valid written authorization under 45 CFR 164.508
+    before disclosing.
+compliance_notes:
+  - >-
+    Covered entities other than small health plans had to comply with the
+    Privacy Rule by April 14, 2003 (45 CFR 164.534(a)).
 version: 1.0.0
 tags:
 - phi
@@ -42,3 +70,7 @@ tags:
 - disclosure
 - authorization
 tier: developer
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

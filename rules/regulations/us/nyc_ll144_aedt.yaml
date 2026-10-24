@@ -1,12 +1,34 @@
 id: NYC_LL144_AEDT_001
 jurisdiction: US-NY
-effective_date: '2023-07-05'
+effective_date: '2023-01-01'
 description: >-
   Prohibits employers and employment agencies in New York City from using an
   automated employment decision tool (AEDT) unless: (1) the tool has been
   subject to a bias audit within one year of use, (2) information about the
   bias audit is publicly available, and (3) certain notices have been
   provided to employees or job candidates. NYC Local Law 144 of 2021.
+
+
+  Layer 1 detects: use, using or deploy (and words that begin with them), then
+  AEDT, automated employment decision tool, AI hiring, recruiting or screening
+  tool, or algorithmic hiring, screening or recruiting, then without or lacking,
+  then bias audit or disparate impact audit or analysis; no or without, then
+  bias audit or independent audit, then of or for, then a hiring, employment,
+  recruiting or screening tool, system, algorithm or AI; a hiring, recruiting or
+  screening tool, algorithm or AI audit (or bias audit) not public, posted,
+  disclosed or published; fail, failing, skip or skipping (to) notify, inform or
+  notice a candidate, applicant or employee, singular, about, of or regarding an
+  AEDT, automated, AI or algorithmic tool, system or use; no or without
+  candidate, applicant or employee notice before or prior to an AEDT, automated
+  employment or AI hiring; and NYC or New York City hiring, employment or
+  recruiting AI, algorithm or tool, then without or lacking, then audit, notice
+  or compliance. The words follow each other with nothing in between. It matches
+  wording, not meaning: it misses the practice told in other words ("Use the AI
+  screening tool without bias audit for the Brooklyn warehouse hiring." has the
+  word "the" after "Use"; "Skip notifying candidates about automated tool use in
+  our NYC hiring." uses notifying and candidates), and it fires on text that
+  only names the practice. Whether a tool is used without its audit or notice is
+  judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -28,42 +50,48 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    ((?:use|using|deploy|deploying)\w*\s+(?:AEDT|automated\s+employment\s+decision\s+tool|AI\s+(?:hiring|recruit\w*|screening)\s+tool|algorithmic\s+(?:hiring|screening|recruit\w*))\s+(?:without|lacking)\s+(?:bias\s+audit|disparate\s+impact\s+(?:audit|analysis))|(?:no|without)\s+(?:bias\s+audit|independent\s+audit)\s+(?:of|for)\s+(?:hiring|employment|recruit\w*|screening)\s+(?:tool|system|algorithm|AI)|(?:hiring|recruit\w*|screening)\s+(?:tool|algorithm|AI)\s+(?:bias\s+)?audit\s+(?:not\s+)?(?:public|posted|disclosed|published)|(?:fail|failing|skip|skipping)\w*\s+(?:to\s+)?(?:notify|inform|notice)\s+(?:candidate|applicant|employee)\s+(?:about|of|regarding)\s+(?:AEDT|automated|AI|algorithmic)\s+(?:tool|system|use)|(?:no|without)\s+(?:candidate|applicant|employee)\s+notice\s+(?:before|prior\s+to)\s+(?:AEDT|automated\s+employment|AI\s+hiring)|(?:NYC|New\s+York\s+City)\s+(?:hiring|employment|recruit\w*)\s+(?:AI|algorithm|tool)\s+(?:without|lacking)\s+(?:audit|notice|compliance))
+    ((?:use|using|deploy|deploying)\w*\s+(?:AEDT|automated\s+employment\s+decision\s+tool|AI\s+(?:hiring|recruit\w*|screening)\s+tool|algorithmic\s+(?:hiring|screening|recruit\w*))\s+(?:without|lacking)\s+(?:bias\s+audit|disparate\s+impact\s+(?:audit|analysis))|\b(?:no|without)\s+(?:bias\s+audit|independent\s+audit)\s+(?:of|for)\s+(?:hiring|employment|recruit\w*|screening)\s+(?:tool|system|algorithm|AI)|(?:hiring|recruit\w*|screening)\s+(?:tool|algorithm|AI)\s+(?:bias\s+)?audit\s+not\s+(?:public|posted|disclosed|published)|(?:fail|failing|skip|skipping)\w*\s+(?:to\s+)?(?:notify|inform|notice)\s+(?:candidate|applicant|employee)\s+(?:about|of|regarding)\s+(?:AEDT|automated|AI|algorithmic)\s+(?:tool|system|use)|\b(?:no|without)\s+(?:candidate|applicant|employee)\s+notice\s+(?:before|prior\s+to)\s+(?:AEDT|automated\s+employment|AI\s+hiring)|(?:NYC|New\s+York\s+City)\s+(?:hiring|employment|recruit\w*)\s+(?:AI|algorithm|tool)\s+(?:without|lacking)\s+(?:audit|notice|compliance))
   flags: i
 severity: high
 category: employment
 source:
+  provision_url: >-
+    https://legistar.council.nyc.gov/LegislationDetail.aspx?ID=4344524&GUID=B051915D-A9AC-451E-81F8-6596032FA3F9
+  provision_label: NYC Administrative Code section 20-871(a) (Local Law 144 of 2021)
   regulation: NYC Local Law 144 of 2021
-  article: NYC Admin Code §20-870 et seq.
+  article: NYC Admin Code §20-871(a)
   url: https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page
   last_updated: '2023-07-05'
   citation: >-
-    NYC Department of Consumer and Worker Protection (official summary of
-    Local Law 144 of 2021): Local Law 144 of 2021 regarding automated
-    employment decision tools ("AEDT") prohibits employers and employment
-    agencies from using an automated employment decision tool unless the tool
-    has been subject to a bias audit within one year of the use of the tool,
-    information about the bias audit is publicly available, and certain
-    notices have been provided to employees or job candidates. The Department
-    of Consumer and Worker Protection began enforcement of this law and rule
-    on July 5, 2023. The Notice must be provided 10 business days prior to
-    use of an AEDT.
+    NYC Admin Code §20-871(a): In the city, it shall be unlawful for an employer
+    or an employment agency to use an automated employment decision tool to
+    screen a candidate or employee for an employment decision unless: 1. Such
+    tool has been the subject of a bias audit conducted no more than one year
+    prior to the use of such tool; and 2. A summary of the results of the most
+    recent bias audit of such tool as well as the distribution date of the tool
+    to which such audit applies has been made publicly available on the website
+    of the employer or employment agency prior to the use of such tool.
 penalty_information:
   civil_penalties:
-    sec_enforcement: >-
-      Civil penalties of $500 for first violation and each additional
-      violation occurring on the same day; $500 to $1,500 for each subsequent
-      violation. Each day of non-compliant use and each failure to provide
-      notice constitutes a separate violation.
+    city_enforcement: >-
+      A civil penalty of not more than $500 for a first violation and each
+      additional violation on the same day, and from $500 to $1,500 for each
+      subsequent violation; each day of non-compliant use and each failure to
+      give a required notice is a separate violation (NYC Admin Code §20-872).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — NYC Local Law 144 prohibits employers and employment agencies
-    from using an automated employment decision tool (AEDT) without: a bias
-    audit within the past year, public posting of audit results, and 10
-    business days advance notice to candidates and employees. Penalties up
-    to $1,500 per violation per day.
+    BLOCKED: NYC Local Law 144 (Admin Code §20-871(a)) makes it unlawful for an
+    employer or employment agency in the city to use an automated employment
+    decision tool to screen a candidate or employee unless the tool has had a
+    bias audit no more than one year before use and a summary of the results has
+    been made public. Section 20-871(b) also requires notice to candidates and
+    employees no less than ten business days before use. Penalties: a civil
+    penalty of not more than $500 for a first violation and each additional
+    violation on the same day, and from $500 to $1,500 for each subsequent
+    violation; each day of non-compliant use and each failure to give a required
+    notice is a separate violation (NYC Admin Code §20-872).
   suggestion: >-
     Before using any AEDT for NYC employment decisions: (1) commission an
     independent bias audit measuring selection rates and impact ratios across
@@ -73,6 +101,11 @@ remediation:
     with notice at least 10 business days before AEDT use including job
     qualifications/characteristics used and instructions for requesting an
     alternative selection process or accommodation.
+compliance_notes:
+  - >-
+    Local Law 144 of 2021 took effect on January 1, 2023 (section 2). The
+    Department of Consumer and Worker Protection's implementing rules (6 RCNY
+    5-300 to 5-304) took effect on July 5, 2023.
 version: 1.0.0
 tags:
 - nyc
@@ -83,3 +116,7 @@ tags:
 - hiring
 - employment
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

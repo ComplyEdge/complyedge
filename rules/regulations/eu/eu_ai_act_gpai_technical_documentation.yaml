@@ -7,6 +7,22 @@ description: >-
   testing processes and evaluation results, and to make it available to the
   AI Office and national competent authorities on request. Article 53(1)(a)
   mandates technical documentation per Annex XI.
+
+
+  Layer 1 detects: deploy, release, distribute, ship or launch,
+  in any form, optionally "a" or "the", then GPAI, general-purpose AI,
+  foundation model, large language model or LLM, then without, lacking,
+  missing or no, then documentation, model card, technical documentation,
+  technical docs or data sheet ("ship the foundation model missing technical
+  documentation"); and, as a second sequence, "no" or "without" as words of
+  their own, then "Annex XI" or "technical documentation", then "for" or "of",
+  then GPAI, general-purpose AI or foundation model ("without technical
+  documentation for the GPAI" does not match, "the" is not allowed there). It
+  matches wording, not meaning: it does not read whether
+  Annex XI documentation exists, so it misses the practice told in other words
+  ("We release the weights of our GPAI model on Friday; the Annex XI file is
+  not written yet."), and it fires on text that only names the practice, such
+  as a refusal. Whether a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -17,39 +33,43 @@ conditions:
     processes as mandated by Article 53(1)(a) of the EU AI Act.
   model: gpt-4
 - type: regex
-  value: (deploy|release|distribute|ship|launch)\w*\s+(a\s+|the\s+)?(gpai|general[\-\s]purpose\s+ai|foundation\s+model|large\s+language\s+model|llm)\s+(without|lacking|missing|no)\s+(documentation|model\s+card|technical\s+documentation|technical\s+docs|data\s+sheet)
+  value: ((deploy|release|distribute|ship|launch)\w*\s+(a\s+|the\s+)?(gpai|general[\-\s]purpose\s+ai|foundation\s+model|large\s+language\s+model|llm)\s+(without|lacking|missing|no)\s+(documentation|model\s+card|technical\s+documentation|technical\s+docs|data\s+sheet)|\b(?:no|without)\s+(?:Annex\s+XI|technical\s+documentation)\s+(?:for|of)\s+(?:GPAI|general[\-\s]purpose\s+AI|foundation\s+model))
   flags: i
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_53/par_1/pnt_a/oj
+  provision_label: Regulation (EU) 2024/1689, Article 53(1)(a)
   regulation: EU AI Act
   article: Article 53(1)(a)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 53(1)(a-b): Providers of
-    general-purpose AI models shall draw up and keep up-to-date the
-    technical documentation of the model, including its training and
-    testing process and the results of its evaluation, which shall
-    contain, at a minimum, the information set out in Annex XI for the
-    purpose of providing it, upon request, to the AI Office and the
-    national competent authorities.
+    Regulation (EU) 2024/1689, Article 53(1)(a): draw up and keep up-to-date the
+    technical documentation of the model, including its training and testing
+    process and the results of its evaluation, which shall contain, at a
+    minimum, the information set out in Annex XI for the purpose of providing
+    it, upon request, to the AI Office and the national competent authorities;
 remediation:
   action: warn
   timing: proactive
   message: >-
-    WARNING — EU AI Act Article 53(1)(a) requires GPAI model providers to
-    maintain comprehensive technical documentation including training
-    processes, testing methodology, and evaluation results (minimum content
-    set out in Annex XI).
-    Deploying without documentation may result in penalties of up to
-    EUR 15M or 3% of global annual revenue.
+    WARNING: EU AI Act Article 53(1)(a) requires providers of general-purpose AI
+    models to draw up and keep up to date technical documentation of the model,
+    including its training and testing process and evaluation results,
+    containing at least the Annex XI information, for provision to the AI Office
+    and national competent authorities on request. Penalties: fines imposed by
+    the Commission of up to 3% of annual total worldwide turnover in the
+    preceding financial year or EUR 15,000,000, whichever is higher, where the
+    provider intentionally or negligently infringed the Regulation (Article
+    101(1)).
   suggestion: >-
-    Prepare technical documentation following Annex XI of the EU AI Act
-    before deployment. Include model architecture details, training data
-    description, evaluation benchmarks, known limitations, and intended
-    use cases. Create a model card and keep documentation up to date.
-version: 1.0.0
+    Prepare technical documentation following Annex XI of the EU AI Act,
+    covering the training and testing process and evaluation results, keep it up
+    to date, and be ready to provide it to the AI Office and national competent
+    authorities on request. Free and open-source models may be exempt under
+    Article 53(2) unless they have systemic risk.
+version: 1.1.0
 tags:
 - eu-ai-act
 - gpai
@@ -61,3 +81,9 @@ tier: enterprise
 compliance_notes:
   - >-
     GPAI obligations under Chapter V have applied since 2 August 2025. The 2 August 2026 date is when the Commission's Article 101 fining powers became exercisable, which is an enforcement milestone, not the date the obligation began. Conflating the two overstates when compliance was required.
+  - >-
+    Article 111(3): providers of general-purpose AI models placed on the market before 2 August 2025 must comply by 2 August 2027. Regulation (EU) 2026/1744 does not amend Articles 51 to 55, 101 or 111(3).
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

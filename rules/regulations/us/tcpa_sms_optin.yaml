@@ -1,10 +1,34 @@
 id: TCPA_SMS_OPTIN_001
 jurisdiction: US
-effective_date: '1991-12-20'
+effective_date: '1992-12-20'
 description: >-
   Requires prior express written consent before sending marketing SMS or
   text messages to consumers using an automatic telephone dialling system or
   prerecorded voice. Telephone Consumer Protection Act, 47 U.S.C. §227.
+
+
+  Layer 1 detects: send, sending, transmit, blast, broadcast, deliver or push
+  (and words that begin with them), then optionally bulk, mass or unsolicited,
+  then marketing, promotional, advertising or advert, then SMS, text message,
+  text messages, text, texts or MMS as whole words, or the same verbs with the channel before the kind (SMS
+  marketing), in both cases unless the word after them is with, after, following,
+  based on, or to opt-in, consent, consenting, consented or subscribed; unsolicited, unwanted or spam SMS, text
+  message, text, texts or MMS; mass or bulk SMS, text or texting without or
+  lacking consent or opt-in; auto-dial, robocall, robo-text or ATDS (and words
+  that begin with them), then without or lacking, then consent, opt-in or
+  permission; ignore, disregard, bypass or override (and words that begin with
+  them), then SMS or text, then opt-out, unsubscribe or stop request; and no or
+  without, then consent (optionally preceded by prior, express and written, in
+  that order), then for or to send, then SMS or text (optionally preceded by
+  marketing). The words follow each other with nothing in between. Opt-in and
+  opt-out may be written with a hyphen, a dash, a space or nothing. It matches
+  wording, not meaning: it does not check the autodialer or prerecorded-voice
+  element, it fires on a consented send whose wording falls outside those
+  exceptions ("Send marketing texts only to the subscribers who checked the SMS
+  consent box at checkout."), and it misses the practice told in other words
+  ("Blast the Black Friday promo by SMS to every phone number in the 2019 lead
+  list we bought; nobody opted in."). Whether a message is sent without the
+  required consent is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -23,7 +47,7 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    ((?:send|sending|transmit|blast|broadcast|deliver|push)\w*\s+(?:bulk\s+|mass\s+|unsolicited\s+)?(?:marketing|promotional|advertising|advert)\s+(?:sms|text\s+message|texts?|mms)(?!\s+(?:with|after|following|based\s+on|to\s+(?:opt[\-\s]?in|consent|consenting|consented|subscribed))(?:\s+|\b))|(?:send|sending|transmit|blast|broadcast|deliver|push)\w*\s+(?:sms|text\s+message|texts?|mms)\s+(?:marketing|promotional|advertising|advert)(?!\s+(?:with|after|following|based\s+on|to\s+(?:opt[\-\s]?in|consent|consenting|consented|subscribed))(?:\s+|\b))|(?:unsolicited|unwanted|spam)\s+(?:sms|text\s+message|texts?|mms)|(?:mass|bulk)\s+(?:sms|text|texting)\s+(?:without|lacking)\s+(?:consent|opt[\-\s]?in)|(?:auto[\-\s]?dial|robocall|robo[\-\s]?text|ATDS)\w*\s+(?:without|lacking)\s+(?:consent|opt[\-\s]?in|permission)|(?:ignore|disregard|bypass|override)\w*\s+(?:sms|text)\s+(?:opt[\-\s]?out|unsubscribe|stop\s+request)|(?:no|without)\s+(?:prior\s+)?(?:express\s+)?(?:written\s+)?consent\s+(?:for|to\s+send)\s+(?:marketing\s+)?(?:sms|text))
+    ((?:send|sending|transmit|blast|broadcast|deliver|push)\w*\s+(?:bulk\s+|mass\s+|unsolicited\s+)?(?:marketing|promotional|advertising|advert)\s+(?:sms|text\s+messages?|texts?(?!\s+messages?\b)|mms)\b(?!\s+(?:with|after|following|based\s+on|to\s+(?:opt[\-\u2010-\u2015\s]?in|consent|consenting|consented|subscribed))(?:\s+|\b))|(?:send|sending|transmit|blast|broadcast|deliver|push)\w*\s+(?:sms|text\s+message|texts?|mms)\s+(?:marketing|promotional|advertising|advert)\b(?!\s+(?:with|after|following|based\s+on|to\s+(?:opt[\-\u2010-\u2015\s]?in|consent|consenting|consented|subscribed))(?:\s+|\b))|(?:unsolicited|unwanted|spam)\s+(?:sms|text\s+message|texts?|mms)|(?:mass|bulk)\s+(?:sms|text|texting)\s+(?:without|lacking)\s+(?:consent|opt[\-\u2010-\u2015\s]?in)|(?:auto[\-\u2010-\u2015\s]?dial|robocall|robo[\-\u2010-\u2015\s]?text|ATDS)\w*\s+(?:without|lacking)\s+(?:consent|opt[\-\u2010-\u2015\s]?in|permission)|(?:ignore|disregard|bypass|override)\w*\s+(?:sms|text)\s+(?:opt[\-\u2010-\u2015\s]?out|unsubscribe|stop\s+request)|\b(?:no|without)\s+(?:prior\s+)?(?:express\s+)?(?:written\s+)?consent\s+(?:for|to\s+send)\s+(?:marketing\s+)?(?:sms|text))
   flags: i
 - type: metadata
   key: message_type
@@ -36,27 +60,29 @@ conditions:
 severity: high
 category: marketing
 source:
+  provision_url: https://www.govinfo.gov/link/uscode/47/227
+  provision_label: 47 U.S.C. 227(b)(1)(A)(iii) (TCPA), as implemented by 47 CFR 64.1200(a)(2)
   regulation: TCPA
-  article: 47 U.S.C. §227
+  article: 47 U.S.C. §227(b)(1)(A)(iii)
   url: https://www.govinfo.gov/link/uscode/47/227
   last_updated: '2021-06-17'
   citation: >-
-    47 U.S.C. §227(b)(1)(A): It shall be unlawful for any person within the
-    United States, or any person outside the United States if the recipient is
-    within the United States — (A) to make any call (other than a call made
-    for emergency purposes or made with the prior express consent of the
-    called party) using any automatic telephone dialing system or an
-    artificial or prerecorded voice — (iii) to any telephone number assigned
-    to a paging service, cellular telephone service, specialized mobile radio
-    service, or other radio common carrier service, or any service for which
-    the called party is charged for the call, unless such call is made solely
-    to collect a debt owed to or guaranteed by the United States. 47 U.S.C.
-    §227(b)(1)(B): to initiate any telephone call to any residential telephone
-    line using an artificial or prerecorded voice to deliver a message without
-    the prior express consent of the called party, unless the call is
-    initiated for emergency purposes, is made solely pursuant to the
-    collection of a debt owed to or guaranteed by the United States, or is
-    exempted by rule or order by the Commission under paragraph (2)(B).
+    47 U.S.C. §227(b)(1): It shall be unlawful for any person within the United
+    States, or any person outside the United States if the recipient is within
+    the United States- (A) to make any call (other than a call made for
+    emergency purposes or made with the prior express consent of the called
+    party) using any automatic telephone dialing system or an artificial or
+    prerecorded voice- ... (iii) to any telephone number assigned to a paging
+    service, cellular telephone service, specialized mobile radio service, or
+    other radio common carrier service, or any service for which the called
+    party is charged for the call, unless such call is made solely to collect a
+    debt owed to or guaranteed by the United States; 47 CFR §64.1200(a): No
+    person or entity may: ... (2) Initiate, or cause to be initiated, any
+    telephone call that includes or introduces an advertisement or constitutes
+    telemarketing, using an automatic telephone dialing system or an artificial
+    or prerecorded voice, to any of the lines or telephone numbers described in
+    paragraphs (a)(1)(i) through (iii) of this section, other than a call made
+    with the prior express written consent of the called party ...
 exceptions:
 - condition: Emergency or safety notifications
   description: Messages related to health, safety, or emergency situations
@@ -70,22 +96,33 @@ exceptions:
     by FCC rules (47 CFR §64.1200)
 penalty_information:
   civil_penalties:
-    sec_enforcement: >-
-      $500 per violation; $1,500 per willful or knowing violation.
-      Class action exposure can reach millions for mass texting campaigns.
+    private_right_of_action: >-
+      Private action for actual monetary loss or $500 in damages for each
+      violation, whichever is greater, which the court may increase to up to 3
+      times that amount for willful or knowing violations (47 U.S.C. 227(b)(3)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — The TCPA (47 U.S.C. §227) requires prior express written
-    consent before sending marketing SMS or text messages. Violations carry
-    penalties of $500-$1,500 per message with class action exposure.
+    BLOCKED: The TCPA (47 U.S.C. 227(b)(1)(A)(iii)) prohibits calls to a
+    cellular telephone number using an automatic telephone dialing system or an
+    artificial or prerecorded voice without the called party's prior express
+    consent, and the FCC rule requires prior express written consent for
+    telemarketing calls (47 CFR 64.1200(a)(2)). A private action can recover
+    actual monetary loss or $500 in damages for each violation, whichever is
+    greater, which the court may increase to up to 3 times that amount for
+    willful or knowing violations (47 U.S.C. 227(b)(3)).
   suggestion: >-
     Obtain prior express written consent before sending marketing texts.
     Consent must be signed (including electronic signatures), clearly
     authorise the specific sender, and disclose that consent is not a
     condition of purchase. Honour all opt-out requests immediately and
     maintain a suppression list.
+compliance_notes:
+  - >-
+    47 U.S.C. 227 took effect one year after the TCPA was enacted on December
+    20, 1991. The prior express written consent requirement for telemarketing
+    comes from the FCC rule in 47 CFR 64.1200(a)(2).
 version: 2.0.0
 tags:
 - tcpa
@@ -95,3 +132,7 @@ tags:
 - telecommunications
 - opt-in
 tier: developer
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

@@ -5,6 +5,22 @@ description: >-
   Prohibits AI systems that use biometric categorisation to infer race,
   political opinions, trade union membership, religious or philosophical
   beliefs, sex life, or sexual orientation. Article 5(1)(g).
+
+
+  Layer 1 detects: "biometric categori" in any form ("biometric
+  categorisation", "biometric categorization", "biometric-categorise",
+  "biometriccategori"); "facial classif" (also "facial-classif" or
+  "facialclassif") with "race" later on the same line; "biometric" with
+  "infer" later on the same line and, after that, "race", "religion",
+  "politic", "sexual", "belief" or "union"; and "emotion recognition" (also
+  "emotion-recognition" or "emotionrecognition") with "categori" later on the
+  same line. Case is ignored and each word can sit inside a longer word. It
+  matches wording, not meaning: it misses inference of these traits described
+  in other words, without "biometric" or "facial classification" in the text,
+  and every mention of "biometric categorisation" fires, including the
+  labelling exception: "Biometric categorisation is used only for labelling
+  our lawfully acquired image dataset by hair colour." fires. Whether a text
+  does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -17,38 +33,45 @@ conditions:
     or filtering of biometric datasets in law enforcement contexts.
   model: gpt-4
 - type: regex
-  value: (biometric[- ]?categori[sz]|facial[- ]?classif.*race|biometric.*infer.*(race|religion|politic|sexual|belief|union)|emotion[- ]?recognition.*categori)
+  value: (biometric[-\s]?categori[sz]|facial[-\s]?classif.*race|biometric.*infer.*(race|religion|politic|sexual|belief|union)|emotion[-\s]?recognition.*categori)
   flags: i
 # Context-gated biometric patterns (biometric.*classification, etc.) require
-# Layer 2 evaluation — they must not fire this critical block-action rule
+# Layer 2 evaluation: they must not fire this critical block-action rule
 # standalone. Layer 1 coverage is the categorisation regex above; broader
 # context lives in the semantic condition.
 severity: critical
 category: prohibited_practice
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_5/par_1/pnt_g/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 5(1)(g)'
   regulation: EU AI Act
   article: Article 5(1)(g)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 5(1)(g): The placing on the market,
-    the putting into service for this specific purpose, or the use of
-    biometric categorisation systems that categorise individually natural
-    persons based on their biometric data to deduce or infer their race,
-    political opinions, trade union membership, religious or philosophical
-    beliefs, sex life or sexual orientation. This prohibition shall not
-    cover any labelling or filtering of lawfully acquired biometric datasets,
-    such as images, based on biometric data or categorising of biometric
-    data in the area of law enforcement.
+    Regulation (EU) 2024/1689, Article 5(1)(g): the placing on the market, the
+    putting into service for this specific purpose, or the use of biometric
+    categorisation systems that categorise individually natural persons based on
+    their biometric data to deduce or infer their race, political opinions,
+    trade union membership, religious or philosophical beliefs, sex life or
+    sexual orientation; this prohibition does not cover any labelling or
+    filtering of lawfully acquired biometric datasets, such as images, based on
+    biometric data or categorizing of biometric data in the area of law
+    enforcement;
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 5(1)(g) prohibits AI-based biometric
-    categorisation systems that infer race, political opinions, religion,
-    sex life, sexual orientation, or trade union membership from biometric
-    data. This practice is banned in the EU since February 2, 2025.
-    Penalties: up to €35M or 7% of global revenue.
+    BLOCKED: EU AI Act Article 5(1)(g) prohibits biometric categorisation
+    systems that categorise individual persons based on their biometric data to
+    deduce or infer race, political opinions, trade union membership, religious
+    or philosophical beliefs, sex life or sexual orientation. Banned in the EU
+    since 2 February 2025. Labelling or filtering of lawfully acquired biometric
+    datasets, and categorising of biometric data in the area of law enforcement,
+    are not covered. Penalties: administrative fines up to EUR 35,000,000 or,
+    for an undertaking, up to 7% of its total worldwide annual turnover for the
+    preceding financial year, whichever is higher (Article 99(3)); for SMEs,
+    including start-ups, whichever is lower (Article 99(6)).
   suggestion: >-
     Remove any biometric categorisation that infers protected characteristics.
     If biometric processing is required, ensure it does not deduce race,
@@ -61,3 +84,7 @@ tags:
 - biometric-categorisation
 - proactive
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

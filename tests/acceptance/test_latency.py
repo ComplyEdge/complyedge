@@ -1,21 +1,14 @@
 """
-Validates latency claims from the published benchmark + one live timing check.
+Validates latency claims from the published benchmark JSON (offline only).
 
-Offline (no API key):
-  - OPA fast-path blocks: 38–100ms range, median ≤100ms  [n=14]
+  - OPA fast-path blocks: median at most 100ms, at least 14 samples
 
-Live (requires COMPLYEDGE_API_KEY):
-  - Single real API call must return in <150ms (OPA-only path)
-
-Claims verified:
-  - "38–100ms (median 62ms, n=14) on our 50-prompt benchmark" [OPA fast-path blocks]
-  - "<150ms" OPA path latency on live call
+No live API calls: those wrote audit rows on the shared test tenant.
 """
 from __future__ import annotations
 
 import json
 import statistics
-import time
 
 import pytest
 from conftest import BENCHMARK_RESULTS_DIR
@@ -45,7 +38,8 @@ def opa_fast_path_latencies(results) -> list[float]:
 
 class TestOpaFastPath:
     """
-    Validates the "38-100ms, median 62ms, n=14" claim for OPA fast-path blocks.
+    OPA fast-path blocks in the published benchmark: median and p95 ceilings
+    and a sample floor, not a snapshot of one run.
     """
 
     def test_opa_fast_path_sample_size(self, opa_fast_path_latencies):
@@ -89,32 +83,3 @@ class TestOpaFastPath:
             "may indicate cached or mocked responses"
         )
 
-
-class TestLiveLatency:
-    """
-    LIVE — Requires COMPLYEDGE_API_KEY.
-    Single real call must come back under 300ms.
-    """
-
-    def test_single_live_call_under_150ms(self, live_session, api_base_url):
-        # Claim: OPA-only path (use_semantic_fallback=False) returns in <150ms
-        payload = {
-            "text": "Hello, I am an AI assistant. How can I help you today?",
-            "agent_id": "acceptance-test",
-            "jurisdiction": "EU",
-            "context": {"system_type": "customer_support"},
-            "use_semantic_fallback": False,
-        }
-        t0 = time.monotonic()
-        resp = live_session.post(f"{api_base_url}/v1/check", json=payload)
-        elapsed_ms = (time.monotonic() - t0) * 1000
-
-        assert (
-            resp.status_code == 200
-        ), f"Expected 200 from {api_base_url}/v1/check, got {resp.status_code}: {resp.text[:200]}"
-        # Use server-reported latency if available, else fall back to wall-clock
-        data = resp.json()
-        server_ms = data.get("latency_ms", elapsed_ms)
-        assert (
-            server_ms < 150
-        ), f"Live OPA-only call took {server_ms:.0f}ms — expected <150ms"

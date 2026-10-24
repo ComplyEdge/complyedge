@@ -2,11 +2,22 @@ id: EU_AI_ACT_GPAI_MODEL_CLASSIFICATION_001
 jurisdiction: EU
 effective_date: '2025-08-02'
 description: >-
-  Requires providers of general-purpose AI models to classify their models
-  before placing them on the EU market. Article 51 of the EU AI Act mandates
-  that GPAI models must be classified and registered with the AI Office,
-  including an assessment of systemic risk potential. Deploying or using a
-  GPAI model without proper classification is a compliance violation.
+  Requires the provider of a general-purpose AI model that meets the Article
+  51(1)(a) condition for systemic risk (high impact capabilities) to notify the
+  Commission without delay and in any event within two weeks. Article 52(1),
+  with the classification criteria in Article 51(1).
+
+
+  Layer 1 detects: one sequence: deploy, launch or release, in any form, optionally "a", then general-purpose AI (also "general purpose
+  AI"), GPAI, foundation model, large language model or LLM, then without,
+  lacking, missing or no, then classification, assessment, registration,
+  categorisation or categorization ("deploy a GPAI without classification").
+  It matches wording, not meaning: it does not read the Article 51(1)
+  threshold or whether the Commission was notified, so it misses the practice
+  told in other words ("Our model crossed 10^25 FLOPs last month and we have
+  not told the Commission."), and it fires on text that only names the
+  practice, such as a refusal. Whether a text does the practice is judged in
+  Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -18,36 +29,47 @@ conditions:
     EU AI Act.
   model: gpt-4
 - type: regex
-  value: (deploy|launch|release|use|integrate)\w*\s+(a\s+)?(general[\-\s]purpose\s+ai|gpai|foundation\s+model|large\s+language\s+model|llm)\s+(without|lacking|missing|no)\s+(classification|assessment|registration|categorisation|categorization)
+  value: (deploy|launch|release)\w*\s+(a\s+)?(general[\-\s]purpose\s+ai|gpai|foundation\s+model|large\s+language\s+model|llm)\s+(without|lacking|missing|no)\s+(classification|assessment|registration|categorisation|categorization)
   flags: i
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_52/par_1/oj
+  provision_label: Regulation (EU) 2024/1689, Article 52(1)
   regulation: EU AI Act
-  article: Article 51
+  article: Article 52(1)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 51: The Commission shall classify
-    a general-purpose AI model as a general-purpose AI model with systemic
-    risk if it meets any of the criteria referred to in paragraph 1. A
-    provider that has a general-purpose AI model that meets those criteria
-    shall notify the AI Office without delay and in any event within two
-    weeks after those criteria are met.
+    Regulation (EU) 2024/1689, Article 51(1): A general-purpose AI model shall
+    be classified as a general-purpose AI model with systemic risk if it meets
+    any of the following conditions: (a) it has high impact capabilities
+    evaluated on the basis of appropriate technical tools and methodologies,
+    including indicators and benchmarks; Article 52(1): Where a general-purpose
+    AI model meets the condition referred to in Article 51(1), point (a), the
+    relevant provider shall notify the Commission without delay and in any event
+    within two weeks after that requirement is met or it becomes known that it
+    will be met.
 remediation:
   action: warn
   timing: proactive
   message: >-
-    WARNING — EU AI Act Article 51 requires general-purpose AI models to be
-    classified and registered with the AI Office before deployment in the EU
-    market. Deploying a GPAI model without classification may result in
-    penalties of up to EUR 15M or 3% of global annual revenue.
+    WARNING: EU AI Act Article 52(1) requires the provider of a general-purpose
+    AI model that meets the high-impact-capabilities condition in Article
+    51(1)(a) to notify the Commission without delay and in any event within two
+    weeks. There is no general registration of general-purpose AI models with
+    the AI Office, and the duty does not bind deployers or users. Penalties:
+    fines imposed by the Commission of up to 3% of annual total worldwide
+    turnover in the preceding financial year or EUR 15,000,000, whichever is
+    higher, where the provider intentionally or negligently infringed the
+    Regulation (Article 101(1)).
   suggestion: >-
-    Classify your GPAI model according to Article 51 criteria before
-    deployment. Assess whether the model meets systemic risk thresholds.
-    If it does, notify the AI Office within two weeks. Maintain
-    documentation of the classification assessment.
-version: 1.0.0
+    If you provide a general-purpose AI model, assess whether it meets the
+    Article 51(1)(a) condition (high impact capabilities; presumed above 10^25
+    floating point operations of training compute under Article 51(2)). If it
+    does, notify the Commission within two weeks and keep the assessment on
+    file.
+version: 1.1.0
 tags:
 - eu-ai-act
 - gpai
@@ -59,3 +81,14 @@ tier: enterprise
 compliance_notes:
   - >-
     GPAI obligations under Chapter V have applied since 2 August 2025. The 2 August 2026 date is when the Commission's Article 101 fining powers became exercisable, which is an enforcement milestone, not the date the obligation began. Conflating the two overstates when compliance was required.
+  - >-
+    Article 111(3): providers of general-purpose AI models placed on the market before 2 August 2025 must comply by 2 August 2027. Regulation (EU) 2026/1744 does not amend Articles 51 to 55, 101 or 111(3).
+  - >-
+    "Use" and "integrate" were removed from the Layer 1 pattern on 2026-10-22:
+    the Article 52(1) notification is the provider's duty, and a deployer that
+    uses or integrates a general-purpose AI model has none, so those verbs
+    fired on lawful use.
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

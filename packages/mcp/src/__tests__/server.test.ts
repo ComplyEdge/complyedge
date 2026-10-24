@@ -6,7 +6,15 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { createRequire } from "node:module";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createServer, resolveSandboxBaseUrl, type SandboxOptions } from "../server.js";
+import { mkdirSync, mkdtempSync, readdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import {
+  BUNDLED_RULES_DIR,
+  createServer,
+  resolveSandboxBaseUrl,
+  type SandboxOptions
+} from "../server.js";
 
 const packageJson = createRequire(import.meta.url)("../../package.json");
 
@@ -39,6 +47,69 @@ describe("ComplyEdge MCP server", () => {
   it("advertises the version this package actually is", async () => {
     const client = await connectedClient();
     expect(client.getServerVersion()?.version).toBe(packageJson.version);
+  });
+
+  /**
+   * Regression (2026-10-19): createServer() built TrustLintEngine() with no
+   * directory, so trustlint loaded ~/.trustlint/rules (the `trustlint update`
+   * cache) or a rules/regulations folder above the working directory before
+   * its bundled rules. On a machine with an old cache the server ran 52 rules
+   * while the package said 63. A decoy rule in both places must not load.
+   */
+  it("loads the bundled corpus even with a rules cache in HOME and a repo corpus above cwd", async () => {
+    const decoyRule = [
+      "id: DECOY-001",
+      "title: Decoy rule from a local cache",
+      "jurisdiction: EU",
+      "category: decoy",
+      "severity: low",
+      "conditions:",
+      "- type: regex",
+      "  value: decoy"
+    ].join("\n");
+    const home = mkdtempSync(join(tmpdir(), "mcp-home-"));
+    mkdirSync(join(home, ".trustlint", "rules", "eu"), { recursive: true });
+    writeFileSync(join(home, ".trustlint", "rules", "eu", "decoy.yaml"), decoyRule);
+    const repo = mkdtempSync(join(tmpdir(), "mcp-repo-"));
+    mkdirSync(join(repo, "rules", "regulations", "eu"), { recursive: true });
+    writeFileSync(join(repo, "rules", "regulations", "eu", "decoy.yaml"), decoyRule);
+    vi.stubEnv("HOME", home);
+    // Vitest workers cannot chdir; trustlint reads process.cwd().
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(repo);
+    try {
+      const client = await connectedClient();
+      const response = await client.request(
+        { method: "tools/call", params: { name: "list_rules", arguments: {} } },
+        CallToolResultSchema
+      );
+      const listed = JSON.parse((response.content[0] as { text: string }).text);
+      const ids = listed.rules.map((rule: { id: string }) => rule.id);
+      expect(ids).not.toContain("DECOY-001");
+      expect(listed.total).toBe(63);
+      expect(readdirSync(BUNDLED_RULES_DIR)).toContain("universal");
+    } finally {
+      cwd.mockRestore();
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("list_rules uses the same jurisdiction rule as check_compliance", async () => {
+    // jurisdiction is where the end user is: EU lists EU and GLOBAL rules, US
+    // lists US, its state and city rules, and GLOBAL rules.
+    const client = await connectedClient();
+    const list = async (jurisdiction: string) => {
+      const response = await client.request(
+        { method: "tools/call", params: { name: "list_rules", arguments: { jurisdiction } } },
+        CallToolResultSchema
+      );
+      return JSON.parse((response.content[0] as { text: string }).text).rules as Array<{ id: string; jurisdiction: string }>;
+    };
+    const eu = await list("EU");
+    expect(new Set(eu.map((r) => r.jurisdiction))).toEqual(new Set(["EU", "GLOBAL"]));
+    const us = await list("US");
+    const ids = us.map((r) => r.id);
+    expect(ids).toContain("NYC_LL144_AEDT_001");
+    expect(ids).toContain("CCPA_CPRA_OPT_OUT_001");
   });
 
   it("lists only the documented offline tools", async () => {
@@ -158,6 +229,35 @@ describe("ComplyEdge MCP server", () => {
       expect(payload.violations[0].citation).toContain("Article 5(1)(c)");
       expect(payload.latency_ms).toBe(7);
       expect(payload.message).toContain("not recorded");
+    });
+
+    // DASH-016, 2026-10-19: an allowed check whose matched rules model review
+    // cleared was reported as "No rule fired".
+    it("names rules model review cleared instead of saying no rule fired", async () => {
+      const fetchImpl = vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            allowed: true,
+            violations: [],
+            overridden_hits: [{ rule_id: "rego-art5-1a-001", reason: "explains", confidence: 0.92 }],
+            engine_path: "opa+llm_confirm",
+            latency_ms: 410,
+            audit_logged: false,
+            sandbox: true
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        )
+      );
+      const client = await connectedClient({ apiKey: "ce_eu_test_key", fetchImpl: fetchImpl as unknown as typeof fetch });
+      const response = await client.request(
+        { method: "tools/call", params: { name: "sandbox_check", arguments: { text: "This article explains subliminal techniques" } } },
+        CallToolResultSchema
+      );
+      const payload = JSON.parse((response.content[0] as { text: string }).text);
+      expect(payload.status).toBe("ALLOWED");
+      expect(payload.cleared_by_model_review).toEqual(["rego-art5-1a-001"]);
+      expect(payload.message).toBe("1 rule(s) matched and model review cleared them. Sandbox: not recorded.");
+      expect(payload.message).not.toContain("No rule fired");
     });
 
     it("refuses to report a response the server did not mark as sandbox", async () => {

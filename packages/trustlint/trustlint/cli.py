@@ -11,8 +11,12 @@ from typing import Optional
 import click
 
 from trustlint import __version__
-from trustlint.engine import TrustLintEngine, LintResult, Violation
-
+from trustlint.engine import (
+    LintResult,
+    TrustLintEngine,
+    Violation,
+    jurisdiction_applies,
+)
 
 # ANSI colors
 RED = "\033[91m"
@@ -29,9 +33,6 @@ SEVERITY_COLORS = {
     "medium": YELLOW,
     "low": DIM,
 }
-
-# Public OSS repo — releases ship rules/regulations/ in the tarball (ADA #875).
-RULES_RELEASE_REPO = "ComplyEdge/complyedge"
 
 # Ordering used by --severity-threshold: a threshold of `T`
 # means exit 1 when any violation has severity at-or-above `T`. Default
@@ -116,9 +117,9 @@ def _print_result(result: LintResult, verbose: bool = False) -> None:
 @click.option("--rules-dir", type=click.Path(exists=True), default=None, help="Path to rules directory")
 @click.pass_context
 def cli(ctx: click.Context, rules_dir: Optional[str]) -> None:
-    """TrustLint — offline compliance linter for AI agents.
+    """TrustLint: offline compliance linter for AI agents.
 
-    Scans text against the ComplyEdge YAML rule corpus using Tier 1
+    Scans text against the bundled TrustLint rule set using Tier 1
     regex patterns. No API key required.
     """
     ctx.ensure_object(dict)
@@ -128,7 +129,23 @@ def cli(ctx: click.Context, rules_dir: Optional[str]) -> None:
 @cli.command()
 @click.argument("target", required=False)
 @click.option("--text", "-t", help="Text string to check (instead of a file)")
-@click.option("--jurisdiction", "-j", help="Filter rules by jurisdiction (EU, US, GLOBAL)")
+@click.option(
+    "--jurisdiction",
+    "-j",
+    help=(
+        "Where the end user is (EU, US, US-CA, GLOBAL). Runs that jurisdiction's "
+        "rules, its sub-jurisdictions (US includes US-CA) and GLOBAL rules."
+    ),
+)
+@click.option(
+    "--direction",
+    type=click.Choice(["input", "output"], case_sensitive=False),
+    default=None,
+    help=(
+        "input = text a user sends, output = text the AI produces. Rules scoped "
+        "to user input or AI output then run only in their direction. Default: all rules."
+    ),
+)
 @click.option("--verbose", "-v", is_flag=True, help="Show citations and remediation")
 @click.option(
     "--json",
@@ -154,6 +171,7 @@ def check(
     target: Optional[str],
     text: Optional[str],
     jurisdiction: Optional[str],
+    direction: Optional[str],
     verbose: bool,
     json_output: bool,
     severity_threshold: str,
@@ -173,7 +191,7 @@ def check(
     engine = TrustLintEngine(rules_dir=ctx.obj.get("rules_dir"))
 
     if not engine.rules:
-        click.echo(f"{YELLOW}⚠ No rules loaded. Run 'trustlint init' or use --rules-dir{RESET}", err=True)
+        click.echo(f"{YELLOW}⚠ No rules loaded. Pass --rules-dir{RESET}", err=True)
         sys.exit(2)
 
     if text:
@@ -190,7 +208,7 @@ def check(
         click.echo(f"{RED}Error: provide --text, a file path, or pipe stdin{RESET}", err=True)
         sys.exit(2)
 
-    result = engine.check(input_text, jurisdiction=jurisdiction)
+    result = engine.check(input_text, jurisdiction=jurisdiction, direction=direction)
 
     if json_output:
         _emit_json(result, file_path=target)
@@ -209,7 +227,11 @@ def rules() -> None:
 
 
 @rules.command("list")
-@click.option("--jurisdiction", "-j", help="Filter by jurisdiction")
+@click.option(
+    "--jurisdiction",
+    "-j",
+    help="Rules that apply in this jurisdiction (includes sub-jurisdictions and GLOBAL)",
+)
 @click.pass_context
 def rules_list(ctx: click.Context, jurisdiction: Optional[str]) -> None:
     """List all loaded compliance rules."""
@@ -221,7 +243,7 @@ def rules_list(ctx: click.Context, jurisdiction: Optional[str]) -> None:
 
     applicable = engine.rules
     if jurisdiction:
-        applicable = [r for r in applicable if r.jurisdiction.upper() == jurisdiction.upper()]
+        applicable = [r for r in applicable if jurisdiction_applies(r.jurisdiction, jurisdiction)]
 
     click.echo(f"\n{BOLD}Loaded Rules ({len(applicable)}){RESET}")
     click.echo(f"{'─' * 70}")
@@ -241,95 +263,36 @@ def rules_list(ctx: click.Context, jurisdiction: Optional[str]) -> None:
 
 @rules.command("update")
 def rules_update() -> None:
-    """Download the latest rule corpus from GitHub releases."""
-    import json
-    import os
-    import tarfile
-    import tempfile
-    from pathlib import Path
-    from urllib.error import URLError
-    from urllib.request import Request, urlopen
-
+    """Explain how to update the rule set (it ships inside the package)."""
+    click.echo("The rule set ships inside the trustlint package. To update it:")
+    click.echo("  pip install -U trustlint")
     home_rules = Path.home() / ".trustlint" / "rules"
-    api_url = f"https://api.github.com/repos/{RULES_RELEASE_REPO}/releases/latest"
+    if home_rules.exists():
+        click.echo(
+            f"{DIM}{home_rules} is no longer read (an older copy downloaded by this "
+            f"command); you can delete it.{RESET}"
+        )
 
-    click.echo(f"{BOLD}Updating rules from GitHub...{RESET}")
 
-    try:
-        headers = {"User-Agent": "trustlint-cli"}
-        token = os.getenv("GITHUB_TOKEN")
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
+def _scan_url(api_key: str) -> str:
+    """The hosted check for the key's region: ce_eu_ is EU, ce_ is US, else EU.
 
-        req = Request(api_url, headers=headers)
-        with urlopen(req, timeout=30) as resp:
-            release = json.loads(resp.read().decode("utf-8"))
-
-        tag = release.get("tag_name", "unknown")
-        tarball_url = release.get("tarball_url")
-        if not tarball_url:
-            click.echo(f"{RED}Error: no tarball_url in release{RESET}", err=True)
-            sys.exit(2)
-
-        click.echo(f"  Latest release: {tag}")
-
-        req = Request(tarball_url, headers=headers)
-        with urlopen(req, timeout=60) as resp:
-            with tempfile.NamedTemporaryFile(suffix=".tar.gz", delete=False) as tmp:
-                tmp.write(resp.read())
-                tmp_path = tmp.name
-
-        home_rules.mkdir(parents=True, exist_ok=True)
-
-        # The archive-relative path is attacker-controlled if a release is ever
-        # tampered with, and `home_rules / relative` happily resolves "../".
-        # A member named ".../rules/regulations/../../../.bashrc.yaml" would
-        # write outside ~/.trustlint/rules entirely. Low likelihood (it is our
-        # own GitHub release) but a real traversal, and this command runs on a
-        # user's machine, so the blast radius is their home directory.
-        # Resolve and containment-check every destination before writing.
-        rules_root = home_rules.resolve()
-        skipped_unsafe = 0
-        with tarfile.open(tmp_path, "r:gz") as tar:
-            for member in tar.getmembers():
-                if not member.isfile():
-                    continue  # ignore dirs, symlinks and devices outright
-                if "/rules/regulations/" in member.name and member.name.endswith(".yaml"):
-                    relative = member.name.split("/rules/regulations/", 1)[1]
-                    dest = (home_rules / relative).resolve()
-                    if not dest.is_relative_to(rules_root):
-                        skipped_unsafe += 1
-                        continue
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    src = tar.extractfile(member)
-                    if src:
-                        dest.write_bytes(src.read())
-        if skipped_unsafe:
-            click.echo(
-                f"{RED}Refused {skipped_unsafe} archive entr"
-                f"{'y' if skipped_unsafe == 1 else 'ies'} that resolved outside "
-                f"~/.trustlint/rules{RESET}",
-                err=True,
-            )
-
-        os.unlink(tmp_path)
-        rule_count = sum(1 for _ in home_rules.rglob("*.yaml"))
-        click.echo(f"{GREEN}✅ Updated {rule_count} rules to ~/.trustlint/rules/ (release {tag}){RESET}")
-
-    except (URLError, OSError, json.JSONDecodeError) as e:
-        click.echo(f"{RED}Error updating rules: {e}{RESET}", err=True)
-        sys.exit(2)
+    Same rule as the complyedge SDK; an account's key only works on its region's host.
+    """
+    if api_key.startswith("ce_") and not api_key.startswith("ce_eu_"):
+        return "https://api.complyedge.io/v1/check"
+    return "https://eu.api.complyedge.io/v1/check"
 
 
 @cli.command()
-@click.option("--api-key", envvar="COMPLYEDGE_API_KEY", help="API key for Tier 2 LLM analysis")
+@click.option("--api-key", envvar="COMPLYEDGE_API_KEY", help="API key for the hosted check (writes an audit record)")
 @click.argument("target", required=False)
 @click.option("--text", "-t", help="Text string to check")
 def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> None:
-    """Run Tier 2 LLM compliance analysis via the ComplyEdge API.
+    """Run the hosted ComplyEdge check (POST /v1/check), which writes an audit record.
 
     Requires COMPLYEDGE_API_KEY (env or --api-key flag). No key → offline
-    regex. If a key is set and the API is unreachable, exit 2 — do not
+    regex. If a key is set and the API is unreachable, exit 2: do not
     silently downgrade to a different engine.
     """
     import json
@@ -361,7 +324,7 @@ def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> 
             sys.exit(1)
         return
 
-    api_url = "https://eu.api.complyedge.io/v1/check"
+    api_url = _scan_url(api_key)
     agent_id = os.environ.get("COMPLYEDGE_AGENT_ID", "trustlint-cli")
     payload = json.dumps(
         {
@@ -386,9 +349,9 @@ def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> 
         latency = data.get("latency_ms", 0)
 
         if allowed:
-            click.echo(f"\n{GREEN}{BOLD}✅ PASS{RESET} — no violations ({latency}ms, API)")
+            click.echo(f"\n{GREEN}{BOLD}✅ PASS{RESET}: no violations ({latency}ms, API)")
         else:
-            click.echo(f"\n{RED}{BOLD}❌ BLOCKED{RESET} — {len(violations)} violation(s) ({latency}ms, API)")
+            click.echo(f"\n{RED}{BOLD}❌ BLOCKED{RESET}: {len(violations)} violation(s) ({latency}ms, API)")
             for v in violations:
                 click.echo(f"  {RED}[{v.get('severity','?').upper()}]{RESET} {v.get('rule_id','?')}")
                 click.echo(f"    {v.get('rule_description','')[:100]}")
@@ -397,48 +360,10 @@ def scan(target: Optional[str], text: Optional[str], api_key: Optional[str]) -> 
     except (URLError, OSError, json.JSONDecodeError) as e:
         click.echo(
             f"{RED}API unreachable ({e}). Not falling back to offline "
-            f"regex — that engine is not the API you asked for.{RESET}",
+            f"regex: that engine is not the API you asked for.{RESET}",
             err=True,
         )
         sys.exit(2)
-
-
-@cli.command()
-@click.option("--force", "-f", is_flag=True, help="Overwrite existing config")
-def init(force: bool) -> None:
-    """Create a .trustlint.yaml config in the current directory."""
-    config_path = Path.cwd() / ".trustlint.yaml"
-
-    if config_path.exists() and not force:
-        click.echo(f"{YELLOW}⚠ .trustlint.yaml already exists. Use --force to overwrite.{RESET}")
-        return
-
-    config_content = """\
-# TrustLint Configuration
-# See: https://github.com/ComplyEdge/complyedge
-
-# Rules directory (default: auto-detect from repo or ~/.trustlint/rules/)
-# rules_dir: ./rules/regulations
-
-# Default jurisdiction filter (optional)
-# jurisdiction: EU
-
-# Severity threshold — only report violations at this level or above
-# severity_threshold: medium
-
-# Files to check (glob patterns)
-# include:
-#   - "**/*.py"
-#   - "**/*.ts"
-#   - "**/*.yaml"
-
-# Files to skip
-# exclude:
-#   - "node_modules/**"
-#   - ".venv/**"
-"""
-    config_path.write_text(config_content, encoding="utf-8")
-    click.echo(f"{GREEN}✅ Created .trustlint.yaml{RESET}")
 
 
 def main() -> None:

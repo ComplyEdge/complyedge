@@ -1,4 +1,4 @@
-"""GPAI Compliance Benchmark — runner.
+"""GPAI Compliance Benchmark: runner.
 
 Loads provider evidence YAML files from a directory, validates them
 against the schema, computes per-provider and aggregate scores across
@@ -17,11 +17,15 @@ import argparse
 import json
 import sys
 from datetime import UTC, date, datetime
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
 import yaml
 from jsonschema import Draft7Validator
+
+_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(_ROOT / "services" / "api"))
 
 OBLIGATION_KEYS = [
     "art_50_2_content_disclosure",
@@ -93,6 +97,23 @@ def score_provider(provider: dict) -> dict[str, Any]:
     }
 
 
+def _average_pct(scored: list[dict[str, Any]]) -> float:
+    """Mean of the exact aggregate/max ratios, rounded once at the end.
+
+    Averaging the already-rounded compliance_pct values lands this data set on
+    53.05, where the float sum decides the rounding: Python 3.11 printed 53.0,
+    3.12+ (compensated float sum) prints 53.1. The exact mean is 53.06, so
+    Fractions make the published average the same on every Python.
+    """
+    if not scored:
+        return 0.0
+    ratios = [
+        Fraction(r["aggregate_score"], r["max_score"]) if r["max_score"] else Fraction(0)
+        for r in scored
+    ]
+    return round(float(sum(ratios) * 100 / len(ratios)), 1)
+
+
 def flag_stale_evidence(provider: dict, threshold_days: int = 180) -> list[str]:
     today = date.today()
     stale: list[str] = []
@@ -101,7 +122,7 @@ def flag_stale_evidence(provider: dict, threshold_days: int = 180) -> list[str]:
             verified = date.fromisoformat(e["verified_date"])
             age = (today - verified).days
             if age > threshold_days:
-                stale.append(f"{ob_key}[{i}] verified {age} days ago — {e['url']}")
+                stale.append(f"{ob_key}[{i}] verified {age} days ago: {e['url']}")
     return stale
 
 
@@ -140,19 +161,18 @@ def run(providers_dir: Path, schema_path: Path, output_path: Path) -> dict[str, 
     # put a 10/18 (55.6%) above a 9/15 (60.0%). Ties break on points, then id.
     scored.sort(key=lambda r: (-r["compliance_pct"], -r["aggregate_score"], r["provider_id"]))
 
+    # The receipt generated_at uses the audit record timestamp format (UTC, Z).
+    from adcr_record import utc_timestamp
+
     output = {
-        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_at": utc_timestamp(datetime.now(UTC)),
         "methodology_version": "1.1",
         "scored_providers": scored,
         "pending_providers": sorted(pending),
         "summary": {
             "total_scored": len(scored),
             "total_pending": len(pending),
-            "avg_compliance_pct": (
-                round(sum(r["compliance_pct"] for r in scored) / len(scored), 1)
-                if scored
-                else 0.0
-            ),
+            "avg_compliance_pct": _average_pct(scored),
             "best": scored[0]["provider_id"] if scored else None,
             "worst": scored[-1]["provider_id"] if scored else None,
         },

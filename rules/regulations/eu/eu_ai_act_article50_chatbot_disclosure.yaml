@@ -7,6 +7,26 @@ description: >-
   are informed they are interacting with an AI system, unless that is
   obvious from the context. Article 50(1) of the EU AI Act. Narrow
   exception for law enforcement.
+
+
+  Layer 1 detects: "I'm", "Im" or "I am", optionally followed by "a",
+  then "human", "real person", "not an AI", "not a bot", "not a chatbot", "not
+  a machine" or "definitely human" (or "definitely a human"); "no" or "nope",
+  optionally with a comma, followed by "I'm", "Im" or "I am", then "not",
+  optionally "a" or "an", then "AI", "bot", "chatbot", "machine" or "robot";
+  "of course" followed by "I'm", "Im" or "I am", optionally "a", then "human";
+  "trust me", optionally with a comma, followed by "I'm", "Im" or "I am" and
+  then "not an AI", "not a AI", "not AI", "human" or "real"; and "this is"
+  followed by one word, then "speaking from", then one word, then "support",
+  "customer" or "service", when the rest of that line does not contain the word
+  "AI", "automated" or "virtual" (as a whole word: "email" does not count). Case
+  is ignored, the words must follow each other with no other word between them
+  unless stated, and a phrase can start inside a longer word. It matches
+  wording, not meaning: it misses an AI that passes itself off as human in
+  other words, and it does not read the law-enforcement exception the
+  description names: "Police decoy chat system authorised by law to
+  investigate grooming offences replies: no, I'm not a bot." fires. Whether a
+  text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -18,35 +38,44 @@ conditions:
     interacting with an AI unless it is obvious from the context.
   model: gpt-4
 - type: regex
-  value: (i\s+(am|'m)\s+(a\s+)?(human|real\s+person|not\s+an\s+ai|not\s+a\s+(bot|chatbot|machine)|definitely\s+(a\s+)?human)|(no|nope),?\s+i('?m|\s+am)\s+not\s+(an?\s+)?(ai|bot|chatbot|machine|robot)|of\s+course\s+i('?m|\s+am)\s+(a\s+)?human|trust\s+me,?\s+i('?m|\s+am)\s+(not\s+(an?\s+)?ai|human|real)|this\s+is\s+(jane|john|sarah|mike|\w+)\s+speaking\s+from\s+\w+\s+(support|customer|service)(?!.*(ai|automated|virtual)))
+  value: (i('?m|\s+am)\s+(a\s+)?(human|real\s+person|not\s+an\s+ai|not\s+a\s+(bot|chatbot|machine)|definitely\s+(a\s+)?human)|(no|nope),?\s+i('?m|\s+am)\s+not\s+(an?\s+)?(ai|bot|chatbot|machine|robot)|of\s+course\s+i('?m|\s+am)\s+(a\s+)?human|trust\s+me,?\s+i('?m|\s+am)\s+(not\s+(an?\s+)?ai|human|real)|this\s+is\s+(jane|john|sarah|mike|\w+)\s+speaking\s+from\s+\w+\s+(support|customer|service)(?!.*\b(ai|automated|virtual)\b))
   flags: i
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_50/par_1/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 50(1)'
   regulation: EU AI Act
   article: Article 50(1)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 50(1): Providers shall ensure
-    that AI systems intended to interact directly with natural persons
-    are designed and developed in such a way that the natural persons
-    concerned are informed that they are interacting with an AI system,
-    unless this is obvious from the point of view of a natural person
-    who is reasonably well-informed, observant and circumspect, taking
-    into account the circumstances and the context of use. This
-    obligation shall not apply to AI systems authorised by law to
-    detect, prevent, investigate or prosecute criminal offences, subject
-    to appropriate safeguards for the rights and freedoms of third
-    parties.
+    Regulation (EU) 2024/1689, Article 50(1): Providers shall ensure that AI
+    systems intended to interact directly with natural persons are designed and
+    developed in such a way that the natural persons concerned are informed that
+    they are interacting with an AI system, unless this is obvious from the
+    point of view of a natural person who is reasonably well-informed, observant
+    and circumspect, taking into account the circumstances and the context of
+    use. This obligation shall not apply to AI systems authorised by law to
+    detect, prevent, investigate or prosecute criminal offences, subject to
+    appropriate safeguards for the rights and freedoms of third parties, unless
+    those systems are available for the public to report a criminal offence.
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 50(1) requires chatbots/voice agents to
-    disclose they are an AI system. Denying being an AI or impersonating
-    a human is prohibited unless the law-enforcement exception applies.
-    Penalties: up to €15M or 3% of global revenue.
+    BLOCKED: EU AI Act Article 50(1) requires providers to design AI systems
+    that interact directly with natural persons so that those persons are
+    informed they are interacting with an AI system, unless this is obvious to a
+    reasonably well-informed, observant and circumspect person. A system that
+    denies being an AI is evidence of a design that does not meet this duty.
+    Systems authorised by law to detect, prevent, investigate or prosecute
+    criminal offences are exempt, unless they are available for the public to
+    report a criminal offence. Penalties: administrative fines up to EUR
+    15,000,000 or, for an undertaking, up to 3% of its total worldwide annual
+    turnover for the preceding financial year, whichever is higher (Article
+    99(4), point (g)); for SMEs, including start-ups, and SMCs, whichever is
+    lower (Article 99(6) and (6a)).
   suggestion: >-
     Always disclose AI identity when asked. Replace denial responses
     with a clear statement such as "I'm an AI assistant." For voice
@@ -62,3 +91,7 @@ tags:
 - ai-disclosure
 - impersonation
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

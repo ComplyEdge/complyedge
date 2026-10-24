@@ -1,8 +1,8 @@
 # @complyedge/sdk
 
-TypeScript/JavaScript SDK for [ComplyEdge](https://www.complyedge.io): runtime EU AI Act enforcement for AI agents.
+TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io): prove what your AI decided, without keeping what it saw. Every `check()` runs against open EU AI Act rules that cite the law and leaves one record per decision, never a copy of the text.
 
-Every `check()` call is evaluated against a deterministic Rego rule bundle, returns article-cited violations, and is written to an audit record kept outside your AI system.
+The rules run as a deterministic Rego bundle, violations come back with their article citations, and the record is kept outside your AI system.
 
 ![npm version](https://img.shields.io/npm/v/%40complyedge%2Fsdk)
 ![npm downloads](https://img.shields.io/npm/dw/%40complyedge%2Fsdk)
@@ -47,17 +47,17 @@ never disagree. Email is your sign-in and cannot be changed from the dashboard.
 - [`@complyedge/mcp`](https://www.npmjs.com/package/@complyedge/mcp) runs the local, offline TrustLint MCP tools with `npx`.
 - [`trustlint`](https://www.npmjs.com/package/trustlint) is the local Node.js CLI for offline rule checks.
 - [`complyedge` on PyPI](https://pypi.org/project/complyedge/) is the Python SDK with the same enforcement API.
-- [Documentation](https://www.complyedge.io/docs) covers the hosted API; the [trust portal](https://trust.complyedge.io) covers security and reliability information.
+- [Documentation](https://complyedge.io/docs) covers the hosted API; the [trust portal](https://trust.complyedge.io) covers security and reliability information.
 
 | | `@complyedge/sdk` | `trustlint` | `@complyedge/mcp` |
 |---|:-:|:-:|:-:|
-| Runs offline, no API key | ✗ | ✓ | ✓ |
-| Rego / OPA evaluation | ✓ | ✗ | ✗ |
-| Audit record outside your AI system | ✓ | ✗ | ✗ |
-| Bundled 64-rule corpus | ✗ | ✓ | ✓ |
-| Temporal / effective-date rules | ✗ | ✗ | ✗ |
-| ESM + CommonJS | ✓ | ✓ | ESM only |
-| MCP host integration | ✗ | ✗ | ✓ |
+| Runs offline, no API key | No | Yes | Yes |
+| Rego / OPA evaluation | Yes | No | No |
+| Audit record outside your AI system | Yes | No | No |
+| Bundled 63 YAML rules | No | Yes | Yes |
+| Temporal / effective-date rules | No | No | No |
+| ESM + CommonJS | Yes | Yes | ESM only |
+| MCP host integration | No | No | Yes |
 
 Temporal / effective-date evaluation lives in the Python engine only. A shared version number across npm and PyPI is not a parity claim.
 
@@ -72,20 +72,30 @@ import { ComplyEdgeClient } from "@complyedge/sdk";
 
 const ce = new ComplyEdgeClient({ apiKey: process.env.COMPLYEDGE_API_KEY! });
 
-const result = await ce.check("Score users based on their social behavior");
+const result = await ce.check("Score users based on their social behavior", {
+  // What only you know, for an ADCR-complete record (optional; see below)
+  decisionContext: {
+    deciding_system: { version: "gpt-5.4-2026-08-01" },
+    purpose_ref: "purpose:support-replies",
+    data_categories: [],
+  },
+});
 
 if (!result.allowed) {
   console.log("Blocked:", result.violations[0].ruleId);
   console.log("Why:", result.violations[0].ruleDescription);
   console.log("Audit event:", result.eventId);
 }
+
+// ComplyEdge keeps the decision, not the text: store eventId next to your own copy
+appLog.info({ prompt: "Score users based on their social behavior", complyedgeEventId: result.eventId });
 ```
 
 Blocked output:
 
 ```
 Blocked: rego-art5-1c-001
-Why: Social scoring prohibited under Article 5(1)(c)
+Why: Regulation (EU) 2024/1689, Article 5(1)(c): the placing on the market, ...
 Audit event: evt_01J...
 ```
 
@@ -93,7 +103,8 @@ Audit event: evt_01J...
 
 `{ sandbox: true }` calls `POST /v1/sandbox/check`: the same rules, the same
 tenant settings and the same verdict, but no audit entry, no usage and no
-rate-limit count. Use it to test cases before wiring an integration. A sandbox
+count against your plan's daily limit (sandbox calls have their own caps:
+60 a minute, 1,000 a day). Use it to test cases before wiring an integration. A sandbox
 result is never evidence: `result.sandbox` is `true` and `result.auditLogged`
 is `false`.
 
@@ -117,7 +128,7 @@ const ce = new ComplyEdgeClient({
 
 ### Regions
 
-Two regions, one home per account, chosen when you create your API key: EU
+Two regions, one home per account, chosen when you sign up and create your first API key: EU
 (`eu.api.complyedge.io`, key prefix `ce_eu_`) or US (`api.complyedge.io`, key
 prefix `ce_`). The client reads the prefix and picks the host. To change the
 region later, use Request a region change in the dashboard; you get a new key for it.
@@ -125,7 +136,7 @@ region later, use Request a region change in the dashboard; you get a new key fo
 which host to call. They do not change the account's region. Precedence, highest first:
 `baseUrl` / `COMPLYEDGE_API_URL`, then `region` / `COMPLYEDGE_REGION`, then
 the key prefix, then EU. A key presented to the other region's stack is
-refused with `401 {"error":"wrong_region","use":"<host>"}` before any lookup.
+refused with `401 {"detail":{"error":"wrong_region","use":"<host>"}}` before any lookup.
 
 The region is where your prompts and audit records are processed and stored.
 It does not decide which laws are checked: the `jurisdiction` field on each
@@ -142,43 +153,74 @@ Calls `POST /v1/check`, the deterministic OPA hot path. Returns:
 |-------|------|---------|
 | `allowed` | `boolean` | `false` means block: a request before your AI sees it, an answer before your user does |
 | `status` | `"safe" \| "violation"` | Convenience mirror of `allowed` |
-| `violations` | `ComplianceViolation[]` | Rule ID, description, severity, reason, confidence |
+| `violations` | `ComplianceViolation[]` | Rule ID, `ruleDescription` (the rule's legal citation), severity, reason, confidence |
 | `eventId` | `string` | Identifier of the audit record for this decision |
+| `textHash` | `string` | Keyed hash (HMAC-SHA-256, your account's key) of the evaluated text; check it with `verifyInput` |
+| `textHashAlg` | `string` | `"hmac-sha256-1"`; absent on records written before the keyed hash was introduced (plain SHA-256) |
 | `auditLogged` | `boolean` | Whether the decision reached the audit record |
-| `enginePath` | `string` | `opa`, `opa_fallback_llm`, or `opa_error` |
+| `enginePath` | `string` | `opa`, `llm`, `hybrid`, `fallback_block` or `trustlint` |
 | `latencyMs` / `opaLatencyMs` | `number` | Server-reported latency |
 | `bundleVersion` | `string` | Rule bundle the decision was evaluated against |
 | `evaluatedRules` | `string[]` | Rule IDs considered |
+| `bundleDigest` | `string` | Content digest of the rule set that decided |
+| `sandbox` | `boolean` | `true` only for a `{ sandbox: true }` check |
+| `jurisdiction` / `timestamp` / `processingTimeMs` | | As evaluated and reported by the server |
 
 Per-call context overrides the client defaults:
 
 ```typescript
 await ce.check(userPrompt, {
-  direction: "prompt",     // "prompt" (user input) or "output" (model output)
+  direction: "prompt",     // "prompt", "output" (default) or "action" the AI is about to take
   jurisdiction: "EU",
   agentId: "hr-screening",
-  userId: "emp_12345",     // who the agent acts for
+  userId: "ref_5d81e2c4",     // who the agent acts for
   userRole: "recruiter",   // their role
   sessionId: "conv_abc",   // the conversation, run or job
 });
 ```
 
+`decisionContext` carries the ADCR 0.1.0 facts only you know (see the quick
+start). It is optional: without it the check runs and is recorded, but the
+record does not meet ADCR class Record. When you send it, `deciding_system`,
+`purpose_ref` and `data_categories` are required; with `subject` the API also
+requires `decision_mode`, `notice` and `explanation_inputs`. The
+`DecisionContext` type says the same.
+
 `userId`, `userRole` and `sessionId` are written on the audit record as
 `user_id`, `user_role` and `session_id`. Leave them out and those columns stay
-Never send a credential in these fields ('userId', 'userRole', 'sessionId'): a login token, session cookie, JWT or
+blank in your audit export. Send a stable identifier from your own system, never
+a name or an email address: `user_id` and `session_id` are stored as keyed
+pseudonyms (`p1:...`) under your account's own key, not as sent. `userRole` is
+stored as sent, so it must name a role, not a person.
+
+Never send a credential in these fields: a login token, session cookie, JWT or
 API key would sit in every audit record and export. If your session id doubles
 as a login token, send a hash of it (for example the first 16 hex characters of
 its SHA-256). ComplyEdge replaces any token- or key-shaped value with
 `redacted:` plus a hash before the record is written.
 
-blank in your audit export. For an agent that always acts for the same person,
+To prove a record was about a given text (the stored hash is keyed, so it
+cannot be recomputed locally):
+
+```typescript
+const ok = await ce.verifyInput(result.eventId, userPrompt); // true only for this exact text
+
+// Optional: append eventId + textHash (+ digests) locally after each check.
+// Never stores the prompt. Your app log still holds the text.
+// new ComplyEdgeClient({ apiKey, receiptJournalPath: "/var/lib/app/ce-receipts.jsonl" })
+```
+
+The full walkthrough, including what happens if you delete your copy early:
+https://complyedge.io/docs/audit-reconciliation.html
+
+For an agent that always acts for the same person,
 set them once on the client:
 
 ```typescript
 const ce = new ComplyEdgeClient({
   apiKey: process.env.COMPLYEDGE_API_KEY!,
   agentId: "hr-screening",
-  userId: "emp_12345",
+  userId: "ref_5d81e2c4",
   userRole: "recruiter",
   sessionId: runId,
 });
@@ -195,7 +237,15 @@ import { ComplyEdgeClient, withCompliance, ComplianceError } from "@complyedge/s
 const openai = withCompliance(
   new OpenAI(),
   new ComplyEdgeClient({ apiKey: process.env.COMPLYEDGE_API_KEY! }),
-  { jurisdiction: "EU", blockOnViolation: true }
+  {
+    jurisdiction: "EU",
+    blockOnViolation: true,
+    decisionContext: {
+      deciding_system: { version: "1.4.0" },
+      purpose_ref: "customer-support",
+      data_categories: ["contact"],
+    },
+  }
 );
 
 try {
@@ -211,7 +261,8 @@ try {
 ```
 
 When the OpenAI request sets `user`, the middleware records it as `userId`.
-Role and session come from the client defaults.
+Role and session come from the client defaults. Pass `decisionContext` in the
+options to send it with every check the middleware makes.
 
 `openai` is an optional peer dependency. Install it only if you use the middleware.
 
@@ -251,10 +302,10 @@ Network and HTTP failures surface as `AxiosError`. The middleware throws
 
 ## Links
 
-- Quick start: https://www.complyedge.io/docs/quick-start.html
-- API reference: https://www.complyedge.io/docs/api-reference.html
-- Browser playground: https://www.complyedge.io/docs/playground.html
-- Enforcement Seal embed: https://www.complyedge.io/docs/trust-badge.html
+- Quick start: https://complyedge.io/docs/quick-start.html
+- API reference: https://complyedge.io/docs/api-reference.html
+- Browser playground: https://complyedge.io/docs/playground.html
+- Enforcement Seal embed: https://complyedge.io/docs/trust-badge.html
 - Python SDK: `pip install complyedge`
 
 ## License

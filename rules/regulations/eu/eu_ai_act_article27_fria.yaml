@@ -2,10 +2,33 @@ id: EU_AI_ACT_ART27_FRIA_001
 jurisdiction: EU
 effective_date: '2027-12-02'
 description: >-
-  Requires public bodies and private entities providing public services to
-  perform a fundamental rights impact assessment before deploying high-risk AI
-  systems in areas listed in Annex III, and notify the market surveillance
-  authority of its results. Article 27.
+  Requires deployers that are bodies governed by public law or private entities
+  providing public services, and deployers of high-risk AI systems referred to
+  in Annex III points 5 (b) and (c), to perform a fundamental rights impact
+  assessment before deploying a high-risk AI system referred to in Article 6(2)
+  (other than in the area of Annex III point 2), and to notify the market
+  surveillance authority of its results. Article 27.
+
+
+  Layer 1 detects: "without impact assessment", or "without fundamental right
+  impact assessment" ("rights" also matches); "no FRIA", or "no fundamental
+  right assessment" or "no fundamental right impact assessment" ("rights" also
+  matches); "skip" or "skipping" followed by "fundamental right assessment"
+  ("rights" also matches) or "impact assessment"; "deploy" or "deploying"
+  followed by "without" or "before" and then "FRIA" or "fundamental right
+  assessment" ("rights" also matches); "fundamental right" or "fundamental
+  rights" followed by "not assessed", "not evaluated" or "not considered"; "no
+  impact assessment" or "no right assessment" ("rights" also matches) followed
+  by "before" or "prior"; "public body", "public service" or "public entity"
+  followed by "without" or "lacking" and then "FRIA" or "assessment"; and
+  "fail", "failing" or "failure" followed by "to assess" or "to evaluate" and
+  then "fundamental right", "fundamental rights" or "impact". Case is ignored,
+  the words must follow each other with no other word between them unless
+  stated, and a phrase can start inside a longer word. It matches wording, not
+  meaning: it misses the practice told in other words, it does not check that
+  the deployer is one Article 27 covers or that the system is high-risk, and
+  it fires on text that only names the practice, such as a refusal. Whether a
+  text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -26,37 +49,48 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    (without\s+(?:fundamental\s+rights?\s+)?impact\s+assessment|no\s+(?:FRIA|fundamental\s+rights?\s+(?:impact\s+)?assessment)|skip(?:ping)?\s+(?:fundamental\s+rights?|impact)\s+assessment|deploy(?:ing)?\s+(?:without|before)\s+(?:FRIA|fundamental\s+rights?\s+assessment)|fundamental\s+rights?\s+(?:not\s+)?(?:assessed|evaluated|considered)|no\s+(?:impact|rights?)\s+assessment\s+(?:before|prior)|public\s+(?:body|service|entity)\s+(?:without|lacking)\s+(?:FRIA|assessment)|fail(?:ing|ure)?\s+to\s+(?:assess|evaluate)\s+(?:fundamental\s+rights?|impact))
+    (without\s+(?:fundamental\s+rights?\s+)?impact\s+assessment|no\s+(?:FRIA|fundamental\s+rights?\s+(?:impact\s+)?assessment)|skip(?:ping)?\s+(?:fundamental\s+rights?|impact)\s+assessment|deploy(?:ing)?\s+(?:without|before)\s+(?:FRIA|fundamental\s+rights?\s+assessment)|fundamental\s+rights?\s+not\s+(?:assessed|evaluated|considered)|no\s+(?:impact|rights?)\s+assessment\s+(?:before|prior)|public\s+(?:body|service|entity)\s+(?:without|lacking)\s+(?:FRIA|assessment)|fail(?:ing|ure)?\s+to\s+(?:assess|evaluate)\s+(?:fundamental\s+rights?|impact))
   flags: i
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_27/par_1/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 27(1)'
   regulation: EU AI Act
   article: Article 27
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 27(1): Prior to deploying a high-risk
-    AI system referred to in Article 6(2), with the exception of high-risk AI
-    systems intended to be used in the area listed in point 2 of Annex III,
-    deployers that are bodies governed by public law, or are private entities
-    providing public services, and deployers of high-risk AI systems referred
-    to in points 5(b) and (c) of Annex III, shall perform an assessment of
-    the impact on fundamental rights that the use of such system may produce.
-    Article 27(3): Once the assessment has been performed, the deployer shall
-    notify the market surveillance authority of its results.
+    Regulation (EU) 2024/1689, Article 27(1), first subparagraph: Prior to
+    deploying a high-risk AI system referred to in Article 6(2), with the
+    exception of high-risk AI systems intended to be used in the area listed in
+    point 2 of Annex III, deployers that are bodies governed by public law, or
+    are private entities providing public services, and deployers of high-risk
+    AI systems referred to in points 5 (b) and (c) of Annex III, shall perform
+    an assessment of the impact on fundamental rights that the use of such
+    system may produce. Article 27(3): Once the assessment referred to in
+    paragraph 1 of this Article has been performed, the deployer shall notify
+    the market surveillance authority of its results, submitting the filled-out
+    template referred to in paragraph 5 of this Article as part of the
+    notification.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 15,000,000 or 3% of worldwide annual turnover
+    eu_enforcement: >-
+      No fine tier is set by the Regulation: Article 27 is not listed in Article
+      99(3) or 99(4). Member States lay down the rules on penalties under
+      Article 99(1).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — EU AI Act Article 27 requires a fundamental rights impact
-    assessment before deploying high-risk AI systems in Annex III areas.
-    Public bodies and private entities providing public services must assess
-    affected persons, specific risks, and oversight measures. Penalties: up
-    to EUR 15M or 3% of global revenue.
+    BLOCKED (readiness check, not yet a binding obligation): EU AI Act Article
+    27 requires a fundamental rights impact assessment before deploying a
+    high-risk AI system referred to in Article 6(2), other than in the area of
+    Annex III point 2 (critical infrastructure). It binds deployers that are
+    bodies governed by public law or private entities providing public services,
+    and deployers of Annex III point 5 (b) and (c) systems. The obligation
+    applies from 2 December 2027 (Article 113, as amended by Regulation (EU)
+    2026/1744). Penalties are set by Member States under Article 99(1).
   suggestion: >-
     Conduct a fundamental rights impact assessment covering: description of
     deployment processes, period and frequency of use, categories of affected
@@ -75,3 +109,7 @@ tier: enterprise
 compliance_notes:
   - >-
     Chapter III high-risk obligations were postponed by Regulation (EU) 2026/1744: Annex III high-risk systems apply from 2 December 2027, and high-risk systems embedded in products under Annex I from 2 August 2028. This rule is enforceable readiness tooling before those dates, not a currently binding obligation, and must not be presented as one.
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

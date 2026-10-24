@@ -55,6 +55,22 @@ _FAIL_MODES = frozenset({"open", "closed"})
 Attribution = Mapping[str, Any] | Callable[[], Mapping[str, Any] | None]
 
 
+#: The ADCR decision context sent with every check of a decorated call. A
+#: mapping, or a zero-argument callable read on EVERY call. Optional: without
+#: it the check runs and is recorded, but the record does not meet ADCR class
+#: Record (it lacks deciding_system.version, purpose_ref, data_categories).
+DecisionContextSource = Mapping[str, Any] | Callable[[], Mapping[str, Any] | None]
+
+
+def _resolve_decision_context(
+    source: DecisionContextSource | None,
+) -> dict[str, Any] | None:
+    if source is None:
+        return None
+    value = source() if callable(source) else source
+    return dict(value) if value else None
+
+
 def _resolve_attribution(attribution: Attribution | None) -> dict[str, Any]:
     if attribution is None:
         return {}
@@ -99,6 +115,7 @@ class ComplianceConfig:
         max_retries: int = 3,
         fail_mode: str = "open",
         attribution: Attribution | None = None,
+        decision_context: DecisionContextSource | None = None,
     ):
         """
         Initialize compliance configuration.
@@ -129,6 +146,9 @@ class ComplianceConfig:
             attribution: Who each call acts for, recorded on the audit entry
                 (user_id, user_role, session_id). A dict, or a zero-argument
                 callable evaluated on every call for per-request identity.
+            decision_context: ADCR decision context sent with every check
+                (deciding_system, purpose_ref, data_categories, ...). A dict,
+                or a zero-argument callable evaluated on every call.
         """
         self.api_key = api_key
         self.check_input = check_input
@@ -142,6 +162,7 @@ class ComplianceConfig:
         self.max_retries = max_retries
         self.fail_mode = _validate_fail_mode(fail_mode)
         self.attribution = attribution
+        self.decision_context = decision_context
 
 
 def default_violation_handler(result: ComplianceResult, context: str) -> None:
@@ -215,6 +236,7 @@ def compliance_check(
     violation_handler: Callable[[ComplianceResult, str], Any] | None = None,
     base_url: str | None = _DEFAULT_BASE_URL,
     attribution: Attribution | None = None,
+    decision_context: DecisionContextSource | None = None,
 ):
     """
     Decorator for automatic ComplyEdge compliance checking.
@@ -266,6 +288,10 @@ def compliance_check(
         attribution: Who each call acts for (user_id, user_role, session_id),
             recorded on the audit entry. A dict, or a zero-argument callable
             evaluated on every call, e.g. ``lambda: {"user_id": current_user.id}``.
+        decision_context: ADCR decision context sent with every check: a dict
+            with deciding_system ({"version": ...}), purpose_ref and
+            data_categories, or a zero-argument callable returning one. Without
+            it the check runs, but its record does not meet ADCR class Record.
 
     Returns:
         Decorated function with automatic compliance checking
@@ -297,6 +323,7 @@ def compliance_check(
                 api_base_url = config.base_url
                 fail_mode = config.fail_mode
                 attr_source = config.attribution or attribution
+                ctx_source = config.decision_context or decision_context
             else:
                 check_input = input
                 check_output = output
@@ -307,6 +334,7 @@ def compliance_check(
                 juris = jurisdiction
                 api_base_url = base_url
                 attr_source = attribution
+                ctx_source = decision_context
                 fail_mode = _validate_fail_mode(
                     os.getenv("COMPLYEDGE_FAIL_MODE", "open")
                 )
@@ -336,6 +364,7 @@ def compliance_check(
                 # Read per call: identity can change between requests.
                 **_resolve_attribution(attr_source),
             )
+            ctx = _resolve_decision_context(ctx_source)
 
             try:
                 # Input compliance checking
@@ -367,7 +396,9 @@ def compliance_check(
 
                         _input_violation = None
                         try:
-                            result = ce.check(combined_input, direction="prompt")
+                            result = ce.check(
+                                combined_input, direction="prompt", decision_context=ctx
+                            )
                             if not result.safe:
                                 logger.warning(
                                     "Input compliance violation detected",
@@ -432,7 +463,7 @@ def compliance_check(
 
                     _output_violation = None
                     try:
-                        result = ce.check(response)
+                        result = ce.check(response, decision_context=ctx)
                         if not result.safe:
                             logger.warning(
                                 "Output compliance violation detected",

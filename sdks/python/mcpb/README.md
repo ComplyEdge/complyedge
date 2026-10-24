@@ -1,30 +1,51 @@
-# ComplyEdge TrustLint — MCPB stdio bundle
+# ComplyEdge TrustLint MCP server, local stdio
 
-Install-true MCP Bundle (`.mcpb`) for **local stdio** desktop / directory clients.
-
-- **Runtime (local only):** `uvx --from 'complyedge[mcp]==0.2.10' -- python -m complyedge.mcp_server`
-- **Tools:** `check_compliance`, `list_rules`, `scan_prompt` (manifest includes MCP `inputSchema` so directory registries that require full Tool shape accept the bundle; schemas match `complyedge.mcp_server`)
-- **Config:** none required on day one. Optional `COMPLYEDGE_API_KEY` adds a fourth tool, `sandbox_check` (hosted enforcement, sandbox mode, nothing recorded); without it the bundle is fully offline.
-- **Official Registry twin:** `io.github.ComplyEdge/complyedge` @ 0.2.10
-- **Pack:** `./pack.sh` uses zip (not `mcpb pack`) so Tool-shaped tools can ship
-- **Hosted (Smithery Toolbox / Add to toolbox):** `https://mcp.complyedge.io/mcp` — Streamable HTTP on CE AWS (PM-01). Prefer this for one-click Install.
-- **Hosted `sandbox_check`:** always listed on the hosted server; works only when the client sends `Authorization: Bearer <API key>` on the connection. One-click install without a key keeps working: the three offline tools need none.
-- **Local MCPB (this bundle):** `uvx … python -m complyedge.mcp_server` for offline / Claude Desktop double-click. Secondary to hosted.
-- **Cursor:** Prefer Smithery Install → hosted URL, or stdio `command`/`args` with uvx as above.
-- **Claude Desktop:** MCPB stdio **or** hosted URL via Smithery Install.
-- **Why not `complyedge-mcp` console script under uvx:** some hosts lack `realpath` and break the generated wrapper; `-m complyedge.mcp_server` is the durable launch.
-
-## Pack
+This folder holds the entry point of the TrustLint MCP server packaged as an
+MCP Bundle (`.mcpb`) for desktop clients. The server runs on your machine over
+stdio. Run it with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-cd sdks/python/mcpb
-./pack.sh
-# writes ../dist/complyedge-trustlint-0.2.10.mcpb
+uvx --from 'complyedge[mcp]==0.2.21' -- python -m complyedge.mcp_server
 ```
 
-## Smoke
+## Tools
 
-```bash
-# requires uv/uvx on PATH (https://docs.astral.sh/uv/)
-uvx --from 'complyedge[mcp]==0.2.10' -- python -m complyedge.mcp_server
+- `check_compliance`, `list_rules` and `scan_prompt` run offline against the
+  bundled TrustLint rules. No API key, and nothing leaves your machine.
+- `sandbox_check` is listed only when `COMPLYEDGE_API_KEY` is set in the
+  server's environment. It sends the text to the hosted ComplyEdge API in
+  sandbox mode: the decision comes back and nothing is recorded.
+
+## Client config
+
+Claude Desktop, Cursor and other clients that launch a stdio server:
+
+```json
+{
+  "mcpServers": {
+    "complyedge": {
+      "command": "uvx",
+      "args": ["--from", "complyedge[mcp]==0.2.21", "--", "python", "-m", "complyedge.mcp_server"],
+      "env": { "COMPLYEDGE_API_KEY": "ce_..." }
+    }
+  }
+}
 ```
+
+Leave out `env` to stay fully offline.
+
+The server is launched with `python -m complyedge.mcp_server` rather than the
+`complyedge-mcp` console script because some hosts lack `realpath`, which the
+generated wrapper needs under uvx.
+
+## Hosted instead
+
+`https://mcp.complyedge.io/mcp` serves the same tools over Streamable HTTP,
+hosted by ComplyEdge. `sandbox_check` is always listed there and works only
+when the client sends `Authorization: Bearer <API key>` on the connection; the
+three offline tools need no key.
+
+The server is listed in the Official MCP Registry as
+`io.github.ComplyEdge/complyedge`, and on Smithery at
+[smithery.ai/servers/complyedge/complyedge](https://smithery.ai/servers/complyedge/complyedge),
+which adds it to a client such as Cursor in one step.

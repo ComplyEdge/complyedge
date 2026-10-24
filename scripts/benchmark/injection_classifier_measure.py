@@ -105,9 +105,12 @@ async def _run(model: str, concurrency: int, only: str | None) -> dict:
     blocks = [r for r in rows if r["expected"] == "block"]
     passes = [r for r in rows if r["expected"] == "none"]
     lat = [r["latency_ms"] for r in rows]
+    # AUD-178: classifier measure run_at is ADCR Zulu.
+    from adcr_record import utc_timestamp
+
     return {
         "model": model,
-        "run_at": datetime.now(UTC).isoformat(),
+        "run_at": utc_timestamp(datetime.now(UTC)),
         "cases": len(rows),
         "llm_calls": len(_usage),
         "unavailable": sum(not r["available"] for r in rows),

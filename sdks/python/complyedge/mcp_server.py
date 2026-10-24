@@ -16,12 +16,28 @@ import json
 import logging
 import os
 import sys
+from pathlib import Path
 from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import CallToolResult, TextContent, Tool, ToolAnnotations
 from trustlint.engine import TrustLintEngine
+
+try:
+    from trustlint.engine import jurisdiction_applies
+except ImportError:  # trustlint releases before the shared helper
+
+    def jurisdiction_applies(rule_jurisdiction: str, requested: str | None) -> bool:
+        """GLOBAL rules apply everywhere; a rule applies in its own jurisdiction,
+        its sub-jurisdictions (US includes US-CA) and its parents."""
+        if not requested:
+            return True
+        rule_j = (rule_jurisdiction or "").upper()
+        want = requested.upper()
+        if rule_j == "GLOBAL":
+            return True
+        return rule_j == want or want.startswith(rule_j + "-") or rule_j.startswith(want + "-")
 
 logger = logging.getLogger("complyedge.mcp")
 
@@ -32,7 +48,8 @@ TOOL_NAMES = ("check_compliance", "list_rules", "scan_prompt")
 # the hosted API (POST /v1/sandbox/check), so without a key it does not exist
 # and the offline contract of the three tools above is untouched. The hosted
 # sandbox evaluates with the tenant's real rules and settings and records
-# nothing: no audit entry, no usage, no rate-limit count. Never evidence.
+# nothing: no audit entry, no usage, no count against the plan's daily limit
+# (own caps: 60 a minute, 1,000 a day). Never evidence.
 SANDBOX_TOOL_NAME = "sandbox_check"
 API_KEY_ENV = "COMPLYEDGE_API_KEY"
 
@@ -105,14 +122,15 @@ _JURISDICTION_ENUM = ["EU", "US", "GLOBAL"]
 SANDBOX_TOOL_DESCRIPTION = (
     "EU AI Act Article 5 and Article 50. Hosted ComplyEdge enforcement, "
     "sandbox mode: the same deterministic rules and tenant settings as "
-    "production, but NOTHING is recorded : no audit entry, no usage, no "
-    "rate-limit count. Use it to try a case before wiring an "
+    "production, but NOTHING is recorded: no audit entry, no usage, no "
+    "count against the plan's daily limit (sandbox calls have their own caps: "
+    "60 a minute, 1,000 a day). Use it to try a case before wiring an "
     "integration or to see what a rule catches; the result is never "
     "evidence. Requires COMPLYEDGE_API_KEY (this tool is listed only "
     "when it is set) and makes one network call to the ComplyEdge API "
     "(POST /v1/sandbox/check). Argument `text` must be non-empty; "
-    "optional `jurisdiction` defaults to EU. Returns BLOCKED or ALLOWED "
-    "with rule ID and article citation, engine_path and latency."
+    "optional `jurisdiction` defaults to EU. Returns BLOCKED with rule ID "
+    "and article citation, or ALLOWED, plus engine_path and latency."
 )
 
 _SANDBOX_CHECK_SCHEMA: dict[str, Any] = {
@@ -249,9 +267,21 @@ def _configure_logging() -> None:
     root.setLevel(logging.INFO)
 
 
+def _bundled_rules_dir() -> str:
+    """The corpus the installed trustlint ships, beside trustlint/engine.py."""
+    import trustlint.engine
+
+    return str(Path(trustlint.engine.__file__).parent / "rules")
+
+
 def _get_engine() -> TrustLintEngine:
-    """TrustLint with package-bundled rules (optional TRUSTLINT_RULES_DIR)."""
-    rules_dir = os.environ.get("TRUSTLINT_RULES_DIR") or None
+    """TrustLint with package-bundled rules (optional TRUSTLINT_RULES_DIR).
+
+    Always passes a directory: with none, TrustLintEngine loads
+    ~/.trustlint/rules (the `trustlint update` cache) or a rules/regulations
+    folder above the working directory before its bundled rules.
+    """
+    rules_dir = os.environ.get("TRUSTLINT_RULES_DIR") or _bundled_rules_dir()
     return TrustLintEngine(rules_dir=rules_dir)
 
 
@@ -370,7 +400,9 @@ async def _sandbox_check(
         not isinstance(jurisdiction, str) or not jurisdiction.strip()
     ):
         raise ValueError("jurisdiction must be a non-empty string when given")
-    api_key = (api_key if api_key is not None else os.environ.get(API_KEY_ENV) or "").strip()
+    api_key = (
+        api_key if api_key is not None else os.environ.get(API_KEY_ENV) or ""
+    ).strip()
     if not api_key:
         raise RuntimeError(
             f"{SANDBOX_TOOL_NAME} needs {API_KEY_ENV}; the offline tools do not."
@@ -460,7 +492,7 @@ async def _list_rules(
     jurisdiction = _optional_jurisdiction(arguments)
     rules = engine.rules
     if jurisdiction:
-        rules = [r for r in rules if r.jurisdiction.upper() == jurisdiction.upper()]
+        rules = [r for r in rules if jurisdiction_applies(r.jurisdiction, jurisdiction)]
 
     rules_list = [
         {
@@ -480,7 +512,12 @@ async def _scan_prompt(
 ) -> CallToolResult:
     prompt = _require_str(arguments, "prompt")
     _require_corpus(engine)
-    result = engine.check(prompt)
+    # A prompt is text a user sends: rules scoped to AI output do not run.
+    # trustlint releases before the direction argument run every rule.
+    try:
+        result = engine.check(prompt, direction="input")
+    except TypeError:
+        result = engine.check(prompt)
 
     if result.clean:
         return _tool_result(

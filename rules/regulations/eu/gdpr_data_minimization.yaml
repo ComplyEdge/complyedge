@@ -1,19 +1,32 @@
 id: GDPR_DATA_MINIMIZATION_001
 jurisdiction: EU
 effective_date: '2018-05-25'
-description: Personal data collection must be adequate, relevant and limited to what
-  is necessary
+description: >-
+  Personal data collection must be adequate, relevant and limited to what is
+  necessary
+
+
+  Layer 1 detects: collect, gather or request (also inside a longer word)
+  followed later on the same line by personal or sensitive, a space, then data
+  or information. It matches wording, not meaning: it does not read the
+  purpose or whether the data is adequate, relevant and limited to what is
+  necessary, so it fires on every collection of personal data written in these
+  words, including a minimal one ("We collect only the personal data the
+  delivery needs: name and address."), and it misses collection told in other
+  words. Whether a collection is excessive is judged in Layer 2.
 conditions:
 - type: semantic
   prompt: Does this request collect more personal data than necessary for the stated
     purpose? Consider if each data field is directly relevant and needed.
   model: gpt-5.4
 - type: regex
-  value: (collect|gather|request).*(personal|sensitive) (data|information)
+  value: (collect|gather|request).*(personal|sensitive)\s(data|information)
   flags: i
 severity: medium
 category: privacy
 source:
+  eli: http://data.europa.eu/eli/reg/2016/679/art_5/par_1/pnt_c/oj
+  provision_label: 'Regulation (EU) 2016/679, Article 5(1)(c)'
   regulation: GDPR
   article: Article 5(1)(c)
   # Retrieved 2026-08-06 from the Official Journal PDF (the authoritative
@@ -28,9 +41,15 @@ source:
   citation: >-
     Regulation (EU) 2016/679 (GDPR), Article 5(1)(c): personal data shall be
     "adequate, relevant and limited to what is necessary in relation to the
-    purposes for which they are processed ('data minimisation')".
+    purposes for which they are processed (‘data minimisation’)".
   url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
   last_updated: '2016-04-27'
+penalty_information:
+  civil_penalties:
+    eu_enforcement: >-
+      Administrative fines up to EUR 20,000,000 or, for an undertaking, up to 4%
+      of the total worldwide annual turnover of the preceding financial year,
+      whichever is higher (Article 83(5), point (a)).
 remediation:
   action: warn
   message: Data collection may violate GDPR data minimization principle
@@ -41,3 +60,7 @@ tags:
 - personal_data
 - collection
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

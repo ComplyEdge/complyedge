@@ -1,11 +1,25 @@
-# ComplyEdge — EU AI Act GPAI (Articles 51-55): Aggregated Check
+# ComplyEdge: EU AI Act GPAI (Articles 51-55): Aggregated Check
 #
 # Aggregates all sub-rules in this package and returns a unified result.
-# OPA queries this package at: POST /v1/data/complyedge/gpai
+# OPA queries this package at: POST /v1/data/complyedge/gpai/result
 #
 # Aggregator carve-out (RULE_STANDARD.md §5.6): imports and combines other
-# rules' violation results — no legal condition of its own. Correctness derives
+# rules' violation results, no legal condition of its own. Correctness derives
 # from the imported sub-rules, each individually subject to §5 sign-off.
+#
+# Imported rules (each individually subject to §5 sign-off):
+#   - gpai.copyright_transparency   (rego-gpai-53c-001)
+#   - gpai.cybersecurity_gpai       (rego-art55-1d-001)
+#   - gpai.downstream_obligations   (rego-gpai-53b-001)
+#   - gpai.incident_reporting       (rego-art55-1c-001)
+#   - gpai.model_classification     (rego-gpai-51-001)
+#   - gpai.model_evaluation         (rego-art55-1a-001)
+#   - gpai.open_source_exemption    (rego-gpai-53-2-001)
+#   - gpai.risk_mitigation          (rego-art55-1b-001)
+#   - gpai.sr_designation           (rego-art52-001)
+#   - gpai.systemic_risk            (rego-gpai-55-001)
+#   - gpai.technical_documentation  (rego-gpai-53a-001)
+#   - gpai.training_summary         (rego-art53-1d-001)
 
 package complyedge.gpai
 

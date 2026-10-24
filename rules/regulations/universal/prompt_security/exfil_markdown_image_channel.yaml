@@ -1,10 +1,24 @@
 id: PROMPT_SECURITY_EXFIL_MARKDOWN_IMAGE_CHANNEL_001
 jurisdiction: GLOBAL
-effective_date: '2026-07-05'
-description: 'Detects the markdown-image / link data-exfiltration channel used by indirect prompt injection:
-  a markdown image or link whose URL query smuggles captured data to an external host. EU AI Act Article
-  15. OWASP LLM01 / LLM06.'
-title: Injection exfiltration — markdown image/link data channel
+effective_date: '2027-12-02'
+description: >-
+  Covers the markdown-image / link data-exfiltration channel used by indirect
+  prompt injection: a markdown image or link whose URL query smuggles captured
+  data to an external host. EU AI Act Article 15. OWASP LLM01 / LLM06.
+
+
+  Layer 1 detects: in any letter case, a markdown image "![...](", an HTML "<img
+  ... src=" (the quote optional) or a markdown link "](", directly followed by
+  an http or https URL whose query string (before any ")", quote or space)
+  contains a parameter named data, leak, exfil, prompt, sys, system, content,
+  payload, q, c, s, secret or token ("?q=" or "&token="). It matches the shape
+  of the link, not what it carries: it does not read whether the URL holds
+  conversation or secret data or who put it there, so it fires on an ordinary
+  search link the user asked for
+  ("[results](https://www.example.com/search?q=opa)"), and it misses a URL that
+  carries data under any other parameter name or in its path. Whether the link
+  exfiltrates data is judged in Layer 2.
+title: 'Injection exfiltration: markdown image/link data channel'
 detection_scope: all
 conditions:
 - type: regex
@@ -13,24 +27,45 @@ conditions:
 severity: critical
 category: security
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_15/par_5/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 15(5)'
   regulation: EU AI Act Article 15 (Accuracy, Robustness, Cybersecurity)
-  article: Regulation (EU) 2024/1689, Article 15
+  article: Regulation (EU) 2024/1689, Article 15(5)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
-  citation: 'Regulation (EU) 2024/1689 (EU AI Act), Article 15(5): "High-risk AI systems shall be resilient
-    against attempts by unauthorised third parties to alter their use, outputs or performance by exploiting
-    system vulnerabilities. The technical solutions aiming to ensure the cybersecurity of high-risk AI
-    systems shall be appropriate to the relevant circumstances and the risks."'
+  citation: >-
+    Regulation (EU) 2024/1689, Article 15(5): High-risk AI systems shall be
+    resilient against attempts by unauthorised third parties to alter their use,
+    outputs or performance by exploiting system vulnerabilities. The technical
+    solutions aiming to ensure the cybersecurity of high-risk AI systems shall
+    be appropriate to the relevant circumstances and the risks. The technical
+    solutions to address AI specific vulnerabilities shall include, where
+    appropriate, measures to prevent, detect, respond to, resolve and control
+    for attacks trying to manipulate the training data set (data poisoning), or
+    pre-trained components used in training (model poisoning), inputs designed
+    to cause the AI model to make a mistake (adversarial examples or model
+    evasion), confidentiality attacks or model flaws.
   last_updated: '2026-07-05'
   citations:
   - 'Secondary reference (not the legal basis): OWASP Top 10 for LLM Applications, https://owasp.org/www-project-top-10-for-large-language-model-applications/'
 remediation:
   action: block
   timing: both
-  message: 🛑 Blocked — a markdown image/link is smuggling data in its URL query (data-exfiltration channel).
+  message: >-
+    🛑 Blocked: a markdown image or link carries a URL query parameter that
+    matches a data-exfiltration pattern.
+    Article 15(5) applies to high-risk AI systems from 2 December 2027
+    (Annex III) and 2 August 2028 (Annex I): this finding is readiness
+    tooling, not a currently binding obligation.
   suggestion: Strip or sanitise auto-rendering markdown images/links in model I/O; never allow untrusted
     content to embed URLs with captured data in query strings.
   allow_override: false
   require_explicit_consent: false
+compliance_notes:
+  - >-
+    Article 15 applies from 2 December 2027 for high-risk AI systems under Annex
+    III and from 2 August 2028 for high-risk AI systems under Annex I (Article
+    113, third paragraph, point (c), as amended by Regulation (EU) 2026/1744).
+    effective_date records the Annex III date.
 version: 1.0.0
 tags:
 - prompt_injection
@@ -43,3 +78,7 @@ tags:
 - owasp_llm06
 - security
 tier: community
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

@@ -2,11 +2,27 @@ id: EU_AI_ACT_GPAI_COPYRIGHT_TRANSPARENCY_001
 jurisdiction: EU
 effective_date: '2025-08-02'
 description: >-
-  Requires providers of general-purpose AI models to put in place a policy
-  to comply with Union copyright law and to make publicly available a
-  sufficiently detailed summary of the training data used, following a
-  template provided by the AI Office. Article 53(1)(c) of the EU AI Act
-  mandates copyright transparency for GPAI training data.
+  Requires providers of general-purpose AI models to put in place a policy to
+  comply with Union law on copyright and related rights, including identifying
+  and complying with rights reservations expressed under Article 4(3) of
+  Directive (EU) 2019/790. Article 53(1)(c) of the EU AI Act.
+
+
+  Layer 1 detects: one sequence: train, fine-tune (also "fine tune",
+  "finetune") or retrain, in any form, then on, with or using, then
+  copyrighted, proprietary or licensed, then data, content, material, works,
+  text or corpus, then without, lacking or no, then disclosure, summary,
+  transparency, documentation or permission ("train on copyrighted data
+  without permission"). The words disclosure, summary and transparency point
+  at the public training-content summary of Article 53(1)(d), a separate duty
+  with its own rule, rather than at the copyright policy of Article 53(1)(c).
+  It matches wording, not meaning: it does not read
+  whether a copyright policy exists or whether rights reservations under
+  Article 4(3) of Directive (EU) 2019/790 are honoured, so it misses the
+  practice told in other words ("We scraped every book on the shadow library
+  into the training set and ignored the robots.txt opt-outs."), and it fires
+  on text that only names the practice, such as a refusal. Whether a text does
+  the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -22,34 +38,36 @@ conditions:
 severity: high
 category: consumer_protection
 source:
+  eli: http://data.europa.eu/eli/reg/2024/1689/art_53/par_1/pnt_c/oj
+  provision_label: 'Regulation (EU) 2024/1689, Article 53(1)(c)'
   regulation: EU AI Act
   article: Article 53(1)(c)
   url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
   last_updated: '2024-07-12'
   citation: >-
-    Regulation (EU) 2024/1689, Article 53(1)(c): Providers of
-    general-purpose AI models shall put in place a policy to comply with
-    Union law on copyright and related rights, and in particular to
-    identify and comply with, including through state of the art
-    technologies, a reservation of rights expressed pursuant to Article
-    4(3) of Directive (EU) 2019/790; and make publicly available a
-    sufficiently detailed summary about the content used for training of
-    the general-purpose AI model, according to a template provided by the
-    AI Office.
+    Regulation (EU) 2024/1689, Article 53(1)(c): put in place a policy to comply
+    with Union law on copyright and related rights, and in particular to
+    identify and comply with, including through state-of-the-art technologies, a
+    reservation of rights expressed pursuant to Article 4(3) of Directive (EU)
+    2019/790;
 remediation:
   action: warn
   timing: proactive
   message: >-
-    WARNING — EU AI Act Article 53(1)(c) requires GPAI model providers to
-    disclose a sufficiently detailed summary of training data and comply
-    with EU copyright law. Training on copyrighted data without transparency
-    may result in penalties of up to EUR 15M or 3% of global annual revenue.
+    WARNING: EU AI Act Article 53(1)(c) requires providers of general-purpose AI
+    models to put in place a policy to comply with Union copyright law,
+    including identifying and complying with rights reservations expressed under
+    Article 4(3) of Directive (EU) 2019/790. The training-content summary is a
+    separate duty under Article 53(1)(d). Penalties: fines imposed by the
+    Commission of up to 3% of annual total worldwide turnover in the preceding
+    financial year or EUR 15,000,000, whichever is higher, where the provider
+    intentionally or negligently infringed the Regulation (Article 101(1)).
   suggestion: >-
-    Publish a detailed summary of training data content following the AI
-    Office template. Implement a copyright compliance policy that respects
-    opt-out rights under the EU Copyright Directive. Document all
-    copyrighted works used in training and maintain an audit trail.
-version: 1.0.0
+    Adopt and document a copyright policy that identifies and honours rights
+    reservations (opt-outs) expressed under Article 4(3) of Directive (EU)
+    2019/790, including through state-of-the-art technologies. Publish the
+    training-content summary separately required by Article 53(1)(d).
+version: 1.0.1
 tags:
 - eu-ai-act
 - gpai
@@ -62,3 +80,9 @@ tier: enterprise
 compliance_notes:
   - >-
     GPAI obligations under Chapter V have applied since 2 August 2025. The 2 August 2026 date is when the Commission's Article 101 fining powers became exercisable, which is an enforcement milestone, not the date the obligation began. Conflating the two overstates when compliance was required.
+  - >-
+    Article 111(3): providers of general-purpose AI models placed on the market before 2 August 2025 must comply by 2 August 2027. Regulation (EU) 2026/1744 does not amend Articles 51 to 55, 101 or 111(3).
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

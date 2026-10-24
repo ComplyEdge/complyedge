@@ -2,10 +2,28 @@ id: GDPR_CONSENT_001
 jurisdiction: EU
 effective_date: '2018-05-25'
 description: >-
-  Requires explicit consent before processing personal data for marketing
-  purposes. Consent must be freely given, specific, informed, and unambiguous.
-  The data subject must be able to withdraw consent at any time.
-  GDPR Article 6(1)(a) and Article 7.
+  Where processing of personal data for marketing relies on consent, requires
+  consent that is freely given, specific, informed and unambiguous, that the
+  controller can demonstrate, and that the data subject can withdraw at any
+  time. GDPR Article 6(1)(a) and Article 7.
+
+
+  Layer 1 detects: the regex condition only (the metadata conditions in this
+  file are not run by the offline engine): processing, storing, collecting,
+  gathering or harvesting, in any form, optionally "your", "the" or "their",
+  then personal data, then without, lacking or before obtaining, then consent,
+  permission or authorization, unless the verb comes right after "not",
+  "don't", "dont", "never" or "without"; marketing without, lacking or before
+  consent, opt-in or permission; personal data, optionally "for", then
+  marketing without or lacking consent; no consent required, needed or
+  obtained for or before processing, marketing or data; skipping, bypassing or
+  ignoring, in any form, consent or opt-in followed by for, before or
+  requirement; and consent not obtained, required or recorded for or before
+  processing or marketing. It matches wording, not meaning: it misses the
+  practice told in other words ("We bought a list of leads and will email them
+  our offers starting Monday."), it does not read whether consent is the legal
+  basis relied on, and it fires on text that only names the practice. Whether
+  a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -15,12 +33,12 @@ conditions:
     consent from the data subject as required by GDPR Article 6(1)(a). Consent
     must be freely given, specific, informed, and an unambiguous indication of
     the data subject's wishes. Detect intent to process personal data without
-    valid consent — but do NOT flag text that explicitly states data is NOT
+    valid consent, but do NOT flag text that explicitly states data is NOT
     being processed, or that describes compliant data handling practices.
   model: gpt-4
 - type: regex
   value: >-
-    ((?<!not\s)(?<!don't\s)(?<!dont\s)(?<!never\s)(?<!without\s)(?:process|store|collect|gather|harvest)\w*\s+(?:your\s+|the\s+|their\s+)?personal\s+data\s+(?:without|lacking|before\s+obtaining)\s+(?:consent|permission|authorization)|marketing\s+(?:without|lacking|before)\s+(?:consent|opt[\-\s]in|permission)|personal\s+data\s+(?:for\s+)?marketing\s+(?:without|lacking)\s+consent|no\s+consent\s+(?:required|needed|obtained)\s+(?:for|before)\s+(?:processing|marketing|data)|(?:skip|bypass|ignore)\w*\s+(?:consent|opt[\-\s]in)\s+(?:for|before|requirement)|consent\s+(?:not\s+)?(?:obtained|required|recorded)\s+(?:for|before)\s+(?:processing|marketing))
+    ((?<!not\s)(?<!don't\s)(?<!dont\s)(?<!never\s)(?<!without\s)(?:process|store|collect|gather|harvest)\w*\s+(?:your\s+|the\s+|their\s+)?personal\s+data\s+(?:without|lacking|before\s+obtaining)\s+(?:consent|permission|authorization)|marketing\s+(?:without|lacking|before)\s+(?:consent|opt[\-\s]in|permission)|personal\s+data\s+(?:for\s+)?marketing\s+(?:without|lacking)\s+consent|no\s+consent\s+(?:required|needed|obtained)\s+(?:for|before)\s+(?:processing|marketing|data)|(?:skip|bypass|ignore)\w*\s+(?:consent|opt[\-\s]in)\s+(?:for|before|requirement)|consent\s+not\s+(?:obtained|required|recorded)\s+(?:for|before)\s+(?:processing|marketing))
   flags: i
 - type: metadata
   key: purpose
@@ -33,34 +51,44 @@ conditions:
 severity: high
 category: privacy
 source:
+  eli: http://data.europa.eu/eli/reg/2016/679/art_6/par_1/pnt_a/oj
+  provision_label: 'Regulation (EU) 2016/679, Article 6(1)(a) and Article 7'
   regulation: GDPR
   article: Article 6(1)(a), Article 7
   url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
   last_updated: '2016-04-27'
   citation: >-
-    Regulation (EU) 2016/679, Article 6(1)(a): Processing shall be lawful
-    only if and to the extent that the data subject has given consent to the
-    processing of his or her personal data for one or more specific purposes.
-    Article 7(1): Where processing is based on consent, the controller shall
-    be able to demonstrate that the data subject has consented to processing
-    of his or her personal data. Article 7(3): The data subject shall have
-    the right to withdraw his or her consent at any time.
+    Regulation (EU) 2016/679, Article 6(1): Processing shall be lawful only if
+    and to the extent that at least one of the following applies: (a) the data
+    subject has given consent to the processing of his or her personal data for
+    one or more specific purposes; Article 7(1): Where processing is based on
+    consent, the controller shall be able to demonstrate that the data subject
+    has consented to processing of his or her personal data. Article 7(3): The
+    data subject shall have the right to withdraw his or her consent at any
+    time.
 penalty_information:
   civil_penalties:
-    sec_enforcement: Up to EUR 20,000,000 or 4% of worldwide annual turnover
+    eu_enforcement: >-
+      Administrative fines up to EUR 20,000,000 or, for an undertaking, up to 4%
+      of the total worldwide annual turnover of the preceding financial year,
+      whichever is higher (Article 83(5), point (a)).
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — GDPR Article 6(1)(a) requires explicit consent before processing
-    personal data for marketing purposes. Consent must be freely given,
-    specific, informed, and unambiguous. Penalties: up to EUR 20M or 4% of
-    global revenue.
+    BLOCKED: Where processing of personal data for marketing relies on consent,
+    GDPR Article 6(1)(a) and Article 7 require consent for one or more specific
+    purposes that the controller can demonstrate and that the data subject can
+    withdraw at any time. Consent is one of the lawful bases listed in Article
+    6(1). Penalties: administrative fines up to EUR 20,000,000 or, for an
+    undertaking, up to 4% of the total worldwide annual turnover of the
+    preceding financial year, whichever is higher (Article 83(5), point (a)).
   suggestion: >-
-    Obtain and record explicit consent from the data subject before processing
-    personal data for marketing. Consent must be freely given, specific,
-    informed, and an unambiguous indication of wishes. Ensure the data subject
-    can withdraw consent at any time as easily as it was given.
+    Where consent is the lawful basis, obtain and record the data subject's
+    consent before processing personal data for marketing. Consent must be
+    freely given, specific, informed and an unambiguous indication of wishes
+    (Article 4(11)), and withdrawing it must be as easy as giving it (Article
+    7(3)). If another lawful basis applies, document it.
 version: 2.0.0
 tags:
 - gdpr
@@ -70,3 +98,7 @@ tags:
 - personal-data
 - marketing
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

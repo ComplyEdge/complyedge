@@ -1,53 +1,83 @@
 id: SANCTIONS_OFAC_RU_ENERGY_WINDDOWN_001
 jurisdiction: US
-effective_date: '2026-01-01'
+effective_date: '2022-03-08'
 description: >-
-  OFAC Russia energy-sector dealings prohibition currently operating under a
-  General License wind-down window. In force now; scheduled to lift/supersede
-  on the window end date. Demonstrates the dynamic-state (effective_window)
-  sanctions primitive.
-title: OFAC Russia energy dealings — General License wind-down
+  Prohibits importing into the United States crude oil, petroleum products,
+  liquefied natural gas and coal of Russian Federation origin, and new
+  investment in the Russian energy sector by a U.S. person (Executive Order
+  14066, Section 1(a)). Transactions with persons blocked under Executive
+  Order 14024 are prohibited by 31 CFR 587.201.
+
+
+  Layer 1 detects: VEB.RF, Gazprombank, Sovcomflot, shadow fleet (written with a
+  hyphen, a dash, a space or nothing), Russian oil, crude, energy, gas or LNG,
+  Urals crude, or price cap or oil price cap (the same separators). It
+  matches wording, not meaning: it fires on any mention ("Write a market note on
+  how Russian oil exports changed after the price cap was introduced in 2022."),
+  and it misses a dealing told in other words ("Charter the tanker to lift
+  700,000 barrels from Primorsk at $78 a barrel and insure it with our London
+  broker."). Whether a text is a dealing the program prohibits is judged in
+  Layer 2.
+title: OFAC Russia energy-sector dealings
 detection_scope: all
 category: sanctions
 conditions:
 - type: regex
   value: >-
-    (?i)\b(VEB\.?RF|Gazprombank|Sovcomflot|shadow[- ]?fleet|Russian\s+(?:oil|crude|energy|gas|LNG)|Urals\s+crude|(?:oil\s+)?price[- ]?cap)\b
+    (?i)\b(VEB\.?RF|Gazprombank|Sovcomflot|shadow[-\u2010-\u2015\s]?fleet|Russian\s+(?:oil|crude|energy|gas|LNG)|Urals\s+crude|(?:oil\s+)?price[-\u2010-\u2015\s]?cap)\b
   flags: i
 severity: high
-effective_window:
-  starts: '2026-01-01'
-  ends: '2026-12-31'
-  superseded_by: SANCTIONS_OFAC_RU_ENERGY_FULL_002
 source:
-  regulation: OFAC (US Treasury) Russia sanctions — General License framework
-  article: 31 CFR Part 587 / Executive Order 14024
+  provision_url: https://www.federalregister.gov/documents/2022/03/10/2022-05232
+  provision_label: 'Executive Order 14066, Section 1(a), and 31 CFR 587.201'
+  regulation: OFAC (US Treasury) Russia sanctions
+  article: Executive Order 14066, Section 1(a) / 31 CFR 587.201
   url: https://ofac.treasury.gov/sanctions-programs-and-country-information/russian-harmful-foreign-activities-sanctions
   citation: >-
-    OFAC administers Russia-related restrictions under EO 14024 and 31 CFR
-    Part 587, issuing General Licenses that authorise wind-down of specified
-    dealings through a stated expiry. This rule models such a prohibition
-    during its wind-down window; the successor rule takes effect on expiry.
-  last_updated: '2026-07-05'
+    Executive Order 14066 of March 8, 2022, Section 1(a): The following are
+    prohibited: (i) the importation into the United States of the following
+    products of Russian Federation origin: crude oil; petroleum; petroleum
+    fuels, oils, and products of their distillation; liquefied natural gas;
+    coal; and coal products; (ii) new investment in the energy sector in the
+    Russian Federation by a United States person, wherever located. 31 CFR
+    587.201(a): All transactions prohibited pursuant to Executive Order (E.O.)
+    14024 of April 15, 2021 are prohibited pursuant to this part.
+  last_updated: '2026-10-22'
 remediation:
   action: block
   timing: proactive
   message: >-
-    🛑 OFAC Russia energy-sector dealing. This prohibition is in force under a
-    General License wind-down; see the transition guidance for the scheduled
-    lift/supersession date.
+    🛑 Possible OFAC Russia sanctions exposure: this content describes a Russia
+    energy-sector dealing. Screen the counterparties before proceeding.
   suggestion: >-
-    Confirm the transaction falls within the authorised wind-down purpose and
-    completes before the window end date. After expiry the successor prohibition
-    applies.
+    Screen counterparties against OFAC sanctions lists and the Russian Harmful
+    Foreign Activities Sanctions Regulations (31 CFR Part 587), and check
+    whether any General License applies, before proceeding.
   allow_override: false
   require_explicit_consent: false
-version: 1.0.0
+compliance_notes:
+- >-
+  Gazprombank, Sovcomflot and Vnesheconombank (VEB.RF) appear on the OFAC SDN
+  list as blocked under Executive Order 14024 (checked against the public
+  SDN.CSV and ALT.CSV exports on 2026-10-22).
+- >-
+  The oil price cap is a Treasury determination under Executive Order 14071.
+  Its text was not read in this review, so the rule detects the phrase but
+  does not cite the determination.
+- >-
+  Rule ID kept from an earlier version that modelled an unsourced General
+  License wind-down window ending 31 December 2026, superseded by a rule that
+  does not exist. Both were removed on 2026-10-22. Executive Order 14066 read
+  from the Federal Register (87 FR 13625); 31 CFR 587.201 from eCFR (version of
+  2026-10-01).
+version: 2.0.0
 tags:
 - sanctions
 - ofac
 - russia
-- wind_down
-- transition_rule
-- effective_window
+- energy
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

@@ -1,11 +1,34 @@
 id: ECPA_ELECTRONIC_SURVEILLANCE_001
 jurisdiction: US
-effective_date: '1986-10-21'
+effective_date: '1987-01-19'
 description: >-
   Prohibits the intentional interception of wire, oral, or electronic
   communications without authorisation. Covers wiretapping, eavesdropping,
   and electronic surveillance. The Electronic Communications Privacy Act
   (ECPA), 18 U.S.C. §2511.
+
+
+  Layer 1 detects: intercept (or intercepts, intercepting, intercepted), then
+  wire, oral or electronic communication; unauthorized or unauthorize (also
+  spelled with an s), then
+  wiretap, intercept, surveillance, eavesdrop, monitor or record (and words that
+  begin with them); wiretap, eavesdrop or surveil (and words that begin with
+  them), then without or lacking, then consent, authorization, warrant or court
+  order; record, monitor or intercept (and words that begin with them), then
+  phone call or calls, email or emails, message or messages, or communication or
+  communications, then without or lacking consent, authorization or knowledge;
+  secretly, covertly or surreptitiously, then record, monitor, intercept or
+  capture (and words that begin with them), then communications, conversations,
+  calls or messages, singular or plural; and install, deploy or use (and words
+  that begin with them), then surveillance, monitoring or intercept (and words
+  that begin with them), then device, software or tool, then without or lacking,
+  then consent, authorization or warrant. The words follow each other with
+  nothing in between, and authorization may be spelled with a z or an s. It matches
+  wording, not meaning: it misses the practice told in other words ("Hide a
+  voice recorder in the conference room so we capture what the union reps say
+  when we leave."), it does not read the consent of a party or a court order,
+  and it fires on text that only names the practice, such as a refusal. Whether
+  a text does the practice is judged in Layer 2.
 detection_scope: all
 conditions:
 - type: semantic
@@ -23,66 +46,73 @@ conditions:
   model: gpt-4
 - type: regex
   value: >-
-    (intercept\w*\s+(?:wire|oral|electronic)\s+communication|unauthoriz(?:ed|e)\s+(?:wiretap|intercept|surveillance|eavesdrop|monitor|record)|(?:wiretap|eavesdrop|surveil)\w*\s+(?:without|lacking)\s+(?:consent|authorization|warrant|court\s+order)|(?:record|monitor|intercept)\w*\s+(?:phone\s+calls?|emails?|messages?|communications?)\s+(?:without|lacking)\s+(?:consent|authorization|knowledge)|(?:secretly|covertly|surreptitiously)\s+(?:record|monitor|intercept|capture)\w*\s+(?:communications?|conversations?|calls?|messages?)|(?:install|deploy|use)\w*\s+(?:surveillance|monitoring|intercept)\w*\s+(?:device|software|tool)\s+(?:without|lacking)\s+(?:consent|authorization|warrant))
+    (intercept\w*\s+(?:wire|oral|electronic)\s+communication|unauthori[sz](?:ed|e)\s+(?:wiretap|intercept|surveillance|eavesdrop|monitor|record)|(?:wiretap|eavesdrop|surveil)\w*\s+(?:without|lacking)\s+(?:consent|authori[sz]ation|warrant|court\s+order)|(?:record|monitor|intercept)\w*\s+(?:phone\s+calls?|emails?|messages?|communications?)\s+(?:without|lacking)\s+(?:consent|authori[sz]ation|knowledge)|(?:secretly|covertly|surreptitiously)\s+(?:record|monitor|intercept|capture)\w*\s+(?:communications?|conversations?|calls?|messages?)|(?:install|deploy|use)\w*\s+(?:surveillance|monitoring|intercept)\w*\s+(?:device|software|tool)\s+(?:without|lacking)\s+(?:consent|authori[sz]ation|warrant))
   flags: i
 severity: critical
 category: privacy
 source:
+  provision_url: https://www.govinfo.gov/link/uscode/18/2511
+  provision_label: '18 U.S.C. 2511 (ECPA)'
   regulation: ECPA
   article: 18 U.S.C. §2511
   url: https://www.govinfo.gov/link/uscode/18/2511
   last_updated: '2008-10-14'
   citation: >-
     18 U.S.C. §2511(1): Except as otherwise specifically provided in this
-    chapter any person who — (a) intentionally intercepts, endeavors to
+    chapter any person who- (a) intentionally intercepts, endeavors to
     intercept, or procures any other person to intercept or endeavor to
-    intercept, any wire, oral, or electronic communication; (b) intentionally
-    uses, endeavors to use, or procures any other person to use or endeavor
-    to use any electronic, mechanical, or other device to intercept any oral
-    communication; (c) intentionally discloses, or endeavors to disclose, to
-    any other person the contents of any wire, oral, or electronic
-    communication, knowing or having reason to know that the information was
-    obtained through the interception of a wire, oral, or electronic
-    communication in violation of this subsection; (d) intentionally uses, or
-    endeavors to use, the contents of any wire, oral, or electronic
-    communication, knowing or having reason to know that the information was
-    obtained through the interception of a wire, oral, or electronic
-    communication in violation of this subsection — shall be punished as
-    provided in subsection (4) or shall be subject to suit as provided in
-    subsection (5).
+    intercept, any wire, oral, or electronic communication; ... (c)
+    intentionally discloses, or endeavors to disclose, to any other person the
+    contents of any wire, oral, or electronic communication, knowing or having
+    reason to know that the information was obtained through the interception of
+    a wire, oral, or electronic communication in violation of this subsection;
+    (d) intentionally uses, or endeavors to use, the contents of any wire, oral,
+    or electronic communication, knowing or having reason to know that the
+    information was obtained through the interception of a wire, oral, or
+    electronic communication in violation of this subsection; ... shall be
+    punished as provided in subsection (4) or shall be subject to suit as
+    provided in subsection (5).
 exceptions:
 - condition: Consent of a party
   description: >-
-    It is not unlawful where one of the parties to the communication has
-    given prior consent to such interception (18 U.S.C. §2511(2)(c))
+    It is not unlawful for a person not acting under color of law to intercept a
+    communication where that person is a party to it or where one of the parties
+    has given prior consent, unless the interception is for the purpose of
+    committing a criminal or tortious act (18 U.S.C. §2511(2)(d))
 - condition: Provider exception
   description: >-
-    Service providers may intercept in the normal course of employment
-    while engaged in activity necessary to the rendition of service or
-    protection of rights or property (18 U.S.C. §2511(2)(a)(i))
+    Service providers may intercept in the normal course of employment while
+    engaged in activity necessary to the rendition of service or protection of
+    rights or property (18 U.S.C. §2511(2)(a)(i))
 - condition: Law enforcement with court order
-  description: >-
-    Authorised by court order under 18 U.S.C. §§2516-2518
+  description: Authorised by court order under 18 U.S.C. §§2516-2518
 penalty_information:
   civil_penalties:
-    sec_enforcement: >-
-      Criminal penalties up to 5 years imprisonment and/or fines; civil
-      liability for actual damages, statutory damages, punitive damages,
-      and attorney's fees (18 U.S.C. §§2511(4), 2520)
+    federal_enforcement: >-
+      Criminal: a fine under title 18, imprisonment of not more than five years,
+      or both (18 U.S.C. 2511(4)(a)). Civil: suit as provided in 18 U.S.C.
+      2511(5) and 2520.
 remediation:
   action: block
   timing: proactive
   message: >-
-    BLOCKED — The Electronic Communications Privacy Act (18 U.S.C. §2511)
-    prohibits intentional interception of wire, oral, or electronic
-    communications without authorisation. Violations carry criminal penalties
-    up to 5 years imprisonment and civil liability.
+    BLOCKED: The Electronic Communications Privacy Act (18 U.S.C. 2511(1))
+    prohibits intentionally intercepting wire, oral, or electronic
+    communications, and disclosing or using their contents, unless an exception
+    applies, such as a party to the communication or one-party consent (18
+    U.S.C. 2511(2)(d)). Violations carry a fine, imprisonment of up to five
+    years, or both (18 U.S.C. 2511(4)(a)), and civil liability.
   suggestion: >-
     Obtain proper consent from the parties before intercepting or recording
     any communications. For business monitoring, ensure employees are informed
     and have consented. For law enforcement purposes, obtain the required
     court order. Check applicable state laws as many require all-party consent.
-version: 1.0.0
+compliance_notes:
+  - >-
+    18 U.S.C. 2511 as amended by the Electronic Communications Privacy Act of
+    1986 (Pub. L. 99-508, enacted October 21, 1986) took effect 90 days after
+    enactment, on January 19, 1987.
+version: 1.1.0
 tags:
 - ecpa
 - wiretap
@@ -90,3 +120,7 @@ tags:
 - interception
 - communications-privacy
 tier: enterprise
+approval:
+  status: approved
+  approved_by: Leo Celis (via agent review per §5.1 amendment v1.1)
+  approved_on: '2026-10-22'

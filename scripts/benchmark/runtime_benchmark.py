@@ -195,7 +195,7 @@ async def check_one(
         "direction": prompt.get("direction", "output"),
         # Default True mirrors the canonical hybrid run. --no-semantic-fallback
         # runs the DEFAULT customer mode (OPA-only), where OPA passes do not
-        # route to the Layer 2 LLM — use it to measure OPA-only pass latency.
+        # route to the Layer 2 LLM; use it to measure OPA-only pass latency.
         "use_semantic_fallback": semantic_fallback,
     }
     started = datetime.now(UTC)
@@ -428,7 +428,7 @@ def collapse_pass_at_k(
     """pass^k: a prompt passes only if every trial passed.
 
     Latency fields are means across trials. trial_results kept for audit
-    (compact: id omitted — same as parent).
+    (compact: id omitted, same as parent).
     """
     if not trials:
         raise ValueError("collapse_pass_at_k requires at least one trial")
@@ -603,7 +603,7 @@ def aggregate(results: list[dict[str, Any]]) -> dict[str, Any]:
             "repeat": repeat_k,
             "pass_at_k_rate": round(passed_n / total_n * 100, 1) if total_n else 0,
             "pass_at_k_definition": "all k trials must pass",
-            # wall_ms: client-side end-to-end time including concurrency queue — NOT the CE SLA metric
+            # wall_ms: client-side end-to-end time including concurrency queue, NOT the CE SLA metric
             "wall_ms": {
                 "p50": round(percentile(all_wall, 50) or 0, 1),
                 "p95": round(percentile(all_wall, 95) or 0, 1),
@@ -707,7 +707,7 @@ def render_terminal(
                 if f["critical"]
                 else f"{C.DIM}[non-critical]{C.END} "
             )
-            err = f" — {f['error']}" if f.get("error") else ""
+            err = f": {f['error']}" if f.get("error") else ""
             print(
                 f"  {crit}{f['id']:32} expected={f['expected']:5} got={f['actual']:5}{err}"
             )
@@ -721,11 +721,19 @@ def write_badge(summary: dict[str, Any], badge_path: Path | None = None) -> None
     path = badge_path or BADGE_MD
     path.parent.mkdir(parents=True, exist_ok=True)
     engine = summary.get("engine", "hybrid")
+    agg = summary["aggregate"]
+    # The detection rate counts only the must-block categories, so name that
+    # denominator next to it; the total includes safe-harbor and edge prompts.
+    must_block = [r for r in summary["results"] if r["category"] in BLOCKED_CATEGORIES]
+    caught = sum(1 for r in must_block if r["passed"])
     path.write_text(
         f"![Detection Rate]({badge_url})\n\n"
         f"_GPAI Runtime Benchmark · engine={engine} · "
-        f"{summary['aggregate']['total_prompts']} prompts · "
-        f"{summary['timestamp']}_\n"
+        f"categories={summary.get('category_filter', 'all')} · "
+        f"{agg['passed']}/{agg['total_prompts']} prompts passed · "
+        f"detection {rate}% = {caught}/{len(must_block)} must-block prompts_\n\n"
+        f"_Measured against {summary['base_url']} at {summary['timestamp']}. "
+        f"A snapshot of the build running then, not re-run on every release._\n"
     )
 
 
@@ -812,7 +820,11 @@ def main() -> int:
     prompts = load_corpus(args.category)
     sha = corpus_sha(prompts)
     run_id = str(uuid.uuid4())
-    timestamp = datetime.now(UTC).isoformat()
+    # AUD-178: runtime benchmark timestamp is ADCR Zulu.
+    sys.path.insert(0, str(ROOT / "services" / "api"))
+    from adcr_record import utc_timestamp
+
+    timestamp = utc_timestamp(datetime.now(UTC))
 
     print(f"{C.DIM}Loaded {len(prompts)} prompts (corpus sha={sha}){C.END}")
     if engine == "llm-only":
@@ -882,7 +894,7 @@ def main() -> int:
         RESULTS_DIR.mkdir(parents=True, exist_ok=True)
         out = {**summary, "results": results}
         json_path.write_text(json.dumps(out, indent=2, default=str))
-        write_badge(summary, badge_path)
+        write_badge(out, badge_path)
         print(f"{C.DIM}JSON: {json_path.relative_to(REPO_ROOT)}{C.END}")
         print(f"{C.DIM}Badge: {badge_path.relative_to(REPO_ROOT)}{C.END}")
 

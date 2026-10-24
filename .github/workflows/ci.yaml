@@ -20,7 +20,52 @@ jobs:
         run: pip install pyyaml jsonschema pytest
 
       - name: Validate rule schemas
-        run: pytest tests/unit/ -v
+        run: pytest tests/unit/test_rules_*.py -v
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install packages and test deps
+        run: |
+          pip install pytest pytest-cov httpx click pyyaml cryptography
+          # TrustLint corpus is a build artifact — copy rules before editable install.
+          rm -rf packages/trustlint/trustlint/rules
+          mkdir -p packages/trustlint/trustlint/rules
+          cp -R rules/regulations/. packages/trustlint/trustlint/rules/
+          pip install -e packages/trustlint/
+          pip install -e sdks/python/
+
+      - name: Unit tests with coverage (>=90%)
+        run: |
+          pytest \
+            packages/trustlint/tests/ \
+            tests/unit/test_sdk_receipt_journal.py \
+            tests/unit/test_sdk_python_comprehensive.py \
+            tests/unit/test_sdk_contract_regressions.py \
+            tests/unit/test_sdk_daily_cap_not_retried.py \
+            tests/unit/test_sdk_endpoint_parity.py \
+            tests/unit/test_sdk_region_resolution.py \
+            tests/unit/test_complyedge_sdk.py \
+            tests/unit/test_complyedge_cli.py \
+            tests/unit/test_complyedge_cli_extended.py \
+            tests/unit/test_complyedge_agents_unit.py \
+            tests/unit/test_complyedge_decorators_unit.py \
+            tests/unit/test_mcp_server.py \
+            tests/unit/test_mcp_http.py \
+            tests/unit/test_mcp_sandbox_tool.py \
+            tests/unit/test_mcp_structured_output.py \
+            --cov=trustlint \
+            --cov=complyedge \
+            --cov-report=term-missing \
+            --cov-fail-under=90 \
+            -v \
+            --tb=short
 
   lint:
     runs-on: ubuntu-latest

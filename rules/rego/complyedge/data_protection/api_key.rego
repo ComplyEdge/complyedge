@@ -10,20 +10,39 @@
 # S3 URL, and a JWT that is a URL query value (a magic link addressed to its
 # recipient) do not fire.
 #
-# Legal citation: Regulation (EU) 2016/679 (GDPR), Article 32(1)
+# Layer 1 detects: AKIA or ASIA then 16 capitals or digits (not after
+# AWSAccessKeyId= or Credential=); ghp_, gho_, ghu_, ghs_ or ghr_ then 36
+# letters or digits; github_pat_ then 50 or more; sk-, sk-proj- or
+# sk-ant-<letters or digits>- then 20 or more letters, digits, _ or -;
+# sk_live_ or rk_live_ then 16 or more; xoxb-, xoxp-, xoxa-, xoxr- or xoxs-
+# then 10 or more; AIza then 35; three dot-separated segments of at least 8
+# base64url characters, the first two starting eyJ, not directly after = (a
+# URL query value); and "Authorization: Bearer" in any case then a token of 20
+# or more characters. Any match ending EXAMPLE does not fire. It matches
+# formats, not purpose: a credential in a format not named here is missed (a
+# HubSpot private app token, pat-eu1- and so on), and it does not read why the
+# value is in the text. No model reviews a hit: a match keeps the block in
+# Layer 2 as well.
+#
+# Legal citation: Regulation (EU) 2016/679 (GDPR), Article 32(1)(b)
 # Recital: 83 - the controller should implement measures to mitigate risks inherent in the processing
 # Effective: 2018-05-25
 # Penalty: GDPR Article 83(4)(a): up to EUR 10,000,000 or 2% of worldwide annual turnover
-# Condition type: deterministic (format match plus checksum; no judgment of meaning)
+# Condition type: deterministic (format match only, no checksum exists for these values; no judgment of meaning)
 # Enforcement layer: layer1
 # Direction: every check (prompt before the model, output before the user)
 # Record: the decision stores the rule, never the matched value or the text
-# Status: review
-# Approved by: pending Leo Celis review per RULE_STANDARD 5.5 (authorized 2026-10-10)
+# ELI: http://data.europa.eu/eli/reg/2016/679/art_32/par_1/pnt_b/oj
+# Provision: Regulation (EU) 2016/679, Article 32(1)(b)
+
+# Status: approved
+# Approved by: Leo Celis on 2026-10-22 (via agent review per §5.1 amendment v1.1)
 
 package complyedge.data_protection.api_key
 
 import rego.v1
+
+import data.complyedge.shared.normalize
 
 default violation := false
 
@@ -42,7 +61,7 @@ _patterns := [
 violation if {
 	input.jurisdiction == "EU"
 	some p in _patterns
-	some m in regex.find_all_string_submatch_n(p, input.text, -1)
+	some m in regex.find_all_string_submatch_n(p, normalize.text, -1)
 	not endswith(m[1], "EXAMPLE")
 	not _presigned_url_param(m[0])
 }
@@ -56,7 +75,7 @@ _presigned_url_param(match) if contains(match, "Credential=")
 
 rule_id := "rego-gdpr32-1-001"
 
-citation := "Regulation (EU) 2016/679 (GDPR), Article 32(1): the controller and the processor must implement appropriate technical and organisational measures to ensure security appropriate to the risk. A credential sent to an AI model or returned to a user is a credential disclosed outside the systems it protects."
+citation := "Regulation (EU) 2016/679 (GDPR), Article 32(1)(b): \"the controller and the processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including inter alia as appropriate: [...] (b) the ability to ensure the ongoing confidentiality, integrity, availability and resilience of processing systems and services\"."
 
 severity := "critical"
 

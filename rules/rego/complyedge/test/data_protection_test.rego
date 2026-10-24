@@ -199,3 +199,26 @@ test_record_carries_rule_not_value if {
 	some v in data_protection.violations with input as eu("Card 4111 1111 1111 1111")
 	not contains(json.marshal(v), "4111")
 }
+
+# ---- separator formats the 2026-10-21 review found missed ----
+# Each sentence below did not fire on the earlier patterns. The identifiers
+# pass their checksums under the same independent Python implementation.
+
+test_card_blocks_dotted_groups if fires_rule("Log line: holder=Pieter de Vries pan=4539.1488.0343.6467 status=declined", "rego-gdpr5-1c-004")
+
+test_iban_blocks_lower_case if fires_rule("crm note: customer anna weber, iban de89 3704 0044 0532 0130 00, wants a callback", "rego-gdpr5-1c-003")
+
+test_de_id_blocks_dashed_groups if fires_rule("Kundennotiz: Herr Becker, Steuer-ID 86-095-742-719, beschwert sich", "rego-gdpr5-1c-005")
+
+test_es_id_blocks_dotted_dni if fires_rule("Resumen del ticket: cliente Lucia Ruiz, DNI 48.291.637-D, reclama un cargo", "rego-gdpr5-1c-007")
+
+test_fr_id_blocks_dotted_nir if fires_rule("CRM note: client Marc Leroy, secu 1.85.05.78.006.084.91, called about his loan.", "rego-gdpr5-1c-006")
+
+test_it_id_blocks_spaced_blocks if fires_rule("Summarise this HR file: Mario Rossi, CF RSS MRA 85T10 A562S, two warnings.", "rego-gdpr5-1c-009")
+
+test_nl_id_blocks_before_comma if fires_rule("klant Sanne de Jong, BSN 241837509, cancelled her policy.", "rego-gdpr5-1c-008")
+
+test_nl_id_blocks_four_two_three if fires_rule("werknemer Daan Visser, burgerservicenummer 2418 37 509 langdurig ziek.", "rego-gdpr5-1c-008")
+
+# A decimal amount is not a BSN followed by punctuation.
+test_nl_id_allows_decimal_amount if not fires_rule("Total due 241837509.50 EUR", "rego-gdpr5-1c-008")
