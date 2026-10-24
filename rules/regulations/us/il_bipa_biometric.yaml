@@ -62,11 +62,11 @@ conditions:
 severity: critical
 category: privacy
 source:
-  provision_url: https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57
+  provision_url: https://www.ilga.gov/Legislation/ILCS/Details?ActID=3004&ChapterID=57
   provision_label: '740 ILCS 14/15 (Illinois BIPA)'
   regulation: Illinois BIPA
   article: 740 ILCS 14/15
-  url: https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57
+  url: https://www.ilga.gov/Legislation/ILCS/Details?ActID=3004&ChapterID=57
   last_updated: '2024-08-02'
   citation: >-
     740 ILCS 14/15(a): A private entity in possession of biometric identifiers
