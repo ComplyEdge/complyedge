@@ -80,7 +80,9 @@ class TestSignup:
             result = runner.invoke(cli, ["signup"])
         assert result.exit_code == 0
         assert "dashboard.complyedge.io" in result.output
-        mock_open.assert_called_once_with("https://dashboard.complyedge.io/?intent=get-started")
+        mock_open.assert_called_once_with(
+            "https://dashboard.complyedge.io/?intent=get-started"
+        )
 
 
 class TestScanExtra:
@@ -95,8 +97,9 @@ class TestScanExtra:
         fake_sys = MagicMock(wraps=real_sys)
         fake_sys.stdin.isatty.return_value = True
         fake_sys.exit = real_sys.exit
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli.sys", fake_sys
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli.sys", fake_sys),
         ):
             result = runner.invoke(cli, ["scan"])
         assert result.exit_code == 2
@@ -106,9 +109,11 @@ class TestScanExtra:
         runner = CliRunner()
         client = MagicMock()
         client.check.side_effect = RuntimeError("boom")
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["scan", "--text", "hello"])
         assert result.exit_code == 2
         assert "API error" in result.output
@@ -124,9 +129,11 @@ class TestScanExtra:
         result_obj = SimpleNamespace(safe=False, event_id="evt-1", violations=[v])
         client = MagicMock()
         client.check.return_value = result_obj
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["scan", "--text", "risky", "--verbose"])
         assert result.exit_code == 1
         assert "Consult legal before publishing" in result.output
@@ -141,10 +148,10 @@ class TestStatusHealth:
         get = MagicMock(return_value=resp)
         if raise_exc:
             get.side_effect = RuntimeError("no route")
-        with patch(
-            "complyedge.cli._get_api_key", return_value="ce_live_abc123xyz"
-        ), patch("complyedge.cli._load_config", return_value={}), patch(
-            "httpx.get", get
+        with (
+            patch("complyedge.cli._get_api_key", return_value="ce_live_abc123xyz"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("httpx.get", get),
         ):
             return runner.invoke(cli, ["status"])
 
@@ -181,9 +188,11 @@ class TestRulesInfo:
             "jurisdictions": ["EU", "US"],
             "generated_at": "2026-01-01",
         }
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("httpx.get", return_value=resp):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("httpx.get", return_value=resp),
+        ):
             result = runner.invoke(cli, ["rules"])
         assert result.exit_code == 0
         assert "eu-ai-act-2025" in result.output
@@ -194,18 +203,22 @@ class TestRulesInfo:
         runner = CliRunner()
         resp = MagicMock()
         resp.status_code = 500
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("httpx.get", return_value=resp):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("httpx.get", return_value=resp),
+        ):
             result = runner.invoke(cli, ["rules"])
         assert result.exit_code == 2
         assert "API error: 500" in result.output
 
     def test_rules_request_exception(self):
         runner = CliRunner()
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("httpx.get", side_effect=RuntimeError("dns fail")):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("httpx.get", side_effect=RuntimeError("dns fail")),
+        ):
             result = runner.invoke(cli, ["rules"])
         assert result.exit_code == 2
         assert "Error:" in result.output
@@ -265,9 +278,11 @@ class TestPreDeploy:
         f.write_text(json.dumps({"system_prompt": "hello"}))
         client = MagicMock()
         client.assess_pre_deployment.side_effect = RuntimeError("upstream")
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["pre-deploy", "-f", str(f)])
         assert result.exit_code == 2
         assert "API error" in result.output
@@ -286,9 +301,11 @@ class TestPreDeploy:
                 "estimated_deadline": "",
             }
         )
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["pre-deploy", "-f", str(f)])
         assert result.exit_code == 0
         assert "PASS" in result.output
@@ -314,9 +331,11 @@ class TestPreDeploy:
                 "estimated_deadline": "2025-02-02",
             }
         )
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["pre-deploy", "-f", str(f), "--verbose"])
         assert result.exit_code == 1
         assert "BLOCKED" in result.output
@@ -343,9 +362,11 @@ class TestPreDeploy:
                 "estimated_deadline": "2027-12-02",
             }
         )
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["pre-deploy", "-f", str(f)])
         assert result.exit_code == 1
         assert "HIGH RISK" in result.output
@@ -365,9 +386,11 @@ class TestPreDeploy:
                 "estimated_deadline": "2027-12-02",
             }
         )
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["pre-deploy", "-f", str(f)])
         assert result.exit_code == 0
         assert "HIGH RISK" in result.output
@@ -392,9 +415,11 @@ class TestPreDeploy:
                 "estimated_deadline": "",
             }
         )
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["pre-deploy", "-f", str(f)])
         assert result.exit_code == 1
         assert "Issues found" in result.output
@@ -413,9 +438,11 @@ class TestPreDeploy:
                 "estimated_deadline": "",
             }
         )
-        with patch("complyedge.cli._get_api_key", return_value="k"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=client):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="k"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=client),
+        ):
             result = runner.invoke(cli, ["pre-deploy", "-f", str(f)])
         assert result.exit_code == 0
         # system_prompt was read from YAML and forwarded to the client.

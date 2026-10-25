@@ -18,6 +18,7 @@ Checked in benchmark_latest.json:
   - Benchmark results file is present and well-formed
   - Every result has the required fields
 """
+
 from __future__ import annotations
 
 import json

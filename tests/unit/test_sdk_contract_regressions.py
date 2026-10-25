@@ -76,7 +76,13 @@ class TestKwargsAreChecked:
         # function body reads, so this cannot miss.
         with patch.dict(
             compliance_check.__globals__,
-            {"_import_models": lambda: (MagicMock(), lambda **kw: fake, ComplianceError)},
+            {
+                "_import_models": lambda: (
+                    MagicMock(),
+                    lambda **kw: fake,
+                    ComplianceError,
+                )
+            },
         ):
             cfg = ComplianceConfig(
                 api_key="test-key",
@@ -116,7 +122,13 @@ class TestKwargsAreChecked:
         # function body reads, so this cannot miss.
         with patch.dict(
             compliance_check.__globals__,
-            {"_import_models": lambda: (MagicMock(), lambda **kw: fake, ComplianceError)},
+            {
+                "_import_models": lambda: (
+                    MagicMock(),
+                    lambda **kw: fake,
+                    ComplianceError,
+                )
+            },
         ):
             cfg = ComplianceConfig(
                 api_key="test-key",
@@ -158,7 +170,13 @@ class TestFailModeIsExplicit:
         # function body reads, so this cannot miss.
         with patch.dict(
             compliance_check.__globals__,
-            {"_import_models": lambda: (MagicMock(), lambda **kw: fake, ComplianceError)},
+            {
+                "_import_models": lambda: (
+                    MagicMock(),
+                    lambda **kw: fake,
+                    ComplianceError,
+                )
+            },
         ):
 
             @compliance_check(config=cfg)
@@ -190,7 +208,13 @@ class TestFailModeIsExplicit:
         # function body reads, so this cannot miss.
         with patch.dict(
             compliance_check.__globals__,
-            {"_import_models": lambda: (MagicMock(), lambda **kw: fake, ComplianceError)},
+            {
+                "_import_models": lambda: (
+                    MagicMock(),
+                    lambda **kw: fake,
+                    ComplianceError,
+                )
+            },
         ):
 
             @compliance_check(config=cfg)

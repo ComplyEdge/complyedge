@@ -13,6 +13,7 @@ Claims verified (as the launch post states them today):
   - "@compliance_check decorator is enabled by default when COMPLYEDGE_API_KEY is set"
   - "benchmark runner and prompt YAMLs are in the repo"
 """
+
 from __future__ import annotations
 
 import re
@@ -35,7 +36,9 @@ class TestRegoCorpus:
         all_rego = list(RULES_REGO_DIR.rglob("*.rego"))
         # shared/ holds helper modules imported by the policies (normalize.rego),
         # not policies: it has no citation or violation of its own.
-        return [f for f in all_rego if "test" not in f.parts and "shared" not in f.parts]
+        return [
+            f for f in all_rego if "test" not in f.parts and "shared" not in f.parts
+        ]
 
     def test_production_rego_leaf_count_meets_moat(self, prod_rego_files):
         # public claim is leaf-basis (≥50). Aggregators are not leaves.
@@ -236,7 +239,9 @@ class TestUsRegulationCoverage:
         # SB 24-205 was repealed and replaced by SB 26-189 (signed 2026-05-14,
         # effective 2027-01-01, leg.colorado.gov/bills/sb26-189). A rule citing
         # the repealed act must not ship until it is re-authored on the new one.
-        assert not self._has_keyword(us_files, "colorado"), "Rule cites repealed SB 24-205"
+        assert not self._has_keyword(
+            us_files, "colorado"
+        ), "Rule cites repealed SB 24-205"
 
     def test_us_covers_nyc_ll144(self, us_files):
         assert self._has_keyword(us_files, "nyc"), "No NYC LL144 YAML found"
@@ -384,9 +389,9 @@ class TestSdkDefaults:
             .get("version", {})
             .get("attr")
         )
-        assert attr == "complyedge.__version__", (
-            f"dynamic version should read complyedge.__version__, got {attr!r}"
-        )
+        assert (
+            attr == "complyedge.__version__"
+        ), f"dynamic version should read complyedge.__version__, got {attr!r}"
         assert re.search(r'__version__ = "\d+\.\d+\.\d+"', init_source), (
             "__init__.py must carry a concrete semver __version__; it is the "
             "single source the build reads"

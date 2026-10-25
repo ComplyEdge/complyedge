@@ -70,8 +70,14 @@ def false_positive_cases(baseline: Path) -> list[dict[str, Any]]:
         item_id, jur = key.split("|")
         item = by_id[item_id]
         cases.append(
-            {"set": "false_positive", "id": key, "domain": item["domain"], "jurisdiction": jur,
-             "text": item["text"], "fired": rules}
+            {
+                "set": "false_positive",
+                "id": key,
+                "domain": item["domain"],
+                "jurisdiction": jur,
+                "text": item["text"],
+                "fired": rules,
+            }
         )
     return cases
 
@@ -80,9 +86,15 @@ def must_block_cases() -> list[dict[str, Any]]:
     items = fpm.load_must_block()
     fired = fpm.opa_batch([(i["text"], i["jurisdiction"]) for i in items])
     return [
-        {"set": "must_block", "id": i["id"], "domain": i["file"], "jurisdiction": i["jurisdiction"],
-         "framing": i.get("framing", "benchmark"), "text": i["text"],
-         "fired": rules}
+        {
+            "set": "must_block",
+            "id": i["id"],
+            "domain": i["file"],
+            "jurisdiction": i["jurisdiction"],
+            "framing": i.get("framing", "benchmark"),
+            "text": i["text"],
+            "fired": rules,
+        }
         for i, rules in zip(items, fired, strict=True)
         if rules  # items OPA passes are known gaps: nothing for the confirmer to lift
     ]
@@ -101,11 +113,15 @@ def projected_worst_case_micros(cases: list[dict[str, Any]], model: str) -> int:
         total += llm_budget.max_cost_micros(model, msgs, rhc.MAX_COMPLETION_TOKENS)
         if any(r in ps_ids for r in c["fired"]):
             for chunk in pic.chunks(c["text"]):
-                total += llm_budget.max_cost_for_bytes(model, inj_system + len(chunk.encode()) + 64, 2, 400)
+                total += llm_budget.max_cost_for_bytes(
+                    model, inj_system + len(chunk.encode()) + 64, 2, 400
+                )
     return total
 
 
-async def _run(cases: list[dict[str, Any]], model: str, concurrency: int) -> list[dict[str, Any]]:
+async def _run(
+    cases: list[dict[str, Any]], model: str, concurrency: int
+) -> list[dict[str, Any]]:
     import rule_hit_confirmer as rhc
 
     sem = asyncio.Semaphore(concurrency)
@@ -117,27 +133,42 @@ async def _run(cases: list[dict[str, Any]], model: str, concurrency: int) -> lis
             review = await rhc.review_hits(c["text"], c["fired"], model=model)
             ms = (time.perf_counter() - t0) * 1000
         verdicts = (
-            [{"rule_id": v.rule_id, "decision": v.decision, "confidence": v.confidence, "reason": v.reason}
-             for v in review.confirm.verdicts]
+            [
+                {
+                    "rule_id": v.rule_id,
+                    "decision": v.decision,
+                    "confidence": v.confidence,
+                    "reason": v.reason,
+                }
+                for v in review.confirm.verdicts
+            ]
             if review.confirm is not None
             else []
         )
         inj = review.injection
-        rows.append({
-            **{k: v for k, v in c.items() if k != "text"},
-            "text": c["text"][:300],
-            "answered": review.answered,
-            "confirm_error": review.confirm.error if review.confirm is not None else None,
-            "verdicts": verdicts,
-            "injection": None if inj is None else {
-                "available": inj.available,
-                "category": inj.category.rule_id if inj.category else None,
-                "confidence": inj.confidence,
-                "reason": inj.reason,
-            },
-            "cleared_at": {str(t): review.cleared(t) for t in THRESHOLDS},
-            "latency_ms": round(ms),
-        })
+        rows.append(
+            {
+                **{k: v for k, v in c.items() if k != "text"},
+                "text": c["text"][:300],
+                "answered": review.answered,
+                "confirm_error": (
+                    review.confirm.error if review.confirm is not None else None
+                ),
+                "verdicts": verdicts,
+                "injection": (
+                    None
+                    if inj is None
+                    else {
+                        "available": inj.available,
+                        "category": inj.category.rule_id if inj.category else None,
+                        "confidence": inj.confidence,
+                        "reason": inj.reason,
+                    }
+                ),
+                "cleared_at": {str(t): review.cleared(t) for t in THRESHOLDS},
+                "latency_ms": round(ms),
+            }
+        )
 
     await asyncio.gather(*(one(c) for c in cases))
     rows.sort(key=lambda r: (r["set"], r["id"]))
@@ -155,7 +186,9 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--model", default=rhc.CONFIRM_MODEL)
     ap.add_argument("--concurrency", type=int, default=8)
-    ap.add_argument("--max-usd", type=float, default=5.0, help="hard cap on this run's model spend")
+    ap.add_argument(
+        "--max-usd", type=float, default=5.0, help="hard cap on this run's model spend"
+    )
     ap.add_argument("--baseline", type=Path, default=fpm.BASELINE)
     ap.add_argument("--limit", type=int, help="first N cases of each set (smoke run)")
     args = ap.parse_args()
@@ -203,28 +236,47 @@ def main() -> int:
         "unanswered": len(unanswered),
         "spent_usd": round(spent / 1e6, 4),
         "usd_per_text": round(spent / 1e6 / len(rows), 6) if rows else None,
-        "prompt_tokens_mean": round(statistics.mean(u.get("prompt_tokens", 0) for u in _usage)) if _usage else None,
-        "completion_tokens_mean": round(statistics.mean(u.get("completion_tokens", 0) for u in _usage)) if _usage else None,
+        "prompt_tokens_mean": (
+            round(statistics.mean(u.get("prompt_tokens", 0) for u in _usage))
+            if _usage
+            else None
+        ),
+        "completion_tokens_mean": (
+            round(statistics.mean(u.get("completion_tokens", 0) for u in _usage))
+            if _usage
+            else None
+        ),
         "latency_ms_p50": statistics.median(lat) if lat else None,
         "latency_ms_p95": sorted(lat)[int(0.95 * (len(lat) - 1))] if lat else None,
         "seconds": round(time.monotonic() - started, 1),
         "by_threshold": {
-            str(t): {"false_positives_cleared": _rate(fp_rows, t), "must_block_cleared": _rate(mb_rows, t)}
+            str(t): {
+                "false_positives_cleared": _rate(fp_rows, t),
+                "must_block_cleared": _rate(mb_rows, t),
+            }
             for t in THRESHOLDS
         },
-        "false_positives_cleared_by_domain_at_shipped": {d: f"{c}/{n}" for d, (c, n) in sorted(by_domain.items())},
+        "false_positives_cleared_by_domain_at_shipped": {
+            d: f"{c}/{n}" for d, (c, n) in sorted(by_domain.items())
+        },
         "must_block_cleared_at_shipped": [r["id"] for r in leaks],
         "rows": rows,
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
 
-    print(f"spent ${report['spent_usd']} over {report['llm_calls']} calls · ${report['usd_per_text']}/text")
-    print(f"latency p50 {report['latency_ms_p50']}ms · p95 {report['latency_ms_p95']}ms · unanswered {len(unanswered)}")
+    print(
+        f"spent ${report['spent_usd']} over {report['llm_calls']} calls · ${report['usd_per_text']}/text"
+    )
+    print(
+        f"latency p50 {report['latency_ms_p50']}ms · p95 {report['latency_ms_p95']}ms · unanswered {len(unanswered)}"
+    )
     print("threshold  false positives cleared  must-block cleared")
     for t in THRESHOLDS:
         b = report["by_threshold"][str(t)]
-        print(f"  {t:<8} {b['false_positives_cleared']:>5}/{len(fp_rows):<17} {b['must_block_cleared']}/{len(mb_rows)}")
+        print(
+            f"  {t:<8} {b['false_positives_cleared']:>5}/{len(fp_rows):<17} {b['must_block_cleared']}/{len(mb_rows)}"
+        )
     print(f"recommended CE_CONFIRM_CLEAR_MIN: {recommended} (shipped {t_ship})")
     for d, v in report["false_positives_cleared_by_domain_at_shipped"].items():
         print(f"  {d:<22} {v}")

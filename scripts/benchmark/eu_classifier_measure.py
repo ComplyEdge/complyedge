@@ -46,7 +46,14 @@ def _capture_usage(_, __, event_dict):
 def _cases() -> list[dict]:
     cases = list(yaml.safe_load(CASES.read_text())["cases"])
     for p in yaml.safe_load(SAFE_HARBOR.read_text())["prompts"]:
-        cases.append({"id": p["id"], "expected": "none", "text": p["text"], "basis": "safe_harbor"})
+        cases.append(
+            {
+                "id": p["id"],
+                "expected": "none",
+                "text": p["text"],
+                "basis": "safe_harbor",
+            }
+        )
     return cases
 
 
@@ -64,11 +71,18 @@ async def _run(model: str, concurrency: int) -> dict:
         expected = case["expected"]
         allowed = expected if isinstance(expected, list) else [expected]
         got = v.category.rule_id if v.category else "none"
-        rows.append({
-            "id": case["id"], "expected": expected, "got": got,
-            "available": v.available, "correct": v.available and got in allowed,
-            "confidence": v.confidence, "reason": v.reason, "latency_ms": round(ms),
-        })
+        rows.append(
+            {
+                "id": case["id"],
+                "expected": expected,
+                "got": got,
+                "available": v.available,
+                "correct": v.available and got in allowed,
+                "confidence": v.confidence,
+                "reason": v.reason,
+                "latency_ms": round(ms),
+            }
+        )
 
     await asyncio.gather(*(one(c) for c in _cases()))
     rows.sort(key=lambda r: r["id"])
@@ -87,9 +101,26 @@ async def _run(model: str, concurrency: int) -> dict:
         "should_pass_passed": f"{sum(r['correct'] for r in passes)}/{len(passes)}",
         "latency_ms_p50": statistics.median(lat),
         "latency_ms_max": max(lat),
-        "prompt_tokens_mean": round(statistics.mean(u.get("prompt_tokens", 0) for u in _usage)) if _usage else None,
-        "completion_tokens_mean": round(statistics.mean(u.get("completion_tokens", 0) for u in _usage)) if _usage else None,
-        "cached_tokens_mean": round(statistics.mean((u.get("prompt_tokens_details") or {}).get("cached_tokens", 0) for u in _usage)) if _usage else None,
+        "prompt_tokens_mean": (
+            round(statistics.mean(u.get("prompt_tokens", 0) for u in _usage))
+            if _usage
+            else None
+        ),
+        "completion_tokens_mean": (
+            round(statistics.mean(u.get("completion_tokens", 0) for u in _usage))
+            if _usage
+            else None
+        ),
+        "cached_tokens_mean": (
+            round(
+                statistics.mean(
+                    (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0)
+                    for u in _usage
+                )
+            )
+            if _usage
+            else None
+        ),
         "rows": rows,
     }
 
@@ -98,7 +129,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
     ap.add_argument("--concurrency", type=int, default=4)
-    ap.add_argument("--max-usd", type=float, default=5.0, help="hard cap on this run's model spend")
+    ap.add_argument(
+        "--max-usd", type=float, default=5.0, help="hard cap on this run's model spend"
+    )
     args = ap.parse_args()
     structlog.configure(processors=[_capture_usage])
     import llm_budget
@@ -110,7 +143,9 @@ def main() -> None:
     OUT.write_text(json.dumps(report, indent=2) + "\n")
     for r in report["rows"]:
         mark = "ok " if r["correct"] else "BAD"
-        print(f"{mark} {r['id']:<38} expected={r['expected']!s:<34} got={r['got']:<26} {r['latency_ms']}ms")
+        print(
+            f"{mark} {r['id']:<38} expected={r['expected']!s:<34} got={r['got']:<26} {r['latency_ms']}ms"
+        )
     summary = {k: v for k, v in report.items() if k != "rows"}
     print(json.dumps(summary, indent=2))
 

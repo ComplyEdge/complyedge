@@ -12,8 +12,9 @@ class TestLogin:
         runner = CliRunner()
         config_file = tmp_path / "config.json"
 
-        with patch("complyedge.cli.CONFIG_FILE", config_file), patch(
-            "complyedge.cli.CONFIG_DIR", tmp_path
+        with (
+            patch("complyedge.cli.CONFIG_FILE", config_file),
+            patch("complyedge.cli.CONFIG_DIR", tmp_path),
         ):
             result = runner.invoke(cli, ["login", "--api-key", "test-key-123"])
 
@@ -26,8 +27,9 @@ class TestLogin:
         runner = CliRunner()
         config_file = tmp_path / "config.json"
 
-        with patch("complyedge.cli.CONFIG_FILE", config_file), patch(
-            "complyedge.cli.CONFIG_DIR", tmp_path
+        with (
+            patch("complyedge.cli.CONFIG_FILE", config_file),
+            patch("complyedge.cli.CONFIG_DIR", tmp_path),
         ):
             runner.invoke(
                 cli,
@@ -58,9 +60,11 @@ class TestScan:
 
     def test_scan_text_safe(self):
         runner = CliRunner()
-        with patch("complyedge.cli._get_api_key", return_value="test-key"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=_mock_ce(True)):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="test-key"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=_mock_ce(True)),
+        ):
             result = runner.invoke(cli, ["scan", "--text", "Process this invoice"])
         assert result.exit_code == 0
         assert "COMPLIANT" in result.output
@@ -73,9 +77,11 @@ class TestScan:
         v.rule_description = "Material disclosure"
         v.reason = "Review with legal"
 
-        with patch("complyedge.cli._get_api_key", return_value="test-key"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=_mock_ce(False, [v])):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="test-key"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=_mock_ce(False, [v])),
+        ):
             result = runner.invoke(cli, ["scan", "--text", "Revenue will increase 25%"])
         assert result.exit_code == 1
         assert "SOX_001" in result.output
@@ -85,17 +91,21 @@ class TestScan:
         test_file = tmp_path / "prompt.txt"
         test_file.write_text("Test prompt")
 
-        with patch("complyedge.cli._get_api_key", return_value="test-key"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=_mock_ce(True)):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="test-key"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=_mock_ce(True)),
+        ):
             result = runner.invoke(cli, ["scan", str(test_file)])
         assert result.exit_code == 0
 
     def test_scan_stdin(self):
         runner = CliRunner()
-        with patch("complyedge.cli._get_api_key", return_value="test-key"), patch(
-            "complyedge.cli._load_config", return_value={}
-        ), patch("complyedge.cli._create_client", return_value=_mock_ce(True)):
+        with (
+            patch("complyedge.cli._get_api_key", return_value="test-key"),
+            patch("complyedge.cli._load_config", return_value={}),
+            patch("complyedge.cli._create_client", return_value=_mock_ce(True)),
+        ):
             result = runner.invoke(cli, ["scan"], input="Piped text")
         assert result.exit_code == 0
 

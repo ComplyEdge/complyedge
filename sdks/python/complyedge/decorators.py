@@ -406,9 +406,11 @@ def compliance_check(
                                         "function_name": func.__name__,
                                         "agent_id": agent,
                                         "event_id": result.event_id,
-                                        "violation_count": len(result.violations)
-                                        if result.violations
-                                        else 0,
+                                        "violation_count": (
+                                            len(result.violations)
+                                            if result.violations
+                                            else 0
+                                        ),
                                         "regulations": result.evaluated_rules,
                                     },
                                 )
@@ -471,9 +473,11 @@ def compliance_check(
                                     "function_name": func.__name__,
                                     "agent_id": agent,
                                     "event_id": result.event_id,
-                                    "violation_count": len(result.violations)
-                                    if result.violations
-                                    else 0,
+                                    "violation_count": (
+                                        len(result.violations)
+                                        if result.violations
+                                        else 0
+                                    ),
                                     "regulations": result.evaluated_rules,
                                 },
                             )

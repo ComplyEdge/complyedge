@@ -41,7 +41,13 @@ def _clean_env(monkeypatch):
 class TestKeyInference:
     @pytest.mark.parametrize(
         "key, region",
-        [("ce_eu_abc", "eu"), ("ce_abc", "us"), ("sk-other", None), ("", None), (None, None)],
+        [
+            ("ce_eu_abc", "eu"),
+            ("ce_abc", "us"),
+            ("sk-other", None),
+            ("", None),
+            (None, None),
+        ],
     )
     def test_region_from_api_key(self, key, region):
         assert region_from_api_key(key) == region
@@ -76,7 +82,10 @@ class TestPrecedence:
     def test_base_url_argument_beats_everything(self, monkeypatch):
         monkeypatch.setenv("COMPLYEDGE_API_URL", "http://env.local/")
         monkeypatch.setenv("COMPLYEDGE_REGION", "eu")
-        assert resolve_base_url("ce_eu_x", base_url="http://localhost:8000/", region="us") == "http://localhost:8000"
+        assert (
+            resolve_base_url("ce_eu_x", base_url="http://localhost:8000/", region="us")
+            == "http://localhost:8000"
+        )
 
     def test_unknown_region_is_refused_loudly(self):
         with pytest.raises(ValueError, match="Unknown ComplyEdge region"):

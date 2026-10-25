@@ -6,6 +6,7 @@ Validates @compliance_check decorator fail-open behaviour (offline only).
 
 No live API calls: those wrote audit rows on the shared test tenant.
 """
+
 from __future__ import annotations
 
 # conftest.py prepends sdks/python to sys.path so this always imports
@@ -62,4 +63,3 @@ class TestDecoratorFailOpen:
         assert (
             result == "result-value"
         ), "Decorator with no API key should pass through without blocking"
-

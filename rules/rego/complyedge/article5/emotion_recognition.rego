@@ -49,7 +49,15 @@ rule_id := "rego-art5-1f-001"
 citation := "Regulation (EU) 2024/1689, Article 5(1)(f): The placing on the market, the putting into service for this specific purpose, or the use of AI systems to infer emotions of a natural person in the areas of workplace and education institutions, except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons."
 severity := "critical"
 
-remediation := "Remove emotion recognition capabilities from workplace and education contexts. If emotion inference is required for medical or safety reasons, document the lawful basis and ensure compliance with applicable exceptions."
+# Remediation states the ban as the law draws it (2026-10-24, Leo: "is that answer
+# law based? make sure that the language is clear, and legal"). The old text said
+# "document the lawful basis", a GDPR term that is not the Art 5(1)(f) exception,
+# and did not say the ban turns on biometric data. Commission Guidelines on
+# prohibited AI practices (4 Feb 2025, updated 31 Jul 2025), paras 245 and 251:
+# 5(1)(f) is read with Art 3(39), so it covers emotion inference from biometric
+# data (faces, voice, keystrokes, posture); inference from written text alone is
+# outside it. The exception is a system intended for medical or safety reasons.
+remediation := "Do not use AI to infer the emotions of people at work or in education from their biometric data, such as faces, voices or typing patterns. The only exception is a system intended for medical or safety reasons."
 
 result := {
 	"violation": violation,

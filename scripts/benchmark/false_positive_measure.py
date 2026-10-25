@@ -83,7 +83,16 @@ JURISDICTIONS = ("EU", "US")
 #: Must equal services/api/opa_client.py OPAClient.PACKAGES (asserted in
 #: tests/unit/test_false_positive_measure.py). Kept here so the CI guard needs
 #: no API dependencies.
-PACKAGES = ("article5", "article50", "gpai", "article6", "highrisk", "prompt_security", "data_protection", "us_corpus")
+PACKAGES = (
+    "article5",
+    "article50",
+    "gpai",
+    "article6",
+    "highrisk",
+    "prompt_security",
+    "data_protection",
+    "us_corpus",
+)
 
 
 def load_battery(battery_dir: Path = BATTERY_DIR) -> list[dict[str, Any]]:
@@ -93,7 +102,9 @@ def load_battery(battery_dir: Path = BATTERY_DIR) -> list[dict[str, Any]]:
         for p in data["prompts"]:
             if p.get("expected_decision", "allow") != "allow":
                 continue
-            items.append({**p, "file": path.name, "domain": data.get("domain", path.stem)})
+            items.append(
+                {**p, "file": path.name, "domain": data.get("domain", path.stem)}
+            )
     ids = collections.Counter(i["id"] for i in items)
     dupes = [k for k, n in ids.items() if n > 1]
     if dupes:
@@ -106,7 +117,9 @@ def load_must_block(
 ) -> list[dict[str, Any]]:
     """Every item the engine must BLOCK: benchmark prompts + the must-block battery."""
     items: list[dict[str, Any]] = []
-    for path in sorted(prompts_dir.glob("*.yaml")) + sorted(must_block_dir.glob("*.yaml")):
+    for path in sorted(prompts_dir.glob("*.yaml")) + sorted(
+        must_block_dir.glob("*.yaml")
+    ):
         data = yaml.safe_load(path.read_text())
         for p in data.get("prompts", []):
             if p.get("expected_decision") == "block":
@@ -126,7 +139,12 @@ def must_block_failures(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
         target = item.get("target_rule")
         if not rules or (target and target not in rules):
             failures.append(
-                {"id": item["id"], "file": item["file"], "target_rule": target, "fired": rules}
+                {
+                    "id": item["id"],
+                    "file": item["file"],
+                    "target_rule": target,
+                    "fired": rules,
+                }
             )
     return failures
 
@@ -144,7 +162,10 @@ def load_gaps(path: Path) -> list[str]:
 
 
 def compare_to_baseline(
-    blocked: list[dict[str, Any]], baseline: dict[str, list[str]], *, every_package: bool = True
+    blocked: list[dict[str, Any]],
+    baseline: dict[str, list[str]],
+    *,
+    every_package: bool = True,
 ) -> tuple[list[str], list[str]]:
     """(new false positives, stale baseline entries).
 
@@ -157,7 +178,9 @@ def compare_to_baseline(
     violating package's hits, so for them only an item that no longer blocks
     at all is stale."""
     now = {
-        f"{baseline_key(b['id'], b['jurisdiction'])}|{rule}" for b in blocked for rule in set(b["rules"])
+        f"{baseline_key(b['id'], b['jurisdiction'])}|{rule}"
+        for b in blocked
+        for rule in set(b["rules"])
     }
     then = {f"{key}|{rule}" for key, rules in baseline.items() for rule in rules}
     if every_package:
@@ -199,7 +222,18 @@ def opa_batch(checks: list[tuple[str, str]]) -> list[list[str]]:
         ],
     }
     proc = subprocess.run(
-        [opa, "eval", "-f", "json", "-d", str(RULES), "--ignore", "*_test.rego", "-I", query],
+        [
+            opa,
+            "eval",
+            "-f",
+            "json",
+            "-d",
+            str(RULES),
+            "--ignore",
+            "*_test.rego",
+            "-I",
+            query,
+        ],
         input=json.dumps(doc),
         capture_output=True,
         text=True,
@@ -240,14 +274,21 @@ class HostedEngine:
             self._last = time.monotonic()
             r = self._http.post(
                 "/v1/sandbox/check",
-                json={"text": text, "agent_id": "fp-measure", "jurisdiction": jurisdiction},
+                json={
+                    "text": text,
+                    "agent_id": "fp-measure",
+                    "jurisdiction": jurisdiction,
+                },
             )
             if r.status_code == 429:
                 try:
                     detail = (r.json() or {}).get("detail") or {}
                 except ValueError:  # a 429 from the gateway, not the API: not JSON
                     detail = {}
-                if isinstance(detail, dict) and detail.get("error") == "sandbox_daily_limit_exceeded":
+                if (
+                    isinstance(detail, dict)
+                    and detail.get("error") == "sandbox_daily_limit_exceeded"
+                ):
                     # Never sleep until midnight: stop and say where to resume.
                     raise DailyCapReached(r.headers.get("Retry-After", ""))
                 time.sleep(int(r.headers.get("Retry-After", "60")))
@@ -276,7 +317,11 @@ def main() -> int:
         help="fail only on blocks outside this baseline, and on stale baseline entries",
     )
     ap.add_argument("--offset", type=int, default=0, help="skip the first N checks")
-    ap.add_argument("--limit", type=int, help=f"run at most N checks (hosted: at most {HOSTED_DAILY_CHECKS} a day)")
+    ap.add_argument(
+        "--limit",
+        type=int,
+        help=f"run at most N checks (hosted: at most {HOSTED_DAILY_CHECKS} a day)",
+    )
     ap.add_argument(
         "--write-baseline",
         type=Path,
@@ -288,10 +333,16 @@ def main() -> int:
     pairs = [
         (item, jur)
         for item in items
-        for jur in ((item["jurisdiction"],) if args.own_jurisdiction_only else JURISDICTIONS)
+        for jur in (
+            (item["jurisdiction"],) if args.own_jurisdiction_only else JURISDICTIONS
+        )
     ]
     total_pairs = len(pairs)
-    pairs = pairs[args.offset :][: args.limit] if args.limit is not None else pairs[args.offset :]
+    pairs = (
+        pairs[args.offset :][: args.limit]
+        if args.limit is not None
+        else pairs[args.offset :]
+    )
     if args.engine == "hosted" and len(pairs) > HOSTED_DAILY_CHECKS:
         raise SystemExit(
             f"{len(pairs)} checks exceed the sandbox's {HOSTED_DAILY_CHECKS}/day cap: "
@@ -300,13 +351,17 @@ def main() -> int:
         )
     partial = len(pairs) != total_pairs
     if partial and (args.baseline or args.write_baseline):
-        raise SystemExit("--baseline / --write-baseline need the whole battery (no --offset / --limit)")
+        raise SystemExit(
+            "--baseline / --write-baseline need the whole battery (no --offset / --limit)"
+        )
     blocked: list[dict[str, Any]] = []
     by_rule: collections.Counter[str] = collections.Counter()
     errors: list[dict[str, Any]] = []
     started = time.monotonic()
 
-    def record(item: dict[str, Any], jur: str, rules: list[str], engine_path: str | None) -> None:
+    def record(
+        item: dict[str, Any], jur: str, rules: list[str], engine_path: str | None
+    ) -> None:
         by_rule.update(rules)
         blocked.append(
             {
@@ -327,7 +382,9 @@ def main() -> int:
             if rules:
                 record(item, jur, rules, "opa")
     else:
-        engine = _local_engine() if args.engine == "local" else HostedEngine(args.base_url)
+        engine = (
+            _local_engine() if args.engine == "local" else HostedEngine(args.base_url)
+        )
         label = engine.label
         try:
             for n, (item, jur) in enumerate(pairs):
@@ -335,17 +392,32 @@ def main() -> int:
                     res = engine.check(item["text"], jur)
                 except DailyCapReached:
                     resume = args.offset + n
-                    print(f"sandbox daily cap reached: resume tomorrow with --offset {resume}")
+                    print(
+                        f"sandbox daily cap reached: resume tomorrow with --offset {resume}"
+                    )
                     errors.extend(
-                        {"id": i["id"], "jurisdiction": j, "error": "not checked: sandbox daily cap reached"}
+                        {
+                            "id": i["id"],
+                            "jurisdiction": j,
+                            "error": "not checked: sandbox daily cap reached",
+                        }
                         for i, j in pairs[n:]
                     )
                     break
-                except Exception as e:  # noqa: BLE001 - recorded, never counted as allow
-                    errors.append({"id": item["id"], "jurisdiction": jur, "error": str(e)[:200]})
+                except (
+                    Exception
+                ) as e:  # noqa: BLE001 - recorded, never counted as allow
+                    errors.append(
+                        {"id": item["id"], "jurisdiction": jur, "error": str(e)[:200]}
+                    )
                     continue
                 if not res.get("allowed", True):
-                    record(item, jur, [v["rule_id"] for v in res.get("violations", [])], res.get("engine_path"))
+                    record(
+                        item,
+                        jur,
+                        [v["rule_id"] for v in res.get("violations", [])],
+                        res.get("engine_path"),
+                    )
         finally:
             engine.close()
     checks = len(pairs)
@@ -369,10 +441,16 @@ def main() -> int:
     }
     RESULTS.mkdir(exist_ok=True)
     out = RESULTS / f"false_positive_measure_{args.engine}_latest.json"
-    out.write_text(json.dumps({**summary, "blocked_items": blocked, "error_items": errors}, indent=2))
+    out.write_text(
+        json.dumps(
+            {**summary, "blocked_items": blocked, "error_items": errors}, indent=2
+        )
+    )
 
     print(f"{summary['engine']}")
-    print(f"items {summary['items']} · checks {checks} · blocked {len(blocked)} · errors {len(errors)}")
+    print(
+        f"items {summary['items']} · checks {checks} · blocked {len(blocked)} · errors {len(errors)}"
+    )
     for rule, n in by_rule.most_common():
         print(f"  {n:4d}  {rule}")
     print(f"written {out.relative_to(REPO)}")
@@ -391,15 +469,23 @@ def main() -> int:
                 baseline_key(b["id"], b["jurisdiction"]): sorted(b["rules"])
                 for b in sorted(blocked, key=lambda b: (b["id"], b["jurisdiction"]))
             },
-            "must_block_gaps": sorted(f["id"] for f in misses if f["file"].startswith("prompts/")),
+            "must_block_gaps": sorted(
+                f["id"] for f in misses if f["file"].startswith("prompts/")
+            ),
         }
-        args.write_baseline.write_text(json.dumps(doc, indent=1, sort_keys=False) + "\n")
-        print(f"baseline written: {len(doc['blocked'])} entries -> {args.write_baseline}")
+        args.write_baseline.write_text(
+            json.dumps(doc, indent=1, sort_keys=False) + "\n"
+        )
+        print(
+            f"baseline written: {len(doc['blocked'])} entries -> {args.write_baseline}"
+        )
     elif args.baseline:
         new, stale = compare_to_baseline(
             blocked, load_baseline(args.baseline), every_package=args.engine == "opa"
         )
-        print(f"baseline {args.baseline.name}: new false positives {len(new)} · stale entries {len(stale)}")
+        print(
+            f"baseline {args.baseline.name}: new false positives {len(new)} · stale entries {len(stale)}"
+        )
         for k in new[:50]:
             print(f"  NEW   {k}")
         for k in stale[:50]:
@@ -417,7 +503,9 @@ def main() -> int:
             f"known gaps {len(gaps)} · new misses {len(new_misses)} · closed gaps {len(closed)}"
         )
         for f in new_misses[:50]:
-            print(f"  MISSED {f['id']} ({f['file']}) target={f['target_rule']} fired={f['fired']}")
+            print(
+                f"  MISSED {f['id']} ({f['file']}) target={f['target_rule']} fired={f['fired']}"
+            )
         for g in closed:
             print(f"  CLOSED {g} (blocks now: remove it from must_block_gaps)")
         if not args.write_baseline:

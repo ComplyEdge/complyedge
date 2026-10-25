@@ -5,6 +5,7 @@ Validates latency claims from the published benchmark JSON (offline only).
 
 No live API calls: those wrote audit rows on the shared test tenant.
 """
+
 from __future__ import annotations
 
 import json
@@ -82,4 +83,3 @@ class TestOpaFastPath:
             f"OPA fast-path minimum ({minimum:.1f}ms) is suspiciously low — "
             "may indicate cached or mocked responses"
         )
-

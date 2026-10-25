@@ -130,7 +130,9 @@ class TestGuardrailConstruction:
         with _no_agents_module(), p:
             guard = create_compliance_guardrail(api_key="k", direction=direction)
             guard(None, None, "hello")
-        client.check.assert_called_once_with("hello", direction=expected, user_id=None, user_role=None, session_id=None)
+        client.check.assert_called_once_with(
+            "hello", direction=expected, user_id=None, user_role=None, session_id=None
+        )
 
     def test_default_rule_is_article_5(self):
         # A single string rule is normalized into a one-element list; the
@@ -149,14 +151,22 @@ class TestGuardrailSafePath:
             out = guard(ctx=None, agent=None, input_data="benign text")
         # With no OpenAI Agents installed, the safe branch returns None.
         assert out is None
-        client.check.assert_called_once_with("benign text", direction="prompt", user_id=None, user_role=None, session_id=None)
+        client.check.assert_called_once_with(
+            "benign text",
+            direction="prompt",
+            user_id=None,
+            user_role=None,
+            session_id=None,
+        )
 
     def test_list_input_is_joined_before_check(self):
         p, client = _patch_client(_safe_result())
         with _no_agents_module(), p:
             guard = create_compliance_guardrail(api_key="k")
             guard(None, None, ["a", 1, "b"])
-        client.check.assert_called_once_with("a 1 b", direction="prompt", user_id=None, user_role=None, session_id=None)
+        client.check.assert_called_once_with(
+            "a 1 b", direction="prompt", user_id=None, user_role=None, session_id=None
+        )
 
 
 class TestGuardrailBlockedPath:

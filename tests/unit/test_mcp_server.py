@@ -175,8 +175,18 @@ async def test_list_rules_jurisdiction_filter():
 async def test_list_rules_us_includes_state_and_city_rules():
     data = _payload(await call_tool("list_rules", {"jurisdiction": "US"}))
     ids = {rule["id"] for rule in data["rules"]}
-    assert {"NYC_LL144_AEDT_001", "CCPA_CPRA_OPT_OUT_001", "IL_BIPA_BIOMETRIC_001"} <= ids
-    assert {rule["jurisdiction"] for rule in data["rules"]} <= {"US", "US-CA", "US-NY", "US-IL", "GLOBAL"}
+    assert {
+        "NYC_LL144_AEDT_001",
+        "CCPA_CPRA_OPT_OUT_001",
+        "IL_BIPA_BIOMETRIC_001",
+    } <= ids
+    assert {rule["jurisdiction"] for rule in data["rules"]} <= {
+        "US",
+        "US-CA",
+        "US-NY",
+        "US-IL",
+        "GLOBAL",
+    }
 
 
 @pytest.mark.asyncio
@@ -328,11 +338,17 @@ async def test_scan_prompt_skips_rules_scoped_to_ai_output(monkeypatch, tmp_path
             encoding="utf-8",
         )
     engine = TrustLintEngine(rules_dir=str(tmp_path))
-    monkeypatch.setitem(inspect.unwrap(call_tool).__globals__, "_get_engine", lambda: engine)
+    monkeypatch.setitem(
+        inspect.unwrap(call_tool).__globals__, "_get_engine", lambda: engine
+    )
     for mod in list(sys.modules.values()):
-        if str(getattr(mod, "__file__", "") or "").endswith("mcp_server.py") and hasattr(mod, "_get_engine"):
+        if str(getattr(mod, "__file__", "") or "").endswith(
+            "mcp_server.py"
+        ) and hasattr(mod, "_get_engine"):
             monkeypatch.setattr(mod, "_get_engine", lambda: engine, raising=False)
 
-    data = _payload(await call_tool("scan_prompt", {"prompt": "Tell me about the zebra."}))
+    data = _payload(
+        await call_tool("scan_prompt", {"prompt": "Tell me about the zebra."})
+    )
     fired = {r.get("rule_id") for r in data["risks"]}
     assert fired == {"ANY_DIRECTION_001"}

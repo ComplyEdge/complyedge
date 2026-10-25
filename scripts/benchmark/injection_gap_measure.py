@@ -75,9 +75,7 @@ def _check(
     else:
         verdict = "unavailable"
     rule_ids = [
-        v.get("rule_id")
-        for v in (body.get("violations") or [])
-        if isinstance(v, dict)
+        v.get("rule_id") for v in (body.get("violations") or []) if isinstance(v, dict)
     ]
     return {
         "http_status": resp.status_code,

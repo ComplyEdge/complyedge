@@ -5,6 +5,7 @@ Offline only for the suite itself: corpus files, benchmark JSON, SDK source.
 Region-aware test-tenant key helpers remain for unit tests that pin the
 picker contract (a key only authenticates on its home stack).
 """
+
 from __future__ import annotations
 
 import os
@@ -51,7 +52,9 @@ def _target_region(api_base_url: str) -> str:
 
 def _test_tenant_key(api_base_url: str = DEFAULT_API_BASE_URL) -> str:
     try:
-        files = sorted(TEST_TENANT_KEY_DIR.glob(f"*.{_target_region(api_base_url)}.key"))
+        files = sorted(
+            TEST_TENANT_KEY_DIR.glob(f"*.{_target_region(api_base_url)}.key")
+        )
         return files[0].read_text().strip() if files else ""
     except OSError:
         return ""

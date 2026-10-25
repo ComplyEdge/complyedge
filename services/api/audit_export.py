@@ -170,9 +170,7 @@ def assess_evidence_completeness(events: list[dict[str, Any]]) -> dict[str, Any]
         # AUD-043: compare UTC instants. Lexicographic string compare against
         # EVIDENCE_CONTRACT_SINCE amnestied post-contract hollow rows stamped
         # with a negative offset (wall clock looked "before" the cutover).
-        instant = _parse_event_instant(
-            event.get("timestamp") or event.get("ts")
-        )
+        instant = _parse_event_instant(event.get("timestamp") or event.get("ts"))
         is_live = instant is None or (
             contract_at is not None and instant >= contract_at
         )
@@ -478,7 +476,9 @@ def write_time_material(record: dict[str, Any]) -> str:
 
 def write_time_link_hash(previous_hash: str, record: dict[str, Any]) -> str:
     """CHN-02: SHA-256(previous row's chain_hash + write_time_material(record))."""
-    return adcr_record.chain_hash(previous_hash or GENESIS_HASH, adcr_record.to_adcr(record))
+    return adcr_record.chain_hash(
+        previous_hash or GENESIS_HASH, adcr_record.to_adcr(record)
+    )
 
 
 def is_chained(event: dict[str, Any]) -> bool:
@@ -545,7 +545,9 @@ def write_time_chain_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
 # checked by openssl (``_verify_token_signature``); this parser never claims to.
 
 _OID_SIGNED_DATA = bytes.fromhex("2a864886f70d010702")  # 1.2.840.113549.1.7.2
-_OID_TST_INFO = bytes.fromhex("2a864886f70d010910 0104".replace(" ", ""))  # ...1.9.16.1.4
+_OID_TST_INFO = bytes.fromhex(
+    "2a864886f70d010910 0104".replace(" ", "")
+)  # ...1.9.16.1.4
 
 
 def _der_read(buf: bytes, pos: int) -> tuple[int, bytes, int]:
@@ -639,7 +641,9 @@ def find_openssl(preferred: str | None = None) -> str | None:
     if not path:
         return None
     try:
-        out = subprocess.run([path, "version"], capture_output=True, text=True, timeout=10).stdout
+        out = subprocess.run(
+            [path, "version"], capture_output=True, text=True, timeout=10
+        ).stdout
     except (OSError, subprocess.SubprocessError):
         return None
     return None if "LibreSSL" in out or not out.startswith("OpenSSL") else path
@@ -667,7 +671,11 @@ def _as_pem(path: str) -> bytes:
         return data
     body = base64.encodebytes(data).replace(b"\n", b"")
     lines = [body[i : i + 64] for i in range(0, len(body), 64)]
-    return b"-----BEGIN CERTIFICATE-----\n" + b"\n".join(lines) + b"\n-----END CERTIFICATE-----\n"
+    return (
+        b"-----BEGIN CERTIFICATE-----\n"
+        + b"\n".join(lines)
+        + b"\n-----END CERTIFICATE-----\n"
+    )
 
 
 def _verify_token_signature(
@@ -698,7 +706,18 @@ def _verify_token_signature(
                     fh.write(_as_pem(root))
             except OSError as exc:
                 return "not_checked", f"cannot read {root}: {exc}"
-            cmd = [openssl, "ts", "-verify", "-data", data, "-in", tsr, "-CAfile", ca, "-partial_chain"]
+            cmd = [
+                openssl,
+                "ts",
+                "-verify",
+                "-data",
+                data,
+                "-in",
+                tsr,
+                "-CAfile",
+                ca,
+                "-partial_chain",
+            ]
             if attime is not None:
                 cmd += ["-attime", str(attime)]
             try:
@@ -709,7 +728,10 @@ def _verify_token_signature(
             if proc.returncode == 0 and "Verification: OK" in output:
                 return "verified", ""
             if "Verification: FAILED" not in output:
-                return "not_checked", f"openssl could not check the token: {output[-200:]}"
+                return (
+                    "not_checked",
+                    f"openssl could not check the token: {output[-200:]}",
+                )
             errors.append(output.splitlines()[-1] if output else "Verification: FAILED")
     return "invalid", (errors[-1] if errors else "Verification: FAILED")[:200]
 
@@ -738,15 +760,23 @@ def _check_anchor_token(
         findings.append(("anchor_token_imprint_missing", "no TSTInfo messageImprint"))
     elif parsed["imprint_hex"] != digest:
         findings.append(
-            ("anchor_token_imprint_mismatch", f"token covers {parsed['imprint_hex'][:16]}…")
+            (
+                "anchor_token_imprint_mismatch",
+                f"token covers {parsed['imprint_hex'][:16]}…",
+            )
         )
     if not tsa_roots:
-        findings.append(("anchor_token_signature_not_checked", "no --tsa-root supplied"))
+        findings.append(
+            ("anchor_token_signature_not_checked", "no --tsa-root supplied")
+        )
         return findings
     tool = find_openssl(openssl)
     if tool is None:
         findings.append(
-            ("anchor_token_signature_not_checked", "needs OpenSSL 1.1 or later on PATH (LibreSSL lacks -partial_chain)")
+            (
+                "anchor_token_signature_not_checked",
+                "needs OpenSSL 1.1 or later on PATH (LibreSSL lacks -partial_chain)",
+            )
         )
         return findings
     outcome, reason = _verify_token_signature(
@@ -820,14 +850,22 @@ def _check_origin_signatures(
         try:
             keys.append(_load_origin_pubkey(path))
         except Exception as exc:  # noqa: BLE001
-            return [("origin_signature_not_checked", f"unreadable pubkey {path}: {exc}")]
+            return [
+                ("origin_signature_not_checked", f"unreadable pubkey {path}: {exc}")
+            ]
     for sig in sigs:
         if not isinstance(sig, dict):
             return [("origin_signature_invalid", "signature entry is not an object")]
-        if any(verify_statement_signature(statement, sig, public_key_spki_der=k) for k in keys):
+        if any(
+            verify_statement_signature(statement, sig, public_key_spki_der=k)
+            for k in keys
+        ):
             return []
     return [
-        ("origin_signature_invalid", "no origin signature verified against supplied pubkeys")
+        (
+            "origin_signature_invalid",
+            "no origin signature verified against supplied pubkeys",
+        )
     ]
 
 
@@ -872,7 +910,9 @@ def verify_write_time_chain(
     """
     findings: list[dict[str, Any]] = []
 
-    def add(finding: str, detail: str = "", seq: int | None = None, event_id: Any = None):
+    def add(
+        finding: str, detail: str = "", seq: int | None = None, event_id: Any = None
+    ):
         findings.append(
             {"finding": finding, "seq": seq, "event_id": event_id, "detail": detail}
         )
@@ -896,18 +936,14 @@ def verify_write_time_chain(
     if chained:
         chained_instants = [
             t
-            for t in (
-                _parse_event_instant(e.get("timestamp")) for e in chained
-            )
+            for t in (_parse_event_instant(e.get("timestamp")) for e in chained)
             if t is not None
         ]
         if chained_instants:
             chain_since_at = min(chained_instants)
             chain_since = chain_since_at.isoformat()
             for e in pre_chain:
-                pre_at = _parse_event_instant(
-                    e.get("timestamp") or e.get("ts")
-                )
+                pre_at = _parse_event_instant(e.get("timestamp") or e.get("ts"))
                 if pre_at is None or pre_at > chain_since_at:
                     add(
                         "unchained_after_chain_start",
@@ -919,7 +955,9 @@ def verify_write_time_chain(
     rows: list[tuple[int, dict[str, Any]]] = []
     for e in chained:
         if e.get("chain_alg") != WRITE_TIME_CHAIN_ALGORITHM:
-            add("unknown_chain_alg", str(e.get("chain_alg")), _seq(e), e.get("event_id"))
+            add(
+                "unknown_chain_alg", str(e.get("chain_alg")), _seq(e), e.get("event_id")
+            )
             continue
         seq = _seq(e)
         if seq is None:
@@ -932,12 +970,22 @@ def verify_write_time_chain(
     previous: tuple[int, dict[str, Any]] | None = None
     for seq, e in rows:
         if seq in seen:
-            add("sequence_duplicate", "two rows carry this chain_seq", seq, e.get("event_id"))
+            add(
+                "sequence_duplicate",
+                "two rows carry this chain_seq",
+                seq,
+                e.get("event_id"),
+            )
         seen.add(seq)
         stored_prev = str(e.get("chain_prev") or "")
         expected = write_time_link_hash(stored_prev, e)
         if expected != e.get("chain_hash"):
-            add("hash_mismatch", "stored chain_hash is not the hash of the row", seq, e.get("event_id"))
+            add(
+                "hash_mismatch",
+                "stored chain_hash is not the hash of the row",
+                seq,
+                e.get("event_id"),
+            )
         if previous is not None:
             prev_seq, prev_event = previous
             if seq > prev_seq + 1:
@@ -948,9 +996,19 @@ def verify_write_time_chain(
                     None,
                 )
             if seq == prev_seq + 1 and stored_prev != prev_event.get("chain_hash"):
-                add("link_break", "chain_prev is not the previous row's chain_hash", seq, e.get("event_id"))
+                add(
+                    "link_break",
+                    "chain_prev is not the previous row's chain_hash",
+                    seq,
+                    e.get("event_id"),
+                )
         elif seq == 1 and stored_prev != GENESIS_HASH:
-            add("link_break", "the first row of a chain must have an empty chain_prev", seq, e.get("event_id"))
+            add(
+                "link_break",
+                "the first row of a chain must have an empty chain_prev",
+                seq,
+                e.get("event_id"),
+            )
         previous = (seq, e)
 
     first_seq = rows[0][0] if rows else None
@@ -968,7 +1026,9 @@ def verify_write_time_chain(
         except (TypeError, ValueError):
             add("anchor_mismatch", "anchor has no integer chain_seq")
             continue
-        newest_anchor_seq = a_seq if newest_anchor_seq is None else max(newest_anchor_seq, a_seq)
+        newest_anchor_seq = (
+            a_seq if newest_anchor_seq is None else max(newest_anchor_seq, a_seq)
+        )
         statement_text = str(anchor.get("statement") or "")
         try:
             stated = json.loads(statement_text)
@@ -977,22 +1037,39 @@ def verify_write_time_chain(
             continue
         statement = statement_text.encode("utf-8")
         if hashlib.sha256(statement).hexdigest() != anchor.get("statement_sha256"):
-            add("anchor_statement_mismatch", "statement_sha256 is not the hash of statement", a_seq)
+            add(
+                "anchor_statement_mismatch",
+                "statement_sha256 is not the hash of statement",
+                a_seq,
+            )
         # ANC-01 names the account ``account_id``; statements made before the
         # ADCR names call it ``tenant_id``.
         stated_account = stated.get("account_id", stated.get("tenant_id"))
         if str(stated.get("chain_seq")) != str(a_seq) or (
             tenant_id and str(stated_account) != tenant_id
         ):
-            add("anchor_statement_mismatch", "statement names another seq or tenant", a_seq)
+            add(
+                "anchor_statement_mismatch",
+                "statement names another seq or tenant",
+                a_seq,
+            )
         if a_seq in by_seq:
             if stated.get("chain_hash") != by_seq[a_seq].get("chain_hash"):
-                add("anchor_mismatch", "anchored chain_hash differs from the export's row", a_seq, by_seq[a_seq].get("event_id"))
+                add(
+                    "anchor_mismatch",
+                    "anchored chain_hash differs from the export's row",
+                    a_seq,
+                    by_seq[a_seq].get("event_id"),
+                )
             else:
                 checked += 1
-        for finding, detail in _check_anchor_token(anchor, statement, tsa_roots, openssl):
+        for finding, detail in _check_anchor_token(
+            anchor, statement, tsa_roots, openssl
+        ):
             add(finding, detail, a_seq)
-        for finding, detail in _check_origin_signatures(anchor, statement_text, origin_pubkeys):
+        for finding, detail in _check_origin_signatures(
+            anchor, statement_text, origin_pubkeys
+        ):
             add(finding, detail, a_seq)
 
     if not anchors:
@@ -1015,7 +1092,10 @@ def verify_write_time_chain(
     if export.get("chain_head") is not None:
         legacy = "verified" if verify_audit_export_chain(export) else "failed"
         if legacy == "failed":
-            add("legacy_export_chain_failed", "the export-time sha256-v1 chain does not verify")
+            add(
+                "legacy_export_chain_failed",
+                "the export-time sha256-v1 chain does not verify",
+            )
 
     names = {f["finding"] for f in findings}
     if names & FAILING_FINDINGS:
@@ -1086,8 +1166,15 @@ def main(argv: list[str] | None = None) -> int:
         origin_pubkeys=args.origin_pubkey or None,
     )
     print(f"verdict: {result['verdict']}")
-    for key in ("chained_rows", "pre_chain_rows", "first_seq", "last_seq",
-                "anchors_checked", "newest_anchor_seq", "legacy_export_chain"):
+    for key in (
+        "chained_rows",
+        "pre_chain_rows",
+        "first_seq",
+        "last_seq",
+        "anchors_checked",
+        "newest_anchor_seq",
+        "legacy_export_chain",
+    ):
         print(f"{key}: {result.get(key)}")
     for f in result["findings"]:
         where = f" seq={f['seq']}" if f.get("seq") is not None else ""

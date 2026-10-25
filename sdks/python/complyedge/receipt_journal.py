@@ -10,10 +10,11 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 # Keys that must never land in the journal (prompt / answer / secrets).
 _FORBIDDEN = frozenset(
@@ -59,7 +60,9 @@ class ReceiptJournal:
         if self.path.parent and not self.path.parent.exists():
             self.path.parent.mkdir(parents=True, exist_ok=True)
 
-    def append_result(self, result: Any, *, skip_sandbox: bool = True) -> ReceiptEntry | None:
+    def append_result(
+        self, result: Any, *, skip_sandbox: bool = True
+    ) -> ReceiptEntry | None:
         """Append from a ``ComplianceResult``. Skips sandbox by default."""
         sandbox = bool(getattr(result, "sandbox", False))
         if skip_sandbox and sandbox:
@@ -74,7 +77,7 @@ class ReceiptJournal:
             bundle_digest=getattr(result, "bundle_digest", None),
             allowed=bool(getattr(result, "allowed", False)),
             timestamp=getattr(result, "timestamp", None),
-            recorded_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            recorded_at=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
             audit_logged=bool(getattr(result, "audit_logged", False)),
             sandbox=sandbox,
         )
@@ -96,7 +99,7 @@ class ReceiptJournal:
                 raise ValueError("receipt journal requires event_id")
             payload.setdefault(
                 "recorded_at",
-                datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
         line = json.dumps(payload, separators=(",", ":"), sort_keys=True)
         with self.path.open("a", encoding="utf-8") as fh:

@@ -315,7 +315,8 @@ def _allowed_from_payload(data: dict[str, Any]) -> bool:
 def _check_path(sandbox: bool) -> str:
     """/v1/sandbox/check evaluates with the tenant's real rules and settings
     but records nothing: no audit entry, no usage, no count against the plan's daily
-    limit (own caps: 60 a minute, 1,000 a day). For trying cases, never for production traffic."""
+    limit (own caps: 60 a minute, 1,000 a day). For trying cases, never for production traffic.
+    """
     return "/v1/sandbox/check" if sandbox else "/v1/check"
 
 
@@ -907,9 +908,9 @@ class ComplyEdgeClient:
                 "text": text,
                 "jurisdiction": jurisdiction or "EU",
                 "agent_id": agent_id,
-                "direction": direction.value
-                if hasattr(direction, "value")
-                else str(direction),
+                "direction": (
+                    direction.value if hasattr(direction, "value") else str(direction)
+                ),
                 "use_semantic_fallback": use_semantic_fallback,
             }
             context = _attribution_context(
@@ -1088,9 +1089,9 @@ class AsyncComplyEdgeClient:
                 "text": text,
                 "jurisdiction": jurisdiction or "EU",
                 "agent_id": agent_id,
-                "direction": direction.value
-                if hasattr(direction, "value")
-                else str(direction),
+                "direction": (
+                    direction.value if hasattr(direction, "value") else str(direction)
+                ),
                 "use_semantic_fallback": use_semantic_fallback,
             }
             context = _attribution_context(

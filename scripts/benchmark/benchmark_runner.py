@@ -108,7 +108,11 @@ def _average_pct(scored: list[dict[str, Any]]) -> float:
     if not scored:
         return 0.0
     ratios = [
-        Fraction(r["aggregate_score"], r["max_score"]) if r["max_score"] else Fraction(0)
+        (
+            Fraction(r["aggregate_score"], r["max_score"])
+            if r["max_score"]
+            else Fraction(0)
+        )
         for r in scored
     ]
     return round(float(sum(ratios) * 100 / len(ratios)), 1)
@@ -159,7 +163,9 @@ def run(providers_dir: Path, schema_path: Path, output_path: Path) -> dict[str, 
     # Rank by percentage, not raw points: providers below the systemic-risk
     # threshold are scored out of 15 and the rest out of 18, so raw points
     # put a 10/18 (55.6%) above a 9/15 (60.0%). Ties break on points, then id.
-    scored.sort(key=lambda r: (-r["compliance_pct"], -r["aggregate_score"], r["provider_id"]))
+    scored.sort(
+        key=lambda r: (-r["compliance_pct"], -r["aggregate_score"], r["provider_id"])
+    )
 
     # The receipt generated_at uses the audit record timestamp format (UTC, Z).
     from adcr_record import utc_timestamp

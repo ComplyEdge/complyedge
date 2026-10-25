@@ -422,9 +422,7 @@ async def run_benchmark(
     return await asyncio.gather(*(all_trials_llm(p) for p in prompts))
 
 
-def collapse_pass_at_k(
-    trials: list[dict[str, Any]], repeat: int
-) -> dict[str, Any]:
+def collapse_pass_at_k(trials: list[dict[str, Any]], repeat: int) -> dict[str, Any]:
     """pass^k: a prompt passes only if every trial passed.
 
     Latency fields are means across trials. trial_results kept for audit
@@ -439,9 +437,7 @@ def collapse_pass_at_k(
     base["trial_passes"] = trial_passes
     base["pass_at_k"] = base["passed"]
     walls = [t["wall_ms"] for t in trials if t.get("wall_ms") is not None]
-    apis = [
-        t["api_latency_ms"] for t in trials if t.get("api_latency_ms") is not None
-    ]
+    apis = [t["api_latency_ms"] for t in trials if t.get("api_latency_ms") is not None]
     base["wall_ms"] = round(statistics.mean(walls), 1) if walls else None
     base["api_latency_ms"] = round(statistics.mean(apis), 1) if apis else None
     # Majority actual for display; if any trial erred, surface error.
@@ -526,18 +522,26 @@ def aggregate(results: list[dict[str, Any]]) -> dict[str, Any]:
                 # api_latency_ms: CE server-side response time (the SLA metric for demos).
                 # OPA-path: ~40–80ms. Hybrid (LLM) path: ~1,000–3,500ms. None if not returned by API.
                 "api_latency_ms": {
-                    "p50": round(percentile(api_latencies, 50) or 0, 1)
-                    if api_latencies
-                    else None,
-                    "p95": round(percentile(api_latencies, 95) or 0, 1)
-                    if api_latencies
-                    else None,
-                    "p99": round(percentile(api_latencies, 99) or 0, 1)
-                    if api_latencies
-                    else None,
-                    "mean": round(statistics.mean(api_latencies), 1)
-                    if api_latencies
-                    else None,
+                    "p50": (
+                        round(percentile(api_latencies, 50) or 0, 1)
+                        if api_latencies
+                        else None
+                    ),
+                    "p95": (
+                        round(percentile(api_latencies, 95) or 0, 1)
+                        if api_latencies
+                        else None
+                    ),
+                    "p99": (
+                        round(percentile(api_latencies, 99) or 0, 1)
+                        if api_latencies
+                        else None
+                    ),
+                    "mean": (
+                        round(statistics.mean(api_latencies), 1)
+                        if api_latencies
+                        else None
+                    ),
                     "n": len(api_latencies),
                 },
                 # Legacy field preserved for backward compatibility

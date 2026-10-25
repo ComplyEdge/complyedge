@@ -318,7 +318,7 @@ def create_mcp() -> FastMCP:
             args["jurisdiction"] = jurisdiction
         return _payload_from_tool_result(await _sandbox_check(args, api_key))
 
-    @mcp.custom_route("/health", methods=["GET"])
+    @mcp.custom_route("/health", methods=["GET"])  # type: ignore[misc]
     async def health(_request: Request) -> Response:
         body, code = _health_payload()
         return JSONResponse(body, status_code=code)

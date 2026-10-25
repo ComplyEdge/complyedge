@@ -4,6 +4,7 @@ Prefer host launch via uvx (see manifest.json mcp_config). This module is a
 fallback when the host runs entry_point with a Python that already has
 ``complyedge[mcp]`` installed (the version manifest.json pins).
 """
+
 from __future__ import annotations
 
 

@@ -356,9 +356,7 @@ class TestGlobalConvenienceFunctions:
         mock_client = Mock()
         mock_client.is_safe.return_value = True
 
-        with patch.dict(
-            is_safe.__globals__, {"ComplyEdge": lambda **kw: mock_client}
-        ):
+        with patch.dict(is_safe.__globals__, {"ComplyEdge": lambda **kw: mock_client}):
             result = is_safe(
                 text="Safe content",
                 api_key="global-test-key",

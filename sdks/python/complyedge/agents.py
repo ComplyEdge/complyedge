@@ -86,7 +86,9 @@ def create_compliance_guardrail(
     rule_type: str | None = None,
     jurisdiction: str | None = None,
     agent_id: str = "default",
-    attribution: Mapping[str, Any] | Callable[[Any], Mapping[str, Any] | None] | None = None,
+    attribution: (
+        Mapping[str, Any] | Callable[[Any], Mapping[str, Any] | None] | None
+    ) = None,
     **_unused: Any,
 ) -> Callable:
     """
@@ -165,7 +167,7 @@ def create_compliance_guardrail(
                 session_id=attr.get("session_id"),
             )
 
-            output_info = {
+            output_info: dict[str, Any] = {
                 "rules": rules_list,
                 "direction": check_direction,
                 "agent_id": agent_id,

@@ -13,7 +13,8 @@ from __future__ import annotations
 
 import base64
 import os
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 # KMS SigningAlgorithm for ECC_NIST_P256 keys.
 ORIGIN_ALG = "ECDSA_SHA_256"

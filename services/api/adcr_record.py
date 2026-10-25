@@ -92,7 +92,10 @@ AUDIT_RETENTION_DAYS = int(os.getenv("AUDIT_RETENTION_DAYS", "184"))
 #: audit row stores a reason code instead (ADCR REC-16: codes, never free
 #: text that could restate the input). Read by the API's audit writer and by
 #: the producer-profile build (the reason-code list).
-MODEL_REASON_CODES = {"LLM_FALLBACK_BLOCK": "llm_fallback_block", "LLM_LAYER2_BLOCK": "llm_layer2_block"}
+MODEL_REASON_CODES = {
+    "LLM_FALLBACK_BLOCK": "llm_fallback_block",
+    "LLM_LAYER2_BLOCK": "llm_layer2_block",
+}
 
 #: A final review and the oversight record it writes. ``needs_legal_counsel``
 #: keeps the flag in the queue and writes no record.
@@ -150,7 +153,7 @@ _STORAGE_KEYS = frozenset({"pk", "sk", "gsi1_pk", "gsi1_sk", "ttl"})
 _CHAIN_KEYS = frozenset(
     {"chain_seq", "chain_prev", "chain_hash", "chain_alg", "chain_link", "chain_status"}
 )
-_DIRECTION = {"prompt": "input", "output": "output", "action": "action"}
+_DIRECTION: dict[Any, Any] = {"prompt": "input", "output": "output", "action": "action"}
 _VERDICT = {
     "block": ("deny", "blocked"),
     "allow": ("allow", "passed"),
@@ -218,7 +221,11 @@ def utc_timestamp(value: Any) -> str:
         t = t.astimezone(UTC)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"unparseable timestamp: {value!r}") from exc
-    frac = f"{t.microsecond // 1000:03d}" if t.microsecond % 1000 == 0 else f"{t.microsecond:06d}"
+    frac = (
+        f"{t.microsecond // 1000:03d}"
+        if t.microsecond % 1000 == 0
+        else f"{t.microsecond:06d}"
+    )
     return t.strftime("%Y-%m-%dT%H:%M:%S.") + frac + "Z"
 
 
@@ -251,7 +258,9 @@ def _jcs(v: Any) -> str:
         return "false"
     if isinstance(v, int):
         if abs(v) >= _MAX_SAFE_INT:
-            raise ValueError("integer outside +-(2^53 - 1); write it as a string (REC-01)")
+            raise ValueError(
+                "integer outside +-(2^53 - 1); write it as a string (REC-01)"
+            )
         return str(v)
     if isinstance(v, (float, Decimal)):
         raise ValueError("non-integer number; write it as a decimal string (REC-01)")
@@ -263,7 +272,13 @@ def _jcs(v: Any) -> str:
         if any(not isinstance(k, str) for k in v):
             raise ValueError("object keys must be strings")
         keys = sorted(v, key=lambda k: k.encode("utf-16-be"))
-        return "{" + ",".join(json.dumps(k, ensure_ascii=False) + ":" + _jcs(v[k]) for k in keys) + "}"
+        return (
+            "{"
+            + ",".join(
+                json.dumps(k, ensure_ascii=False) + ":" + _jcs(v[k]) for k in keys
+            )
+            + "}"
+        )
     raise ValueError(f"value of type {type(v).__name__} has no JSON form")
 
 
@@ -271,13 +286,20 @@ def chain_hash(previous_hash: str, record: dict[str, Any]) -> str:
     """CHN-02: SHA-256 over the previous hash (hex text) followed by the
     canonical record without its ``chain`` member."""
     body = {k: v for k, v in record.items() if k != "chain"}
-    return hashlib.sha256((previous_hash or "").encode("utf-8") + canonical(body)).hexdigest()
+    return hashlib.sha256(
+        (previous_hash or "").encode("utf-8") + canonical(body)
+    ).hexdigest()
 
 
 def anchor_statement(account_id: str, chain_seq: int, chain_hash_hex: str) -> bytes:
     """ANC-01 anchor statement, canonical bytes."""
     return canonical(
-        {"account_id": str(account_id), "chain_alg": CHAIN_ALG, "chain_hash": chain_hash_hex, "chain_seq": int(chain_seq)}
+        {
+            "account_id": str(account_id),
+            "chain_alg": CHAIN_ALG,
+            "chain_hash": chain_hash_hex,
+            "chain_seq": int(chain_seq),
+        }
     )
 
 
@@ -348,7 +370,11 @@ def is_adcr_exportable(row: dict[str, Any]) -> bool:
 
 
 def _pseudonym(value: Any, key_version: Any) -> dict[str, Any] | None:
-    if isinstance(value, str) and value.startswith("p1:") and isinstance(key_version, int):
+    if (
+        isinstance(value, str)
+        and value.startswith("p1:")
+        and isinstance(key_version, int)
+    ):
         return {"key_version": key_version, "value": value}
     return None
 
@@ -358,7 +384,9 @@ def _is_rule(violation: Any) -> bool:
 
 
 def _rule_ref(v: dict[str, Any]) -> dict[str, Any]:
-    ref = {k: val for k, val in v.items() if k not in ("rule_description", "description")}
+    ref = {
+        k: val for k, val in v.items() if k not in ("rule_description", "description")
+    }
     citation = v.get("rule_description") or v.get("description")
     if citation:
         ref["citation"] = citation
@@ -374,16 +402,12 @@ def _fallback(row: dict[str, Any]) -> dict[str, Any] | None:
     return None
 
 
-def _exemption_provision(
-    e: dict[str, Any], by_rule: dict[str, Any]
-) -> dict[str, Any]:
+def _exemption_provision(e: dict[str, Any], by_rule: dict[Any, Any]) -> dict[str, Any]:
     """Prefer the ELI/url provision stored on the row or on the fired rule."""
     stored = e.get("provision")
     if isinstance(stored, dict) and (stored.get("eli") or stored.get("url")):
         return {
-            k: stored[k]
-            for k in ("eli", "url", "label")
-            if stored.get(k) is not None
+            k: stored[k] for k in ("eli", "url", "label") if stored.get(k) is not None
         }
     rule = by_rule.get(e.get("rule_id")) or {}
     if isinstance(rule.get("provision"), dict) and (
@@ -399,7 +423,9 @@ def _exemptions(row: dict[str, Any], rules: list[dict[str, Any]]) -> dict[str, l
     for e in row.get("exemptions") or []:
         if not isinstance(e, dict):
             continue
-        entry = {k: v for k, v in e.items() if k not in ("exemption", "basis", "provision")}
+        entry = {
+            k: v for k, v in e.items() if k not in ("exemption", "basis", "provision")
+        }
         entry["name"] = e.get("exemption")
         entry["provision"] = _exemption_provision(e, by_rule)
         claimed.append(entry)
@@ -422,7 +448,13 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
     same record. Pure and deterministic: the chain writer and the verifier call
     it on the same row and must get the same bytes.
     """
-    row = json_value({k: v for k, v in row.items() if k not in _STORAGE_KEYS and k not in _CHAIN_KEYS})
+    row = json_value(
+        {
+            k: v
+            for k, v in row.items()
+            if k not in _STORAGE_KEYS and k not in _CHAIN_KEYS
+        }
+    )
     # Attributes carried in an ADCR field; every other one goes under
     # ``complyedge`` so the chain covers the whole row.
     used = {"event_id", "tenant_id", "timestamp", "event_type"}
@@ -470,8 +502,12 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
             rec["detected_at"] = occurred_at
 
     checker: dict[str, Any] = {"id": CHECKER_ID}
-    for src, dst in (("bundle_id", "version"), ("engine_path", "path"), ("model_used", "model"),
-                     ("confirm_model", "confirm_model")):
+    for src, dst in (
+        ("bundle_id", "version"),
+        ("engine_path", "path"),
+        ("model_used", "model"),
+        ("confirm_model", "confirm_model"),
+    ):
         if src in row:
             checker[dst] = row[src]
             used.add(src)
@@ -568,7 +604,14 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
             used.add("fallback")
 
     if event_type == EVENT_OVERSIGHT:
-        for f in ("proposal_ref", "oversight_action", "reviewer_role", "authority_ref", "inputs_ref", "reason_code"):
+        for f in (
+            "proposal_ref",
+            "oversight_action",
+            "reviewer_role",
+            "authority_ref",
+            "inputs_ref",
+            "reason_code",
+        ):
             if row.get(f) is not None:
                 rec[f] = row[f]
                 used.add(f)
@@ -588,7 +631,11 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
         # ``allowed`` is the decision; ``action`` refines an allowed one (flag).
         # Rows written before the action followed the decision can carry
         # ``action: allow`` on a block, so a refusal is read from ``allowed``.
-        verdict, action = _VERDICT["block"] if row.get("allowed") is False else _VERDICT.get(native, ("deny", "blocked"))
+        verdict, action = (
+            _VERDICT["block"]
+            if row.get("allowed") is False
+            else _VERDICT.get(native, ("deny", "blocked"))
+        )
         rec["verdict"] = verdict
         rec["action"] = action
         rec["native_result"] = native
@@ -642,7 +689,13 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
             if any(c in SPECIAL_CATEGORIES for c in cats):
                 rec["special_category"] = True
             used.add("data_categories")
-        for f in ("purpose_ref", "correlation_id", "works_agreement_ref", "legal_basis", "subject_is_employee"):
+        for f in (
+            "purpose_ref",
+            "correlation_id",
+            "works_agreement_ref",
+            "legal_basis",
+            "subject_is_employee",
+        ):
             if row.get(f) is not None:
                 rec[f] = row[f]
                 used.add(f)
@@ -650,7 +703,13 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
         if subject:
             rec["subject"] = subject
             used.add("subject")
-        for f in ("decision_mode", "notice", "explanation_inputs", "withheld", "escrow_ref"):
+        for f in (
+            "decision_mode",
+            "notice",
+            "explanation_inputs",
+            "withheld",
+            "escrow_ref",
+        ):
             if row.get(f) is not None:
                 rec[f] = row[f]
                 used.add(f)
@@ -661,7 +720,9 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
             rec[name] = p
             used.add(field)
     if any(name in rec for name in ("user", "session", "subject")) or (
-        "commitments" in rec and rec["commitments"] and "key_version" in rec["commitments"][0]
+        "commitments" in rec
+        and rec["commitments"]
+        and "key_version" in rec["commitments"][0]
     ):
         used.add("pseudonym_key_version")
 
@@ -765,8 +826,12 @@ def export_document(
         except (ValueError, TypeError, KeyError):
             continue
     anchored = max(
-        (e["statement"].get("chain_seq") for e in entries
-         if isinstance(e["statement"].get("chain_seq"), int) and e["statement"]["chain_seq"] <= last),
+        (
+            e["statement"].get("chain_seq")
+            for e in entries
+            if isinstance(e["statement"].get("chain_seq"), int)
+            and e["statement"]["chain_seq"] <= last
+        ),
         default=0,
     )
     envelope = {
@@ -774,7 +839,10 @@ def export_document(
         "account_id": str(account_id),
         "producer_id": PRODUCER_ID,
         "period": {"from": utc_timestamp(period_from), "to": utc_timestamp(period_to)},
-        "clock_source": {"reference": CLOCK_REFERENCE, "tolerance_ms": CLOCK_TOLERANCE_MS},
+        "clock_source": {
+            "reference": CLOCK_REFERENCE,
+            "tolerance_ms": CLOCK_TOLERANCE_MS,
+        },
         "chain_summary": {
             "alg": CHAIN_ALG,
             "first_seq": min(seqs) if seqs else 0,

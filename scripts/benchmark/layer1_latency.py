@@ -25,6 +25,7 @@ Local reproducible microbenchmark, NOT prod telemetry. Production Layer-1
 latency is tracked per request via the ``opa_latency_ms`` field emitted to
 CloudWatch (see services/api/main.py).
 """
+
 from __future__ import annotations
 
 import argparse
@@ -77,6 +78,7 @@ def _assert_packages_match_bundle() -> None:
             f"  benchmarked but not in bundle: {sorted(extra) or 'none'}\n"
             "Update PACKAGES here and in services/api/opa_client.py together."
         )
+
 
 def _capture_environment() -> dict:
     """Record the measurement environment.

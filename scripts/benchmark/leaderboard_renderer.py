@@ -50,8 +50,12 @@ def render_markdown(data: dict) -> str:
     rows = data["scored_providers"]
     if rows:
         top, bottom = rows[0]["compliance_pct"], rows[-1]["compliance_pct"]
-        best = ", ".join(f"`{r['provider_id']}`" for r in rows if r["compliance_pct"] == top)
-        worst = ", ".join(f"`{r['provider_id']}`" for r in rows if r["compliance_pct"] == bottom)
+        best = ", ".join(
+            f"`{r['provider_id']}`" for r in rows if r["compliance_pct"] == top
+        )
+        worst = ", ".join(
+            f"`{r['provider_id']}`" for r in rows if r["compliance_pct"] == bottom
+        )
         lines.append(f"- **Highest score:** {best} ({top}%)")
         lines.append(f"- **Lowest score:** {worst} ({bottom}%)")
     lines.append("")
@@ -70,7 +74,11 @@ def render_markdown(data: dict) -> str:
     # rows are listed by points, then provider id, as the runner sorts them.
     rank = 0
     for i, row in enumerate(data["scored_providers"], start=1):
-        if i == 1 or row["compliance_pct"] != data["scored_providers"][i - 2]["compliance_pct"]:
+        if (
+            i == 1
+            or row["compliance_pct"]
+            != data["scored_providers"][i - 2]["compliance_pct"]
+        ):
             rank = i
         per = row["per_obligation"]
         cells = [

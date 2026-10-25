@@ -37,7 +37,12 @@ except ImportError:  # trustlint releases before the shared helper
         want = requested.upper()
         if rule_j == "GLOBAL":
             return True
-        return rule_j == want or want.startswith(rule_j + "-") or rule_j.startswith(want + "-")
+        return (
+            rule_j == want
+            or want.startswith(rule_j + "-")
+            or rule_j.startswith(want + "-")
+        )
+
 
 logger = logging.getLogger("complyedge.mcp")
 
@@ -350,7 +355,7 @@ def _sandbox_enabled() -> bool:
     return bool((os.environ.get(API_KEY_ENV) or "").strip())
 
 
-@server.list_tools()
+@server.list_tools()  # type: ignore[misc]
 async def list_tools() -> list[Tool]:
     """Fixed order: check_compliance → list_rules → scan_prompt, then
     sandbox_check only when COMPLYEDGE_API_KEY is set."""
@@ -551,7 +556,7 @@ async def _scan_prompt(
     )
 
 
-@server.call_tool()
+@server.call_tool()  # type: ignore[misc]
 async def call_tool(name: str, arguments: dict[str, Any] | None) -> CallToolResult:
     """Dispatch a tool call. Unknown tools and bad args raise (isError=True)."""
     args = arguments or {}

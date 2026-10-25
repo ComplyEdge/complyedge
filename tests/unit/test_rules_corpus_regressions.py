@@ -33,15 +33,22 @@ REGS = ROOT / "rules" / "regulations"
 SCHEMA = json.loads((ROOT / "rules" / "schemas" / "rule-schema.json").read_text())
 
 HIGH_RISK = [
-    "article6_high_risk_classification", "article9_risk_management",
-    "article10_data_governance", "article12_record_keeping",
-    "article13_transparency", "article14_human_oversight",
-    "article15_accuracy_robustness", "article16_provider_obligations",
-    "article26_deployer_obligations", "article27_fria",
+    "article6_high_risk_classification",
+    "article9_risk_management",
+    "article10_data_governance",
+    "article12_record_keeping",
+    "article13_transparency",
+    "article14_human_oversight",
+    "article15_accuracy_robustness",
+    "article16_provider_obligations",
+    "article26_deployer_obligations",
+    "article27_fria",
 ]
 GPAI = [
-    "gpai_copyright_transparency", "gpai_downstream_obligations",
-    "gpai_model_classification", "gpai_systemic_risk",
+    "gpai_copyright_transparency",
+    "gpai_downstream_obligations",
+    "gpai_model_classification",
+    "gpai_systemic_risk",
     "gpai_technical_documentation",
 ]
 
@@ -103,9 +110,9 @@ class TestGpaiDatesMatchApplicability:
             (EU / "eu_ai_act_article53_gpai_training_summary.yaml").read_text()
         )
         for name in GPAI:
-            assert _load(name)["effective_date"] == art53["effective_date"], (
-                "GPAI rules disagree with their own Article 53 sibling"
-            )
+            assert (
+                _load(name)["effective_date"] == art53["effective_date"]
+            ), "GPAI rules disagree with their own Article 53 sibling"
 
 
 class TestCitationClaimsAreTrue:
@@ -114,16 +121,17 @@ class TestCitationClaimsAreTrue:
     def test_every_eu_ai_act_rule_carries_a_citation(self):
         files = list(EU.glob("eu_ai_act_*.yaml"))
         missing = [
-            f.name for f in files
+            f.name
+            for f in files
             if not (yaml.safe_load(f.read_text()).get("source") or {}).get("citation")
         ]
         assert not missing, f"EU AI Act rules without a verbatim citation: {missing}"
 
     def test_readme_does_not_claim_every_rule_is_cited(self):
         txt = (ROOT / "README.md").read_text()
-        assert "Every rule carries a verbatim citation" not in txt, (
-            "README claims universal citation coverage; measured 57/64"
-        )
+        assert (
+            "Every rule carries a verbatim citation" not in txt
+        ), "README claims universal citation coverage; measured 57/64"
 
     def test_no_rule_cites_complyedge_as_its_own_authority(self):
         offenders = []
@@ -162,6 +170,7 @@ class TestMalformedRulesAreNotSilent:
 
     def test_engine_records_skipped_files(self, tmp_path):
         import sys
+
         sys.path.insert(0, str(ROOT / "packages" / "trustlint"))
         from trustlint.engine import TrustLintEngine
 
@@ -174,6 +183,7 @@ class TestMalformedRulesAreNotSilent:
 
     def test_real_corpus_loads_with_nothing_skipped(self):
         import sys
+
         sys.path.insert(0, str(ROOT / "packages" / "trustlint"))
         from trustlint.engine import TrustLintEngine
 
@@ -206,9 +216,15 @@ class TestRegoCitationsMatchTheRegulationCorpus:
         for f in REGS.rglob("*.yaml"):
             d = _y.safe_load(f.read_text()) or {}
             src = d.get("source") or {}
-            reg, art, cit = src.get("regulation"), src.get("article"), src.get("citation")
+            reg, art, cit = (
+                src.get("regulation"),
+                src.get("article"),
+                src.get("citation"),
+            )
             if reg and art and cit:
-                out.setdefault((str(reg).strip(), str(art).strip()), []).append((f.stem, cit))
+                out.setdefault((str(reg).strip(), str(art).strip()), []).append(
+                    (f.stem, cit)
+                )
         return out
 
     @staticmethod

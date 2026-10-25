@@ -89,9 +89,9 @@ def corpus(tmp_path_factory):
 )
 def test_rule_meets_the_test_minimum(corpus, leaf):
     src = leaf.read_text()
-    assert "default violation := false" in src, (
-        "the count needs `default violation := false`"
-    )
+    assert (
+        "default violation := false" in src
+    ), "the count needs `default violation := false`"
     positives = corpus(leaf, _never(src))
     negatives = corpus(leaf, _always(src))
 
