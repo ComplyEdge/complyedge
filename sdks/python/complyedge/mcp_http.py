@@ -175,8 +175,6 @@ def _allowed_origins() -> list[str]:
     if raw:
         return [h.strip() for h in raw.split(",") if h.strip()]
     return [
-        "https://smithery.ai",
-        "https://www.smithery.ai",
         "https://claude.ai",
         "https://cursor.com",
         "https://www.complyedge.io",

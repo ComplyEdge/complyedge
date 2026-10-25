@@ -268,18 +268,12 @@ presented to the other region's stack is refused with
 
 <!-- mcp-name: io.github.ComplyEdge/complyedge -->
 
-[![Smithery](https://img.shields.io/badge/Smithery-listed-6b46c1)](https://smithery.ai/servers/complyedge/complyedge)
-
 Agent/MCP tools that check prompts and outputs against ComplyEdge’s TrustLint
 corpus with cited findings: not another EU AI Act risk-tier chatbot
 and not a law-search database.
 
-**Hosted Streamable HTTP (preferred for remote / Smithery Toolbox):**
+**Hosted Streamable HTTP (preferred for remote clients):**
 `https://mcp.complyedge.io/mcp`
-
-```bash
-npx -y @smithery/cli@latest mcp add complyedge/complyedge --client cursor
-```
 
 **Local stdio** for any MCP-compatible host (Claude, Cursor, Inspector):
 

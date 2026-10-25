@@ -46,6 +46,4 @@ when the client sends `Authorization: Bearer <API key>` on the connection; the
 three offline tools need no key.
 
 The server is listed in the Official MCP Registry as
-`io.github.ComplyEdge/complyedge`, and on Smithery at
-[smithery.ai/servers/complyedge/complyedge](https://smithery.ai/servers/complyedge/complyedge),
-which adds it to a client such as Cursor in one step.
+`io.github.ComplyEdge/complyedge`.
