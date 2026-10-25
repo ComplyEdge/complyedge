@@ -39,7 +39,7 @@ jobs:
           mkdir -p packages/trustlint/trustlint/rules
           cp -R rules/regulations/. packages/trustlint/trustlint/rules/
           pip install -e packages/trustlint/
-          pip install -e sdks/python/
+          pip install -e "sdks/python/[mcp]"
 
       - name: Unit tests with coverage (>=90%)
         run: |
@@ -77,7 +77,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install SDK
-        run: pip install -e sdks/python/
+        run: pip install -e "sdks/python/[mcp]"
 
       - name: Check imports
         run: python -c "from complyedge import compliance_check; print('SDK imports OK')"
