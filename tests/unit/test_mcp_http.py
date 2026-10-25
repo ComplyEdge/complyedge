@@ -98,7 +98,7 @@ def test_http_mcp_tool_descriptions_match_stdio_source() -> None:
     import asyncio
 
     mcp = create_mcp()
-    tools = asyncio.get_event_loop().run_until_complete(mcp.list_tools())
+    tools = asyncio.run(mcp.list_tools())
     for tool in tools:
         expected = (
             HOSTED_SANDBOX_DESCRIPTION
@@ -156,7 +156,7 @@ def test_check_compliance_tool_via_fastmcp() -> None:
 
     mcp = create_mcp()
     # Resolve registered tool
-    tools = asyncio.get_event_loop().run_until_complete(mcp.list_tools())
+    tools = asyncio.run(mcp.list_tools())
     assert [t.name for t in tools] == HOSTED_TOOL_NAMES
 
 
