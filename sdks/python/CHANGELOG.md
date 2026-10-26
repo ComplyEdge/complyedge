@@ -14,6 +14,11 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.23] - 2026-10-26
+
+### Removed
+- `smithery.ai` and `www.smithery.ai` from the hosted MCP HTTP server's default allowed origins. Set `MCP_ALLOWED_ORIGINS` (comma-separated) to choose the origins yourself.
+
 ## [0.2.22] - 2026-10-23
 
 ### Added
@@ -117,6 +122,7 @@ Matching numbers would imply a parity that does not exist.
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.23]: https://pypi.org/project/complyedge/0.2.23/
 [0.2.22]: https://pypi.org/project/complyedge/0.2.22/
 [0.2.21]: https://pypi.org/project/complyedge/0.2.21/
 [0.2.20]: https://pypi.org/project/complyedge/0.2.20/
