@@ -2,7 +2,7 @@
 
 TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io): prove what your AI decided, without keeping what it saw. Every `check()` runs against open EU AI Act rules that cite the law and leaves one record per decision, never a copy of the text.
 
-The rules run as a deterministic Rego bundle, violations come back with their article citations, and the record is kept outside your AI system.
+Phrase rules run on every check. On a paid plan a clean pass then runs an injection check when the month's model budget covers it, which can block. The wider review runs only when you turn it on and that budget covers it. A rule block cites the article, and the record is kept outside your AI system.
 
 ![npm version](https://img.shields.io/npm/v/%40complyedge%2Fsdk)
 ![npm downloads](https://img.shields.io/npm/dw/%40complyedge%2Fsdk)
@@ -138,7 +138,7 @@ which host to call. They do not change the account's region. Precedence, highest
 the key prefix, then EU. A key presented to the other region's stack is
 refused with `401 {"detail":{"error":"wrong_region","use":"<host>"}}` before any lookup.
 
-The region is where your prompts and audit records are processed and stored.
+The region is where your checks run and your audit records are stored. The prompt and the AI's answer are never stored. On a paid plan, after the phrase rules pass, the injection check sends that text to OpenAI in the US when the month's model budget covers it. The wider review sends it only when you turn it on and the month's model budget covers it.
 It does not decide which laws are checked: the `jurisdiction` field on each
 check does. No general law requires either region. US law does not require US
 storage, and GDPR allows transfers outside the EU with safeguards such as
@@ -147,7 +147,7 @@ or customers ask for.
 
 ## `check(text, context?)`
 
-Calls `POST /v1/check`, the deterministic OPA hot path. Returns:
+Calls `POST /v1/check`. Phrase rules run on every check. On a paid plan a clean pass then runs an injection check when the month's model budget covers it, which can block. The wider review runs only when you turn it on and that budget covers it. Returns:
 
 | Field | Type | Meaning |
 |-------|------|---------|

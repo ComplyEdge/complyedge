@@ -887,9 +887,12 @@ class ComplyEdgeClient:
             decision_context: Record fields only you know (deciding system
                 version, purpose, data categories, ...), written to the audit
                 record as ADCR 0.1.0 fields. See the API reference.
-            use_semantic_fallback: Enable LLM-based Layer 2 evaluation for ambiguous
-                cases. Defaults to False (OPA fast-path only, ~73ms median). Set True
-                to add 2-5s LLM deepening on cases OPA passes.
+            use_semantic_fallback: Wider legal review after the phrase rules pass.
+                Defaults to False, so that review stays off. On a Developer or
+                Enterprise plan the injection meaning check still runs after a
+                clean pass when the month's model budget covers it, and it can
+                block. If that budget is used up, the phrase rules decide.
+                Set True to also run the wider review.
             raise_on_violation: Raise ComplianceError if violations are found
             sandbox: Evaluate without recording (POST /v1/sandbox/check). Same
                 verdict, no audit entry, no usage, no count against the plan's

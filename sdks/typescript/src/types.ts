@@ -102,7 +102,8 @@ export interface ComplianceViolation {
 }
 
 /**
- * Result of POST /v1/check (the deterministic OPA enforcement path).
+ * Result of POST /v1/check. Phrase rules run first. On a paid plan a clean
+ * pass also runs an injection check when the month's model budget covers it.
  * Field names mirror the Python SDK's ComplianceResult.
  */
 export interface ComplianceResult {

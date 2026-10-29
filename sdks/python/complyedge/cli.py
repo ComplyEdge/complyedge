@@ -39,9 +39,26 @@ def _load_config() -> dict:
 
 
 def _save_config(config: dict) -> None:
+    """Write the API key so another user cannot read it, even for a moment.
+
+    write_text creates the file with the process umask (often world-readable)
+    and only then calls chmod. The bytes of the key sit on disk in that gap.
+    Open the file owner-only first, then write.
+    """
+    import os
+
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    CONFIG_FILE.write_text(json.dumps(config, indent=2), encoding="utf-8")
-    CONFIG_FILE.chmod(0o600)  # Owner-only read/write
+    os.chmod(CONFIG_DIR, 0o700)
+    payload = json.dumps(config, indent=2)
+    fd = os.open(CONFIG_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fd = -1
+            fh.write(payload)
+    finally:
+        if fd >= 0:
+            os.close(fd)
 
 
 def _get_api_key() -> str | None:

@@ -349,7 +349,7 @@ test_key_stripe_restricted_live if api_key.violation with input as eu("key rk_li
 
 test_key_slack if api_key.violation with input as eu(concat("", ["token xo", "xb-1234567890-abcdef set"]))
 
-test_key_google if api_key.violation with input as eu("key AIzaSyAb3dEf7hIj1lMn5pQr9tUv1xYz3B5d7F9 set")
+test_key_google if api_key.violation with input as eu(concat("", ["key AIza", "SyFAKE00000000000000000000000000000", " set"]))
 
 test_key_jwt if api_key.violation with input as eu("token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiayJ9.k9Xq2LmAiNaTuRe7 set")
 

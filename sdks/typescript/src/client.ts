@@ -133,9 +133,10 @@ export class ComplyEdgeClient {
   /**
    * Run a compliance check on text input.
    *
-   * Calls POST /v1/check: the deterministic OPA hot path. A decision here is
-   * evaluated against the Rego rule bundle, returns article-cited violations,
-   * and is written to the Article 12 audit trail (`auditLogged`).
+   * Calls POST /v1/check. Phrase rules (Rego) run on every check. On a paid plan a
+   * clean pass then runs an injection check when the month's model budget covers it, which can block. The wider review
+   * runs only when you turn it on and that budget covers it. A rule block cites the article. The
+   * decision is written to the audit trail (`auditLogged`).
    *
    * With `context.sandbox: true` it calls POST /v1/sandbox/check instead:
    * same verdict, nothing recorded (`auditLogged` false, `sandbox` true).

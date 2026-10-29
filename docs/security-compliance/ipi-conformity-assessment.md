@@ -66,9 +66,9 @@ The target is the model's tool use: making it call a tool with arguments chosen 
 
 ## 3. How a decision is made and recorded
 
-**Layer 1, deterministic (default).** The Rego leaves match the text of the request or the answer. No LLM is involved. When a leaf fires, the request or answer is blocked and the record carries the rule ID, the Article 15(5) citation, the time, a keyed hash of the text and an `event_id`. The text itself is not stored.
+**Layer 1, phrase rules.** The Rego leaves match the text of the request or the answer. The leaf does not call a model. When a leaf fires, the request or answer is blocked and the record carries the rule ID, the Article 15(5) citation, the time, a keyed hash of the text and an `event_id`. The text itself is not stored.
 
-**Layer 2, by meaning (opt-in).** With `use_semantic_fallback=True`, after the rules pass, a classifier judges whether the text tries to instruct an AI system, against the same Article 15(5) categories. A block from it has an ID of the form `llm-art15-ipi-NNN`, so the record says a model decided, not a rule, and the block must quote the injected instruction from the text; an answer whose quote is not in the text is rejected. On this path the classifier fails closed: if it cannot answer, the request is denied.
+**Injection check, by meaning (paid plans).** After the phrase rules pass, on a Developer or Enterprise plan, when the month's model budget covers it, the injection meaning check judges whether the text tries to instruct an AI system, against the same Article 15(5) categories. It runs even when the wider review is off. If that budget is used up, the phrase rules decide. A block from it has an ID of the form `llm-art15-ipi-NNN`, so the record says a model decided, not a rule, and the block must quote the injected instruction from the text. An answer whose quote is not in the text is rejected. If that check cannot answer, the request is denied.
 
 **What the record lets a reviewer check.** Which rule or classifier decided, under which provision, when, and, using the `event_id` and the deployer's own copy of the text, which text it was about (`POST /v1/audit/verify`; see [complyedge.io/docs/audit-reconciliation.html](https://complyedge.io/docs/audit-reconciliation.html)).
 
@@ -84,7 +84,7 @@ The target is the model's tool use: making it call a tool with arguments chosen 
 
 ## 5. Limits a reviewer should know
 
-- **Layer 1 matches English phrasings.** Paraphrases and other languages can pass the rules; that is why the opt-in Layer 2 classifier exists. A deterministic block is reproducible; a pass is not proof the text was clean.
+- **Layer 1 matches English phrasings.** Paraphrases and other languages can pass the rules. On a paid plan, after a clean pass, the injection meaning check judges those by meaning and can block when the month's model budget covers it. If that budget is used up, the phrase rules decide. The wider legal review stays off unless turned on. A deterministic block is reproducible; a pass is not proof the text was clean.
 - **Only routed text is checked.** ComplyEdge sees what the integration sends to `/v1/check`. It does not see calls that bypass it, and with the SDK's default `fail_mode="open"` an outage lets traffic through unchecked and unrecorded.
 - **No tool-trajectory analysis.** ComplyEdge sees text at the API boundary, not the sequence of tool calls an agent makes.
 - **A rule match is about one text, not the system.** It does not establish that the system as a whole meets Article 15(5). That needs the provider's own testing (red-teaming, model evaluation) as well.

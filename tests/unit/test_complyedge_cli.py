@@ -39,6 +39,37 @@ class TestLogin:
         config = json.loads(config_file.read_text())
         assert config["base_url"] == "http://localhost:8000"
 
+    def test_api_key_file_is_private_before_the_bytes_are_written(
+        self, tmp_path, monkeypatch
+    ):
+        import os
+        from pathlib import Path
+
+        from complyedge import cli as cli_mod
+
+        secret_dir = tmp_path / "home"
+        monkeypatch.setattr(cli_mod, "CONFIG_DIR", secret_dir)
+        monkeypatch.setattr(cli_mod, "CONFIG_FILE", secret_dir / "config.json")
+        old_umask = os.umask(0o022)
+        modes: list[int] = []
+        real_write = Path.write_text
+
+        def spy(self, *args, **kwargs):
+            real_write(self, *args, **kwargs)
+            modes.append(self.stat().st_mode & 0o777)
+
+        monkeypatch.setattr(Path, "write_text", spy)
+        try:
+            cli_mod._save_config({"api_key": "ce_secret"})
+        finally:
+            os.umask(old_umask)
+        # The old path wrote the key with write_text, which is world-readable
+        # until chmod. That path must not run.
+        assert modes == [] or modes == [0o600]
+        assert (cli_mod.CONFIG_FILE.stat().st_mode & 0o777) == 0o600
+        assert (secret_dir.stat().st_mode & 0o777) == 0o700
+        assert "ce_secret" in cli_mod.CONFIG_FILE.read_text()
+
 
 def _mock_ce(safe=True, violations=None):
     mock_result = MagicMock()

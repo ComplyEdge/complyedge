@@ -126,7 +126,7 @@ _JURISDICTION_ENUM = ["EU", "US", "GLOBAL"]
 # the guards over it ("not the hosted policy engine") must keep meaning that.
 SANDBOX_TOOL_DESCRIPTION = (
     "EU AI Act Article 5 and Article 50. Hosted ComplyEdge enforcement, "
-    "sandbox mode: the same deterministic rules and tenant settings as "
+    "sandbox mode: the same check as production, including the paid injection check when the month's model budget covers it, and the same tenant settings as "
     "production, but NOTHING is recorded: no audit entry, no usage, no "
     "count against the plan's daily limit (sandbox calls have their own caps: "
     "60 a minute, 1,000 a day). Use it to try a case before wiring an "
@@ -134,8 +134,10 @@ SANDBOX_TOOL_DESCRIPTION = (
     "evidence. Requires COMPLYEDGE_API_KEY (this tool is listed only "
     "when it is set) and makes one network call to the ComplyEdge API "
     "(POST /v1/sandbox/check). Argument `text` must be non-empty; "
-    "optional `jurisdiction` defaults to EU. Returns BLOCKED with rule ID "
-    "and article citation, or ALLOWED, plus engine_path and latency."
+    "optional `jurisdiction` defaults to EU. Returns BLOCKED or ALLOWED. "
+    "A phrase-rule block carries the rule ID and the article. An injection "
+    "block names the law. A wider-review block does not cite an article. "
+    "Plus engine_path and latency."
 )
 
 _SANDBOX_CHECK_SCHEMA: dict[str, Any] = {

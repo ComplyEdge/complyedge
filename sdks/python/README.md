@@ -38,7 +38,7 @@ def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-That's it. Every input and output is checked against the EU AI Act rule set (Article 5, Article 50, GPAI). Inputs and outputs that break a blocking rule are stopped before they reach the user. Every check gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed hash of the text; every block by a rule also gets its legal citation. `decision_context` is optional: without it every check still runs and is recorded, but the record does not meet ADCR class Record (see [Tell the record what only you know](#tell-the-record-what-only-you-know)). With the default fail mode, `open`, an API outage lets traffic through unchecked and unrecorded; set `COMPLYEDGE_FAIL_MODE=closed`, or pass `config=ComplianceConfig(fail_mode="closed")`, to raise `ComplianceUnavailableError` instead. Without an API key the decorator always runs the function unchecked.
+That's it. Every input and output is checked against the EU AI Act rule set (Article 5, Article 50, GPAI). Every check gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed hash of the text. A block by a rule also gets its legal citation. On a paid plan the injection check can also block when the month's model budget covers it, and that block names the law. A wider-review block does not cite an article. If that review is on and clears every hit, the request is allowed. `decision_context` is optional: without it every check still runs and is recorded, but the record does not meet ADCR class Record (see [Tell the record what only you know](#tell-the-record-what-only-you-know)). With the default fail mode, `open`, an API outage lets traffic through unchecked and unrecorded; set `COMPLYEDGE_FAIL_MODE=closed`, or pass `config=ComplianceConfig(fail_mode="closed")`, to raise `ComplianceUnavailableError` instead. Without an API key the decorator always runs the function unchecked.
 
 Classifiers (`eu-ai-act-*` MCPs) score the *system*. ComplyEdge checks and records *this* prompt or output. Article 50 here is unlabeled or deceptive use, not C2PA watermarking.
 
@@ -63,10 +63,12 @@ The decorator reads your API key from the `COMPLYEDGE_API_KEY` environment varia
 
 `jurisdiction` is where the end user is, not where your company is based: the EU AI Act applies when an AI system's output is used in the EU, wherever the provider or deployer is established ([Art. 2(1)(c)](https://eur-lex.europa.eu/eli/reg/2024/1689)). Default: `EU`.
 
-| Value | What the hosted API enforces deterministically |
+| Value | What the phrase rules cover |
 |---|---|
 | `EU` | EU AI Act: Article 5 prohibited practices, plus Article 6 high-risk, Article 50 and GPAI (Articles 51 to 55) rules that fire on text describing a missing control; prompt-injection detection; personal data and secrets (citing GDPR). Any rule that fires blocks the call. |
 | `US`, `US-*` | SEC Regulation FD selective disclosure + prompt-injection detection |
+
+On a paid plan, a clean pass then runs an injection check when the month's model budget covers it, which can block. The wider review runs only when you turn it on and that budget covers it.
 
 HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144 and ECPA rules, and the GDPR YAML rules (consent, data minimisation, DPIA, erasure, breach notification, transfers), run offline in TrustLint (`pip install trustlint`), not on the hosted `/v1/check` path. The hosted personal data and secrets rules above cite GDPR Articles 5(1)(c) and 32(1).
 
@@ -247,7 +249,7 @@ region later, use Request a region change in the dashboard; you get a new key fo
 `base_url`, `region`, `COMPLYEDGE_API_URL`, and `COMPLYEDGE_REGION` only
 choose which host to call. They do not change the account's region.
 
-The region is where your prompts and audit records are processed and stored.
+The region is where your checks run and your audit records are stored. The prompt and the AI's answer are never stored. On a paid plan, after the phrase rules pass, the injection check sends that text to OpenAI in the US when the month's model budget covers it. The wider review sends it only when you turn it on and the month's model budget covers it.
 It does not decide which laws are checked: the `jurisdiction` field on each
 check does. No general law requires either region. US law does not require US
 storage, and GDPR allows transfers outside the EU with safeguards such as
@@ -314,7 +316,7 @@ environment and a fourth tool appears:
 
 | Tool | Description |
 |------|-------------|
-| `sandbox_check` | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, same verdict as production, and nothing recorded: no audit entry, no usage, and no count against your plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). Returns BLOCKED with rule ID and article citation, or ALLOWED. Never evidence. |
+| `sandbox_check` | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, same verdict as production, and nothing recorded: no audit entry, no usage, and no count against your plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). Returns BLOCKED or ALLOWED. A phrase-rule block carries the rule ID and the article. An injection block names the law. A wider-review block does not cite an article. Never evidence. |
 
 Without the key the tool is not listed and the server stays fully offline.
 

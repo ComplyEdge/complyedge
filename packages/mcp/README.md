@@ -44,7 +44,7 @@ appears. Without it the tool is not listed and the server stays fully offline.
 
 | Tool | Returns | Notes |
 |---|---|---|
-| `sandbox_check` | `BLOCKED` with rule ID and article citation, or `ALLOWED`; an allowed check also lists any rules that matched and model review cleared (`cleared_by_model_review`; model review runs on paid plans only, a free plan never gets a model call) | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, and no count against your plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). One network call per check. Never evidence. An EU account's key is `ce_eu_` and calls `eu.api.complyedge.io`; a US account's key is `ce_` and calls `api.complyedge.io`. The region is your account's, chosen when you sign up and create your first API key. `COMPLYEDGE_API_URL` picks a host and does not change the account's region. To change the region later, use Request a region change in the dashboard. |
+| `sandbox_check` | `BLOCKED` or `ALLOWED`. A phrase-rule block carries the rule ID and the article. An injection block names the law. A wider-review block does not cite an article. An allowed check can list rules the wider review cleared, and that review runs only when you turn it on and the month's model budget covers it | Hosted enforcement in sandbox mode (`POST /v1/sandbox/check`): your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, and no count against your plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). One network call per check. Never evidence. An EU account's key is `ce_eu_` and calls `eu.api.complyedge.io`; a US account's key is `ce_` and calls `api.complyedge.io`. The region is your account's, chosen when you sign up and create your first API key. `COMPLYEDGE_API_URL` picks a host and does not change the account's region. To change the region later, use Request a region change in the dashboard. |
 
 Rotating the key: mint the new one with **Rotate key** on the dashboard's API
 Key page (it asks first), update
@@ -58,7 +58,7 @@ reveal. Both keys work until you revoke, so nothing has to go dark in between.
   Rego, and it is not the hosted check path. Use
   [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk) for
   `POST /v1/check` and the audit record (timestamp, keyed text hash, `event_id`,
-  and the rule IDs and citations when a rule fires; see
+  and the rule and the law named when a phrase rule or the injection check fired. A wider-review block does not cite an article; see
   https://complyedge.io/docs/audit-reconciliation.html).
 - Findings are rule matches, not legal advice, not a legal
   opinion, and not a regulatory classification of an AI system.
@@ -71,7 +71,7 @@ reveal. Both keys work until you revoke, so nothing has to go dark in between.
 
 ## Links
 
-- [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk): hosted checks and the audit record (timestamp, keyed text hash, `event_id`, and the rule IDs and citations when a rule fires)
+- [`@complyedge/sdk`](https://www.npmjs.com/package/@complyedge/sdk): hosted checks and the audit record (timestamp, keyed text hash, `event_id`, and the rule and the law named when a phrase rule or the injection check fired. A wider-review block does not cite an article)
 - [`trustlint`](https://www.npmjs.com/package/trustlint): the same offline engine as a CLI
 - [`complyedge` on PyPI](https://pypi.org/project/complyedge/): Python MCP server, published under this same registry entry
 - GitHub Action: `uses: complyedge/trustlint-action@v1`

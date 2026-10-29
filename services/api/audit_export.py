@@ -556,12 +556,16 @@ def _der_read(buf: bytes, pos: int) -> tuple[int, bytes, int]:
         raise ValueError("DER: unexpected end of data")
     tag = buf[pos]
     pos += 1
+    if pos >= len(buf):
+        raise ValueError("DER: unexpected end of data")
     length = buf[pos]
     pos += 1
     if length & 0x80:
         n = length & 0x7F
         if n == 0 or n > 4:
             raise ValueError("DER: unsupported length encoding")
+        if pos + n > len(buf):
+            raise ValueError("DER: unexpected end of data")
         length = int.from_bytes(buf[pos : pos + n], "big")
         pos += n
     end = pos + length

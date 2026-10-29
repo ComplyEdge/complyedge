@@ -15,7 +15,7 @@ nothing. `trustlint scan` with `COMPLYEDGE_API_KEY` sends the text to the hosted
 (`ce_eu_` keys to eu.api.complyedge.io, `ce_` keys to api.complyedge.io), which writes
 an audit record. For the hosted
 check and its audit record (for every decision a timestamp, a keyed hash of the
-text and an `event_id`, plus the rule IDs and citations when a rule fires; never
+text and an `event_id`, plus the rule and the law named when a phrase rule or the injection check fired. A wider-review block does not cite an article; never
 the text itself), use the
 [ComplyEdge TypeScript SDK](https://www.npmjs.com/package/@complyedge/sdk) or the
 [ComplyEdge Python SDK](https://pypi.org/project/complyedge/).

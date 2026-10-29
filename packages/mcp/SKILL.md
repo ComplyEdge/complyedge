@@ -20,7 +20,7 @@ complyedge-mcp) they make no network call; on the hosted MCP the text is sent
 to ComplyEdge's server for that call and not stored. The hosted check path
 (the SDK and `POST /v1/check`, with your API key) writes an audit record for
 every decision: timestamp, a keyed hash of the text, an `event_id`, and the rule IDs
-and citations when a rule fires; never the text itself.
+and citations when a phrase rule or the injection check fired. A wider-review block does not cite an article; never the text itself.
 
 ## Install
 
