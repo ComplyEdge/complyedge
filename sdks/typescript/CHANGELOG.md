@@ -144,6 +144,7 @@ imply a parity that does not exist.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/typescript
+[0.2.8]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.8
 [0.2.7]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.7
 [0.2.6]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.6
 [0.2.5]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.5

@@ -175,6 +175,7 @@ came back clean now returns violations.
   Runs via `npx` with no Python runtime and no API key.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/mcp
+[0.2.4]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.4
 [0.2.3]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.3
 [0.2.2]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.2
 [0.2.1]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.1

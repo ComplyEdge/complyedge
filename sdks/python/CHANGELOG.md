@@ -130,6 +130,7 @@ Matching numbers would imply a parity that does not exist.
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.24]: https://pypi.org/project/complyedge/0.2.24/
 [0.2.23]: https://pypi.org/project/complyedge/0.2.23/
 [0.2.22]: https://pypi.org/project/complyedge/0.2.22/
 [0.2.21]: https://pypi.org/project/complyedge/0.2.21/
