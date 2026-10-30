@@ -16,6 +16,11 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.8] - 2026-10-30
+
+### Changed
+- The README and the `check()` and `ComplianceResult` documentation now say what a check does: phrase rules run on every check, a paid plan then runs an injection check when the month's model budget covers it, and the wider review runs only when you turn it on. They no longer call the hosted check deterministic. No behaviour change.
+
 ## [0.2.7] - 2026-10-23
 
 ### Added

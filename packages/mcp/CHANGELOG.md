@@ -11,6 +11,12 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-10-30
+
+### Changed
+- `sandbox_check` description: the same check as production, including the paid injection check when the month's model budget covers it. A phrase-rule block carries the rule ID and the article, an injection block names the law, and a wider-review block does not cite an article.
+- README and SKILL.md describe the audit record the same way.
+
 ## [0.2.3] - 2026-10-23
 
 ### Fixed

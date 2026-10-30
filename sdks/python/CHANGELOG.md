@@ -14,6 +14,14 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.24] - 2026-10-30
+
+### Fixed
+- The CLI now writes the saved API key owner-only from the first byte. It used to create the file with the process umask and only then restrict it, so the key sat readable by other users for a moment. The config directory is now owner-only too.
+
+### Changed
+- The `use_semantic_fallback` docstring and the `sandbox_check` tool description now say what the check does: phrase rules run on every check, a paid plan then runs an injection check when the month's model budget covers it, and the wider review runs only when you turn it on.
+
 ## [0.2.23] - 2026-10-26
 
 ### Removed

@@ -1,6 +1,6 @@
 {
   "name": "@complyedge/mcp",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Offline MCP server for EU AI Act compliance checks. Three read-only tools over a bundled 63-rule corpus: Art. 5 prohibited practices, Art. 50 transparency, GPAI, GDPR, HIPAA, SOX, PCI DSS, COPPA. Runs with npx: no Python, no API key, no network call. Setting COMPLYEDGE_API_KEY adds an optional hosted sandbox_check tool.",
   "publishConfig": {
     "access": "public"
