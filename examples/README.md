@@ -65,6 +65,10 @@ store catches that a local chain cannot. Runs offline on recorded decisions and 
 [`audit/sample-audit-export.json`](audit/sample-audit-export.json) is a reference export: the
 shape of the records a tenant downloads.
 
+## Homepage Demo
+
+The check shown on complyedge.io, reproduced: a support chatbot told to pose as a person, blocked under EU AI Act Article 50(1). Runs against the sandbox by default (nothing recorded); `--record` writes one record and saves it as the export returns it. See [`homepage-demo/`](homepage-demo/).
+
 ## Environment Setup
 
 ```bash

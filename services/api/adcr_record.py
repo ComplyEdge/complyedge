@@ -1,7 +1,7 @@
-"""One stored audit row as an ADCR 0.1.0 record.
+"""One stored audit row as an ADCR record.
 
 ADCR, the AI Decision Check Record, is the open rulebook at
-https://complyedge.io/rulebook/0.1.0. This module is the single mapping from a
+https://complyedge.io/rulebook/<version>. This module is the single mapping from a
 ComplyEdge audit row to an ADCR record. The write-time chain hashes its output
 (CHN-02) and the ADCR export serves its output, so the bytes a reader receives
 are the bytes that were hashed. Nothing else builds an ADCR record.
@@ -39,7 +39,15 @@ from urllib.parse import quote
 from uuid import UUID
 
 MAPPING_VERSION = "complyedge-adcr-1"
-RULEBOOK = "https://complyedge.io/rulebook/0.1.0"
+RULEBOOK_BASE = "https://complyedge.io/rulebook/"
+#: The version a row written now conforms to. The chain writer stores it on the
+#: row as ``rulebook_version`` (audit_chain.transact_items), because the record's
+#: ``rulebook`` is inside the hashed bytes: a record keeps the version it was
+#: written under, and is never re-pointed at a later one (REC-02).
+RULEBOOK_VERSION = "0.2.0"
+RULEBOOK = RULEBOOK_BASE + RULEBOOK_VERSION
+#: Rows chained before ``rulebook_version`` existed were hashed naming 0.1.0.
+RULEBOOK_0_1_0 = RULEBOOK_BASE + "0.1.0"
 PRODUCER_ID = "https://complyedge.io/producer-profile/"
 RULE_SET_INDEX_BASE = "https://complyedge.io/rule-set/"
 CHECKER_ID = "complyedge"
@@ -441,6 +449,13 @@ def _exemptions(row: dict[str, Any], rules: list[dict[str, Any]]) -> dict[str, l
     return {"claimed": claimed, "rejected": rejected}
 
 
+def rulebook_of(row: dict[str, Any]) -> str:
+    """The rulebook a stored row's record names: the version stored with it,
+    or 0.1.0 for a row written before the version was stored."""
+    version = row.get("rulebook_version")
+    return RULEBOOK_BASE + str(version) if version else RULEBOOK_0_1_0
+
+
 def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
     """The ADCR record for one stored row, without its ``chain`` member.
 
@@ -457,13 +472,13 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
     )
     # Attributes carried in an ADCR field; every other one goes under
     # ``complyedge`` so the chain covers the whole row.
-    used = {"event_id", "tenant_id", "timestamp", "event_type"}
+    used = {"event_id", "tenant_id", "timestamp", "event_type", "rulebook_version"}
     key_version = row.get("pseudonym_key_version")
     event_type = row.get("event_type") or EVENT_DECISION
     occurred_at = utc_timestamp(row["timestamp"]) if row.get("timestamp") else None
 
     rec: dict[str, Any] = {
-        "rulebook": RULEBOOK,
+        "rulebook": rulebook_of(row),
         "record_version": MAPPING_VERSION,
         "record_id": row.get("event_id"),
         **({"occurred_at": occurred_at} if occurred_at else {}),

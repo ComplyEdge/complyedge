@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dw/@complyedge/mcp)](https://www.npmjs.com/package/@complyedge/mcp)
 [![license](https://img.shields.io/npm/l/@complyedge/mcp)](https://github.com/ComplyEdge/complyedge/blob/main/LICENSE)
 
-Offline checks of prompts and answers against the bundled TrustLint rule set (63 YAML rules: EU AI Act Article 5 and Article 50, and more), with the article citation when a rule fires. It checks *this* prompt or output; it does not classify your system.
+Offline checks of prompts and answers against AI laws, using the bundled TrustLint rule set (63 YAML rules): EU AI Act Article 5 and Article 50, GPAI and NYC Local Law 144, plus GDPR and US privacy rules, with the citation when a rule fires. It checks *this* prompt or output; it does not classify your system.
 
 Each line is an alternative; pick the one you need.
 

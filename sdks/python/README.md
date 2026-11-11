@@ -1,6 +1,6 @@
 # ComplyEdge Python SDK
 
-Prove what your AI decided, without keeping what it saw. Every request and answer is checked against open EU AI Act rules that cite the law: one record per decision, never a copy of the text.
+The evidence AI laws ask for, collected on every AI call. Blocked when it breaks the law, and logged with the rule, the law and the time, never the prompt or the answer. Rules today: the EU AI Act.
 
 ## Choose the Right Package
 

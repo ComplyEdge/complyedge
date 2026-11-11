@@ -1,0 +1,69 @@
+{
+  "action": "block",
+  "agent_id": "support-assistant",
+  "allowed": false,
+  "api_key_id": "346c0a521f97ffb3",
+  "art12_purposes": [
+    {
+      "purpose": "identifying situations that may result in the AI system presenting a risk within the meaning of Article 79(1) or in a substantial modification",
+      "ref": "Article 12(2)(a)"
+    },
+    {
+      "purpose": "facilitating the post-market monitoring referred to in Article 72",
+      "ref": "Article 12(2)(b)"
+    },
+    {
+      "purpose": "monitoring the operation of high-risk AI systems referred to in Article 26(5)",
+      "ref": "Article 12(2)(c)"
+    }
+  ],
+  "bundle_digest": "5f51c649da68af0ecaa5c68cf661a38494e679fd256373f2ef9f959f54671693",
+  "bundle_id": "sha256:5f51c649da68",
+  "chain_alg": "sha256-chain-1",
+  "chain_hash": "cdefbd9a38495dc9ed8dc975f78e95e0270c899298a44bbef1ae9dc446e1db09",
+  "chain_prev": "7b18f5657ac4028853c8b1252fcf6ef197b6cb9ef734a50c3677fc33b7f3f622",
+  "chain_seq": 146,
+  "direction": "prompt",
+  "engine_path": "opa",
+  "event_id": "dd74a827-3238-42d6-b695-a6b33484ca1c",
+  "exemptions": [],
+  "jurisdiction": "EU",
+  "latency_ms": 1042,
+  "model_used": null,
+  "pseudonym_key_version": 1,
+  "region": "us-west-2",
+  "rejected_exemptions": [],
+  "retention_class": "retention-184d",
+  "retention_erase_after": "2027-05-14T23:26:55.612313+00:00",
+  "rulebook_version": "0.2.0",
+  "schema_version": "v1",
+  "session_id": null,
+  "tenant_id": "bb92d83c-48dc-418f-82cd-9755c37c6f54",
+  "text_hash": "1e6aae6e113ab97f6e706f44a2b50683c106ce08d761ec045e51679fa9e2bee7",
+  "text_hash_alg": "hmac-sha256-1",
+  "timestamp": "2026-11-11T23:26:55.612313+00:00",
+  "user_id": null,
+  "user_role": null,
+  "violation_detected": true,
+  "violation_ids": [
+    "rego-art50-1-001"
+  ],
+  "violations": [
+    {
+      "approved": true,
+      "confidence": 1,
+      "provision": {
+        "eli": "http://data.europa.eu/eli/reg/2024/1689/art_50/par_1/oj",
+        "label": "Regulation (EU) 2024/1689, Article 50(1)"
+      },
+      "reason": "Ensure all chatbots and AI-powered conversational agents clearly disclose their AI nature to users at the start of interactions. Do not impersonate or pose as a human.",
+      "rule_description": "Regulation (EU) 2024/1689, Article 50(1): Providers shall ensure that AI systems intended to interact directly with natural persons are designed and developed in such a way that the natural persons concerned are informed that they are interacting with an AI system, unless this is obvious from the point of view of a natural person who is reasonably well-informed, observant and circumspect, taking into account the circumstances and the context of use. This obligation shall not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties, unless those systems are available for the public to report a criminal offence.",
+      "rule_id": "rego-art50-1-001",
+      "rule_version": "ed520a124b1e274e8f61a4aba1d05b45201f9578a92ea6cd55aa2cd195e949b0",
+      "severity": "high"
+    }
+  ],
+  "violations_count": 1,
+  "chain_status": "chained",
+  "chain_link": "455c507ae2aaa02f3dacc93ec0b9ccf989432cec4c06fa281edced3f78582635"
+}

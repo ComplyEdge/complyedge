@@ -1,7 +1,7 @@
 {
   "name": "@complyedge/mcp",
   "version": "0.2.4",
-  "description": "Offline MCP server for EU AI Act compliance checks. Three read-only tools over a bundled 63-rule corpus: Art. 5 prohibited practices, Art. 50 transparency, GPAI, GDPR, HIPAA, SOX, PCI DSS, COPPA. Runs with npx: no Python, no API key, no network call. Setting COMPLYEDGE_API_KEY adds an optional hosted sandbox_check tool.",
+  "description": "Offline MCP server that checks prompts and answers against AI laws, with the citation when a rule fires: EU AI Act Art. 5 and Art. 50, GPAI, NYC Local Law 144, plus GDPR and US privacy rules (63 bundled). Three read-only tools. Runs with npx: no Python, no API key, no network call. Setting COMPLYEDGE_API_KEY adds an optional hosted sandbox_check tool.",
   "publishConfig": {
     "access": "public"
   },
@@ -42,7 +42,9 @@
     "coppa",
     "npx",
     "trustlint",
-    "complyedge"
+    "complyedge",
+    "ai-laws",
+    "nyc-ll144"
   ],
   "author": "ComplyEdge",
   "license": "Apache-2.0",

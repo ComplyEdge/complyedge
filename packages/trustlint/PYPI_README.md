@@ -8,8 +8,9 @@
 Article 50 (and related corpus rules). Scans text against its bundled TrustLint
 rule set. No API key is required for local checks.
 
-TrustLint catches rule-backed EU AI Act, SOX, HIPAA, GDPR, COPPA, and PCI DSS
-risks before text reaches production.
+TrustLint checks prompts and answers against AI laws before they ship: EU AI Act
+Article 5 and Article 50 and NYC Local Law 144, plus GDPR, HIPAA, SOX, PCI DSS
+and COPPA rules.
 
 ## Install
 

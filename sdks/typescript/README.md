@@ -1,6 +1,6 @@
 # @complyedge/sdk
 
-TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io): prove what your AI decided, without keeping what it saw. Every `check()` runs against open EU AI Act rules that cite the law and leaves one record per decision, never a copy of the text.
+TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io). The evidence AI laws ask for, collected on every AI call. Blocked when it breaks the law, and logged with the rule, the law and the time, never the prompt or the answer. Rules today: the EU AI Act.
 
 Phrase rules run on every check. On a paid plan a clean pass then runs an injection check when the month's model budget covers it, which can block. The wider review runs only when you turn it on and that budget covers it. A rule block cites the article, and the record is kept outside your AI system.
 

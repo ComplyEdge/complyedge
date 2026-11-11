@@ -1,13 +1,13 @@
 ---
 name: complyedge-eu-ai-act-check-and-cite
 description: >
-  Check this prompt or output against EU AI Act Article 5 and Article 50 rules
-  and cite the article, via the ComplyEdge TrustLint MCP. Use when the user
+  Check this prompt or output against AI laws (EU AI Act Article 5 and
+  Article 50, NYC Local Law 144) and cite the law, via the ComplyEdge TrustLint MCP. Use when the user
   wants agent I/O checked and cited, not system classification, FRIA forms, or
   C2PA watermarking.
 ---
 
-# ComplyEdge: EU AI Act check and cite
+# ComplyEdge: check against AI laws and cite
 
 Classifiers named `eu-ai-act-*` score the *system*. ComplyEdge checks *this*
 prompt or output, with a citation on every finding: the article for legal

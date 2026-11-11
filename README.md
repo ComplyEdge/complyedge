@@ -3,21 +3,30 @@
 [![PyPI](https://img.shields.io/pypi/v/complyedge)](https://pypi.org/project/complyedge/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-**Block AI requests that break EU law.**
+**The evidence AI laws ask for, collected on every AI call.**
 
-Every check is logged: the rule, the law and the time. Never what your users typed or what the AI answered.
+Each call is checked against the law and logged, ready for your auditor. We never store the conversation.
 
 Each log entry holds the rules that fired and the article behind each, the exact rule set that decided (`bundle_digest`), the time, a keyed hash of the text and an `event_id`. It is kept outside your AI system, and you keep the text: with the `event_id` you can prove to an auditor, a data protection officer or a certifier which text a log entry was about, and ComplyEdge never keeps the content. When a rule that covers the act itself fires (Article 5 practices, prompt injection under Article 15(5), and on EU checks personal data and secrets such as email, phone, IBAN, card and national ID numbers, API keys and private keys), the request or answer is blocked and the block is recorded with its citation. Article 50, GPAI and high-risk rules fire on text that describes a missing control, and when one fires the call is blocked and recorded the same way. It checks *this* prompt or output; it does not classify your system. The rules in this repository are the rule set ComplyEdge runs. What a decision record must contain and prove is a separate document, ADCR, the open rulebook: [complyedge.io/rulebook](https://complyedge.io/rulebook/).
 
-The same rules are available to your agent as an **MCP server** that checks the text you pass it, offline, with a citation on every finding.
-
-Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server**, a Model Context Protocol server that exposes compliance checks as tools to any MCP host (Claude, Cursor, MCP Inspector).
+Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP server** that gives any MCP host (Claude, Cursor, MCP Inspector) the same rules as tools, offline, with a citation on every finding.
 
 **When an auditor, a regulator or a large customer asks "which rule decided this, under which law, and can you prove it was this text?", the log entry answers.** When a rule fires, the entry names the rule and the article; every entry, blocked or allowed, lets you prove which text it was about without sending the text to anyone who did not already have it. The sections "Verify a record" and "The rulebook" below show how.
 
 > What does your compliance tool tell a regulator when it blocks a request? A probability score?
 >
 > ComplyEdge says: **Article 5(1)(a), rule `rego-art5-1a-001`, timestamp, keyed input hash.** One is an audit trail. One is a guess.
+
+## AI laws covered
+
+| AI law | Where it runs |
+|---|---|
+| EU AI Act | Checked live on calls with an EU jurisdiction, the default (`/v1/check`), and offline in TrustLint |
+| NYC Local Law 144 (AI in hiring) | Offline in TrustLint |
+| California SB 243 (companion chatbots) | Rules coming |
+| Colorado SB 26-189 (consequential decisions) | Rules coming |
+
+GDPR and US privacy and sector rules (HIPAA, COPPA, CCPA and others) are listed under [Rules](#rules).
 
 ## MCP Server (Model Context Protocol)
 
@@ -154,7 +163,7 @@ def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-Three lines. Every AI input and output evaluated against the EU AI Act rule set (Article 5, Article 50, GPAI). Every decision gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed text hash; a block by a rule also gets its legal citation. On a paid plan the injection check can also block when the month's model budget covers it, and that block names the law. A wider-review block does not cite an article. If that review is on and clears every hit, the request is allowed. With the default `fail_mode="open"`, an API outage lets traffic through unchecked and unrecorded; use `fail_mode="closed"` to block instead.
+Three lines. Every AI input and output checked against AI laws: with the default EU jurisdiction, the EU AI Act rule set (Article 5, Article 50, GPAI), plus prompt injection rules on every check. Every decision gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed text hash; a block by a rule also gets its legal citation. On a paid plan the injection check can also block when the month's model budget covers it, and that block names the law. A wider-review block does not cite an article. If that review is on and clears every hit, the request is allowed. With the default `fail_mode="open"`, an API outage lets traffic through unchecked and unrecorded; use `fail_mode="closed"` to block instead.
 
 Set `COMPLYEDGE_API_KEY` to your key. The decorator activates by default; to disable without removing the key (e.g., in CI), set `COMPLYEDGE_ENABLED=false`.
 
@@ -201,9 +210,13 @@ Each record joins your account's hash chain as it is written, in the same transa
 
 The log is written for the people who have to judge a decision afterwards: an auditor, a data protection officer, a certifier. It records what was checked and what was decided; it does not prove that every AI call went through it (only routed calls are checked), and it does not decide whether a law applies to your system.
 
+## Human review
+
+On Enterprise, a person's review of a decision is recorded too: a review of a flag in the dashboard, and a contest request and its answer through `POST /v1/audit/contest`. The record names the reviewer as a keyed pseudonym and the outcome, and it joins the same hash chain as the decision it reviews.
+
 ## The rule set and the rulebook
 
-The rules in [`rules/`](rules) are the rule set ComplyEdge runs: one rule per legal provision, each with its citation and approval status; [`rules/README.md`](rules/README.md) maps the directories. What a decision record must contain and prove is a separate, open document: ADCR, the AI Decision Check Record, published at [complyedge.io/rulebook](https://complyedge.io/rulebook/) as version 0.1.0, in development, with its schemas, an offline verifier and test vectors. A record names the rule set that decided it by digest. ComplyEdge is ADCR's first implementation. No conformance class is claimed; the gaps are listed field by field in Annex C of the rulebook.
+The rules in [`rules/`](rules) are the rule set ComplyEdge runs: one rule per legal provision, each with its citation and approval status; [`rules/README.md`](rules/README.md) maps the directories. What a decision record must contain and prove is a separate, open document: ADCR, the AI Decision Check Record, published at [complyedge.io/rulebook](https://complyedge.io/rulebook/) as version 0.2.0, in development, with its schemas, an offline verifier and test vectors. A record names the rule set that decided it by digest. ComplyEdge is ADCR's first implementation. No conformance class is claimed; the gaps are listed field by field in Annex C of the rulebook.
 
 - **Rule IDs.** Every rule has a stable ID that names the provision: `rego-art5-1c-001` is AI Act Article 5(1)(c), first rule. Other forms cover Annex III points (`rego-art6-annex3-5b-001`), the Article 15(5) prompt-injection family (`rego-art15-ipi-001`), GPAI (`rego-gpai-53a-001`), GDPR (`rego-gdpr5-1c-001`) and US securities disclosure (`rego-sox-302-001`, which covers SEC Regulation FD, 17 CFR 243.100(a); the ID is kept from when it was filed under SOX §302). The full scheme is in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md).
 - **Citations.** Each rule's `citation` names the instrument and the provision at paragraph and point level, then the text of that provision, for example `Regulation (EU) 2024/1689, Article 5(1)(c): ...`. That string is what goes into the record when the rule fires.

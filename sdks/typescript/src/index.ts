@@ -1,7 +1,7 @@
 /**
  * ComplyEdge TypeScript SDK
  *
- * Runtime EU AI Act enforcement for AI agents.
+ * The evidence AI laws ask for, collected on every AI call.
  *
  * @example
  * ```typescript

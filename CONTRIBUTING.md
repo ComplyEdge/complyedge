@@ -172,7 +172,7 @@ ADCR, the AI Decision Check Record ([complyedge.io/rulebook](https://complyedge.
 2. Name the clause of law or the audit criterion the change rests on, exactly (instrument, article, paragraph, point), and quote the text you rely on.
 3. Say what the rulebook says today, what it should say, why, and which test vector the change adds or changes. If the change touches a standard (for example ISO/IEC 24970 or prEN 18229-1), name the clause; do not paste text from a paywalled standard.
 
-ADCR is at version 0.1.0, in development, and follows semantic versioning. The decision process is in the rulebook's [governance document](https://complyedge.io/rulebook/0.1.0/GOVERNANCE.md).
+ADCR is at version 0.2.0, in development, and follows semantic versioning. The decision process is in the rulebook's [governance document](https://complyedge.io/rulebook/0.2.0/GOVERNANCE.md).
 
 ---
 
