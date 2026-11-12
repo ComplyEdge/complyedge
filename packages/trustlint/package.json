@@ -1,6 +1,6 @@
 {
   "name": "trustlint",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Offline linter that checks prompts and answers against AI laws before they ship: EU AI Act Art. 5 and Art. 50 and NYC Local Law 144, plus GDPR, HIPAA, SOX, PCI DSS and COPPA rules (63 bundled, regex). CLI and library. No API key, no network call.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

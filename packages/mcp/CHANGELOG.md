@@ -11,6 +11,12 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-11-11
+
+### Changed
+- Package description and README describe checks against AI laws (EU AI Act, NYC Local Law 144, GDPR, HIPAA) instead of the EU AI Act alone. No code change.
+- Depends on `trustlint` ^2.2.1, the release with the same description change.
+
 ## [0.2.4] - 2026-10-30
 
 ### Changed
@@ -175,6 +181,7 @@ came back clean now returns violations.
   Runs via `npx` with no Python runtime and no API key.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/mcp
+[0.2.5]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.5
 [0.2.4]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.4
 [0.2.3]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.3
 [0.2.2]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.2

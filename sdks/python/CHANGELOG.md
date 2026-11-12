@@ -14,6 +14,11 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.25] - 2026-11-11
+
+### Changed
+- Package description and README describe checks against AI laws (EU AI Act, NYC Local Law 144, GDPR, HIPAA) instead of the EU AI Act alone. No code change.
+
 ## [0.2.24] - 2026-10-30
 
 ### Fixed
@@ -130,6 +135,7 @@ Matching numbers would imply a parity that does not exist.
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.25]: https://pypi.org/project/complyedge/0.2.25/
 [0.2.24]: https://pypi.org/project/complyedge/0.2.24/
 [0.2.23]: https://pypi.org/project/complyedge/0.2.23/
 [0.2.22]: https://pypi.org/project/complyedge/0.2.22/

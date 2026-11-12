@@ -1,6 +1,6 @@
 {
   "name": "@complyedge/mcp",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Offline MCP server that checks prompts and answers against AI laws, with the citation when a rule fires: EU AI Act Art. 5 and Art. 50, GPAI, NYC Local Law 144, plus GDPR and US privacy rules (63 bundled). Three read-only tools. Runs with npx: no Python, no API key, no network call. Setting COMPLYEDGE_API_KEY adds an optional hosted sandbox_check tool.",
   "publishConfig": {
     "access": "public"
@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "trustlint": "^2.2.0"
+    "trustlint": "^2.2.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

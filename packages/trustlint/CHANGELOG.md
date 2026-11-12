@@ -18,6 +18,11 @@ that does not exist.
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-11-11
+
+### Changed
+- Package description and README describe checks against AI laws (EU AI Act, NYC Local Law 144, GDPR, HIPAA) instead of the EU AI Act alone. No code change.
+
 ## [2.2.0] - 2026-10-23
 
 ### Changed
@@ -150,6 +155,7 @@ the source moved on. Published to restore the npm distribution.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/trustlint
+[2.2.1]: https://www.npmjs.com/package/trustlint/v/2.2.1
 [2.2.0]: https://www.npmjs.com/package/trustlint/v/2.2.0
 [2.1.2]: https://www.npmjs.com/package/trustlint/v/2.1.2
 [2.1.1]: https://www.npmjs.com/package/trustlint/v/2.1.1

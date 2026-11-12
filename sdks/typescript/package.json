@@ -1,6 +1,6 @@
 {
   "name": "@complyedge/sdk",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "ComplyEdge TypeScript SDK: the evidence AI laws ask for, collected on every AI call. Blocked when it breaks the law, and logged with the rule, the law and the time, never the prompt or the answer. Rules today: the EU AI Act. OPA/Rego policy checks, plus OpenAI middleware.",
   "publishConfig": {
     "access": "public"

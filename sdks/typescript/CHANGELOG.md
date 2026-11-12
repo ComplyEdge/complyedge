@@ -16,6 +16,11 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.9] - 2026-11-11
+
+### Changed
+- Package description and README describe checks against AI laws (EU AI Act, NYC Local Law 144, GDPR, HIPAA) instead of the EU AI Act alone. No code change.
+
 ## [0.2.8] - 2026-10-30
 
 ### Changed
@@ -144,6 +149,7 @@ imply a parity that does not exist.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/typescript
+[0.2.9]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.9
 [0.2.8]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.8
 [0.2.7]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.7
 [0.2.6]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.6
