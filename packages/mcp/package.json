@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "trustlint": "^2.2.1"
+    "trustlint": "^2.2.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

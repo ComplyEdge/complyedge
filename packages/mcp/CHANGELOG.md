@@ -11,6 +11,9 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+### Changed
+- The `trustlint` dependency floor is now `^2.2.2` (copy-only rule text, "1 rule violated"). 0.2.6 already resolves 2.2.2 through `^2.2.1`.
+
 ## [0.2.6] - 2026-11-16
 
 ### Changed

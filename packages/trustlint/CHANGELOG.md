@@ -18,6 +18,18 @@ that does not exist.
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-11-17
+
+npm and PyPI.
+
+### Fixed
+- A single violation reads "1 rule violated", not "1 rules violated".
+- Bundled rule text: corrected descriptions and messages for the Art 50(2)
+  synthetic media, Art 5(1)(h) real-time biometric, GDPR data minimisation, PII
+  input, safety-disable, system-prompt leak, COPPA, CCPA, HIPAA and Regulation FD
+  rules. Detection patterns are unchanged.
+- Package descriptions no longer state a rule count.
+
 ## [2.2.1] - 2026-11-11
 
 ### Changed
@@ -155,6 +167,7 @@ the source moved on. Published to restore the npm distribution.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/trustlint
+[2.2.2]: https://www.npmjs.com/package/trustlint/v/2.2.2
 [2.2.1]: https://www.npmjs.com/package/trustlint/v/2.2.1
 [2.2.0]: https://www.npmjs.com/package/trustlint/v/2.2.0
 [2.1.2]: https://www.npmjs.com/package/trustlint/v/2.1.2
