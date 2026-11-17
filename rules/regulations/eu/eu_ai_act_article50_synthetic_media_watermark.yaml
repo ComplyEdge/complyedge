@@ -2,10 +2,11 @@ id: EU_AI_ACT_ART50_SYNTHETIC_MEDIA_WATERMARK_001
 jurisdiction: EU
 effective_date: '2026-08-02'
 description: >-
-  Requires synthetic audio, image, or video content to be watermarked and
-  disclosed as artificially generated or manipulated. Article 50(2) of the
-  EU AI Act. This rule covers references to generating synthetic media
-  without the required watermark/disclosure pipeline.
+  Requires providers of AI systems generating synthetic audio, image, video or
+  text content to mark the outputs in a machine-readable format, so they are
+  detectable as artificially generated or manipulated. Article 50(2) of the EU
+  AI Act. This rule covers text about generating synthetic media without a
+  marking pipeline, or stripping or disabling one.
 
 
   Layer 1 detects: "generate", "produce", "create", "render", "synthesise" or

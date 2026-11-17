@@ -1,4 +1,4 @@
-# ComplyEdge: US corpus aggregator (SOX)
+# ComplyEdge: US corpus aggregator (Regulation FD)
 #
 # OPA queries this package at: POST /v1/data/complyedge/us_corpus/result
 # Aggregator carve-out (RULE_STANDARD.md §5.6): no legal condition of its own.

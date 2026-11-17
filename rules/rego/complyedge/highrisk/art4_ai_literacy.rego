@@ -1,4 +1,4 @@
-# ComplyEdge: EU AI Act Article 4: Ai Literacy
+# ComplyEdge: EU AI Act Article 4: AI Literacy
 #
 # Having staff operate or use AI systems with no AI literacy measures, or an
 # instruction to skip AI literacy training.

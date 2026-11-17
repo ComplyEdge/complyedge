@@ -2,13 +2,13 @@
 
 This directory holds the YAML rules for detecting prompt injection, direct and indirect. They sit under `rules/regulations/universal/` because they run in every jurisdiction: whether text tries to instruct an AI system does not depend on where the user is. We map them to Article 15(5) of the EU AI Act, which requires high-risk AI systems to be resilient against attempts by unauthorised third parties to alter their use, outputs or performance. That mapping is our reading, not a regulator's: the methodology below says why, and what it does not establish.
 
-The same techniques run on the hosted `/v1/check` path as 12 Rego leaves in [`rules/rego/complyedge/prompt_security/`](../../../rego/complyedge/prompt_security/), with IDs `rego-art15-ipi-001` to `rego-art15-ipi-010`.
+The same techniques run on the hosted `/v1/check` path as Rego leaves in [`rules/rego/complyedge/prompt_security/`](../../../rego/complyedge/prompt_security/), with IDs of the form `rego-art15-ipi-{seq}`.
 
 ## Methodology
 
 What each rule checks, how a decision is recorded, how the rules are tested and what they do not establish: **[`docs/security-compliance/ipi-conformity-assessment.md`](../../../../docs/security-compliance/ipi-conformity-assessment.md)**. Read it before authoring a rule here.
 
-## Rules in this directory (10)
+## Rules in this directory
 
 | File | Sub-category (methodology §2) |
 |---|---|

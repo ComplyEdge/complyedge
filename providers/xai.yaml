@@ -118,7 +118,7 @@ obligations:
       summary: >-
         Grok 4.3 documentation page covering 1M context window,
         modalities, pricing, function calling, structured outputs, and
-        configurable reasoning effort levels — without parameter
+        configurable reasoning effort levels, without parameter
         count, training compute, training data taxonomy, or
         evaluation report.
       sha256: 6b7ae3ea2ce7cdf8ac187877d25828751ad9630a3936deef9ba3533656d2b8ec
@@ -131,7 +131,7 @@ obligations:
         Grok 4 announcement publishing benchmark results across
         Humanity's Last Exam, GPQA, LiveCodeBench, USAMO 2025, HMMT
         2025, AIME'25, ARC-AGI-2, Vending-Bench with comparative
-        figures vs Claude Opus 4, Gemini 2.5 Pro, o3 — but providing
+        figures vs Claude Opus 4, Gemini 2.5 Pro, o3, but providing
         no FLOPs disclosure or structured technical documentation.
       sha256: f44c177a8a9707a614a0494370a06f7f8f9f6b4475578f656b87d794912698a7
       wayback_url: http://web.archive.org/web/20260708184615/https://x.ai/news/grok-4
@@ -158,7 +158,7 @@ obligations:
       AI Office template format is published. No dedicated AI-training
       crawler identifier with documented robots.txt opt-out exists
       (Google operates Google-Extended, Meta operates
-      Meta-ExternalAgent — xAI documents no equivalent). The reliance
+      Meta-ExternalAgent; xAI documents no equivalent). The reliance
       on X public posts as a primary training source raises additional
       copyright-transparency concerns around third-party rightsholder
       content shared on X. Score is 0: bare-minimum privacy-policy

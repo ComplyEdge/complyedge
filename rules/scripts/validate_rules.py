@@ -3,8 +3,9 @@
 Rule Validation Script
 ======================
 
-Validates all compliance rules against the master schema and ensures
-regulatory accuracy and technical correctness.
+Validates every rule file under regulations/ against the rule schema
+(schemas/rule-schema.json). It checks structure only, not whether a rule reads
+the law correctly.
 
 Usage:
     cd rules && python scripts/validate_rules.py

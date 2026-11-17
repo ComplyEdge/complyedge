@@ -4,13 +4,10 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/trustlint.svg)](https://pypi.org/project/trustlint/)
 [![PyPI provenance](https://img.shields.io/badge/PyPI-PEP%20740%20provenance-3775A9)](https://docs.pypi.org/attestations/)
 
-**Offline Python compliance linter for AI agents**: EU AI Act Article 5 and
-Article 50 (and related corpus rules). Scans text against its bundled TrustLint
-rule set. No API key is required for local checks.
-
-TrustLint checks prompts and answers against AI laws before they ship: EU AI Act
-Article 5 and Article 50 and NYC Local Law 144, plus GDPR, HIPAA, SOX, PCI DSS
-and COPPA rules.
+**Offline Python compliance linter for AI agents.** TrustLint checks prompts and
+answers against AI laws before they ship: EU AI Act Article 5 and Article 50 and
+NYC Local Law 144, plus GDPR, HIPAA, SOX, PCI DSS and COPPA rules. No API key is
+required for local checks.
 
 ## Install
 
@@ -37,11 +34,12 @@ Use `trustlint check prompt.txt` to scan a file, or
 `trustlint check` and `trustlint rules list` run locally, need no API key and record
 nothing. `trustlint scan` with `COMPLYEDGE_API_KEY` sends the text to the hosted check
 (`ce_eu_` keys to eu.api.complyedge.io, `ce_` keys to api.complyedge.io), which writes
-an audit record. For the hosted
-check and its audit record (for every decision a timestamp, a keyed hash of the
-text and an `event_id`, plus the rule and the law named when a phrase rule or the injection check fired. A wider-review block does not cite an article; never
-the text itself), use the
+an audit record. For the hosted check and its audit record, use the
 [ComplyEdge Python SDK](https://pypi.org/project/complyedge/).
+The record holds, for every decision, a timestamp, a keyed hash of the text and
+an `event_id`, plus the rule and the law when a phrase rule or the injection
+check fired, never the text itself.
+A wider-review block does not cite an article.
 
 - [ComplyEdge Python SDK](https://pypi.org/project/complyedge/)
 - [TrustLint npm package](https://www.npmjs.com/package/trustlint)

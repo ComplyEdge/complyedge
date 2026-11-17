@@ -2,8 +2,9 @@ id: GDPR_DATA_MINIMIZATION_001
 jurisdiction: EU
 effective_date: '2018-05-25'
 description: >-
-  Personal data collection must be adequate, relevant and limited to what is
-  necessary
+  Requires personal data to be adequate, relevant and limited to what is
+  necessary in relation to the purposes for which it is processed. GDPR
+  Article 5(1)(c), the data minimisation principle.
 
 
   Layer 1 detects: collect, gather or request (also inside a longer word)
@@ -52,8 +53,16 @@ penalty_information:
       whichever is higher (Article 83(5), point (a)).
 remediation:
   action: warn
-  message: Data collection may violate GDPR data minimization principle
-  suggestion: Review if all requested data fields are necessary for the stated purpose
+  message: >-
+    WARNING: GDPR Article 5(1)(c) requires personal data to be adequate,
+    relevant and limited to what is necessary in relation to the purposes for
+    which it is processed. Penalties: administrative fines up to EUR 20,000,000
+    or, for an undertaking, up to 4% of the total worldwide annual turnover of
+    the preceding financial year, whichever is higher (Article 83(5), point
+    (a)).
+  suggestion: >-
+    Check that every personal data field you collect is needed for the stated
+    purpose, and drop the ones that are not.
 version: 1.0.0
 tags:
 - data_minimization

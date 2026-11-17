@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Phase 1 measurement: injection-detection gap fixtures against /v1/check.
 
-Runs each fixture twice — use_semantic_fallback false, then true — and writes
+Runs each fixture twice (use_semantic_fallback false, then true) and writes
 a JSON report under scripts/benchmark/results/.
 
 Usage (local API with OPA + DEV_API_KEY):
@@ -36,7 +36,7 @@ RESULTS = Path(__file__).resolve().parent / "results"
 OUT = RESULTS / "injection_gap_measure_latest.json"
 
 # Rough gpt-4o-mini input+output for evaluate_fast (~700 tokens in, ~80 out).
-# Operator-facing estimate only — not a billing oracle.
+# Operator-facing estimate only, not a billing oracle.
 USD_PER_SEMANTIC_CALL = 0.00015
 
 

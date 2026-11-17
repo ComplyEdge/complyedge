@@ -253,18 +253,18 @@ obligations:
     score: 3
     rationale: >-
       Meta meets all four pillars of Article 55 systemic-risk
-      obligations: (a) formal risk-management framework — Advanced AI
+      obligations: (a) formal risk-management framework: Advanced AI
       Scaling Framework v2 defines catastrophic outcomes and threshold
       methodology across Cybersecurity, Chemical & Biological, and
       Loss of Control with explicit governance, threat-modelling, and
       development/deployment halt criteria; (b) capability evaluations
-      and red-teaming — CyberSec Eval 1-4 (industry's most
+      and red-teaming: CyberSec Eval 1-4 (industry's most
       comprehensive open-source LLM cybersecurity evaluation suite),
       AutoPatchBench, CyberSOCEval, plus CBRNE evaluations for
-      Llama 3.x; (c) systemic incident mitigation tooling — Llama
+      Llama 3.x; (c) systemic incident mitigation tooling: Llama
       Guard 4, Prompt Guard 2, Code Shield, LlamaFirewall released as
       production-grade open-source safeguards; (d) external
-      partnerships and information-sharing — MLCommons AI Safety
+      partnerships and information-sharing: MLCommons AI Safety
       Working Group, AI Alliance, CrowdStrike (SOC evaluations).
     evidence:
     - url: https://ai.meta.com/static-resource/Meta_Advanced-AI-Scaling-Framework-v2

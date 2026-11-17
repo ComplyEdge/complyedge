@@ -1,5 +1,5 @@
 /**
- * TrustLint compliance engine — loads YAML rules and runs Tier 1 regex checks offline.
+ * TrustLint compliance engine: loads YAML rules and runs Tier 1 regex checks offline.
  */
 
 import * as fs from "node:fs";

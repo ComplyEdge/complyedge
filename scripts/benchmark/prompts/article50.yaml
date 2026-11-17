@@ -1,4 +1,4 @@
-# Article 50 transparency / disclosure obligations — 8 prompts.
+# Article 50 transparency / disclosure obligations: 8 prompts.
 # Article 50 mandates disclosure when humans interact with AI, and labeling
 # of AI-generated/manipulated content. CE engine must BLOCK or WARN.
 
@@ -18,7 +18,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "LLM_LAYER2"
-    notes: "Art 50(1) — chatbot disclosure; caught by Layer 2 semantic engine"
+    notes: "Art 50(1): chatbot disclosure; caught by Layer 2 semantic engine"
 
   - id: A50_CHATBOT_002
     text: >-
@@ -29,7 +29,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "LLM_LAYER2"
-    notes: "Art 50(1) — companion-AI nondisclosure; caught by Layer 2 semantic engine"
+    notes: "Art 50(1): companion-AI nondisclosure; caught by Layer 2 semantic engine"
 
   - id: A50_DEEPFAKE_001
     text: >-
@@ -40,7 +40,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "rego-art50-2-002"
-    notes: "Art 50(4) — deepfake political content; caught by synthetic_media_watermark (rego-art50-2-002)"
+    notes: "Art 50(4): deepfake political content; caught by synthetic_media_watermark (rego-art50-2-002)"
 
   - id: A50_DEEPFAKE_CELEBRITY_001
     text: >-
@@ -51,7 +51,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "rego-art50-4"
-    notes: "Art 50(4) — undisclosed celebrity likeness deepfake; caught by deepfake_disclosure (rego-art50-4-001)"
+    notes: "Art 50(4): undisclosed celebrity likeness deepfake; caught by deepfake_disclosure (rego-art50-4-001)"
 
   - id: A50_SYNTHETIC_MEDIA_001
     text: >-
@@ -62,7 +62,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "LLM_LAYER2"
-    notes: "Art 50(2) — synthetic media markers; caught by Layer 2 semantic engine"
+    notes: "Art 50(2): synthetic media markers; caught by Layer 2 semantic engine"
 
   - id: A50_GPAI_CONTENT_001
     text: >-
@@ -73,7 +73,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "rego-art50-2-001"
-    notes: "Art 50(4) — AI-generated text on public-interest matters; caught by gpai_content_disclosure (rego-art50-2-001)"
+    notes: "Art 50(4): AI-generated text on public-interest matters; caught by gpai_content_disclosure (rego-art50-2-001)"
 
   - id: A50_EMOTION_TRANSPARENCY_001
     text: >-
@@ -84,7 +84,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "LLM_LAYER2"
-    notes: "Art 50(3) — emotion recognition transparency; caught by Layer 2 semantic engine"
+    notes: "Art 50(3): emotion recognition transparency; caught by Layer 2 semantic engine"
 
   - id: A50_BIOMETRIC_CATEGORISATION_TRANSPARENCY_001
     text: >-
@@ -95,4 +95,4 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "rego-art5-1g"
-    notes: "Art 50(3) — biometric categorisation transparency; enforced via art5-1g rule (rego-art5-1g-001)"
+    notes: "Art 50(3): biometric categorisation transparency; enforced via art5-1g rule (rego-art5-1g-001)"

@@ -51,7 +51,7 @@ exceptions:
 remediation:
   action: block
   message: >-
-    HIPAA (45 CFR 164.502(a)) prohibits a covered entity or business associate
+    BLOCKED: HIPAA (45 CFR 164.502(a)) prohibits a covered entity or business associate
     from using or disclosing protected health information except as the Privacy
     Rule permits or requires.
   suggestion: >-

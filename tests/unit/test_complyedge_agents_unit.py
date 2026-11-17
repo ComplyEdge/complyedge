@@ -131,7 +131,12 @@ class TestGuardrailConstruction:
             guard = create_compliance_guardrail(api_key="k", direction=direction)
             guard(None, None, "hello")
         client.check.assert_called_once_with(
-            "hello", direction=expected, user_id=None, user_role=None, session_id=None
+            "hello",
+            direction=expected,
+            user_id=None,
+            user_role=None,
+            session_id=None,
+            use_semantic_fallback=False,
         )
 
     def test_default_rule_is_article_5(self):
@@ -157,6 +162,7 @@ class TestGuardrailSafePath:
             user_id=None,
             user_role=None,
             session_id=None,
+            use_semantic_fallback=False,
         )
 
     def test_list_input_is_joined_before_check(self):
@@ -165,7 +171,12 @@ class TestGuardrailSafePath:
             guard = create_compliance_guardrail(api_key="k")
             guard(None, None, ["a", 1, "b"])
         client.check.assert_called_once_with(
-            "a 1 b", direction="prompt", user_id=None, user_role=None, session_id=None
+            "a 1 b",
+            direction="prompt",
+            user_id=None,
+            user_role=None,
+            session_id=None,
+            use_semantic_fallback=False,
         )
 
 
@@ -178,9 +189,35 @@ class TestGuardrailBlockedPath:
             )
             with pytest.raises(Exception) as exc:
                 guard(None, None, "prohibited social scoring")
-        # The fallback raises with the human-readable reason (rules label included).
+        # The fallback raises with the human-readable reason, naming the rule
+        # that fired.
         assert "Compliance violation detected" in str(exc.value)
-        assert "eu-ai-act/article-5" in str(exc.value)
+        assert "ART5_001" in str(exc.value)
+
+    def test_reason_names_the_fired_rule_not_the_default_label(self):
+        """Regression 2026-11-16 (ADA NVDA answer): the guardrail's rules label
+        defaults to eu-ai-act/article-5, and the block reason printed that
+        label, so a US Reg FD block (rego-sox-302-001) read as an EU Article 5
+        block in ADA's error."""
+        fake, _ = _fake_agents_module()
+        result = _blocked_result()
+        result.violations[0].rule_id = "rego-sox-302-001"
+        p, _ = _patch_client(result)
+        with fake, p:
+            guard = create_compliance_guardrail(
+                api_key="k", direction="output", jurisdiction="US"
+            )
+            out = guard.guardrail_function(None, None, "the market expects revenue to grow")
+        assert out.output_info["fired_rules"] == ["rego-sox-302-001"]
+        assert "rego-sox-302-001" in out.output_info["reason"]
+        assert "article-5" not in out.output_info["reason"]
+
+    def test_use_semantic_fallback_reaches_the_check(self):
+        p, client = _patch_client(_safe_result())
+        with _no_agents_module(), p:
+            guard = create_compliance_guardrail(api_key="k", use_semantic_fallback=True)
+            guard(None, None, "hello")
+        assert client.check.call_args.kwargs["use_semantic_fallback"] is True
 
 
 class TestGuardrailErrorHandling:

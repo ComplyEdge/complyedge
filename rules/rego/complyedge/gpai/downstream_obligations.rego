@@ -10,8 +10,7 @@
 #
 # Layer 1 detects: "downstream", then the word "no", "not", "without" or "lack" (any
 # ending), then documentation, information or support; the word "no",
-# "not",
-# "without" or "lack" (any ending), then "downstream", then provider or
+# "not", "without" or "lack" (any ending), then "downstream", then provider or
 # integrator, then doc, info or guid; "gpai" or "foundation model" (space,
 # hyphen or one word), then the word "no", "not" or "without", then "downstream",
 # then obligat or support; "api" or "model", then the word "no", "not" or "without",

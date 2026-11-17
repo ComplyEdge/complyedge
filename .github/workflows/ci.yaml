@@ -37,7 +37,7 @@ jobs:
       - name: Install packages and test deps
         run: |
           pip install pytest pytest-cov pytest-asyncio httpx click pyyaml cryptography
-          # TrustLint corpus is a build artifact — copy rules before editable install.
+          # TrustLint corpus is a build artifact: copy rules before editable install.
           rm -rf packages/trustlint/trustlint/rules
           mkdir -p packages/trustlint/trustlint/rules
           cp -R rules/regulations/. packages/trustlint/trustlint/rules/
@@ -63,6 +63,8 @@ jobs:
             tests/unit/test_mcp_http.py \
             tests/unit/test_mcp_sandbox_tool.py \
             tests/unit/test_mcp_structured_output.py \
+            tests/unit/test_sdk_appeals.py \
+            tests/unit/test_sdk_companion_methods.py \
             --cov=trustlint \
             --cov=complyedge \
             --cov-report=term-missing \

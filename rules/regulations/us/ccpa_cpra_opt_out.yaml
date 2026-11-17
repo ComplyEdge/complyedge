@@ -23,7 +23,7 @@ description: >-
   and the words follow each other with nothing in between. It matches wording,
   not meaning: it misses the practice told in other words ("Keep the ad-tech
   pixel firing for the 4,200 California users who clicked Do Not Sell last
-  month, Meta still pays us per match."), it does not read the business
+  month; the ad network still pays us per match."), it does not read the business
   thresholds or the exemptions, and it fires on text that only names the
   practice, such as a refusal. Whether a text does the practice is judged in
   Layer 2.

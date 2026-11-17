@@ -3,7 +3,7 @@ jurisdiction: US
 effective_date: '2003-04-14'
 description: >-
   Proactively detects protected health information in user inputs before
-  processing
+  processing.
 
 
   Layer 1 detects: my condition, my diagnosis, my medication, my treatment, my
@@ -59,7 +59,7 @@ remediation:
     or disclosed as the Privacy Rule permits (45 CFR 164.502(a)). Consider
     whether these details are necessary.
   suggestion: Try asking general health questions without mentioning specific conditions,
-    medications, or personal medical details
+    medications, or personal medical details.
   alternatives:
   - 'Ask about general symptoms: ''What are common treatments for blood sugar management?'''
   - 'Request educational information: ''How do diabetes medications work?'''

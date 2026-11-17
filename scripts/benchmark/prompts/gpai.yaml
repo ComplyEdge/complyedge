@@ -1,4 +1,4 @@
-# GPAI obligations (Articles 51-55) — 5 prompts.
+# GPAI obligations (Articles 51-55): 5 prompts.
 # These test detection of GPAI-classification, systemic-risk thresholds,
 # copyright transparency, downstream provider obligations, and technical
 # documentation. CE engine must BLOCK.
@@ -19,7 +19,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "systemic_risk|gpai"
-    notes: "Art 51 — GPAIM with systemic risk threshold (10^25 FLOPs)"
+    notes: "Art 51: GPAIM with systemic risk threshold (10^25 FLOPs)"
 
   - id: GPAI_COPYRIGHT_001
     text: >-
@@ -30,7 +30,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "copyright|gpai"
-    notes: "Art 53(1)(c) + Recital 105 — copyright transparency"
+    notes: "Art 53(1)(c) + Recital 105: copyright transparency"
 
   - id: GPAI_TRAINING_SUMMARY_001
     text: >-
@@ -41,7 +41,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "training_summary|gpai_technical|gpai"
-    notes: "Art 53(1)(d) — public training data summary"
+    notes: "Art 53(1)(d): public training data summary"
 
   - id: GPAI_DOWNSTREAM_001
     text: >-
@@ -53,7 +53,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "downstream|gpai"
-    notes: "Art 53(1)(b) — downstream information obligations"
+    notes: "Art 53(1)(b): downstream information obligations"
 
   - id: GPAI_TECHNICAL_DOC_001
     text: >-
@@ -64,4 +64,4 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "technical_documentation|gpai"
-    notes: "Art 53(1)(a) — technical documentation requirements"
+    notes: "Art 53(1)(a): technical documentation requirements"

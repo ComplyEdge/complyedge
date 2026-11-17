@@ -1,11 +1,11 @@
 """
-ComplyEdge CLI — cloud-connected compliance commands.
+ComplyEdge CLI: cloud-connected compliance commands.
 
 Commands:
-  complyedge login    — Authenticate and store API key
-  complyedge scan     — Run compliance check via API
-  complyedge status   — Show current config and API health
-  complyedge rules    — List loaded compliance rules
+  complyedge login    Authenticate and store API key
+  complyedge scan     Run compliance check via API
+  complyedge status   Show current config and API health
+  complyedge rules    List loaded compliance rules
 """
 
 from __future__ import annotations
@@ -80,7 +80,7 @@ def _mask_key(key: str) -> str:
 @click.group()
 @click.version_option(version=__version__, prog_name="complyedge")
 def cli() -> None:
-    """ComplyEdge — runtime compliance enforcement for AI agents."""
+    """ComplyEdge: check each AI call against AI laws and log the evidence."""
     pass
 
 
@@ -137,7 +137,7 @@ def _create_client(api_key: str, base_url: str | None = None):
     "--jurisdiction",
     "-j",
     default="EU",
-    help="Jurisdiction (EU, US, GLOBAL) — defaults to EU",
+    help="Jurisdiction (EU, US, GLOBAL); defaults to EU",
 )
 @click.option("--verbose", "-v", is_flag=True, help="Show full violation details")
 def scan(
@@ -189,7 +189,7 @@ def scan(
 
     # Display results
     if result.safe:
-        click.echo(f"\n{GREEN}{BOLD}COMPLIANT{RESET} — no violations detected")
+        click.echo(f"\n{GREEN}{BOLD}PASS{RESET}: no violations detected")
         click.echo(
             f"{DIM}Jurisdiction: {jurisdiction} | Event: {result.event_id}{RESET}"
         )
@@ -376,16 +376,16 @@ def pre_deploy(
 
     click.echo(f"\n{'─' * 50}")
     if risk_tier == "unacceptable":
-        click.echo(f"{RED}{BOLD}BLOCKED — system uses prohibited AI practices{RESET}")
+        click.echo(f"{RED}{BOLD}BLOCKED: the system uses prohibited AI practices{RESET}")
         sys.exit(1)
     elif risk_tier == "high":
-        click.echo(f"{YELLOW}{BOLD}HIGH RISK — compliance obligations apply{RESET}")
+        click.echo(f"{YELLOW}{BOLD}HIGH RISK: compliance obligations apply{RESET}")
         sys.exit(1) if violations else sys.exit(0)
     elif violations:
-        click.echo(f"{YELLOW}Issues found — review before deployment{RESET}")
+        click.echo(f"{YELLOW}Issues found: review them before deployment{RESET}")
         sys.exit(1)
     else:
-        click.echo(f"{GREEN}{BOLD}PASS — ready for deployment{RESET}")
+        click.echo(f"{GREEN}{BOLD}PASS: no violations found{RESET}")
         sys.exit(0)
 
 

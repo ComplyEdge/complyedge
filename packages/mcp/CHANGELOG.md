@@ -11,6 +11,12 @@ from memory, and anything not evidenced is left out instead of guessed at.
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-11-16
+
+### Changed
+- Package description, README and tool descriptions no longer state rule counts that grow, and name the laws the tools check. Same tools, no behaviour change.
+
+
 ## [0.2.5] - 2026-11-11
 
 ### Changed
@@ -181,6 +187,7 @@ came back clean now returns violations.
   Runs via `npx` with no Python runtime and no API key.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/packages/mcp
+[0.2.6]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.6
 [0.2.5]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.5
 [0.2.4]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.4
 [0.2.3]: https://www.npmjs.com/package/@complyedge/mcp/v/0.2.3

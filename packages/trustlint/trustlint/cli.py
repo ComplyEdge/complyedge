@@ -1,4 +1,4 @@
-"""TrustLint CLI — offline compliance linter for AI agents."""
+"""TrustLint CLI: offline compliance linter for AI agents."""
 
 from __future__ import annotations
 

@@ -16,6 +16,22 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.10] - 2026-11-16
+
+### Added
+- `client.recordAppeal({ decisionId, kind })` records a person's request about a decision (Enterprise plan) and returns the request id. The agent and system version are read from the decision; pass `agentId` or `systemVersion` only when the decision has none. Retrying with the same `requestedAt` returns the same id.
+- `client.recordAnswer(requestId, { outcome, statementRef, reviewer })` records your answer by that id. Sending the same answer twice records it once.
+- `client.listAppeals(status)` and `client.getAppeal(requestId)` read appeals back, late ones first, each with `dueAt`, `late` and `answeredLate`; `getAppeal` also returns the decision it is about.
+- Each appeal has `answers` and `extensions`: every answer and extension, oldest first, each extension with `inTime`. `answer` and `extension` are the ones recorded last; `answeredLate` is judged on the first answer.
+- API errors carry the API's own message, such as which field is wrong.
+- Answers can also be `refused` or `extended` (you told the person you need more time). The same answer means every field matches, the reviewer included.
+- Companion chatbot laws: `check(text, { useCase: "companion_chatbot", companion: {...} })` returns `companionAssessment`, `companionNotAssessedReason`, `companionFallback` and `requiredActions`. A companion check without `direction` or `sessionId` is refused before sending.
+- `client.confirmAction({ requiredAction, check, confirmationId, source, shownAt })` records a shown notice and retries while the check is still being recorded (409), for up to 10 minutes after the check.
+- `client.preserve({ conversation, trigger, preservedAt, decidingSystemVersion })` and `canonicalConversation()`: the conversation is sent in RFC 8785 canonical form.
+
+### Changed
+- `direction` is sent only when you give it. It used to default to `"output"` in the request; the API applies the same default, so ordinary checks decide the same way.
+
 ## [0.2.9] - 2026-11-11
 
 ### Changed
@@ -149,6 +165,7 @@ imply a parity that does not exist.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/typescript
+[0.2.10]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.10
 [0.2.9]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.9
 [0.2.8]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.8
 [0.2.7]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.7

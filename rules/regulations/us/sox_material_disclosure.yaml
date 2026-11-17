@@ -1,6 +1,6 @@
 id: SOX_HYBRID_MATERIAL_DISCLOSURE_001
 jurisdiction: US
-title: SOX / Regulation FD material information disclosure review
+title: Regulation FD material information disclosure review
 description: >-
   Covers possible disclosure of material nonpublic information about an
   issuer, which Regulation FD (17 CFR 243.100) governs.
@@ -260,7 +260,7 @@ remediation:
     tier2_action: sox_compliance_block
     tier3_action: require_executive_approval
   message: >-
-    ⚠️ SOX / Regulation FD review: this content may disclose material nonpublic
+    ⚠️ Regulation FD review: this content may disclose material nonpublic
     information. Under Regulation FD (17 CFR 243.100(a)), an issuer that
     discloses material nonpublic information to the persons described in
     243.100(b)(1) must make it public simultaneously for an intentional

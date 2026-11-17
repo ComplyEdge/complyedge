@@ -47,7 +47,7 @@ interest"); the Article 15 prompt-injection rules block it and the record names 
 three are allowed with no citation: escalating record 3 to a human is the application's decision,
 not a ComplyEdge outcome. `GET /v1/audit/export` returns every decision as a hash-only record. On **Enterprise** the export is an evidence pack
 chained with `sha256-v1`, `link = SHA-256(previous_link + canonical_json(record))`, `chain_head`
-over the whole export. Free/Developer get the same records, each carrying its place in your account's write-time chain (`chain_seq`, `chain_prev`, `chain_hash`), with `attestation: "none"` and no export-time `chain_link`/`chain_head`;
+over the whole export. The Free and Developer plans get the same records, each carrying its place in your account's write-time chain (`chain_seq`, `chain_prev`, `chain_hash`), with `attestation: "none"` and no export-time `chain_link`/`chain_head`;
 `--live` falls back to the shipped fixture when the key is not Enterprise so the tampering checks still run.
 The example then pins `chain_head` to an **anchor** the audit store cannot write to.
 

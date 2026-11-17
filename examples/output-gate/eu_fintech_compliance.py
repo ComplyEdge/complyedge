@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # flake8: noqa: E501
 """
-ComplyEdge — EU Fintech Output Gate
+ComplyEdge EU Fintech Output Gate
 
 Demonstrates ComplyEdge as a compliance gate on LLM output for three
 EU AI Act scenarios that carry the highest fine exposure (Art. 5: up to
@@ -9,9 +9,9 @@ EU AI Act scenarios that carry the highest fine exposure (Art. 5: up to
 
 Each scenario mirrors a real fintech / AI company pattern:
 
-  S1 — Safe baseline        (B2B product copy, no person evaluation)
-  S2 — Social scoring       (citizen trustworthiness system)     → Art 5(1)(c)
-  S3 — Bank behavioral loan (credit decision from social data)   → Art 5(1)(c)
+  S1: Safe baseline         (B2B product copy, no person evaluation)
+  S2: Social scoring        (citizen trustworthiness system)     → Art 5(1)(c)
+  S3: Bank behavioral loan (credit decision from social data)   → Art 5(1)(c)
 
   S3 is the case lenders ask about: a loan decision built from a social
   behaviour score. The social-scoring rule blocks text like this. Whether a
@@ -20,7 +20,7 @@ Each scenario mirrors a real fintech / AI company pattern:
   context the data came from); credit scoring as such is an Annex III
   high-risk use, not a prohibited one.
 
-Usage (no LLM needed — prompts pre-filled):
+Usage (no LLM needed: prompts pre-filled):
     pip install complyedge
     export COMPLYEDGE_API_KEY="your-key"
     python eu_fintech_compliance.py
@@ -67,7 +67,7 @@ SCENARIOS = [
             "tool targeting mid-size EU technology companies. Focus on collaboration "
             "features and GDPR compliance. Do not mention individual user scoring."
         ),
-        "note": "Baseline — describes software, no person evaluation.",
+        "note": "Baseline: describes software, no person evaluation.",
     },
     {
         "id": "S2",
@@ -94,7 +94,7 @@ SCENARIOS = [
     },
     {
         "id": "S3",
-        "label": "Bank Loan AI — Behavioural Credit Scoring",
+        "label": "Bank Loan AI: Behavioural Credit Scoring",
         "expected": "VIOLATION",
         "article": "Article 5(1)(c)",
         "penalty": "€35M or 7% global turnover",
@@ -157,7 +157,7 @@ def run_scenario(ce: ComplyEdge, scenario: dict, live: bool) -> dict:
     expected = scenario["expected"]
 
     print(f"\n{_B}{_C}{'═' * _W}{_X}")
-    print(f"{_B}{_C}{sid} — {label}{_X}")
+    print(f"{_B}{_C}{sid}: {label}{_X}")
     print(f"{_B}{_C}{'═' * _W}{_X}")
     print(f"  {_D}·{_X}  Expected: {_B}{expected}{_X}  |  {_D}{scenario['note'][:70]}{_X}")
 
@@ -192,7 +192,7 @@ def run_scenario(ce: ComplyEdge, scenario: dict, live: bool) -> dict:
         ]
         if result.violations:
             v = result.violations[0]
-            rule_id = getattr(v, "rule_id", "—")
+            rule_id = getattr(v, "rule_id", "none")
             lines.append(f"{_R}BLOCKED{_X}  rule_id='{rule_id}'")
             # The legal citation arrives as rule_description: main.py maps the
             # Rego rule's citation onto that field. There is no `citation`
@@ -203,10 +203,10 @@ def run_scenario(ce: ComplyEdge, scenario: dict, live: bool) -> dict:
             if citation:
                 lines.append(f"{_D}citation:{_X} {citation[:90]}…")
         else:
-            lines.append(f"{_G}ALLOWED{_X}  no violations  event_id={getattr(result, 'event_id', '—')}")
+            lines.append(f"{_G}ALLOWED{_X}  no violations  event_id={getattr(result, 'event_id', 'none')}")
 
         if "article" in scenario and scenario["article"]:
-            lines.append(f"{_Y}Article:{_X} {scenario['article']}  |  Penalty: {scenario.get('penalty', '—')}")
+            lines.append(f"{_Y}Article:{_X} {scenario['article']}  |  Penalty: {scenario.get('penalty', 'none')}")
 
         _box(lines)
         return {"id": sid, "got": got, "expected": expected, "match": match, "latency_ms": latency_ms}
@@ -223,7 +223,7 @@ def run_scenario(ce: ComplyEdge, scenario: dict, live: bool) -> dict:
             f"{_R}BLOCKED{_X}  ComplianceError raised (decorator behaviour)",
         ]
         if "article" in scenario and scenario["article"]:
-            lines.append(f"{_Y}Article:{_X} {scenario['article']}  |  Penalty: {scenario.get('penalty', '—')}")
+            lines.append(f"{_Y}Article:{_X} {scenario['article']}  |  Penalty: {scenario.get('penalty', 'none')}")
         _box(lines)
         return {"id": sid, "got": got, "expected": expected, "match": match, "latency_ms": latency_ms}
 
@@ -249,7 +249,7 @@ def main() -> None:
     ce = ComplyEdge(api_key=api_key)
 
     print(f"\n{_B}{_C}{'═' * _W}{_X}")
-    print(f"{_B}{_C}ComplyEdge — EU Fintech Compliance Output Gate{_X}")
+    print(f"{_B}{_C}ComplyEdge EU Fintech Compliance Output Gate{_X}")
     print(f"{_B}{_C}  CE sits between LLM output and the user.{_X}")
     print(f"{_B}{_C}  Prohibited content is blocked before delivery.{_X}")
     print(f"{_B}{_C}{'═' * _W}{_X}")

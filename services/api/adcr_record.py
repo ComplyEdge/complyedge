@@ -44,7 +44,7 @@ RULEBOOK_BASE = "https://complyedge.io/rulebook/"
 #: row as ``rulebook_version`` (audit_chain.transact_items), because the record's
 #: ``rulebook`` is inside the hashed bytes: a record keeps the version it was
 #: written under, and is never re-pointed at a later one (REC-02).
-RULEBOOK_VERSION = "0.2.0"
+RULEBOOK_VERSION = "0.3.0"
 RULEBOOK = RULEBOOK_BASE + RULEBOOK_VERSION
 #: Rows chained before ``rulebook_version`` existed were hashed naming 0.1.0.
 RULEBOOK_0_1_0 = RULEBOOK_BASE + "0.1.0"
@@ -82,6 +82,9 @@ EVENT_INCIDENT = "incident"
 EVENT_OPT_OUT = "opt_out"
 EVENT_CLASSIFICATION = "classification"
 EVENT_FALLBACK = "fallback"
+#: Companion chatbot laws (Rulebook 0.3.0): a conversation kept as a
+#: commitment only, for a law that asks for it to be preserved.
+EVENT_PRESERVATION = "preservation"
 #: OVS-01: the dashboard is opened by the account's one sign-in identity, so
 #: the person who reviews a flag there is the account holder.
 REVIEWER_ROLE_ACCOUNT_HOLDER = "account_holder"
@@ -157,7 +160,34 @@ DATA_CATEGORIES = SPECIAL_CATEGORIES | frozenset(
 #: Article 22(2) exceptions a legal basis may name.
 ART22_EXCEPTIONS = frozenset({"22(2)(a)", "22(2)(b)", "22(2)(c)"})
 
-_STORAGE_KEYS = frozenset({"pk", "sk", "gsi1_pk", "gsi1_sk", "ttl"})
+def appeals_index_pk(tenant_id: object) -> str:
+    """GSI1 key of a tenant's appeal (contest) rows: the Appeals list reads
+    only these instead of the tenant's whole EVENT# keyspace."""
+    return f"TENANT#{tenant_id}#APPEALS"
+
+
+def decision_index_pk(tenant_id: object, event_id: str) -> str:
+    """GSI1 key of one decision row: found by event_id in one read. The sort
+    key holds the timestamp, which a caller with only the id does not have."""
+    return f"TENANT#{tenant_id}#EVENT#{event_id}"
+
+
+#: Storage keys are outside the hash, so a transfer that rewrites them under
+#: another tenant id leaves every row verifying. gsi3_* / gsi4_* are the
+#: companion session and user indexes (Rulebook 0.3.0).
+_STORAGE_KEYS = frozenset(
+    {
+        "pk",
+        "sk",
+        "gsi1_pk",
+        "gsi1_sk",
+        "gsi3_pk",
+        "gsi3_sk",
+        "gsi4_pk",
+        "gsi4_sk",
+        "ttl",
+    }
+)
 _CHAIN_KEYS = frozenset(
     {"chain_seq", "chain_prev", "chain_hash", "chain_alg", "chain_link", "chain_status"}
 )
@@ -608,6 +638,19 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
         for f in ("classification_result", "assessment_ref"):
             if row.get(f) is not None:
                 rec[f] = row[f]
+                used.add(f)
+
+    if event_type == EVENT_PRESERVATION:
+        for f in ("trigger", "conversation_commitment", "commitment_alg", "preserved_at"):
+            if row.get(f) is not None:
+                if f == "preserved_at":
+                    stamp = _optional_utc_timestamp(row[f])
+                    if stamp is None:
+                        used.add(f)
+                        continue
+                    rec[f] = stamp
+                else:
+                    rec[f] = row[f]
                 used.add(f)
 
     if event_type == EVENT_FALLBACK:

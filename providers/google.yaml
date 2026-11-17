@@ -56,7 +56,7 @@ obligations:
       (e.g. Gemini 3 Pro) document the resulting classification outcomes.
       Score is 2 (not 3) because no public artefact citing Article 51(1)(a)
       compute thresholds or formal AI Office notification has been located
-      on official Google channels — the FSF substitutes Google's own CCL
+      on official Google channels; the FSF substitutes Google's own CCL
       taxonomy for the Act's compute-based threshold.
     evidence:
     - url: https://deepmind.google/discover/blog/updating-the-frontier-safety-framework/
@@ -65,7 +65,7 @@ obligations:
       summary: >-
         February 2025 FSF 2.0 announcement defining Critical
         Capability Levels (CCLs) and stating the Framework has been
-        implemented for evaluating Gemini 2.0 — demonstrating per-model
+        implemented for evaluating Gemini 2.0, demonstrating per-model
         systemic-risk classification.
       sha256: 943cb244660d27001d6bfc487fc2cb9dbd66a1965bb38deafaedc3aeca72bac3
       wayback_url: http://web.archive.org/web/20250928130215/https://deepmind.google/discover/blog/updating-the-frontier-safety-framework/
@@ -143,7 +143,7 @@ obligations:
       the spirit of Art 53(1)(c). No published copyright policy describes
       how TDM reservations under Article 4(3) of the DSM Directive are
       systematically identified and respected during crawling beyond
-      robots.txt — so score is 2 not 3.
+      robots.txt, so score is 2 not 3.
     evidence:
     - url: https://blog.google/technology/ai/an-update-on-web-publisher-controls/
       verified_date: '2026-07-10'

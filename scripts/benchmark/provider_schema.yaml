@@ -1,13 +1,13 @@
-# GPAI Compliance Benchmark — Provider Evidence Schema
+# GPAI Compliance Benchmark: Provider Evidence Schema
 #
 # Every file in providers/*.yaml conforms to this shape. The benchmark
 # runner validates against this schema before scoring.
 #
 # Scoring scale (per obligation):
-#   0 — no evidence (provider does not address the obligation publicly)
-#   1 — partial   (mention without verifiable detail)
-#   2 — adequate  (clear, specific, sourced documentation)
-#   3 — exceeds   (machine-readable, regularly updated, audited)
+#   0: no evidence (provider does not address the obligation publicly)
+#   1: partial   (mention without verifiable detail)
+#   2: adequate  (clear, specific, sourced documentation)
+#   3: exceeds   (machine-readable, regularly updated, audited)
 #
 # Evidence rule: public documentation only. Each evidence item must have
 # a URL, a verified_date (YYYY-MM-DD), and a quote or summary.
@@ -37,9 +37,9 @@ properties:
     type: string
     enum: [closed_api, open_weights, hybrid]
     description: |
-      `closed_api` — provider only ships the model behind an API.
-      `open_weights` — model weights are publicly downloadable.
-      `hybrid` — both (e.g. Mistral, Cohere).
+      `closed_api`: provider only ships the model behind an API.
+      `open_weights`: model weights are publicly downloadable.
+      `hybrid`: both (e.g. Mistral, Cohere).
 
   systemic_risk_threshold:
     type: boolean
@@ -57,9 +57,9 @@ properties:
     type: string
     enum: [verified, needs_review, pending]
     description: |
-      `verified`   — every URL fetched and the quoted text confirmed.
-      `needs_review` — URLs cited but not all manually re-confirmed.
-      `pending`    — stub entries; do not include in published scores.
+      `verified`  : every URL fetched and the quoted text confirmed.
+      `needs_review`: URLs cited but not all manually re-confirmed.
+      `pending`   : stub entries; do not include in published scores.
 
   obligations:
     type: object

@@ -20,7 +20,8 @@
 # words. Whether a text selectively discloses material nonpublic information
 # is judged in Layer 2.
 #
-# Deterministic OPA/Rego leaf so SOX blocks on the /v1/check hot path.
+# Deterministic OPA/Rego leaf so this Regulation FD check blocks on the
+# /v1/check hot path.
 # TrustLint YAML (sox_material_disclosure.yaml) still serves
 # /v1/sensitivity/detect. These patterns cover the smoke strings:
 # forward-looking earnings guidance, material undisclosed events, insider info.

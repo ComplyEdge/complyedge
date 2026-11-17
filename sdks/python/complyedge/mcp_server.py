@@ -62,9 +62,10 @@ API_KEY_ENV = "COMPLYEDGE_API_KEY"
 TOOL_ANNOTATIONS = ToolAnnotations(readOnlyHint=True, idempotentHint=True)
 
 # Shared with mcp_http so stdio/HTTP surfaces cannot drift (Glama A1–A5).
-# Each description must name EU AI Act / Article 5 / Article 50 (GE-5).
+# Each description names AI laws and must keep EU AI Act / Article 5 / Article 50.
 _LAW = (
-    "EU AI Act Article 5 and Article 50. TrustLint offline regex: not the "
+    "AI laws: EU AI Act Article 5 and Article 50, NYC Local Law 144, GDPR and "
+    "HIPAA, plus prompt injection. TrustLint offline regex: not the "
     "hosted policy engine, not a system classifier. "
 )
 TOOL_DESCRIPTIONS: dict[str, str] = {
@@ -125,7 +126,8 @@ _JURISDICTION_ENUM = ["EU", "US", "GLOBAL"]
 # Kept OUT of TOOL_DESCRIPTIONS on purpose: that dict is the offline trio and
 # the guards over it ("not the hosted policy engine") must keep meaning that.
 SANDBOX_TOOL_DESCRIPTION = (
-    "EU AI Act Article 5 and Article 50. Hosted ComplyEdge enforcement, "
+    "AI laws, starting with EU AI Act Article 5 and Article 50, plus prompt "
+    "injection. Hosted ComplyEdge enforcement, "
     "sandbox mode: the same check as production, including the paid injection check when the month's model budget covers it, and the same tenant settings as "
     "production, but NOTHING is recorded: no audit entry, no usage, no "
     "count against the plan's daily limit (sandbox calls have their own caps: "

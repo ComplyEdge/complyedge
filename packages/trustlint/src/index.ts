@@ -1,5 +1,5 @@
 /**
- * TrustLint — offline compliance linter for AI agents.
+ * TrustLint: offline compliance linter for AI agents.
  *
  * Programmatic API for embedding TrustLint in Node.js applications.
  */

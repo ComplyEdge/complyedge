@@ -98,7 +98,7 @@ class TestScan:
         ):
             result = runner.invoke(cli, ["scan", "--text", "Process this invoice"])
         assert result.exit_code == 0
-        assert "COMPLIANT" in result.output
+        assert "PASS" in result.output
 
     def test_scan_text_violation(self):
         runner = CliRunner()

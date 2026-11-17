@@ -341,7 +341,9 @@ def _compute_chain_head_in_order(events: list[dict[str, Any]]) -> str | None:
 #: was decided. They are not part of the customer's record, so neither export
 #: carries them (Leo, 2026-09-29). `timestamp` and `event_id` already say what
 #: `sk` encodes; retention is stated once in the envelope (`retention_days`).
-EXPORT_INTERNAL_KEYS = frozenset({"pk", "sk", "gsi1_pk", "gsi1_sk", "ttl"})
+EXPORT_INTERNAL_KEYS = frozenset(
+    {"pk", "sk", "gsi1_pk", "gsi1_sk", "gsi3_pk", "gsi3_sk", "gsi4_pk", "gsi4_sk", "ttl"}
+)
 
 #: Stamp fields that may arrive as ISO strings with a leftover offset.
 #: ``normalize_event`` only converts ``datetime`` objects (AUD-054); string
@@ -472,6 +474,37 @@ def write_time_material(record: dict[str, Any]) -> str:
     sides go through this one function.
     """
     return adcr_record.canonical(adcr_record.to_adcr(record)).decode("utf-8")
+
+
+#: The incident a key-moving transfer writes on the target (companion spec X9).
+TRANSFER_INCIDENT_KIND = "account_transfer"
+TRANSFER_REF_PREFIX = "transfer:"
+
+
+def transfer_ref(source_tenant_id: str, last_chain_hash: str) -> str:
+    return f"{TRANSFER_REF_PREFIX}{source_tenant_id}:{last_chain_hash}"
+
+
+def transfer_links(events: list[dict[str, Any]]) -> dict[str, str]:
+    """{source tenant id: its last chain_hash} from account_transfer rows.
+
+    Only a chained row can carry a link: an unchained row is not covered by
+    any chain, so it could name a made-up segment and take it out of the main
+    chain unchecked. A row naming its own tenant is not a transfer. A chain of
+    transfers (A to B, then B to C) gives one link per source."""
+    out: dict[str, str] = {}
+    for e in events:
+        if e.get("event_type") != "incident" or e.get("incident_kind") != TRANSFER_INCIDENT_KIND:
+            continue
+        if not is_chained(e):
+            continue
+        ref = str(e.get("report_ref") or "")
+        if not ref.startswith(TRANSFER_REF_PREFIX):
+            continue
+        source, _, last = ref[len(TRANSFER_REF_PREFIX):].rpartition(":")
+        if source and last and source != str(e.get("tenant_id")):
+            out[source] = last
+    return out
 
 
 def write_time_link_hash(previous_hash: str, record: dict[str, Any]) -> str:
@@ -811,6 +844,7 @@ FAILING_FINDINGS = frozenset(
         "unchained_after_chain_start",
         "unknown_chain_alg",
         "legacy_export_chain_failed",
+        "segment_link_mismatch",
     }
 )
 
@@ -879,6 +913,7 @@ def verify_write_time_chain(
     tsa_roots: list[str] | None = None,
     openssl: str | None = None,
     origin_pubkeys: list[str] | None = None,
+    _segment: bool = False,
 ) -> dict[str, Any]:
     """Verify the write-time chain and its anchors from an export file alone.
 
@@ -911,6 +946,14 @@ def verify_write_time_chain(
       anchor_mismatch        an anchor's chain_hash is not the export's at that seq
       anchor_token_*         the RFC 3161 token: parse, status, imprint, signature
       legacy_export_chain_failed   the sha256-v1 export-time chain fails
+      segment_link_mismatch  rows moved in from another account do not end at
+                             the last hash the transfer row recorded (a moved
+                             row removed, or the moved rows re-hashed). The
+                             moved rows all predate the transfer row, so if
+                             any is in the export its last one must be too
+      segment_absent         a transfer row is in the export and none of the
+                             rows it moved are (a date-range export); leaves
+                             the verdict unverified
     """
     findings: list[dict[str, Any]] = []
 
@@ -925,6 +968,38 @@ def verify_write_time_chain(
     if not isinstance(events, list):
         add("malformed_export", "events is not a list")
         return {"verdict": "failed", "findings": findings}
+
+    # Rows moved in from another account (companion spec X9) keep their
+    # source tenant_id and chain: each source is checked as its own chain, and
+    # the owner's account_transfer incident row is the link to its last hash.
+    # Links are read once, over every row, and each segment is checked on its
+    # own without following links again: in A to B to C, B's segment holds the
+    # row linking A, and A's rows are checked as their own segment.
+    links = {} if _segment else transfer_links(events)
+    if links:
+        for source, last_hash in links.items():
+            segment = [e for e in events if str(e.get("tenant_id")) == source]
+            if not segment:
+                # A date-range export can hold the transfer row without the
+                # older moved rows. Not a failure, never a pass: the rows the
+                # link vouches for are not here to check.
+                add("segment_absent",
+                    f"rows moved in from {source} are not in this export")
+                continue
+            seg = verify_write_time_chain({"events": segment}, _segment=True)
+            for f in seg.get("findings", []):
+                if f["finding"] not in ("no_anchor", "unanchored_tail"):
+                    add(f["finding"], f"moved segment {source}: {f['detail']}",
+                        f["seq"], f["event_id"])
+            tail = max(
+                (e for e in segment if is_chained(e) and _seq(e) is not None),
+                key=lambda e: _seq(e),
+                default=None,
+            )
+            if tail is None or tail.get("chain_hash") != last_hash:
+                add("segment_link_mismatch",
+                    f"moved segment {source} does not end at the recorded hash")
+        events = [e for e in events if str(e.get("tenant_id")) not in links]
 
     chained = [e for e in events if is_chained(e)]
     pre_chain = [e for e in events if not is_chained(e)]
@@ -1110,6 +1185,7 @@ def verify_write_time_chain(
         and "anchor_token_signature_not_checked" not in names
         and "origin_signature_not_checked" not in names
         and "unanchored_tail" not in names
+        and "segment_absent" not in names
     ):
         verdict = "verified"
     else:

@@ -1,4 +1,4 @@
-"""TrustLint compliance engine — loads YAML rules and runs Tier 1 regex checks offline."""
+"""TrustLint compliance engine: loads YAML rules and runs Tier 1 regex checks offline."""
 
 from __future__ import annotations
 

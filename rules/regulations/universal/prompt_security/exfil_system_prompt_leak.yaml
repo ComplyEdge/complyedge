@@ -14,8 +14,7 @@ description: >-
   confidential instruction(s), prompt or rules, or "prompt verbatim"; and "what
   are", "what were" or "what is" "your" (optionally exact, full or complete)
   followed by initial, original, system or hidden, then instruction(s), prompt,
-  rules or directive(s). It does not match a request for the AI's configuration
-  in other words. It matches wording, not meaning: it does not read who is
+  rules or directive(s). It matches wording, not meaning: it does not read who is
   asking, so it fires on the operator's own request ("show the system prompt in
   the settings panel"), and it misses a leak request worded any other way.
   Whether the text tries to extract the AI's hidden instructions is judged in

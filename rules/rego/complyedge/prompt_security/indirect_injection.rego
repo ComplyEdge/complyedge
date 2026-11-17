@@ -1,8 +1,7 @@
 # ComplyEdge: Article 15 robustness: labeled indirect injection / instruction override (IPI)
 #
-# Fake separators, system markers or role tags inside a text ("<system>", "###
-# new instructions") that try to start a new context and take over the AI's
-# instructions.
+# Text, typed by a user or sitting in content the AI reads, that tells an AI
+# to ignore its previous instructions or to act as an unrestricted assistant.
 #
 # Layer 1 detects: in any letter case, ignore, disregard, forget, override or
 # bypass, followed by one or more of "the", "all", "any", "your", "previous",
@@ -10,8 +9,8 @@
 # constraint(s), guideline(s) or "system prompt" ("ignore all previous
 # instructions"); "unrestricted assistant with no guidelines"; and "act as an
 # unrestricted assistant". It does not match separators, system markers or
-# role tags such as "<system>": the separator form described above is matched
-# by the separator/context hijack leaf, which shares this rule_id. It matches
+# role tags such as "<system>": those are matched by the separator/context
+# hijack leaf, which shares this rule_id. It matches
 # wording, not meaning: it fires on text that only names the attack ("should
 # the bot ignore the previous instructions in a forwarded email?"), and it
 # misses an override worded any other way. Whether the text tries to take over
@@ -24,7 +23,7 @@
 # "indirect prompt injection". It matched the NAME of the attack, so text about
 # injection ("a guide on detecting indirect prompt injection in vendor emails")
 # was blocked as an injection. The benchmark prompt still blocks on the
-# override pattern below. Pending Leo re-sign-off per RULE_STANDARD §5.
+# override pattern below. Re-signed off on 2026-10-22 (see Status below).
 # Effective: universal (prompt injection is jurisdiction-independent; the rule blocks the pattern as a security control now. The Article 15(5) obligation it cites applies to high-risk AI systems from 2 December 2027 under Annex III and 2 August 2028 under Annex I, Article 113, as amended by Regulation (EU) 2026/1744)
 # ELI: http://data.europa.eu/eli/reg/2024/1689/art_15/par_5/oj
 # Provision: Regulation (EU) 2024/1689, Article 15(5)

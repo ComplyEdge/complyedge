@@ -1,7 +1,7 @@
-"""ComplyEdge TrustLint MCP — Streamable HTTP (stateless) for hosted deploy.
+"""ComplyEdge TrustLint MCP: Streamable HTTP (stateless) for hosted deploy.
 
 Used by the CE AWS Lambda (``complyedge-mcp-trustlint``) and local ASGI smoke.
-Same three tools as ``mcp_server`` (stdio). TrustLint offline only — not OPA.
+Same three tools as ``mcp_server`` (stdio). TrustLint offline only, not OPA.
 """
 
 from __future__ import annotations

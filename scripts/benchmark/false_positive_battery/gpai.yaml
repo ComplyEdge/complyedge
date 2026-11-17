@@ -4,7 +4,7 @@ description: >-
   Hard negatives for the GPAI leaves: trigger vocabulary in benign senses. All must be ALLOWED.
 prompts:
   # ---------------------------------------------------------------------------
-  # rego-gpai-53c-001 — copyright policy / training content (Art 53(1)(c))
+  # rego-gpai-53c-001: copyright policy / training content (Art 53(1)(c))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_CPY_001
     text: |-
@@ -132,7 +132,7 @@ prompts:
     notes: "German: published copyright policy and respected rights reservations."
 
   # ---------------------------------------------------------------------------
-  # rego-art55-1d-001 — cybersecurity for systemic-risk GPAI (Art 55(1)(d))
+  # rego-art55-1d-001: cybersecurity for systemic-risk GPAI (Art 55(1)(d))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_CYB_001
     text: |-
@@ -244,7 +244,7 @@ prompts:
     notes: "Spanish: asking how to strengthen protection."
 
   # ---------------------------------------------------------------------------
-  # rego-gpai-53b-001 — downstream provider documentation (Art 53(1)(b))
+  # rego-gpai-53b-001: downstream provider documentation (Art 53(1)(b))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_DWN_001
     text: |-
@@ -360,7 +360,7 @@ prompts:
     notes: "Model manifest linking downstream documentation."
 
   # ---------------------------------------------------------------------------
-  # rego-art55-1c-001 — serious incident tracking and reporting (Art 55(1)(c))
+  # rego-art55-1c-001: serious incident tracking and reporting (Art 55(1)(c))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_INC_001
     text: |-
@@ -477,7 +477,7 @@ prompts:
     notes: "Code that tracks and labels serious incidents for reporting."
 
   # ---------------------------------------------------------------------------
-  # rego-gpai-51-001 — GPAI classification (Art 51)
+  # rego-gpai-51-001: GPAI classification (Art 51)
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_CLS_001
     text: |-
@@ -575,7 +575,7 @@ prompts:
     notes: "German: classification completed and documented."
 
   # ---------------------------------------------------------------------------
-  # rego-art55-1a-001 — model evaluation / adversarial testing (Art 55(1)(a))
+  # rego-art55-1a-001: model evaluation / adversarial testing (Art 55(1)(a))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_EVL_001
     text: |-
@@ -694,7 +694,7 @@ prompts:
     notes: "Spanish research summary on red-teaming methods."
 
   # ---------------------------------------------------------------------------
-  # rego-gpai-53-2-001 — open-source exemption (Art 53(2))
+  # rego-gpai-53-2-001: open-source exemption (Art 53(2))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_OSS_001
     text: |-
@@ -796,7 +796,7 @@ prompts:
     notes: "Spanish: asking how to qualify correctly."
 
   # ---------------------------------------------------------------------------
-  # rego-art55-1b-001 — systemic risk assessment and mitigation (Art 55(1)(b))
+  # rego-art55-1b-001: systemic risk assessment and mitigation (Art 55(1)(b))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_RSK_001
     text: |-
@@ -911,7 +911,7 @@ prompts:
     notes: "Generic risk-matrix helper."
 
   # ---------------------------------------------------------------------------
-  # rego-art52-001 — notification of systemic-risk designation (Art 52)
+  # rego-art52-001: notification of systemic-risk designation (Art 52)
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_SRD_001
     text: |-
@@ -1018,7 +1018,7 @@ prompts:
     notes: "Accurate explainer of the procedure."
 
   # ---------------------------------------------------------------------------
-  # rego-gpai-55-001 — systemic risk obligations (Art 55)
+  # rego-gpai-55-001: systemic risk obligations (Art 55)
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_SYS_001
     text: |-
@@ -1126,7 +1126,7 @@ prompts:
     notes: "Clinical pre-operative guidance."
 
   # ---------------------------------------------------------------------------
-  # rego-gpai-53a-001 — technical documentation (Art 53(1)(a))
+  # rego-gpai-53a-001: technical documentation (Art 53(1)(a))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_TDOC_001
     text: |-
@@ -1232,7 +1232,7 @@ prompts:
     notes: "French: documentation maintained."
 
   # ---------------------------------------------------------------------------
-  # rego-art53-1d-001 — public training content summary (Art 53(1)(d))
+  # rego-art53-1d-001: public training content summary (Art 53(1)(d))
   # ---------------------------------------------------------------------------
   - id: FPB_GPAI_TSUM_001
     text: |-

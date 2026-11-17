@@ -33,10 +33,18 @@
 # A rule whose pattern list contains both kinds is classified by its WEAKEST
 # patterns and carries `mixed_patterns: true`. Never round a mixed rule up.
 #
+# OUT OF SCOPE: the US companion chatbot pack (rules/rego/complyedge/
+# us_companion/). It does not match text. It is a second query after the
+# companion meaning check and decides on that check's labels, the check date
+# and the context keys (layer2), so the text-only limit above does not describe
+# it. What a companion decision establishes is stated in the chatbot laws docs.
+#
 # REPRODUCE the census this file is checked against:
 #   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
+#     ! -path '*/us_companion/*' \
 #     | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 75 leaves
 #   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
+#     ! -path '*/us_companion/*' \
 #     | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  8 aggregators
 #
 # Enforced by tests/unit/test_corpus_evidence_classification.py, which fails if

@@ -13,12 +13,13 @@ Checks prompts and answers against AI laws before they ship: EU AI Act Article 5
 `trustlint check` and `trustlint rules list` run locally, need no API key and record
 nothing. `trustlint scan` with `COMPLYEDGE_API_KEY` sends the text to the hosted check
 (`ce_eu_` keys to eu.api.complyedge.io, `ce_` keys to api.complyedge.io), which writes
-an audit record. For the hosted
-check and its audit record (for every decision a timestamp, a keyed hash of the
-text and an `event_id`, plus the rule and the law named when a phrase rule or the injection check fired. A wider-review block does not cite an article; never
-the text itself), use the
+an audit record. For the hosted check and its audit record, use the
 [ComplyEdge TypeScript SDK](https://www.npmjs.com/package/@complyedge/sdk) or the
 [ComplyEdge Python SDK](https://pypi.org/project/complyedge/).
+The record holds, for every decision, a timestamp, a keyed hash of the text and
+an `event_id`, plus the rule and the law when a phrase rule or the injection
+check fired, never the text itself.
+A wider-review block does not cite an article.
 
 - [ComplyEdge TypeScript SDK](https://www.npmjs.com/package/@complyedge/sdk)
 - [ComplyEdge MCP server](https://www.npmjs.com/package/@complyedge/mcp)
@@ -55,8 +56,8 @@ Both bundle the rule set, so neither needs a local `rules/` directory.
   engine reads none of the three. Both engines run only `regex` conditions and
   the Tier 1 patterns of `hybrid_detection` conditions. A `semantic` condition
   in a YAML rule is not run by either engine.
-- The npm package bundles the 63 YAML rules of the TrustLint rule set, and the
-  Node engine loads all 63; inside them, only the Tier-1 conditions run.
+- The npm package bundles the YAML rules of the TrustLint rule set, and the
+  Node engine loads all of them; inside them, only the Tier-1 conditions run.
   A version number is not a parity claim with PyPI TrustLint.
 
 ## Quick Start

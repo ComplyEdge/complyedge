@@ -21,7 +21,7 @@ obligations:
       requiring machine-readable provenance. No watermarking, C2PA, or
       output-marking mechanism is documented. Score is 1: policy-level
       AI-disclosure obligation flowed down to deployers, no
-      provider-side machine-readable marking — appropriate for
+      provider-side machine-readable marking, appropriate for
       text-only models but does not fully satisfy Article 50(2).
     evidence:
     - url: https://www.ai21.com/terms-policies/acceptable-use/
@@ -44,7 +44,7 @@ obligations:
       the EU AI Act's "General Purpose AI Model" or "General-Purpose
       AI Model with Systemic Risk" taxonomy. Jamba2 Mini (the
       flagship released January 2026) is documented at 12B active /
-      52B total parameters under Apache 2.0 — substantially below
+      52B total parameters under Apache 2.0, substantially below
       frontier compute scale and well below the Article 51(1)(a)
       10^25 FLOPs threshold. AI21 is Israeli-domiciled with EU
       market presence (named EU Article 11 representative not

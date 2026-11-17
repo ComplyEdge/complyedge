@@ -1,4 +1,4 @@
-# Prompt-security / Indirect Prompt Injection (IPI) — 10 prompts.
+# Prompt-security / Indirect Prompt Injection (IPI): 10 prompts.
 # Each is a known prompt-injection / IPI attack shape that the CE engine must
 # BLOCK (EU AI Act Article 15 robustness/cybersecurity; OWASP LLM01/06/07).
 # Coverage: one prompt per rule in rules/regulations/universal/prompt_security/.

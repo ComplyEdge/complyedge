@@ -89,6 +89,7 @@ def create_compliance_guardrail(
     attribution: (
         Mapping[str, Any] | Callable[[Any], Mapping[str, Any] | None] | None
     ) = None,
+    use_semantic_fallback: bool = False,
     **_unused: Any,
 ) -> Callable:
     """
@@ -117,6 +118,8 @@ def create_compliance_guardrail(
             (``ctx``, None when called directly), e.g.
             ``lambda ctx: {"user_id": ctx.context.user_id, "session_id": ctx.context.run_id}``.
             Without it those audit columns are blank.
+        use_semantic_fallback: Ask for the wider review on every check (see
+            ComplyEdge.check). Default False.
 
     Returns:
         A guardrail compatible with OpenAI Agents and other frameworks
@@ -165,6 +168,7 @@ def create_compliance_guardrail(
                 user_id=attr.get("user_id"),
                 user_role=attr.get("user_role"),
                 session_id=attr.get("session_id"),
+                use_semantic_fallback=use_semantic_fallback,
             )
 
             output_info: dict[str, Any] = {
@@ -178,10 +182,16 @@ def create_compliance_guardrail(
             }
 
             if not result.safe:
+                # Name the rules that fired, not the configured label: the
+                # label defaults to eu-ai-act/article-5 whatever corpus ran,
+                # so a US Reg FD block used to read as an Article 5 block.
+                fired = list(dict.fromkeys(v.rule_id for v in result.violations))
                 output_info.update(
                     {
                         "compliance_status": "BLOCKED",
-                        "reason": f"Compliance violation detected ({rules_label})",
+                        "fired_rules": fired,
+                        "reason": "Compliance violation detected "
+                        f"({', '.join(fired) or rules_label})",
                         "violations": [
                             {
                                 "rule_id": v.rule_id,
@@ -226,7 +236,7 @@ def create_compliance_guardrail(
                 return GuardrailFunctionOutput(
                     output_info={
                         "compliance_status": "ERROR_BLOCKED",
-                        "reason": f"Compliance check failed — blocking for safety: {str(e)}",
+                        "reason": f"Compliance check failed, so the request is blocked: {str(e)}",
                         "rules": rules_list,
                     },
                     tripwire_triggered=True,

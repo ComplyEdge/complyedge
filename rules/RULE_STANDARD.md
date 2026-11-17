@@ -56,7 +56,7 @@ Every Rego rule file must declare a `rule_id` constant that is traceable from th
 | `rego-art55-1a-001` | Article 55(1)(a), model evaluation for GPAI models with systemic risk |
 | `rego-art52-001` | Article 52, the procedure for designating a GPAI model with systemic risk |
 
-Two indirect prompt-injection leaves reuse the ID of the direct technique they extend (`rego-art15-ipi-003`, `rego-art15-ipi-008`), so the corpus has 75 leaf files and 73 distinct IDs. A new rule takes the next free sequence number; an ID is never reassigned to a different provision. Stability outranks the form: audit records key on the ID, so an ID minted against the wrong provision is kept, and the header names the provision the rule implements on its `Provision:` line and says why the ID differs. Two IDs are in that position: `rego-art15-1-001` implements Article 15(3), and `rego-sox-302-001` implements Regulation FD (17 CFR 243.100(a)), not SOX §302.
+Two indirect prompt-injection leaves reuse the ID of the direct technique they extend (`rego-art15-ipi-003`, `rego-art15-ipi-008`), so the corpus has two fewer distinct IDs than leaf files. A new rule takes the next free sequence number; an ID is never reassigned to a different provision. Stability outranks the form: audit records key on the ID, so an ID minted against the wrong provision is kept, and the header names the provision the rule implements on its `Provision:` line and says why the ID differs. Two IDs are in that position: `rego-art15-1-001` implements Article 15(3), and `rego-sox-302-001` implements Regulation FD (17 CFR 243.100(a)), not SOX §302.
 
 **Why this matters:** a reviewer reading a directory listing can see which provisions are covered, which have several rules, and which are missing. If the IDs were opaque (for example `rule_047`), that assessment would need every file opened.
 
@@ -354,7 +354,7 @@ The ComplyEdge rule structure follows the operationalization hierarchy from ETSI
 | ETSI Concept | ComplyEdge Mapping |
 |---|---|
 | **Requirement** | Article + Paragraph + Point (e.g., Art 5(1)(c)) |
-| **Quality Dimension** | The rule's package: `article5` (prohibited practices), `article50` (transparency), `article6` and `highrisk` (high-risk obligations), `gpai`, `data_protection`, `prompt_security`, `us_corpus` |
+| **Quality Dimension** | The rule's package: `article5` (prohibited practices), `article50` (transparency), `article6` and `highrisk` (high-risk obligations), `gpai`, `data_protection`, `prompt_security`, `us_corpus`, `us_companion` (US companion chatbot laws, several rules per file in a leaves map) |
 | **Assessment Criterion** | The `condition` field: the verifiable behaviour being checked |
 | **Evidence** | Test cases + OPA evaluation output |
 | **Decision record** | The `result` object returned by OPA |

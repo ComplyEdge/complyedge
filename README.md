@@ -23,7 +23,7 @@ Ships three ways: a Python SDK, an offline CI linter (TrustLint), and an **MCP s
 |---|---|
 | EU AI Act | Checked live on calls with an EU jurisdiction, the default (`/v1/check`), and offline in TrustLint |
 | NYC Local Law 144 (AI in hiring) | Offline in TrustLint |
-| California SB 243 (companion chatbots) | Rules coming |
+| Companion chatbot laws: California (SB 243, SB 1119), New York (Articles 47 and 48), Washington, Oregon | Checked live on calls with `use_case` `companion_chatbot` (`/v1/check`). Detecting what a message means needs a paid plan |
 | Colorado SB 26-189 (consequential decisions) | Rules coming |
 
 GDPR and US privacy and sector rules (HIPAA, COPPA, CCPA and others) are listed under [Rules](#rules).
@@ -92,7 +92,7 @@ npx -y @complyedge/mcp                               # the MCP server on Node, n
 claude mcp add complyedge -- npx -y @complyedge/mcp  # add the Node MCP server to Claude Code
 ```
 
-Cursor one-click: [Install TrustLint MCP](cursor://anysphere.cursor-deeplink/mcp/install?name=ComplyEdge%20TrustLint%20EU%20AI%20Act&config=eyJ1cmwiOiAiaHR0cHM6Ly9tY3AuY29tcGx5ZWRnZS5pby9tY3AifQ)
+Cursor one-click: [Install TrustLint MCP](cursor://anysphere.cursor-deeplink/mcp/install?name=ComplyEdge%20TrustLint&config=eyJ1cmwiOiAiaHR0cHM6Ly9tY3AuY29tcGx5ZWRnZS5pby9tY3AifQ)
 
 OpenAI Agents extra (hosted path; needs `COMPLYEDGE_API_KEY`):
 
@@ -216,11 +216,11 @@ On Enterprise, a person's review of a decision is recorded too: a review of a fl
 
 ## The rule set and the rulebook
 
-The rules in [`rules/`](rules) are the rule set ComplyEdge runs: one rule per legal provision, each with its citation and approval status; [`rules/README.md`](rules/README.md) maps the directories. What a decision record must contain and prove is a separate, open document: ADCR, the AI Decision Check Record, published at [complyedge.io/rulebook](https://complyedge.io/rulebook/) as version 0.2.0, in development, with its schemas, an offline verifier and test vectors. A record names the rule set that decided it by digest. ComplyEdge is ADCR's first implementation. No conformance class is claimed; the gaps are listed field by field in Annex C of the rulebook.
+The rules in [`rules/`](rules) are the rule set ComplyEdge runs: one rule per legal provision, each with its citation and approval status; [`rules/README.md`](rules/README.md) maps the directories. What a decision record must contain and prove is a separate, open document: ADCR, the AI Decision Check Record, published at [complyedge.io/rulebook](https://complyedge.io/rulebook/) as version 0.3.0, in development, with its schemas, an offline verifier and test vectors. A record names the rule set that decided it by digest. ComplyEdge is ADCR's first implementation. No conformance class is claimed; the gaps are listed field by field in Annex C of the rulebook.
 
 - **Rule IDs.** Every rule has a stable ID that names the provision: `rego-art5-1c-001` is AI Act Article 5(1)(c), first rule. Other forms cover Annex III points (`rego-art6-annex3-5b-001`), the Article 15(5) prompt-injection family (`rego-art15-ipi-001`), GPAI (`rego-gpai-53a-001`), GDPR (`rego-gdpr5-1c-001`) and US securities disclosure (`rego-sox-302-001`, which covers SEC Regulation FD, 17 CFR 243.100(a); the ID is kept from when it was filed under SOX §302). The full scheme is in [`rules/RULE_STANDARD.md`](rules/RULE_STANDARD.md).
 - **Citations.** Each rule's `citation` names the instrument and the provision at paragraph and point level, then the text of that provision, for example `Regulation (EU) 2024/1689, Article 5(1)(c): ...`. That string is what goes into the record when the rule fires.
-- **Approval states.** Rego leaf headers carry `Status: approved` (or `review` / `pending re-approval`). YAML rules carry an `approval` object with the same meaning. Only `approved` means a named person signed off. Today 75 of the 75 Rego leaves and 63 of the 63 YAML rules are approved: 136 of the 136 rule IDs in the published rule set (the 75 Rego leaves carry 73 distinct IDs, because two indirect prompt-injection leaves share the ID of the technique they extend). Most were approved on 2026-10-22 through agent-delegated review (RULE_STANDARD §5.5): an agent ran the §5.2 checklist and the approver authorized the result; each file's approval line says so.
+- **Approval states.** Rego leaf headers carry `Status: approved` (or `review` / `pending re-approval`). YAML rules carry an `approval` object with the same meaning. Only `approved` means a named person signed off. The rule set page for each digest lists every rule ID with its approval state (two indirect prompt-injection leaves share the ID of the technique they extend, so there are fewer Rego IDs than Rego leaves). Most were approved on 2026-10-22 through agent-delegated review (RULE_STANDARD §5.5): an agent ran the §5.2 checklist and the approver authorized the result; each file's approval line says so.
 - **Bundle digest.** Every check response and every record carries `bundle_digest`, a SHA-256 over the rule files that were loaded when the decision was made. It changes whenever any rule changes, so a record names the exact rule set that decided it.
 
 `rule_id` is the citation key: every rule carries its article reference in the rule set (`rego-art5-1c-001` → Article 5(1)(c)), and the full citation text ships with the rule under [`rules/`](rules).
@@ -255,8 +255,8 @@ Both cite the same legal article and differ only in engine. Map between them via
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
   └ complyedge/mcp_server.py   MCP server (stdio): check_compliance, list_rules, scan_prompt
 packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
-rules/regulations/    63 YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
-rules/rego/           75 leaf OPA/Rego policies + 8 package aggregators
+rules/regulations/    YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
+rules/rego/           Leaf OPA/Rego policies + package aggregators
 rules/schemas/        Rule validation schema
 rules/scripts/        Schema validator (`validate_rules.py`)
 examples/             Usage examples (decorators, OpenAI Agents)
@@ -266,16 +266,16 @@ tests/                Rule validation + acceptance tests
 
 ## Rules
 
-63 YAML rules (EU, US, global and universal) + 75 deterministic leaf OPA/Rego policies (+ 8 package aggregators).
+YAML rules (EU, US, global and universal) and deterministic leaf OPA/Rego policies (plus package aggregators). The rule set page for each digest lists every rule.
 
-**What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf decides by matching the evaluated text (the leaf does not call a model). On a paid plan the hosted check also runs an injection meaning check after a clean pass when the month's model budget covers it. If that budget is used up, the phrase rules decide. For 32 of them the text *is* the regulated act (Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and secrets matched by format and checksum, one US disclosure control) so a block prevents the act and the citation on the decision is load-bearing. The other 43 fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. On the hosted API any leaf that fires blocks the call and records it with its citation, whichever group it is in. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
+**What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf decides by matching the evaluated text (the leaf does not call a model). On a paid plan the hosted check also runs an injection meaning check after a clean pass when the month's model budget covers it. If that budget is used up, the phrase rules decide. For some of them the text *is* the regulated act (Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and secrets matched by format and checksum, one US disclosure control) so a block prevents the act and the citation on the decision is load-bearing. The others fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. On the hosted API any leaf that fires blocks the call and records it with its citation, whichever group it is in. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
 
-| Jurisdiction | Rules | Regulations |
-|---|---|---|
-| **EU** | 36 YAML | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI + Art 15 IPI (hosted); GDPR personal data and secrets, Articles 5(1)(c) and 32(1) (hosted, EU checks); other GDPR rules (offline, TrustLint) |
-| **US** | 15 YAML | Regulation FD (hosted, US checks); HIPAA, SOX §§404/802, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA, OFAC sanctions (offline in TrustLint; hosted through `/v1/sensitivity/detect` by plan) |
-| **Global** | 1 YAML | PCI DSS |
-| **Universal** | 11 YAML | PII detection, prompt injection (direct + indirect) |
+| Jurisdiction | Regulations |
+|---|---|
+| **EU** | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI + Art 15 IPI (hosted); GDPR personal data and secrets, Articles 5(1)(c) and 32(1) (hosted, EU checks); other GDPR rules (offline, TrustLint) |
+| **US** | Regulation FD (hosted, US checks); HIPAA, SOX §§404/802, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA, OFAC sanctions (offline in TrustLint; hosted through `/v1/sensitivity/detect` by plan) |
+| **Global** | PCI DSS |
+| **Universal** | PII detection, prompt injection (direct + indirect) |
 
 Each rule specifies conditions, severity, detection scope, and remediation with legal citations. See the [rule schema](rules/schemas/rule-schema.json) for the format.
 
@@ -299,7 +299,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 ## Architecture
 
-**Layer 1, Deterministic (hot path):** 75 leaf OPA/Rego policies (+ 8 package aggregators) evaluate every request, no LLM. On the live API the engine's own time (`opa_latency_ms`) measured a p50 of 58ms and a p95 of 114ms over 20 warm requests (`production_opa_latency_latest.json`, 2026-07-30). The engine (OPA/Rego + TrustLint) evaluated in 1.018ms p99 in a local microbenchmark against the 8-package bundle the API queries (`layer1_latency_latest.json`, one 500-iteration run, 2026-10-21); queried one package after another, the same 8 packages measured 4.055ms p99. End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. The paid-plan injection check, when the month's model budget covers it, and the wider review when it is on, add 2-5s on the long tail. Binary pass/block, legal citation when a rule fires. (TrustLint applies the same regex corpus offline for CI use.)
+**Layer 1, Deterministic (hot path):** leaf OPA/Rego policies (plus package aggregators) evaluate every request, no LLM. On the live API the engine's own time (`opa_latency_ms`) measured a p50 of 58ms and a p95 of 114ms over 20 warm requests (`production_opa_latency_latest.json`, 2026-07-30). The engine (OPA/Rego + TrustLint) evaluated in 1.018ms p99 in a local microbenchmark against the 8-package bundle the API queries (`layer1_latency_latest.json`, one 500-iteration run, 2026-10-21); queried one package after another, the same 8 packages measured 4.055ms p99. End-to-end through the live API, the published 60-prompt run measured a p50 of 139ms and p95 of 2,519ms across the 39 OPA-decided prompts, with individual requests spanning 47ms to 10.7s (`runtime_benchmark_latest.json`, 2026-07-28). That run mixes cold and concurrent invocations against a Lambda-backed API, which is where the long tail comes from; we publish the whole run rather than a hand-picked warm figure. The paid-plan injection check, when the month's model budget covers it, and the wider review when it is on, add 2-5s on the long tail. Binary pass/block, legal citation when a rule fires. (TrustLint applies the same regex corpus offline for CI use.)
 
 **Injection check and wider review:** On a Developer or Enterprise plan, after the phrase rules pass, an injection meaning check runs when the month's model budget covers it. If that budget is used up, the phrase rules decide. It judges by meaning against the Article 15 `prompt_security` categories. A block is `llm-art15-ipi-*`, carries the Article 15 citation, and must quote the injected text from the request. A missing answer denies. The wider legal review runs only when `use_semantic_fallback=True` or the account's Layer 2 setting is on, and the month's model budget covers it. Its block is `LLM_LAYER2_BLOCK`. That label is not an article citation. If the wider review cannot answer, the request is denied. The wider review is off unless turned on. Free plans get no model call. A model check adds 2-5s.
 

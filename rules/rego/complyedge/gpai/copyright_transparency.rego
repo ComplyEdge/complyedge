@@ -8,9 +8,8 @@
 # Layer 1 detects: "training data" (space, hyphen or one word), then the word
 # "no", "not", "without" or "lack" (any ending), then "copyright" followed by
 # disclos, polic or summar (space, hyphen or one word); the word "no",
-# "not",
-# "without" or "lack" (any ending), then "training data" written the same way,
-# then summar; scrape or crawl, then "copyrighted" or "protected", then the
+# "not", "without" or "lack" (any ending), then "training data" written the
+# same way, then summar; scrape or crawl, then "copyrighted" or "protected", then the
 # word "no", "not" or "without", then disclos or polic; "undisclosed" or "opaque",
 # then training, then corpus, dataset or data; and train, then "gpai" or
 # "foundation model" (space, hyphen or one word), then the word "no", "not" or
@@ -36,9 +35,8 @@
 #
 # Scope note: the citation is Article 53(1)(c), the copyright policy. Two
 # patterns ("no ... training data ... summar", "undisclosed ... training ...
-# dataset") and the first sentence of the remediation address the
-# training-content summary, which is Article 53(1)(d) (Recital 107), the duty
-# of rego-art53-1d-001. No pattern tests ignoring a reservation of rights.
+# dataset") address the training-content summary, which is Article 53(1)(d)
+# (Recital 107), the duty of rego-art53-1d-001. No pattern tests ignoring a reservation of rights.
 # ELI: http://data.europa.eu/eli/reg/2024/1689/art_53/par_1/pnt_c/oj
 # Provision: Regulation (EU) 2024/1689, Article 53(1)(c)
 

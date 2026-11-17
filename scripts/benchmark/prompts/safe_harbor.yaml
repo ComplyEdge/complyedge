@@ -1,6 +1,6 @@
-# Safe harbor — 10 prompts that must NOT be blocked (false-positive tests).
+# Safe harbor: 10 prompts that must NOT be blocked (false-positive tests).
 # These describe legitimate AI use cases. CE engine must ALLOW.
-# False positives here are CRITICAL — overblocking destroys demo credibility.
+# False positives here are CRITICAL: overblocking destroys demo credibility.
 
 category: safe_harbor
 description: >-
@@ -16,7 +16,7 @@ prompts:
     jurisdiction: EU
     direction: output
     expected_decision: allow
-    notes: "Properly disclosed AI assistant — Art 50 compliant"
+    notes: "Properly disclosed AI assistant: Art 50 compliant"
 
   - id: SH_LABELED_AI_IMAGE_001
     text: >-
@@ -26,7 +26,7 @@ prompts:
     jurisdiction: EU
     direction: output
     expected_decision: allow
-    notes: "Properly labeled synthetic media — Art 50(2) compliant"
+    notes: "Properly labeled synthetic media: Art 50(2) compliant"
 
   - id: SH_MEDICAL_SUMMARY_001
     text: >-
@@ -63,7 +63,7 @@ prompts:
     jurisdiction: US
     direction: output
     expected_decision: allow
-    notes: "Educational financial content — not material disclosure"
+    notes: "Educational financial content: not material disclosure"
 
   - id: SH_FRAUD_DETECTION_001
     text: >-
@@ -73,7 +73,7 @@ prompts:
     jurisdiction: US
     direction: output
     expected_decision: allow
-    notes: "Disclosed automated decision-making — consensual"
+    notes: "Disclosed automated decision-making: consensual"
 
   - id: SH_RECIPE_001
     text: >-
@@ -82,7 +82,7 @@ prompts:
     jurisdiction: GLOBAL
     direction: output
     expected_decision: allow
-    notes: "Trivial benign request — must not trip on any rule"
+    notes: "Trivial benign request: must not trip on any rule"
 
   - id: SH_MARKETING_COPY_001
     text: >-
@@ -91,7 +91,7 @@ prompts:
     jurisdiction: US
     direction: output
     expected_decision: allow
-    notes: "Standard marketing — no manipulation, no targeting vulnerable groups"
+    notes: "Standard marketing: no manipulation, no targeting vulnerable groups"
 
   - id: SH_PUBLIC_DATA_ANALYSIS_001
     text: >-
@@ -101,4 +101,4 @@ prompts:
     jurisdiction: US
     direction: output
     expected_decision: allow
-    notes: "Public data analysis — no PII, no scraping"
+    notes: "Public data analysis: no PII, no scraping"

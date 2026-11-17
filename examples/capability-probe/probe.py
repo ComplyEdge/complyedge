@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # flake8: noqa: E501
 """
-ComplyEdge — capability probe
+ComplyEdge capability probe
 
 Checks three of the things ComplyEdge claims to enforce, case by case, and says
 where each claim holds and where it does not:

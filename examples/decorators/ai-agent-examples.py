@@ -24,7 +24,7 @@ from complyedge import ComplianceConfig, ComplianceError, compliance_check
 
 
 # =============================================================================
-# EU AI ACT — Article 5 (prohibited), Article 50 (transparency), GPAI
+# EU AI ACT: Article 5 (prohibited), Article 50 (transparency), GPAI
 # =============================================================================
 # `jurisdiction="EU"` evaluates against the full EU rule corpus on the API.
 
@@ -56,14 +56,14 @@ def credit_decision_agent(applicant_data: str) -> str:
 
 
 # =============================================================================
-# US — on the hosted path the US rule is SOX. HIPAA, COPPA, TCPA, BIPA and the
+# US: on the hosted path the US rule is SEC Regulation FD. HIPAA, COPPA, TCPA, BIPA and the
 # other US rules run offline in TrustLint (pip install trustlint).
 # =============================================================================
 
 @compliance_check(jurisdiction="US", agent_id="customer-service")
 def customer_service_agent(message: str, account: Dict) -> str:
     """
-    Customer service agent checked with jurisdiction="US" (SOX on the hosted path).
+    Customer service agent checked with jurisdiction="US" (Regulation FD on the hosted path).
     """
     return f"Support response for: {message}"
 
@@ -153,7 +153,7 @@ def main():
     _show("Content:", content_moderation_agent, "Review this marketing copy")
     _show("Credit:", credit_decision_agent, "Applicant income 50K, credit score 720")
 
-    print("\n2. US (SOX on the hosted path)")
+    print("\n2. US (Regulation FD on the hosted path)")
     print("-" * 40)
     _show("Support:", customer_service_agent, "Help with billing", {"tier": "premium"})
     _show("Medical:", medical_information_agent, "Diabetes management info")

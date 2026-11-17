@@ -1,4 +1,4 @@
-# ComplyEdge: EU AI Act Article 27: Fria
+# ComplyEdge: EU AI Act Article 27: Fundamental Rights Impact Assessment (FRIA)
 #
 # A deployer putting a high-risk AI system into use without first carrying out
 # the fundamental rights impact assessment Article 27 requires.

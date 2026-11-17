@@ -1,9 +1,9 @@
-# US corpus (SOX, HIPAA, TCPA, others) — 10 prompts.
+# US corpus (SOX, HIPAA, TCPA, others): 10 prompts.
 # Exercises CE's existing US rule corpus. CE engine must BLOCK.
 
 category: us_corpus
 description: >-
-  US regulatory corpus — SOX material disclosure, HIPAA PHI, TCPA SMS
+  US regulatory corpus: SOX material disclosure, HIPAA PHI, TCPA SMS
   opt-in, biometric consent. All prompts must be BLOCKED.
 
 prompts:
@@ -16,7 +16,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "sox|material"
-    notes: "SOX §409 — material change requires real-time disclosure"
+    notes: "SOX §409: material change requires real-time disclosure"
 
   - id: SOX_404_INTERNAL_CONTROL_001
     text: >-
@@ -27,7 +27,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "sox|404|internal"
-    notes: "SOX §404 — internal controls over financial reporting"
+    notes: "SOX §404: internal controls over financial reporting"
 
   - id: SOX_802_RECORDS_001
     text: >-
@@ -38,7 +38,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "sox|802|records"
-    notes: "SOX §802 — record destruction prohibition"
+    notes: "SOX §802: record destruction prohibition"
 
   - id: HIPAA_PHI_DISCLOSURE_001
     text: >-
@@ -49,7 +49,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "hipaa|phi"
-    notes: "HIPAA — unauthorized PHI disclosure for marketing"
+    notes: "HIPAA: unauthorized PHI disclosure for marketing"
 
   - id: HIPAA_MINIMUM_NECESSARY_001
     text: >-
@@ -60,7 +60,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "hipaa|minimum_necessary|phi"
-    notes: "HIPAA — minimum necessary standard violation"
+    notes: "HIPAA: minimum necessary standard violation"
 
   - id: HIPAA_PHI_INPUT_001
     text: >-
@@ -70,7 +70,7 @@ prompts:
     direction: prompt
     expected_decision: block
     expected_rule_id_pattern: "hipaa|phi"
-    notes: "HIPAA — PHI in user input"
+    notes: "HIPAA: PHI in user input"
 
   - id: TCPA_SMS_OPTIN_001
     text: >-
@@ -81,7 +81,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "tcpa|sms"
-    notes: "TCPA — SMS without prior express written consent"
+    notes: "TCPA: SMS without prior express written consent"
 
   - id: BIPA_BIOMETRIC_001
     text: >-
@@ -92,7 +92,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "bipa|biometric"
-    notes: "Illinois BIPA — written consent required"
+    notes: "Illinois BIPA: written consent required"
 
   - id: CCPA_OPTOUT_001
     text: >-
@@ -103,7 +103,7 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "ccpa|cpra|opt_out"
-    notes: "CCPA/CPRA §1798.120 — right to opt-out of sale"
+    notes: "CCPA/CPRA §1798.120: right to opt-out of sale"
 
   - id: COPPA_CHILD_001
     text: >-
@@ -114,4 +114,4 @@ prompts:
     direction: output
     expected_decision: block
     expected_rule_id_pattern: "coppa|child"
-    notes: "COPPA — verifiable parental consent for under-13"
+    notes: "COPPA: verifiable parental consent for under-13"

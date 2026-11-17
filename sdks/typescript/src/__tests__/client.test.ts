@@ -81,7 +81,6 @@ describe("ComplyEdgeClient", () => {
         text: "Hello world",
         agent_id: "default",
         jurisdiction: "EU",
-        direction: "output",
         use_semantic_fallback: false,
         context: undefined,
       });
@@ -112,7 +111,6 @@ describe("ComplyEdgeClient", () => {
         text: "Score users by social behaviour",
         agent_id: "default",
         jurisdiction: "EU",
-        direction: "output",
         use_semantic_fallback: false,
         context: undefined,
       });
@@ -183,6 +181,47 @@ describe("ComplyEdgeClient", () => {
       expect(mockPost).toHaveBeenCalledWith("/v1/audit/verify", { event_id: "e1", text: "the text" });
       mockPost.mockResolvedValue({ data: { event_id: "e1", match: false } });
       await expect(client.verifyInput("e1", "other")).resolves.toBe(false);
+    });
+
+    it("recordAppeal posts the request to /v1/audit/contest and returns its id", async () => {
+      mockPost.mockResolvedValue({ data: { event_id: "req-1", event_type: "contest" } });
+      await expect(
+        client.recordAppeal({
+          decisionId: "dec-1",
+          kind: "human_intervention",
+          systemVersion: "2026.10.1",
+          agentId: "credit-assistant",
+          requestedAt: "2026-11-13T08:44:00Z",
+        })
+      ).resolves.toBe("req-1");
+      expect(mockPost).toHaveBeenCalledWith("/v1/audit/contest", {
+        agent_id: "credit-assistant",
+        deciding_system: { version: "2026.10.1" },
+        decision_ref: "dec-1",
+        request_kind: "human_intervention",
+        requested_at: "2026-11-13T08:44:00Z",
+      });
+    });
+
+    it("recordAnswer posts the answer by the request id and reports a retry", async () => {
+      mockPost.mockResolvedValue({
+        data: { event_id: null, request_id: "req/1", already_recorded: true },
+      });
+      const result = await client.recordAnswer("req/1", {
+        outcome: "rectified",
+        statementRef: "ticket:88213",
+        reviewer: "staff:4471",
+        respondedAt: new Date("2026-11-20T15:10:00Z"),
+        rectifiedAt: "2026-11-20T15:10:00Z",
+      });
+      expect(result).toEqual({ eventId: null, requestId: "req/1", alreadyRecorded: true });
+      expect(mockPost).toHaveBeenCalledWith("/v1/audit/reviews/req%2F1/answer", {
+        review_outcome: "rectified",
+        statement_ref: "ticket:88213",
+        reviewer: "staff:4471",
+        responded_at: "2026-11-20T15:10:00.000Z",
+        rectified_at: "2026-11-20T15:10:00Z",
+      });
     });
 
     it("tolerates an API response without the evidence fields", async () => {
@@ -292,6 +331,42 @@ describe("ComplyEdgeClient", () => {
       await client.check("test");
       const body = mockPost.mock.calls[mockPost.mock.calls.length - 1][1];
       expect(JSON.parse(JSON.stringify(body))).not.toHaveProperty("decision_context");
+    });
+
+    it("sends companionUserMessage as companion_user_message on a companion reply", async () => {
+      mockPost.mockResolvedValue({ data: { event_id: "e", allowed: true, violations: [] } });
+      await client.check("Please don't go", {
+        direction: "output",
+        useCase: "companion_chatbot",
+        sessionId: "sess-1",
+        companionUserMessage: "ok I am logging off",
+      });
+      expect(mockPost).toHaveBeenCalledWith(
+        "/v1/check",
+        expect.objectContaining({
+          direction: "output",
+          use_case: "companion_chatbot",
+          companion_user_message: "ok I am logging off",
+        })
+      );
+      await client.check("hi", { direction: "output", useCase: "companion_chatbot", sessionId: "s" });
+      const body = mockPost.mock.calls[mockPost.mock.calls.length - 1][1];
+      expect(body).not.toHaveProperty("companion_user_message");
+    });
+
+    it("refuses companionUserMessage off a companion reply before sending", async () => {
+      await expect(
+        client.check("hi", { direction: "output", companionUserMessage: "bye" })
+      ).rejects.toThrow("companionUserMessage");
+      await expect(
+        client.check("hi", {
+          direction: "prompt",
+          useCase: "companion_chatbot",
+          sessionId: "s",
+          companionUserMessage: "bye",
+        })
+      ).rejects.toThrow("companionUserMessage");
+      expect(mockPost).not.toHaveBeenCalled();
     });
 
     it("includes processing time", async () => {

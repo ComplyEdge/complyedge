@@ -3,7 +3,7 @@
 GPAI Runtime Detection Benchmark
 =================================
 
-Hits the live CE /v1/check API with 50 standardized prompts across 6
+Hits the live CE /v1/check API with 60 standardized prompts across 7
 categories. Reports detection rate, false-positive rate, p50/p95/p99
 latency.
 

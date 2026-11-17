@@ -26,7 +26,16 @@ export type { Region, AttributionFields } from "./client";
 export { ReceiptJournal } from "./receiptJournal";
 export type { ReceiptEntry } from "./receiptJournal";
 export { withCompliance, ComplianceError } from "./openai-middleware";
+export { COMPANION_USE_CASE } from "./types";
+export { canonicalConversation } from "./client";
 export type {
+  CompanionContext,
+  RequiredAction,
+  ConfirmActionInput,
+  ConfirmActionResult,
+  ConversationMessage,
+  PreserveInput,
+  PreserveResult,
   ComplyEdgeConfig,
   ComplianceContext,
   ComplianceResult,
@@ -38,4 +47,12 @@ export type {
   SensitivityDetection,
   PreDeploymentInput,
   PreDeploymentResult,
+  AppealKind,
+  AppealInput,
+  AppealAnswerInput,
+  AppealAnswerResult,
+  Appeal,
+  AppealDetail,
+  AppealExtension,
+  AppealResponse,
 } from "./types";

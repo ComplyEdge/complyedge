@@ -16,14 +16,14 @@ obligations:
       generation of "deep fakes" or content "falsely appear[ing] as
       having been created by a human". Cohere also defines "Outputs"
       as "information, text, image, audio or video content
-      artificially created by Cohere Services" — establishing a
+      artificially created by Cohere Services", establishing a
       taxonomy for AI-generated content. However, Cohere's models are
       text-focused (Command A, Command A Reasoning, Aya) without
       hosted image/video/audio generation requiring machine-readable
       provenance. No watermarking, C2PA metadata, or output-marking
       mechanism is documented. Score is 1: policy-level disclosure
       obligation imposed on deployers, but no provider-side
-      machine-readable marking — which is acceptable for text-only
+      machine-readable marking, which is acceptable for text-only
       models but does not fully satisfy Article 50(2).
     evidence:
     - url: https://docs.cohere.com/docs/usage-policy
@@ -110,7 +110,7 @@ obligations:
       format. The Command R / Command R+ Model Card mentions only
       that models were "trained on a wide variety of text from many
       sources that contain toxic content" with a citation to academic
-      literature (Luccioni and Viviano 2021) — this is a high-level
+      literature (Luccioni and Viviano 2021), this is a high-level
       acknowledgement, not a structured disclosure. No dedicated
       AI-training crawler identifier (Google-Extended /
       Meta-ExternalAgent equivalent) with documented robots.txt

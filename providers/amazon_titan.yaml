@@ -107,7 +107,7 @@ obligations:
       doc_type: model_card
       summary: >-
         Amazon Nova product page describing the Nova model family
-        (Nova Act, Nova Forge, Nova Models — Micro/Lite/Pro/Premier,
+        (Nova Act, Nova Forge, Nova Models (Micro/Lite/Pro/Premier),
         Nova Canvas image, Nova Reel video, Nova Sonic audio, Nova
         2 Lite/Sonic, Nova Multimodal Embeddings) and disclosing
         model lineage from Amazon internal applications (Alexa+,

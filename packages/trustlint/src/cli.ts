@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * TrustLint CLI — offline compliance linter for AI agents.
+ * TrustLint CLI: offline compliance linter for AI agents.
  *
  * Usage:
  *   trustlint check <file>          Scan a file for compliance violations

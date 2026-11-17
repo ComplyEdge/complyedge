@@ -109,7 +109,9 @@ class TestEveryEntryPointUsesIt:
             def __init__(self, **kw):
                 seen.append(kw)
 
-            def check(self, text, sandbox=False, decision_context=None):
+            # **kw: check() forwards every ComplyEdge.check keyword (direction,
+            # use_case, context, ...); this test is about region, not those.
+            def check(self, text, **kw):
                 return "checked"
 
             def is_safe(self, text, decision_context=None):

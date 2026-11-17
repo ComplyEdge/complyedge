@@ -2,8 +2,8 @@ id: UNIVERSAL_PII_INPUT_001
 jurisdiction: GLOBAL
 effective_date: '2025-01-01'
 description: >-
-  Covers personally identifiable information in user inputs to prevent
-  inadvertent disclosure
+  Covers personally identifiable information in user inputs, to prevent
+  inadvertent disclosure.
 
 
   Layer 1 detects: a US Social Security number written as three, two and four

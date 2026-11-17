@@ -36,8 +36,15 @@ class TestRegoCorpus:
         all_rego = list(RULES_REGO_DIR.rglob("*.rego"))
         # shared/ holds helper modules imported by the policies (normalize.rego),
         # not policies: it has no citation or violation of its own.
+        # us_companion is the companion chatbot pack: a second query after the
+        # companion meaning check (OPAClient.evaluate_companion), deciding on
+        # that check's labels. Its own tests cover it (tests/unit/test_companion_*).
         return [
-            f for f in all_rego if "test" not in f.parts and "shared" not in f.parts
+            f
+            for f in all_rego
+            if "test" not in f.parts
+            and "shared" not in f.parts
+            and "us_companion" not in f.parts
         ]
 
     def test_production_rego_leaf_count_meets_moat(self, prod_rego_files):
@@ -354,9 +361,11 @@ class TestSdkDefaults:
     def test_use_semantic_fallback_default_in_payload(self, init_source):
         # Claim: "Default SDK behaviour is OPA-only"
         # L246 in __init__.py — the default payload dict passed to the API
+        # The payload now forwards the keyword, so the default lives on the
+        # signature of check() and its wrappers.
         assert (
-            '"use_semantic_fallback": False' in init_source
-        ), 'SDK payload default "use_semantic_fallback": False not found in __init__.py'
+            "use_semantic_fallback: bool = False" in init_source
+        ), "SDK default use_semantic_fallback: bool = False not found in __init__.py"
 
     def test_use_semantic_fallback_default_in_sync_client(self, init_source):
         # L530 — ComplyEdgeClient.check_compliance parameter default

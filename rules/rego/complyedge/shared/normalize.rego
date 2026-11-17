@@ -4,8 +4,8 @@
 # against normalize.text instead of input.text, so the same words decide the
 # same way whatever whitespace or quote characters the text happens to use:
 #
-# - a run of spaces, tabs or Unicode spaces (no-break space U+00A0, U+2000 to
-#   U+200A, U+202F, U+205F, U+3000) becomes one space;
+# - a run of spaces, tabs or Unicode spaces (no-break space U+00A0, U+1680,
+#   U+2000 to U+200A, U+202F, U+205F, U+3000) becomes one space;
 # - a line break (CR LF, CR, U+0085, U+2028, U+2029), with the spaces around
 #   it, becomes one LF. A line break still ends a line: `.` does not cross it
 #   and `^` / `$` with the m flag still see it. `\s` matches it, so a phrase

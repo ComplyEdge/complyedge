@@ -14,6 +14,23 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.26] - 2026-11-16
+
+### Added
+- `ComplyEdge.record_appeal(decision_id, kind)` records a person's request about a decision (Enterprise plan) and returns the request id. The agent and system version are read from the decision; pass `agent_id=` or `system_version=` only when the decision has none. Retrying with the same `requested_at` returns the same id.
+- `ComplyEdge.record_answer(request_id, outcome, statement_ref=..., reviewer=...)` records your answer by that id. Sending the same answer twice records it once.
+- `ComplyEdge.list_appeals(status="open")` and `ComplyEdge.get_appeal(request_id)` read appeals back, late ones first, each with `due_at`, `late` and `answered_late`.
+- Each appeal has `answers` and `extensions`: every answer and extension, oldest first, each extension with `in_time`. `answer` and `extension` are the ones recorded last; `answered_late` is judged on the first answer.
+- A 503 with code `review_not_recorded` (the account's audit key is unavailable) is not retried: trying again will not help. The error has `retryable=False`.
+- API errors carry the API's own message, such as which field is wrong.
+- Answers can also be `refused` or `extended` (you told the person you need more time). The same answer means every field matches, the reviewer included.
+- Companion chatbot laws: `check(..., use_case="companion_chatbot", context={...})` returns `companion_assessment`, `companion_not_assessed_reason`, `companion_fallback` and `required_actions`. A companion check without `direction` or `session_id` is refused before sending.
+- `ComplyEdge.confirm_action(required_action, check, confirmation_id=..., source=..., shown_at=...)` records a shown notice and retries while the check is still being recorded (409), for up to 10 minutes after the check.
+- `ComplyEdge.preserve(conversation, trigger=..., preserved_at=..., deciding_system_version=...)` and `canonical_conversation()`: the conversation is sent in RFC 8785 canonical form.
+
+### Changed
+- `direction` is sent only when you give it. It used to default to `"output"` in the request; the API applies the same default, so ordinary checks decide the same way.
+
 ## [0.2.25] - 2026-11-11
 
 ### Changed
@@ -135,6 +152,7 @@ Matching numbers would imply a parity that does not exist.
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.26]: https://pypi.org/project/complyedge/0.2.26/
 [0.2.25]: https://pypi.org/project/complyedge/0.2.25/
 [0.2.24]: https://pypi.org/project/complyedge/0.2.24/
 [0.2.23]: https://pypi.org/project/complyedge/0.2.23/

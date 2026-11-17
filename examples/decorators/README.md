@@ -28,7 +28,7 @@ The `jurisdiction` parameter selects the rule corpus evaluated server-side:
 | Value | What the hosted API runs |
 |---|---|
 | `EU` | EU AI Act: Article 5 prohibited practices; Article 6 (text describing an Annex III use); Articles 4, 9 to 16, 26, 27, 50 and the GPAI articles 51 to 55 (text describing a missing control); personal data and secrets (GDPR Articles 5(1)(c) and 32(1)); prompt-injection detection |
-| `US`, `US-*` | SOX §302 material disclosure; prompt-injection detection |
+| `US`, `US-*` | SEC Regulation FD selective disclosure (rule ID `rego-sox-302-001`); prompt-injection detection |
 
 On either jurisdiction a rule that fires blocks the call: the decorator raises `ComplianceError` unless you pass a `violation_handler`. The other US rules (HIPAA, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA) run offline in TrustLint (`pip install trustlint`), not on the hosted `/v1/check` path.
 

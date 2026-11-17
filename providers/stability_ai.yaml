@@ -74,12 +74,12 @@ obligations:
       Stability publishes technical documentation across multiple
       surfaces: (a) Hugging Face model cards for each major model
       (Stable Diffusion 3.5 Large, Stable Audio Open Small, etc.)
-      with model type, architecture (MMDiT — Multimodal Diffusion
+      with model type, architecture (MMDiT, Multimodal Diffusion
       Transformer), text encoders enumerated (OpenCLIP-ViT/G,
       CLIP-ViT/L, T5-xxl with context lengths), implementation
       details (QK normalization), license terms, intended uses, and
       out-of-scope uses; (b) original research paper on MMDiT
-      architecture (arxiv 2403.03206 — "Scaling Rectified Flow
+      architecture (arxiv 2403.03206, "Scaling Rectified Flow
       Transformers for High-Resolution Image Synthesis"); (c) launch
       blogs (introducing-stable-diffusion-3-5, sd3.5 NIM, SV4D 2.0)
       with comparative benchmark and integration details; (d) GitHub
@@ -223,7 +223,7 @@ obligations:
         Tech Coalition membership announcement (Feb 11, 2026)
         confirming Stability AI's participation in the global
         alliance combating online child sexual exploitation and
-        abuse (CSAM) — operationalising the AUP CSAM prohibition
+        abuse (CSAM), operationalising the AUP CSAM prohibition
         through industry collaboration.
       sha256: 78d3c9e7d95e5de02e6c8ac4fc910c4961b9bb67856d0252e78f8b700ac38982
       wayback_url: https://web.archive.org/web/20260509200137/https://stability.ai/news-updates/stability-ai-joins-the-tech-coalition

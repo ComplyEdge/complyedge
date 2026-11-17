@@ -52,7 +52,7 @@ obligations:
       doc_type: model_card
       summary: >-
         Model card confirms 3B parameters, 11.2T pretraining tokens,
-        384 H100 GPUs × 24 days — well below 1e25 FLOPs Art 51
+        384 H100 GPUs × 24 days, well below 1e25 FLOPs Art 51
         threshold.
       sha256: 7c237c4cfa050f77a2f7e6c8e48db81b9287e4d56a3723de2f81c29bbd8033b1
       wayback_url: https://web.archive.org/web/20260710234640/https://huggingface.co/HuggingFaceTB/SmolLM3-3B
@@ -100,7 +100,7 @@ obligations:
       verified_date: '2026-07-10'
       doc_type: api_doc
       summary: >-
-        Hugging Face Hub model-cards documentation — platform-wide
+        Hugging Face Hub model-cards documentation, platform-wide
         standard mandating technical disclosure (model details,
         intended use, training data, evaluation, limitations) for
         all models on the Hub.
@@ -130,7 +130,7 @@ obligations:
       summary: >-
         Model card "EU Summary of Public Content" section: "The EU AI
         Act requires all GPAI models to provide a Public Summary of
-        Training Content according to a given template" — links to
+        Training Content according to a given template", links to
         EC template and to the dedicated transparency Space.
       sha256: 87ac9a7eafaf780f77a04508e4317142f67643a2a74ea32cec87e63722c616a6
       wayback_url: https://web.archive.org/web/20260710234640/https://huggingface.co/HuggingFaceTB/SmolLM3-3B
@@ -166,7 +166,7 @@ obligations:
       llama.cpp, ONNX, MLX, MLC, ExecuTorch with code examples and
       recommended sampling parameters (temperature=0.6, top_p=0.95).
       Hugging Face Content Policy (effective April 10 2025) governs
-      acceptable use — restricted-content categories (illegal,
+      acceptable use, restricted-content categories (illegal,
       fraudulent, harmful/abusive, IP-violating, platform-abuse) and
       a DSA-compliant out-of-court dispute mechanism. Limitations
       note in model card warns downstream users to verify outputs.

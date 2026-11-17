@@ -1,6 +1,6 @@
 # @complyedge/sdk
 
-TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io). The evidence AI laws ask for, collected on every AI call. Blocked when it breaks the law, and logged with the rule, the law and the time, never the prompt or the answer. Rules today: the EU AI Act.
+TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io). The evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act and prompt injection.
 
 Phrase rules run on every check. On a paid plan a clean pass then runs an injection check when the month's model budget covers it, which can block. The wider review runs only when you turn it on and that budget covers it. A rule block cites the article, and the record is kept outside your AI system.
 
@@ -54,7 +54,7 @@ never disagree. Email is your sign-in and cannot be changed from the dashboard.
 | Runs offline, no API key | No | Yes | Yes |
 | Rego / OPA evaluation | Yes | No | No |
 | Audit record outside your AI system | Yes | No | No |
-| Bundled 63 YAML rules | No | Yes | Yes |
+| Bundled YAML rules | No | Yes | Yes |
 | Temporal / effective-date rules | No | No | No |
 | ESM + CommonJS | Yes | Yes | ESM only |
 | MCP host integration | No | No | Yes |
@@ -170,7 +170,7 @@ Per-call context overrides the client defaults:
 
 ```typescript
 await ce.check(userPrompt, {
-  direction: "prompt",     // "prompt", "output" (default) or "action" the AI is about to take
+  direction: "prompt",     // "prompt", "output" or "action" the AI is about to take; left out, the API reads "output"
   jurisdiction: "EU",
   agentId: "hr-screening",
   userId: "ref_5d81e2c4",     // who the agent acts for
@@ -179,7 +179,7 @@ await ce.check(userPrompt, {
 });
 ```
 
-`decisionContext` carries the ADCR 0.1.0 facts only you know (see the quick
+`decisionContext` carries the ADCR facts only you know (see the quick
 start). It is optional: without it the check runs and is recorded, but the
 record does not meet ADCR class Record. When you send it, `deciding_system`,
 `purpose_ref` and `data_categories` are required; with `subject` the API also
@@ -226,6 +226,93 @@ const ce = new ComplyEdgeClient({
 });
 ```
 
+### Companion chatbots (California, New York, Washington, Oregon)
+
+Send `useCase: "companion_chatbot"` and ComplyEdge checks each message against
+the companion chatbot laws for the user's state (`jurisdiction` `US-CA`,
+`US-NY`, `US-WA` or `US-OR`) and tells your app what it must do for it. Such a
+check needs `direction` (`"prompt"` for the user's message, `"output"` for the
+bot's reply) and a `sessionId`. Without either the SDK refuses the check
+before sending anything.
+
+`direction` is sent only when you give it. On any other check the API then
+treats the text as `"output"`.
+
+Companion facts go in `companion`, in the API's snake_case, and are sent in
+the request's `context`. You can leave any key out; one you leave out means
+unknown, never "adult":
+
+| Key | Values |
+|---|---|
+| `age_status` | `known_minor`, `child`, `reason_to_believe_minor`, `adult`, `treated_as_child`, `unknown` |
+| `age_source` | `os_signal`, `sb976_fallback`, `self_declared`, `operator_known`, `age_assurance`, `none` |
+| `directed_to_minors`, `uses_prior_personal_memory`, `under_25`, `parent_linked`, `parent_changed_time_limit`, `fda_regulated_device`, `is_session_start` | `true` or `false` |
+| `parent_changed_memory_default`, `parent_changed_push_default`, `child_16_plus`, `memory_risk_guardrails`, `parent_disabled_access` (California child defaults) | `true` or `false` |
+| `ad_targeting` | `none`, `contextual`, `chat_personal_info`, `cross_context` |
+| `ny_art47_excluded`, `ny_art48_off_purpose_refused`, `wa_excluded`, `or_excluded` (your system is outside that state's law; left out means covered) | `true` or `false` |
+| `ny_art48_exempt_purpose` | `customer_service`, `efficiency_research_technical`, `internal` |
+| `session_started_at` | ISO 8601 time the session started |
+| `minutes_today`, `referrals_this_session` | whole numbers |
+
+The result carries four more fields:
+
+| Field | Meaning |
+|---|---|
+| `companionAssessment` | `"assessed"` or `"not_assessed"`; `null` on any other check. Not assessed is never a clean pass |
+| `companionNotAssessedReason` | `plan`, `budget`, `unavailable`, `no_direction` or `no_session`; else `null` |
+| `companionFallback` | `true` when ComplyEdge could not work out the actions: apply your own protocol to this message |
+| `requiredActions` | `{ action, ruleIds, jurisdiction, reasonCode, dueAt, intervalKey, counted }[]` |
+
+After your app shows a notice, record it with `confirmAction`. Pass the
+`requiredActions` entry and the check result; the call fills the action, the
+check's id and timestamp, the interval key, the state and the rule id from
+them. The check is recorded a moment after it returns, so while it is not
+there yet the call retries with growing waits, for up to 10 minutes after the
+check's timestamp. `block_reply`, `disable_prior_personal_memory` and `disable_push_notifications` are applied
+in your response and never confirmed. `preserve_conversation` is recorded with `preserve`, whose answer lists `accountDuties`.
+On a reply check, pass the user's last message as `companionUserMessage` so the
+rules about leaving and requested products can be judged; it is never stored.
+
+When a law asks you to keep a conversation, `preserve` sends it once.
+ComplyEdge keeps a keyed hash of it, never the text. The SDK first puts it in
+one canonical form (a JSON array of `role`, `text`, `sent_at`, text in Unicode
+NFC, written by RFC 8785), so the copy you keep verifies later whatever its
+whitespace or key order. `canonicalConversation(conversation)` returns that
+string.
+
+```typescript
+const ce = new ComplyEdgeClient({ apiKey, agentId: "pal", sessionId });
+
+const result = await ce.check(userMessage, {
+  jurisdiction: "US-CA",
+  direction: "prompt",
+  useCase: "companion_chatbot",
+  companion: { age_status: "known_minor", age_source: "os_signal", minutes_today: 42 },
+});
+for (const needed of result.requiredActions) {
+  if (needed.action === "show_crisis_referral") {
+    showCrisisReferral(); // your app shows it
+    await ce.confirmAction({
+      requiredAction: needed,
+      check: result,
+      confirmationId: `${result.eventId}:${needed.intervalKey}`,
+      source: "complyedge",
+      shownAt: new Date(),
+      format: "app",
+      decidingSystemVersion: "pal-3",
+      language: "en",
+    });
+  }
+}
+
+await ce.preserve({
+  conversation: [{ role: "user", text: userMessage, sent_at: sentAt }],
+  trigger: "parent_notified",
+  preservedAt: new Date(),
+  decidingSystemVersion: "pal-3",
+});
+```
+
 ## OpenAI middleware
 
 Wrap an OpenAI client so user messages are checked before they reach the model:
@@ -266,6 +353,38 @@ options to send it with every check the middleware makes.
 
 `openai` is an optional peer dependency. Install it only if you use the middleware.
 
+## Appeals: a person asks about a decision
+
+When a person asks for a human review, an explanation or a correction of a
+decision your AI made (GDPR Art. 22, EU AI Act Art. 86), record the request
+and, later, your answer. Enterprise plan.
+
+```typescript
+// The person asks. The agent and system version are read from the decision.
+const requestId = await ce.recordAppeal({
+  decisionId: decision.eventId,
+  kind: "human_intervention",
+  requestedAt: ticket.createdAt,
+});
+
+// Your team answers. statementRef points at the reply in your own system.
+await ce.recordAnswer(requestId, {
+  outcome: "upheld",
+  statementRef: `ticket:${ticket.id}`,
+  reviewer: `staff:${agent.id}`,
+});
+
+// Appeals with no answer yet, late ones first, each with its due date.
+for (const appeal of await ce.listAppeals()) {
+  if (appeal.late) console.log(appeal.requestId, "was due", appeal.dueAt);
+}
+```
+
+Retrying `recordAppeal` with the same `requestedAt` returns the same id.
+Each appeal also lists every answer and extension, oldest first (`answers`,
+`extensions`). `answer` is the one recorded last; `answeredLate` is judged on the first.
+Full guide: https://complyedge.io/docs/appeals.html
+
 ## Pre-deployment assessment
 
 ```typescript
@@ -283,7 +402,7 @@ console.log(assessment.euAiActCategory); // "employment-workers"
 Legacy sensitivity detection (`POST /v1/sensitivity/detect`), kept for existing
 callers. It runs the TrustLint and LLM pipeline, not OPA, and writes an audit
 record with the same `userId`, `userRole` and `sessionId` attribution. Use
-`check()` for runtime enforcement.
+`check()` for the hosted check against AI laws.
 
 ## Errors
 

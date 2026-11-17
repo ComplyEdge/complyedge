@@ -1,6 +1,6 @@
 # ComplyEdge Python SDK
 
-The evidence AI laws ask for, collected on every AI call. Blocked when it breaks the law, and logged with the rule, the law and the time, never the prompt or the answer. Rules today: the EU AI Act.
+The evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act and prompt injection.
 
 ## Choose the Right Package
 
@@ -20,7 +20,7 @@ evidence trail. For an offline command-line linter with no API key, use
 pip install complyedge
 ```
 
-## Quick Start: EU AI Act in Three Lines
+## Quick Start in Three Lines
 
 ```python
 from complyedge import compliance_check
@@ -38,7 +38,7 @@ def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-That's it. Every input and output is checked against the EU AI Act rule set (Article 5, Article 50, GPAI). Every check gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed hash of the text. A block by a rule also gets its legal citation. On a paid plan the injection check can also block when the month's model budget covers it, and that block names the law. A wider-review block does not cite an article. If that review is on and clears every hit, the request is allowed. `decision_context` is optional: without it every check still runs and is recorded, but the record does not meet ADCR class Record (see [Tell the record what only you know](#tell-the-record-what-only-you-know)). With the default fail mode, `open`, an API outage lets traffic through unchecked and unrecorded; set `COMPLYEDGE_FAIL_MODE=closed`, or pass `config=ComplianceConfig(fail_mode="closed")`, to raise `ComplianceUnavailableError` instead. Without an API key the decorator always runs the function unchecked.
+That's it. Every input and output is checked against AI laws: with `jurisdiction="EU"`, the EU AI Act rule set (Article 5, Article 50, GPAI), plus prompt injection rules on every check. Every check gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed hash of the text. A block by a rule also gets its legal citation. On a paid plan the injection check can also block when the month's model budget covers it, and that block names the law. A wider-review block does not cite an article. If that review is on and clears every hit, the request is allowed. `decision_context` is optional: without it every check still runs and is recorded, but the record does not meet ADCR class Record (see [Tell the record what only you know](#tell-the-record-what-only-you-know)). With the default fail mode, `open`, an API outage lets traffic through unchecked and unrecorded; set `COMPLYEDGE_FAIL_MODE=closed`, or pass `config=ComplianceConfig(fail_mode="closed")`, to raise `ComplianceUnavailableError` instead. Without an API key the decorator always runs the function unchecked.
 
 Classifiers (`eu-ai-act-*` MCPs) score the *system*. ComplyEdge checks and records *this* prompt or output. Article 50 here is unlabeled or deceptive use, not C2PA watermarking.
 
@@ -169,7 +169,7 @@ SHA-256, which `verify_input` also checks.
 The audit record can carry fields ComplyEdge cannot know: the version of your AI
 system, the purpose of the processing and the categories of personal data the
 decision used. Pass them as `decision_context`; they are written to the record as
-ADCR 0.1.0 fields (https://complyedge.io/producer-profile/). `decision_context` is
+ADCR fields (https://complyedge.io/producer-profile/). `decision_context` is
 optional: without it the check runs and is recorded, but the record does not meet
 ADCR class Record. When you send it, `deciding_system.version`, `purpose_ref` and
 `data_categories` (`[]` when none) are required; every other key is optional.
@@ -200,6 +200,93 @@ result = ce.check("Score users based on their social behavior", sandbox=True)
 print(result.blocked, result.sandbox)  # True True
 ```
 
+### Companion chatbots (California, New York, Washington, Oregon)
+
+Send `use_case="companion_chatbot"` and ComplyEdge checks each message against
+the companion chatbot laws for the user's state (`jurisdiction` `US-CA`,
+`US-NY`, `US-WA` or `US-OR`) and tells your app what it must do for it. Such a
+check needs `direction` (`"prompt"` for the user's message, `"output"` for the
+bot's reply) and a `session_id`. Without either the SDK refuses the check
+before sending anything.
+
+`direction` is sent only when you give it. On any other check the API then
+treats the text as `"output"`.
+
+Companion facts go in `context`. You can leave any key out; one you leave out
+means unknown, never "adult":
+
+| Key | Values |
+|---|---|
+| `age_status` | `known_minor`, `child`, `reason_to_believe_minor`, `adult`, `treated_as_child`, `unknown` |
+| `age_source` | `os_signal`, `sb976_fallback`, `self_declared`, `operator_known`, `age_assurance`, `none` |
+| `directed_to_minors`, `uses_prior_personal_memory`, `under_25`, `parent_linked`, `parent_changed_time_limit`, `fda_regulated_device`, `is_session_start` | `True` or `False` |
+| `parent_changed_memory_default`, `parent_changed_push_default`, `child_16_plus`, `memory_risk_guardrails`, `parent_disabled_access` (California child defaults) | `True` or `False` |
+| `ad_targeting` | `none`, `contextual`, `chat_personal_info`, `cross_context` |
+| `ny_art47_excluded`, `ny_art48_off_purpose_refused`, `wa_excluded`, `or_excluded` (your system is outside that state's law; left out means covered) | `True` or `False` |
+| `ny_art48_exempt_purpose` | `customer_service`, `efficiency_research_technical`, `internal` |
+| `session_started_at` | ISO 8601 time the session started |
+| `minutes_today`, `referrals_this_session` | whole numbers |
+
+The result carries four more fields:
+
+| Field | Meaning |
+|---|---|
+| `companion_assessment` | `"assessed"` or `"not_assessed"`; `None` on any other check. Not assessed is never a clean pass |
+| `companion_not_assessed_reason` | `plan`, `budget`, `unavailable`, `no_direction` or `no_session`; else `None` |
+| `companion_fallback` | `True` when ComplyEdge could not work out the actions: apply your own protocol to this message |
+| `required_actions` | List of `RequiredAction(action, rule_ids, jurisdiction, reason_code, due_at, interval_key, counted)` |
+
+After your app shows a notice, record it with `confirm_action`. Pass the
+`required_actions` entry and the check result; the call fills the action, the
+check's id and timestamp, the interval key, the state and the rule id from
+them. The check is recorded a moment after it returns, so while it is not
+there yet the call retries with growing waits, for up to 10 minutes after the
+check's timestamp. `block_reply`, `disable_prior_personal_memory` and `disable_push_notifications` are applied
+in your response and never confirmed. `preserve_conversation` is recorded with `preserve`, whose answer lists `account_duties`.
+On a reply check, pass the user's last message as `companion_user_message` so
+the rules about leaving and requested products can be judged; it is never stored.
+
+When a law asks you to keep a conversation, `preserve` sends it once.
+ComplyEdge keeps a keyed hash of it, never the text. The SDK first puts it in
+one canonical form (a JSON array of `role`, `text`, `sent_at`, text in Unicode
+NFC, written by RFC 8785), so the copy you keep verifies later whatever its
+whitespace or key order. `canonical_conversation(conversation)` returns those
+bytes.
+
+```python
+from datetime import datetime, timezone
+
+ce = ComplyEdge(api_key=api_key, agent_id="pal", session_id=session_id)
+
+result = ce.check(
+    user_message,
+    jurisdiction="US-CA",
+    direction="prompt",
+    use_case="companion_chatbot",
+    context={"age_status": "known_minor", "age_source": "os_signal",
+             "session_started_at": started_at, "minutes_today": 42},
+)
+for needed in result.required_actions:
+    if needed.action == "show_crisis_referral":
+        show_crisis_referral()  # your app shows it
+        ce.confirm_action(
+            needed, result,
+            confirmation_id=f"{result.event_id}:{needed.interval_key}",
+            source="complyedge",
+            shown_at=datetime.now(timezone.utc),
+            format="app",
+            deciding_system_version="pal-3",
+            language="en",
+        )
+
+ce.preserve(
+    [{"role": "user", "text": user_message, "sent_at": sent_at}],
+    trigger="parent_notified",
+    preserved_at=datetime.now(timezone.utc),
+    deciding_system_version="pal-3",
+)
+```
+
 Or the global convenience functions:
 
 ```python
@@ -215,6 +302,32 @@ if not is_safe(text, api_key=api_key, jurisdiction="EU"):
 # Full result
 result = check(text, api_key=api_key, jurisdiction="EU")
 ```
+
+## Appeals: a person asks about a decision
+
+When a person asks for a human review, an explanation or a correction of a
+decision your AI made (GDPR Art. 22, EU AI Act Art. 86), record the request
+and, later, your answer. Enterprise plan.
+
+```python
+# The person asks. The agent and system version are read from the decision.
+request_id = ce.record_appeal(decision.event_id, "human_intervention",
+                              requested_at=ticket.created_at)
+
+# Your team answers. statement_ref points at the reply in your own system.
+ce.record_answer(request_id, "upheld", statement_ref=f"ticket:{ticket.id}",
+                 reviewer=f"staff:{agent.id}")
+
+# Appeals with no answer yet, late ones first, each with its due date.
+for appeal in ce.list_appeals():
+    if appeal["late"]:
+        print(appeal["request_id"], "was due", appeal["due_at"])
+```
+
+Retrying `record_appeal` with the same `requested_at` returns the same id.
+Each appeal also lists every answer and extension, oldest first (`answers`,
+`extensions`). `answer` is the one recorded last; `answered_late` is judged on the first.
+Full guide: https://complyedge.io/docs/appeals.html
 
 ## Rotating your key
 
