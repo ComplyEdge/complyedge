@@ -35,6 +35,15 @@ actions contains e if {
 	some e in candidate
 	h.active(leaves[e.rule_id])
 	not out_of_scope(e.rule_id)
+	not h.upcoming(e)
+}
+
+# Periodic notices the check has not reached yet (helpers.periodic_entry).
+upcoming contains e if {
+	some e in candidate
+	h.active(leaves[e.rule_id])
+	not out_of_scope(e.rule_id)
+	h.upcoming(e)
 }
 
 # Scope. Art. 47 (§ 1700(4)): an "AI companion" retains prior sessions, asks
@@ -86,7 +95,7 @@ leaves["us-ny-art47-notice"] := {
 
 ny_start_allowed := object.get(input, "ny_notice_today_for_user", false) != true
 
-candidate contains h.entry(rid, leaves[rid], "show_not_human_notice", "ny_1702_not_human_notice", h.periodic_due("not_human", 3 * h.hour_ns, ny_start_allowed), true) if {
+candidate contains h.periodic_entry(rid, leaves[rid], "show_not_human_notice", "ny_1702_not_human_notice", "not_human", 3 * h.hour_ns, ny_start_allowed, true) if {
 	rid := "us-ny-art47-notice"
 }
 

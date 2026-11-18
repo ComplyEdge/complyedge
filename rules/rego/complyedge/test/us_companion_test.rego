@@ -822,3 +822,75 @@ test_wa_and_or_excluded_systems_get_no_duty if {
 	wa_cov := run(check("US-WA", wa_2027, wa_2027 - mn, "prompt", ["expresses_self_harm"], {}, no_anchors))
 	has(wa_cov, "us-wa-hb2225-crisis", "show_crisis_referral")
 }
+
+# ── Upcoming periodic notices (SB243-F4, 2026-11-18) ────────────────────────
+# "at least every three hours" caps the gap. The pack used to say nothing
+# until a message arrived at or after base + 3h, so a reminder reached the
+# user late whenever they paused. Every check now carries the next due time,
+# so the app can show the reminder on time. Reported case: messages at 2h59m
+# and 3h20m after the session start.
+
+upcoming_get(r, rid, action) := e if {
+	some e in r.upcoming_actions
+	e.rule_id == rid
+	e.action == action
+}
+
+test_ca_minor_break_is_upcoming_before_three_hours if {
+	start := ca_2026 + hr
+	r := run(check("US-CA", start + ((2 * hr) + (59 * mn)), start, "prompt", [], {"age_status": "known_minor"}, nh_done(start)))
+	not has(r, "us-ca-22602c-minor-break", "show_break_reminder")
+	e := upcoming_get(r, "us-ca-22602c-minor-break", "show_break_reminder")
+	e.due_ns == start + (3 * hr)
+	e.counted == true
+}
+
+test_ca_minor_break_late_message_is_due_at_three_hours_not_later if {
+	start := ca_2026 + hr
+	r := run(check("US-CA", start + ((3 * hr) + (20 * mn)), start, "prompt", [], {"age_status": "known_minor"}, nh_done(start)))
+	get(r, "us-ca-22602c-minor-break", "show_break_reminder").due_ns == start + (3 * hr)
+	not upcoming_get(r, "us-ca-22602c-minor-break", "show_break_reminder")
+}
+
+test_ca_minor_break_next_due_runs_from_the_confirmed_one if {
+	start := ca_2026 + hr
+	anchors := object.union(nh_done(start), {"break_reminder": start + (3 * hr)})
+	r := run(check("US-CA", start + ((3 * hr) + (20 * mn)), start, "prompt", [], {"age_status": "known_minor"}, anchors))
+	not has(r, "us-ca-22602c-minor-break", "show_break_reminder")
+	upcoming_get(r, "us-ca-22602c-minor-break", "show_break_reminder").due_ns == start + (6 * hr)
+}
+
+test_upcoming_only_for_the_people_the_law_covers if {
+	start := ca_2026 + hr
+	r := run(check("US-CA", start + hr, start, "prompt", [], {}, nh_done(start)))
+	not upcoming_get(r, "us-ca-22602c-minor-break", "show_break_reminder")
+}
+
+test_wa_minor_notice_upcoming_every_hour if {
+	anchor := wa_2027 - (30 * mn)
+	r := run(check("US-WA", wa_2027, anchor - hr, "prompt", [], {"age_status": "known_minor"}, nh_done(anchor)))
+	not has(r, "us-wa-hb2225-notice", "show_not_human_notice")
+	upcoming_get(r, "us-wa-hb2225-notice", "show_not_human_notice").due_ns == anchor + hr
+}
+
+test_ny_notice_upcoming_after_the_confirmed_one if {
+	anchor := ny_2026 - hr
+	r := run(check("US-NY", ny_2026, anchor - hr, "prompt", [], {}, nh_done(anchor)))
+	not has(r, "us-ny-art47-notice", "show_not_human_notice")
+	upcoming_get(r, "us-ny-art47-notice", "show_not_human_notice").due_ns == anchor + (3 * hr)
+}
+
+test_start_notice_is_never_upcoming if {
+	start := wa_2027 - mn
+	r := run(check("US-WA", wa_2027, start, "prompt", [], {}, no_anchors))
+	get(r, "us-wa-hb2225-notice", "show_not_human_notice").due_ns == start
+	not upcoming_get(r, "us-wa-hb2225-notice", "show_not_human_notice")
+}
+
+test_no_upcoming_outside_the_date_window if {
+	start := t("2026-12-31T23:00:00-08:00")
+	r := run(check("US-CA", start + (30 * mn), start, "prompt", [], {"age_status": "known_minor"}, nh_done(start)))
+	upcoming_get(r, "us-ca-22602c-minor-break", "show_break_reminder")
+	r2 := run(check("US-CA", t("2027-01-01T00:30:00-08:00"), start, "prompt", [], {"age_status": "known_minor"}, nh_done(start)))
+	not upcoming_get(r2, "us-ca-22602c-minor-break", "show_break_reminder")
+}

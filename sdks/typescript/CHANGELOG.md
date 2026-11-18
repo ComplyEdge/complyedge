@@ -16,6 +16,11 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.11] - 2026-11-18
+
+### Added
+- `ComplianceResult.upcomingActions`: the repeated notices a companion session will owe next (break reminder, not-human notice), each with `dueAt`. Show each one by then even if the user sends nothing; confirm it with `confirmAction` when a later check lists it in `requiredActions`, passing the time it was shown.
+
 ## [0.2.10] - 2026-11-16
 
 ### Added
@@ -165,6 +170,7 @@ imply a parity that does not exist.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/typescript
+[0.2.11]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.11
 [0.2.10]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.10
 [0.2.9]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.9
 [0.2.8]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.8

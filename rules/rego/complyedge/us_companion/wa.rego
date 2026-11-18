@@ -37,6 +37,15 @@ actions contains e if {
 	some e in candidate
 	h.active(leaves[e.rule_id])
 	not out_of_scope(e.rule_id)
+	not h.upcoming(e)
+}
+
+# Periodic notices the check has not reached yet (helpers.periodic_entry).
+upcoming contains e if {
+	some e in candidate
+	h.active(leaves[e.rule_id])
+	not out_of_scope(e.rule_id)
+	h.upcoming(e)
 }
 
 # Scope. Ch. 168, Laws of 2026, Sec. 2(1)(b) leaves out of "AI companion
@@ -70,7 +79,7 @@ notice_reason := "wa_sec4_2_minor_hourly_notice" if h.washington_minor
 
 notice_reason := "wa_sec3_2_not_human_notice" if not h.washington_minor
 
-candidate contains h.entry(rid, leaves[rid], "show_not_human_notice", notice_reason, h.periodic_due("not_human", notice_interval, true), true) if {
+candidate contains h.periodic_entry(rid, leaves[rid], "show_not_human_notice", notice_reason, "not_human", notice_interval, true, true) if {
 	rid := "us-wa-hb2225-notice"
 }
 

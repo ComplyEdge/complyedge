@@ -82,7 +82,7 @@ export function resolveBaseUrl(opts: {
 // Keep in sync with package.json. Hardcoding it here meant the User-Agent
 // silently reported a stale version after every release bump, which is the
 // one field support uses to tell which client a customer is actually on.
-const SDK_VERSION = "0.2.10";
+const SDK_VERSION = "0.2.11";
 
 /** The audit record's user attribution, in the API's field names. */
 export interface AttributionFields {
@@ -248,6 +248,7 @@ export class ComplyEdgeClient {
       companionNotAssessedReason: data.companion_not_assessed_reason ?? null,
       companionFallback: data.companion_fallback === true,
       requiredActions: parseRequiredActions(data.required_actions),
+      upcomingActions: parseRequiredActions(data.upcoming_actions),
     };
     this.receiptJournal?.appendResult(result);
     return result;

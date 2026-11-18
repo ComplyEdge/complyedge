@@ -37,6 +37,15 @@ actions contains e if {
 	some e in candidate
 	h.active(leaves[e.rule_id])
 	not out_of_scope(e.rule_id)
+	not h.upcoming(e)
+}
+
+# Periodic notices the check has not reached yet (helpers.periodic_entry).
+upcoming contains e if {
+	some e in candidate
+	h.active(leaves[e.rule_id])
+	not out_of_scope(e.rule_id)
+	h.upcoming(e)
 }
 
 # Scope. Oregon Laws 2026, ch. 85, § 1(1)(a)(B) leaves out of "artificial
@@ -176,7 +185,7 @@ leaves["us-or-sb1546-minor-break"] := {
 	"citation": "Or. Laws 2026, ch. 85, § 1(4)(b): the operator shall cause the artificial intelligence companion to: (B) Provide a clear and conspicuous reminder at a minimum of every three hours of interaction that the user should take a break from interactions with the artificial intelligence companion or artificial intelligence companion platform, along with a further reminder that the user is interacting with artificially generated output.",
 }
 
-candidate contains h.entry(rid, leaves[rid], "show_break_reminder", "or_1_4bB_minor_break_reminder", h.periodic_due("break_reminder", 3 * h.hour_ns, false), true) if {
+candidate contains h.periodic_entry(rid, leaves[rid], "show_break_reminder", "or_1_4bB_minor_break_reminder", "break_reminder", 3 * h.hour_ns, false, true) if {
 	rid := "us-or-sb1546-minor-break"
 	h.oregon_minor
 }

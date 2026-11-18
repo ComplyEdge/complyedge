@@ -14,6 +14,11 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.27] - 2026-11-18
+
+### Added
+- `ComplianceResult.upcoming_actions`: the repeated notices a companion session will owe next (break reminder, not-human notice), each with `due_at`. Show each one by then even if the user sends nothing; confirm it with `confirm_action` when a later check lists it in `required_actions`, passing the time it was shown.
+
 ## [0.2.26] - 2026-11-16
 
 ### Added
@@ -152,6 +157,7 @@ Matching numbers would imply a parity that does not exist.
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.27]: https://pypi.org/project/complyedge/0.2.27/
 [0.2.26]: https://pypi.org/project/complyedge/0.2.26/
 [0.2.25]: https://pypi.org/project/complyedge/0.2.25/
 [0.2.24]: https://pypi.org/project/complyedge/0.2.24/

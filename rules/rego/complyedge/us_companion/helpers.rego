@@ -10,7 +10,8 @@
 #   2. Which age group is the user in? (minor, child, Oregon and Washington minor)
 #   3. Did the model find a label on the right side of the exchange?
 #      (message_label for direction "prompt", reply_label for "output")
-#   4. When is a periodic notice due? (start component, then anchor + interval)
+#   4. When is a periodic notice due? (start component, then anchor + interval),
+#      and is it due at this check or still upcoming?
 #
 # Rego never reads text here: meaning comes from the model's labels.
 #
@@ -144,18 +145,32 @@ base(kind) := anchor(kind) if anchor(kind) != null
 
 base(kind) := start_ns if anchor(kind) == null
 
-# Due time of a periodic notice, or undefined when nothing is due yet.
-# with_start true: with no confirmed notice of that kind yet, the start
-# notice is due at the session start. Otherwise due once the check reaches
-# base + interval.
-periodic_due(kind, _, true) := start_ns if {
+# Entry of a periodic notice (the break reminder, the repeated not-human and
+# child notices). with_start true: with no confirmed notice of that kind yet,
+# the start notice is due at the session start, a plain entry. Otherwise the
+# entry is due at base + interval and carries periodic: true. The state files
+# split it on the check instant (upcoming below): due -> required_actions;
+# not yet due -> upcoming_actions, so the app can show the notice when it falls
+# due even when the user sends no message then. Without that time a reminder
+# reached the user only with the first message at or after base + interval,
+# so every gap was longer than the interval and a pause stretched it, while the
+# statutes cap it ("at least every three hours", § 22602(c)(2); GBL § 1702).
+# Validation run 2026-11-18, finding SB243-F4.
+periodic_entry(rid, meta, action, reason, kind, _, true, counted) := entry(rid, meta, action, reason, start_ns, counted) if {
 	anchor(kind) == null
 }
 
-periodic_due(kind, interval, with_start) := due if {
+periodic_entry(rid, meta, action, reason, kind, interval, with_start, counted) := object.union(
+	entry(rid, meta, action, reason, base(kind) + interval, counted),
+	{"periodic": true},
+) if {
 	not start_pending(kind, with_start)
-	due := base(kind) + interval
-	check_ns >= due
+}
+
+# A periodic entry the check has not reached yet.
+upcoming(e) if {
+	e.periodic == true
+	e.due_ns > check_ns
 }
 
 start_pending(kind, true) if anchor(kind) == null

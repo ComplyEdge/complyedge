@@ -63,7 +63,7 @@ from tenacity import (
     wait_exponential,
 )
 
-__version__ = "0.2.26"
+__version__ = "0.2.27"
 
 # Default API URL — set via COMPLYEDGE_API_URL env var or explicit config
 DEFAULT_BASE_URL = os.getenv("COMPLYEDGE_API_URL")
@@ -217,9 +217,11 @@ class PreservationReceipt:
     account_duties: list[str] = field(default_factory=list)
 
 
-def _required_actions_from_payload(data: dict[str, Any]) -> list[RequiredAction]:
+def _required_actions_from_payload(
+    data: dict[str, Any], key: str = "required_actions"
+) -> list[RequiredAction]:
     out: list[RequiredAction] = []
-    for entry in data.get("required_actions") or []:
+    for entry in data.get(key) or []:
         if not isinstance(entry, dict) or not entry.get("action"):
             continue
         out.append(
@@ -243,6 +245,7 @@ def _companion_fields(data: dict[str, Any]) -> dict[str, Any]:
         "companion_not_assessed_reason": data.get("companion_not_assessed_reason"),
         "companion_fallback": data.get("companion_fallback") is True,
         "required_actions": _required_actions_from_payload(data),
+        "upcoming_actions": _required_actions_from_payload(data, "upcoming_actions"),
     }
 
 
@@ -291,6 +294,11 @@ class ComplianceResult:
     # apply your own protocol to it.
     companion_fallback: bool = False
     required_actions: list[RequiredAction] = field(default_factory=list)
+    # Periodic notices (break reminder, repeated not-human notice) this session
+    # will owe that are not due yet. Show each one by its due_at even when no
+    # message arrives; when a later check lists it in required_actions, confirm
+    # it with the time it was shown. No interval_key until then.
+    upcoming_actions: list[RequiredAction] = field(default_factory=list)
 
     @property
     def safe(self) -> bool:

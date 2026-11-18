@@ -19,6 +19,9 @@
 #     {action, rule_id, jurisdiction, reason_code, due_ns, counted}
 #     The API merges entries of the same action into one, listing every
 #     rule_id (X2 "one entry per action").
+#   result.upcoming_actions: periodic notices this session will owe and the
+#     check has not reached yet, same entry shape with due_ns in the future
+#     (helpers.periodic_entry). The app shows each one by its due time.
 #   result.rules_evaluated: the leaves of the check's jurisdiction that are
 #     inside their date window at check_ns.
 #
@@ -35,10 +38,10 @@ import data.complyedge.us_companion.or
 import data.complyedge.us_companion.wa
 
 state := {
-	"US-CA": {"leaves": ca.leaves, "actions": ca.actions},
-	"US-NY": {"leaves": ny.leaves, "actions": ny.actions},
-	"US-WA": {"leaves": wa.leaves, "actions": wa.actions},
-	"US-OR": {"leaves": or.leaves, "actions": or.actions},
+	"US-CA": {"leaves": ca.leaves, "actions": ca.actions, "upcoming": ca.upcoming},
+	"US-NY": {"leaves": ny.leaves, "actions": ny.actions, "upcoming": ny.upcoming},
+	"US-WA": {"leaves": wa.leaves, "actions": wa.actions, "upcoming": wa.upcoming},
+	"US-OR": {"leaves": or.leaves, "actions": or.actions, "upcoming": or.upcoming},
 }
 
 pack := state[input.jurisdiction]
@@ -47,6 +50,14 @@ pack := state[input.jurisdiction]
 # file can bypass the window), and a leaf of another state never fires.
 fired contains e if {
 	some e in pack.actions
+	meta := pack.leaves[e.rule_id]
+	meta.jurisdiction == input.jurisdiction
+	h.active(meta)
+}
+
+# Same filters for the periodic notices not due yet at check_ns.
+pending contains e if {
+	some e in pack.upcoming
 	meta := pack.leaves[e.rule_id]
 	meta.jurisdiction == input.jurisdiction
 	h.active(meta)
@@ -61,11 +72,16 @@ default required_actions := []
 
 required_actions := sort([e | some e in fired]) if pack
 
+default upcoming_actions := []
+
+upcoming_actions := sort([e | some e in pending]) if pack
+
 default rules_evaluated := []
 
 rules_evaluated := sort([rid | some rid in evaluated]) if pack
 
 result := {
 	"required_actions": required_actions,
+	"upcoming_actions": upcoming_actions,
 	"rules_evaluated": rules_evaluated,
 }

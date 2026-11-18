@@ -315,6 +315,13 @@ export interface ComplianceResult {
   companionFallback: boolean;
   /** What your app must do for this message; [] when none or not a companion check. */
   requiredActions: RequiredAction[];
+  /**
+   * Periodic notices (break reminder, repeated not-human notice) this session
+   * will owe that are not due yet. Show each one by its dueAt even when no
+   * message arrives; when a later check lists it in requiredActions, confirm it
+   * with the time it was shown. No intervalKey until then.
+   */
+  upcomingActions: RequiredAction[];
 }
 
 export interface SensitivityDetection {
