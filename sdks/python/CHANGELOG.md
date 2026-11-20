@@ -14,6 +14,10 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+### Added
+- `ComplianceResult.companion_warnings` and `ComplianceError.companion_warnings`: codes for what a companion check's request shows is wrong with the integration (`age_status_missing`, `session_start_changed`). Empty on an API that predates it.
+- `companion_assessment` can be `"operator_asserted"`: the actions came from the `operator_labels` you sent in `context`, and the meaning check did not run.
+
 ## [0.2.27] - 2026-11-18
 
 ### Added

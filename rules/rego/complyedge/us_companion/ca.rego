@@ -22,10 +22,10 @@
 # from the chat (§ 21813). An operator that does not determine a user's age
 # applies these child protections to every user (§ 21811(b)).
 #
-# Each leaf below is one row of the X2 table. Rego reads only the model's
+# Each leaf below is one duty of the statute: one action, one trigger. Rego reads only the model's
 # labels, the check date, the context keys and the anchors; whether a text
 # expresses self-harm or claims to be human is judged by the companion
-# meaning check (X3) before this pack is queried.
+# meaning check before this pack is queried.
 #
 # Legal citation: Cal. Bus. & Prof. Code § 22602 (SB 243, Ch. 677, Stats. 2025; amended by SB 1119, Ch. 190, Stats. 2026); §§ 21811, 21812, 21812.5, 21813 (SB 1119, Ch. 190, Stats. 2026)
 # Effective: 2026-01-01 (§ 22602); § 22602(c) ends 2026-12-31 (deleted by SB 1119); 2027-07-01 (§§ 21812(e), 21812.5(d), 21813(b))
@@ -341,7 +341,7 @@ ca_time_dues contains due if {
 
 # Over the daily two hours: due at the session start. minutes_today is the
 # app's number and changes between checks, so a due derived from it moved on
-# every check and each check raised a new counted duty. X6: due times come from
+# every check and each check raised a new counted duty. Due times come from
 # times CE holds, never from times the app reports.
 ca_time_dues contains h.start_ns if {
 	minutes := h.ctx("minutes_today", 0)

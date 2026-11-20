@@ -247,6 +247,7 @@ export class ComplyEdgeClient {
       companionAssessment: data.companion_assessment ?? null,
       companionNotAssessedReason: data.companion_not_assessed_reason ?? null,
       companionFallback: data.companion_fallback === true,
+      companionWarnings: parseWarnings(data.companion_warnings),
       requiredActions: parseRequiredActions(data.required_actions),
       upcomingActions: parseRequiredActions(data.upcoming_actions),
     };
@@ -635,6 +636,7 @@ export interface CheckRefusal {
   companionAssessment: string | null;
   companionNotAssessedReason: string | null;
   companionFallback: boolean;
+  companionWarnings: string[];
   /** What the law asks for this message; empty when the body names none. */
   requiredActions: RequiredAction[];
   upcomingActions: RequiredAction[];
@@ -660,9 +662,15 @@ export function checkRefusal(err: unknown): CheckRefusal | null {
     companionNotAssessedReason:
       (detail.companion_not_assessed_reason as string | undefined) ?? null,
     companionFallback: detail.companion_fallback === true,
+    companionWarnings: parseWarnings(detail.companion_warnings),
     requiredActions: parseRequiredActions(detail.required_actions),
     upcomingActions: parseRequiredActions(detail.upcoming_actions),
   };
+}
+
+/** companion_warnings as sent; absent (an older API) parses as empty. */
+function parseWarnings(raw: unknown): string[] {
+  return Array.isArray(raw) ? raw.map((w) => String(w)) : [];
 }
 
 /** The API's error detail as one line: a message, or each field and its problem. */

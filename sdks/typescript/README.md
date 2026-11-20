@@ -258,9 +258,10 @@ The result carries four more fields:
 
 | Field | Meaning |
 |---|---|
-| `companionAssessment` | `"assessed"` or `"not_assessed"`; `null` on any other check. Not assessed is never a clean pass |
+| `companionAssessment` | `"assessed"`, `"not_assessed"` or `"operator_asserted"` (you sent `operator_labels` in `context`, so the meaning check did not run); `null` on any other check. Not assessed is never a clean pass |
 | `companionNotAssessedReason` | `plan`, `budget`, `unavailable`, `no_direction` or `no_session`; else `null` |
 | `companionFallback` | `true` when ComplyEdge could not work out the actions: apply your own protocol to this message |
+| `companionWarnings` | Codes for what your requests show is wrong with the integration: `age_status_missing`, `session_start_changed`. Empty when nothing is. A warning never changes the actions |
 | `requiredActions` | `{ action, ruleIds, jurisdiction, reasonCode, dueAt, intervalKey, counted }[]` |
 
 After your app shows a notice, record it with `confirmAction`. Pass the

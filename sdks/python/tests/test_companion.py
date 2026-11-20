@@ -634,3 +634,45 @@ def test_refusal_without_companion_fields_parses_as_empty(post: MagicMock) -> No
 def test_an_error_with_no_http_answer_has_empty_refusal_fields() -> None:
     e = ComplianceError("Request failed: timeout", retryable=True)
     assert e.status_code is None and e.body is None and e.required_actions == []
+
+
+# --- integration warnings and operator-supplied labels -----------------------
+
+
+@patch("httpx.Client.post")
+def test_warnings_and_operator_asserted_parse_and_labels_are_sent(post: MagicMock) -> None:
+    post.return_value = _resp(
+        {
+            **CHECK_OK,
+            **COMPANION_FIELDS,
+            "companion_assessment": "operator_asserted",
+            "companion_warnings": ["age_status_missing"],
+        }
+    )
+    r = _client().check(
+        "x",
+        direction="prompt",
+        use_case="companion_chatbot",
+        context={"session_id": "s", "operator_labels": ["expresses_self_harm"]},
+    )
+    assert r.companion_assessment == "operator_asserted"
+    assert r.companion_warnings == ["age_status_missing"]
+    assert post.call_args.kwargs["json"]["context"]["operator_labels"] == ["expresses_self_harm"]
+
+
+@patch("httpx.Client.post")
+def test_an_api_without_warnings_parses_as_empty(post: MagicMock) -> None:
+    post.return_value = _resp({**CHECK_OK, **COMPANION_FIELDS})
+    r = _client().check("x", direction="prompt", use_case="companion_chatbot", session_id="s")
+    assert r.companion_warnings == []
+
+
+@patch("httpx.Client.post")
+def test_a_refused_check_keeps_its_warnings(post: MagicMock) -> None:
+    detail = {**REFUSAL_DETAIL, "companion_warnings": ["session_start_changed"]}
+    post.return_value = _resp({"detail": detail}, 429)
+    with pytest.raises(ComplianceError) as err:
+        _client().check(
+            "x", direction="prompt", use_case="companion_chatbot", context={"session_id": "s"}
+        )
+    assert err.value.companion_warnings == ["session_start_changed"]

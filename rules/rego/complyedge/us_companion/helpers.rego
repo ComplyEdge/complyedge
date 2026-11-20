@@ -21,8 +21,6 @@
 # US daylight-saving rule (second Sunday of March to first Sunday of
 # November) with fixed offsets, so no tz database is needed in the OPA
 # process. effective_to is the last day the leaf applies, inclusive.
-#
-# Spec: docs/architecture/companion-chatbot-laws-tech-spec.md X2, X6
 
 package complyedge.us_companion.helpers
 
@@ -35,7 +33,7 @@ minute_ns := 60000000000
 day_ns := 86400000000000
 
 # ── Context ──────────────────────────────────────────────────────────────────
-# A missing key means "unknown", never "adult" and never "not shown" (X1).
+# A missing key means "unknown", never "adult" and never "not shown".
 
 ctx(key, fallback) := object.get(object.get(input, "context", {}), key, fallback)
 
@@ -117,12 +115,12 @@ any_reply_label(codes) if {
 	reply_label(code)
 }
 
-# ── Session start and anchors (X6) ───────────────────────────────────────────
+# ── Session start and anchors ────────────────────────────────────────────────
 
 # The session start the app sent. When it sent none but says this check is
 # the session start, the start is now. Otherwise unknown: no interval can be
 # computed and periodic leaves stay silent (a check without a session gets
-# only the actions that need no interval, X1).
+# only the actions that need no interval).
 start_ns := s if {
 	s := ctx("session_started_ns", null)
 	is_number(s)

@@ -10,7 +10,7 @@
 # the operator has determined, by a permissible age assurance method, that
 # the user is not a covered minor.
 #
-# Each leaf below is one row of the X2 table. Rego reads only the model's
+# Each leaf below is one duty of the statute: one action, one trigger. Rego reads only the model's
 # labels, the check date, the context keys and the anchors.
 #
 # Legal citation: N.Y. Gen. Bus. Law Art. 47, §§ 1701, 1702; Art. 48, §§ 1800, 1801, 1804 (S9051-B, ch. 368, Laws of 2026)

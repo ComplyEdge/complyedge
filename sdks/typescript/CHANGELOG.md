@@ -16,6 +16,10 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+### Added
+- `ComplianceResult.companionWarnings` and `ComplyEdgeError.companionWarnings`: codes for what a companion check's request shows is wrong with the integration (`age_status_missing`, `session_start_changed`). Empty on an API that predates it.
+- `companionAssessment` can be `"operator_asserted"`: the actions came from the `operator_labels` you sent in `context`, and the meaning check did not run.
+
 ## [0.2.11] - 2026-11-18
 
 ### Added

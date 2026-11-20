@@ -1,7 +1,7 @@
-# ComplyEdge: US companion chatbot rule pack tests (spec T1, X2)
+# ComplyEdge: US companion chatbot rule pack tests
 # Run with: opa test rules/rego/ -v --run us_companion
 #
-# Expected actions are written by hand from the X2 table and the statutes,
+# Expected actions are written by hand from the statutes,
 # never read back from the pack. Times are written in the state's local
 # offset so the window edges read as the statute dates.
 

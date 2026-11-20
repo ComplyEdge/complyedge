@@ -213,9 +213,37 @@ describe("companion chatbot support", () => {
       expect(r.requiredActions).toEqual([]);
     });
 
+    it("parses warnings and operator_asserted, and sends operator_labels", async () => {
+      mockPost.mockResolvedValue({
+        data: {
+          ...CHECK_OK,
+          ...COMPANION_FIELDS,
+          companion_assessment: "operator_asserted",
+          companion_warnings: ["age_status_missing"],
+        },
+      });
+      const r = await client.check("x", {
+        direction: "prompt",
+        useCase: "companion_chatbot",
+        sessionId: "s",
+        companion: { operator_labels: ["expresses_self_harm"] },
+      });
+      expect(r.companionAssessment).toBe("operator_asserted");
+      expect(r.companionWarnings).toEqual(["age_status_missing"]);
+      expect(mockPost.mock.calls[0][1].context.operator_labels).toEqual(["expresses_self_harm"]);
+    });
+
+    it("a refused check keeps its warnings", () => {
+      const refusal = checkRefusal({
+        response: { status: 429, data: { detail: { companion_warnings: ["session_start_changed"] } } },
+      });
+      expect(refusal?.companionWarnings).toEqual(["session_start_changed"]);
+    });
+
     it("an older API without the fields parses as empty", async () => {
       mockPost.mockResolvedValue({ data: CHECK_OK });
       const r = await client.check("x");
+      expect(r.companionWarnings).toEqual([]);
       expect(r.companionAssessment).toBeNull();
       expect(r.companionNotAssessedReason).toBeNull();
       expect(r.companionFallback).toBe(false);

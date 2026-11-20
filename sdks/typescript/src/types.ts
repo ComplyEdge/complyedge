@@ -94,6 +94,13 @@ export interface CompanionContext {
   session_started_at?: string;
   minutes_today?: number;
   referrals_this_session?: number;
+  /**
+   * Label codes your own system found on this text, for example
+   * ["expresses_self_harm"]. When sent, the meaning check does not run: the
+   * actions come from these codes and the result says "operator_asserted".
+   * [] says your system looked and found nothing.
+   */
+  operator_labels?: string[];
 }
 
 /** Something a companion check tells your app to do for this message. */
@@ -308,14 +315,20 @@ export interface ComplianceResult {
   /** Client-measured round trip, including network. */
   processingTimeMs: number;
   /**
-   * Companion checks only: "assessed" or "not_assessed" (never a clean pass).
+   * Companion checks only: "assessed", "not_assessed" (never a clean pass) or
+   * "operator_asserted" (the actions came from the operator_labels you sent).
    * null on every other check and on an API that predates it.
    */
-  companionAssessment: "assessed" | "not_assessed" | null;
+  companionAssessment: "assessed" | "not_assessed" | "operator_asserted" | null;
   /** "plan", "budget", "unavailable", "no_direction" or "no_session"; else null. */
   companionNotAssessedReason: string | null;
   /** true when ComplyEdge could not work out the actions: apply your own protocol. */
   companionFallback: boolean;
+  /**
+   * What your requests show is wrong with the integration: "age_status_missing",
+   * "session_start_changed". Never changes the decision or the actions.
+   */
+  companionWarnings: string[];
   /** What your app must do for this message; [] when none or not a companion check. */
   requiredActions: RequiredAction[];
   /**

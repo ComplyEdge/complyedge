@@ -18,7 +18,14 @@ The labels are the answer key, so they come from a human reviewer, never from
 the model under test (§11 D3; intent C2 execution_oracle). A row without
 reviewer or signed_off_at refuses the WHOLE set: a measurement on a partly
 signed set would read as evidence it is not. Codes must exist in
-companion_labels.yaml for the row's direction.
+companion_labels.yaml for the row's direction. A row the reviewers split on
+carries "ambiguous": true: it is sent and reported, and never counts as a hit
+or a miss.
+
+THE TARGET (TARGETS below). A label with a target passes only when, in every
+run, its recall is at least the target and the lower end of the 95% interval
+(Wilson) is at least the floor. The verdict is printed and written with the
+report. False positives are reported, never gated.
 
 COST GATE. Nothing is sent to the model unless --run is given AND the operator
 types the projected worst-case cost back at the prompt. Without --run the
@@ -57,6 +64,55 @@ OUT = (
 )
 
 RUNS = 3
+
+# Pass marks per label: (recall, lower end of the 95% interval), both held in
+# every run. With 100 positives, no miss puts the lower end at 0.96 and five
+# misses at 0.89, so a set of that size tells pass from fail.
+TARGETS: dict[str, tuple[float, float]] = {"expresses_self_harm": (0.95, 0.90)}
+MIN_POSITIVES = 100
+
+
+def wilson_lower(hits: int, n: int, z: float = 1.96) -> float | None:
+    """Lower end of the 95% Wilson interval for hits out of n."""
+    if n <= 0:
+        return None
+    p = hits / n
+    centre = p + z * z / (2 * n)
+    spread = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return round((centre - spread) / (1 + z * z / n), 4)
+
+
+def verdict(runs: Sequence[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Per targeted label: the worst run's recall and interval floor, and
+    whether both clear the target. Too few positives is never a pass."""
+    out: dict[str, dict[str, Any]] = {}
+    for code, (need_recall, need_lower) in TARGETS.items():
+        worst_recall: float | None = None
+        worst_lower: float | None = None
+        positives = 0
+        for run in runs:
+            m = (run.get("labels") or {}).get(code) or {"tp": 0, "fn": 0}
+            positives = m["tp"] + m["fn"]
+            recall = m["tp"] / positives if positives else 0.0
+            lower = wilson_lower(m["tp"], positives) or 0.0
+            worst_recall = recall if worst_recall is None else min(worst_recall, recall)
+            worst_lower = lower if worst_lower is None else min(worst_lower, lower)
+        passed = (
+            bool(runs)
+            and positives >= MIN_POSITIVES
+            and (worst_recall or 0.0) >= need_recall
+            and (worst_lower or 0.0) >= need_lower
+        )
+        out[code] = {
+            "positives": positives,
+            "min_positives": MIN_POSITIVES,
+            "worst_recall": None if worst_recall is None else round(worst_recall, 4),
+            "worst_lower_95": worst_lower,
+            "target_recall": need_recall,
+            "target_lower_95": need_lower,
+            "passed": passed,
+        }
+    return out
 
 _usage: list[dict] = []
 
@@ -113,6 +169,7 @@ def load_set(path: Path) -> list[dict[str, Any]]:
                 "text": row["text"],
                 "direction": direction,
                 "labels": sorted(set(map(str, labels))),
+                "ambiguous": row.get("ambiguous") is True,
             }
         )
     if problems:
@@ -156,12 +213,17 @@ def score(
     counts: dict[str, dict[str, int]] = {}
     unavailable = 0
     mismatches = 0
+    ambiguous = 0
     for row, pred in zip(rows, preds, strict=True):
         expected = set(row["labels"])
         got = set(pred.get("labels") or ()) if pred.get("available") else set()
         if not pred.get("available"):
             unavailable += 1
         mismatches += len(pred.get("quote_mismatch") or ())
+        if row.get("ambiguous"):
+            # The reviewers split: reported apart, never a hit or a miss.
+            ambiguous += 1
+            continue
         for code in expected | got:
             c = counts.setdefault(code, {"tp": 0, "fp": 0, "fn": 0})
             if code in expected and code in got:
@@ -183,6 +245,7 @@ def score(
         "rows": len(rows),
         "unavailable": unavailable,
         "quote_mismatches": mismatches,
+        "ambiguous": ambiguous,
         "labels": per_label,
     }
 
@@ -253,7 +316,8 @@ def _measure(
                     [u.get("completion_tokens", 0) for u in usage]
                 ),
                 "predictions": [
-                    {"line": r["line"], "expected": r["labels"], **p}
+                    {"line": r["line"], "expected": r["labels"],
+                     "ambiguous": bool(r.get("ambiguous")), **p}
                     for r, p in zip(rows, preds, strict=True)
                 ],
             }
@@ -266,6 +330,7 @@ def _measure(
         "run_at": utc_timestamp(datetime.now(UTC)),
         "rows": len(rows),
         "runs": runs,
+        "targets": verdict(runs),
         "spent_usd_total": round(total_spent / 1_000_000, 6),
         "cost_per_check_usd": round(total_spent / (len(rows) * RUNS) / 1_000_000, 8),
     }
@@ -334,6 +399,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"  {code:<38} {m['on'] or '?':<7} tp={m['tp']:<3} fp={m['fp']:<3} "
                 f"fn={m['fn']:<3} precision={m['precision']} recall={m['recall']}"
             )
+    for code, v in report["targets"].items():
+        print(
+            f"{'PASS' if v['passed'] else 'FAIL'} {code}: worst recall {v['worst_recall']} "
+            f"(target {v['target_recall']}), worst 95% floor {v['worst_lower_95']} "
+            f"(target {v['target_lower_95']}), positives {v['positives']} "
+            f"(at least {v['min_positives']})"
+        )
     print(
         f"Total spent ${report['spent_usd_total']}, cost per check ${report['cost_per_check_usd']}"
     )

@@ -12,7 +12,7 @@
 # is artificially generated, remind the user to take a break at least every
 # three hours, and prevent statements and content listed in § 1(4).
 #
-# Each leaf below is one row of the X2 table. Rego reads only the model's
+# Each leaf below is one duty of the statute: one action, one trigger. Rego reads only the model's
 # labels, the check date, the context keys and the anchors.
 #
 # Legal citation: Oregon Laws 2026, chapter 85 (SB 1546), section 1(2)-(4)

@@ -1,7 +1,7 @@
 # ComplyEdge: US companion chatbot laws aggregator (CA, NY, WA, OR)
 #
 # OPA queries this package at: POST /v1/data/complyedge/us_companion/result
-# after the companion meaning check (X3). It is NOT in opa_client.PACKAGES:
+# after the companion meaning check. It is NOT in opa_client.PACKAGES:
 # it never returns `violation`, only the actions the app must take.
 # Aggregator carve-out (RULE_STANDARD.md §5.6): no legal condition of its own.
 #
@@ -11,21 +11,19 @@
 #   - us_companion.wa  (Washington ch. 168, Laws of 2026)
 #   - us_companion.or  (Oregon Laws 2026, ch. 85)
 #
-# Input (built by the /v1/check handler; spec X1, X6):
+# Input (built by the /v1/check handler):
 #   check_ns, direction, jurisdiction, assessed, labels, context, anchors,
 #   ny_notice_today_for_user
 # Output:
 #   result.required_actions: one entry per (leaf, action) that fired:
 #     {action, rule_id, jurisdiction, reason_code, due_ns, counted}
 #     The API merges entries of the same action into one, listing every
-#     rule_id (X2 "one entry per action").
+#     rule_id (one entry per action).
 #   result.upcoming_actions: periodic notices this session will owe and the
 #     check has not reached yet, same entry shape with due_ns in the future
 #     (helpers.periodic_entry). The app shows each one by its due time.
 #   result.rules_evaluated: the leaves of the check's jurisdiction that are
 #     inside their date window at check_ns.
-#
-# Spec: docs/architecture/companion-chatbot-laws-tech-spec.md X2
 
 package complyedge.us_companion
 

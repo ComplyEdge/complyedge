@@ -244,6 +244,7 @@ def _companion_fields(data: dict[str, Any]) -> dict[str, Any]:
         "companion_assessment": data.get("companion_assessment"),
         "companion_not_assessed_reason": data.get("companion_not_assessed_reason"),
         "companion_fallback": data.get("companion_fallback") is True,
+        "companion_warnings": [str(w) for w in (data.get("companion_warnings") or [])],
         "required_actions": _required_actions_from_payload(data),
         "upcoming_actions": _required_actions_from_payload(data, "upcoming_actions"),
     }
@@ -286,13 +287,17 @@ class ComplianceResult:
     sandbox: bool = False
     # Companion chatbot checks (use_case="companion_chatbot") only. None /
     # False / [] on every other check and on an API that predates them.
-    # "assessed" or "not_assessed"; not_assessed is never a clean pass.
+    # "assessed", "not_assessed" or "operator_asserted" (the actions came from
+    # the context.operator_labels you sent); not_assessed is never a clean pass.
     companion_assessment: str | None = None
     # plan, budget, unavailable, no_direction or no_session.
     companion_not_assessed_reason: str | None = None
     # True when ComplyEdge could not work out the actions for this message:
     # apply your own protocol to it.
     companion_fallback: bool = False
+    # What your requests show is wrong with the integration: "age_status_missing",
+    # "session_start_changed". Never changes the decision or the actions.
+    companion_warnings: list[str] = field(default_factory=list)
     required_actions: list[RequiredAction] = field(default_factory=list)
     # Periodic notices (break reminder, repeated not-human notice) this session
     # will owe that are not due yet. Show each one by its due_at even when no
@@ -342,6 +347,7 @@ class ComplianceError(Exception):
         companion_assessment: str | None = None,
         companion_not_assessed_reason: str | None = None,
         companion_fallback: bool = False,
+        companion_warnings: list[str] | None = None,
     ):
         # `retryable` exists because the retry decorator on check_compliance was
         # dead code: it was configured to retry httpx.RequestError and
@@ -368,6 +374,7 @@ class ComplianceError(Exception):
         self.companion_assessment = companion_assessment
         self.companion_not_assessed_reason = companion_not_assessed_reason
         self.companion_fallback = companion_fallback
+        self.companion_warnings = companion_warnings or []
 
 
 def _refusal_fields(response: httpx.Response) -> dict[str, Any]:

@@ -12,7 +12,7 @@
 # self-harm, including eating disorders, to crisis resources and prevents
 # content encouraging or describing how to commit self-harm.
 #
-# Each leaf below is one row of the X2 table. Rego reads only the model's
+# Each leaf below is one duty of the statute: one action, one trigger. Rego reads only the model's
 # labels, the check date, the context keys and the anchors.
 #
 # Legal citation: Chapter 168, Laws of 2026 (Engrossed Substitute House Bill 2225), Secs. 3, 4, 5, 9
