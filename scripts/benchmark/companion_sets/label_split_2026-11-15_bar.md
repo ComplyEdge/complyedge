@@ -1,8 +1,7 @@
 # Label split: pass bar (written before the run, 2026-11-15)
 
 Set: `label_split_2026-11-15.jsonl`, 60 replies. Keys come from the statute
-text, written by the agent on Leo Celis's instruction ("you do it, based on
-the research"); no human signed them.
+text and were written by an AI agent; no human signed them.
 
 Arms, each 3 runs on the same model (`companion_classifier_measure.py`):
 - OLD: the committed labels (`claims_human` = human or sentient;

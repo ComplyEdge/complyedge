@@ -313,6 +313,23 @@ await ce.preserve({
 });
 ```
 
+A refused check still says what the law asks. When the daily limit is reached
+(429) or the service cannot answer (503), `check` throws, and `checkRefusal`
+reads the same fields from the error. Show those notices too:
+
+```typescript
+import { checkRefusal } from "@complyedge/sdk";
+
+let actions;
+try {
+  actions = (await ce.check(userMessage, companionContext)).requiredActions;
+} catch (err) {
+  const refusal = checkRefusal(err);
+  if (!refusal) throw err;
+  actions = refusal.requiredActions; // empty when the error names none
+}
+```
+
 ## OpenAI middleware
 
 Wrap an OpenAI client so user messages are checked before they reach the model:
@@ -407,7 +424,10 @@ record with the same `userId`, `userRole` and `sessionId` attribution. Use
 ## Errors
 
 Network and HTTP failures surface as `AxiosError`. The middleware throws
-`ComplianceError` when a check blocks a request.
+`ComplianceError` when a check blocks a request. An error thrown by `check`
+for an HTTP answer also has `refusal`: the status, the parsed body, and the
+companion fields when the body holds them (`checkRefusal(err)` returns the
+same).
 
 ## Limitations and honest scope
 

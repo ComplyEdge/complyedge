@@ -824,7 +824,7 @@ def main() -> int:
     prompts = load_corpus(args.category)
     sha = corpus_sha(prompts)
     run_id = str(uuid.uuid4())
-    # AUD-178: runtime benchmark timestamp is ADCR Zulu.
+    # Runtime benchmark timestamp is ADCR Zulu.
     sys.path.insert(0, str(ROOT / "services" / "api"))
     from adcr_record import utc_timestamp
 

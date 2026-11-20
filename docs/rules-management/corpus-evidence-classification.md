@@ -4,7 +4,7 @@
 
 ## Why this document exists
 
-Every leaf policy in the corpus **detects** by matching a regular expression against `input.text` (plus `input.jurisdiction`). **All 75 of 75.** One rule, `article5/biometric_categorisation.rego`, additionally reads inputs that can only ever *suppress* a match, the Article 5(1)(g) carve-outs, and never uses them to detect one. That follows from the architecture: no LLM runs on the hot path, so the deterministic layer can only reason about the text in front of it, and it is a hard limit on what a decision proves.
+Every leaf policy in the eight packages the main check queries **detects** by matching a regular expression against `input.text` (plus `input.jurisdiction`). **All 75 of 75.** The US companion chatbot pack (`us_companion/`, six files) is outside this page: it does not match text, it reads the labels of the companion meaning check, which is a model. One rule, `article5/biometric_categorisation.rego`, additionally reads inputs that can only ever *suppress* a match, the Article 5(1)(g) carve-outs, and never uses them to detect one. That follows from the architecture: no LLM runs on the hot path, so the deterministic layer can only reason about the text in front of it, and it is a hard limit on what a decision proves.
 
 For some obligations that limit costs nothing: a request to socially score citizens *is* the prohibited practice, so blocking the text prevents the act. For others it is decisive: no text matcher can establish whether a quality management system, an Annex IV technical file, a human-oversight assignment or a FRIA exists. Stating which rule is which, in public, is cheaper than letting a reviewer discover it by opening one file.
 
@@ -169,8 +169,10 @@ Not safe to say: that the corpus "covers the high-risk requirements", or that a 
 ## Reproduce
 ```bash
 find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
+  ! -path '*/us_companion/*' ! -path '*/shared/*' \
   | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 75 leaves
 find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
+  ! -path '*/us_companion/*' ! -path '*/shared/*' \
   | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  8 aggregators
 ```
 

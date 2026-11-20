@@ -335,6 +335,13 @@ class ComplianceError(Exception):
         event_id: str | None = None,
         retryable: bool = False,
         code: str | None = None,
+        status_code: int | None = None,
+        body: Any = None,
+        required_actions: list[RequiredAction] | None = None,
+        upcoming_actions: list[RequiredAction] | None = None,
+        companion_assessment: str | None = None,
+        companion_not_assessed_reason: str | None = None,
+        companion_fallback: bool = False,
     ):
         # `retryable` exists because the retry decorator on check_compliance was
         # dead code: it was configured to retry httpx.RequestError and
@@ -348,6 +355,34 @@ class ComplianceError(Exception):
         #: The API's error code when it sends one (companion endpoints answer
         #: {"code", "message"}), e.g. "check_not_written_yet"; else None.
         self.code = code
+        #: The HTTP status and parsed JSON body of a refused check; None when
+        #: the error did not come from an HTTP answer.
+        self.status_code = status_code
+        self.body = body
+        #: A refused companion check (daily cap 429, 503) still says what the
+        #: law asks for this message. The API sends these in the error body;
+        #: they used to be flattened into the message string, so an app that
+        #: caught the error could not show the crisis referral it was owed.
+        self.required_actions = required_actions or []
+        self.upcoming_actions = upcoming_actions or []
+        self.companion_assessment = companion_assessment
+        self.companion_not_assessed_reason = companion_not_assessed_reason
+        self.companion_fallback = companion_fallback
+
+
+def _refusal_fields(response: httpx.Response) -> dict[str, Any]:
+    """What a refused check's body carries, for ComplianceError: the status,
+    the parsed body, and the companion fields when the detail holds them."""
+    fields: dict[str, Any] = {"status_code": response.status_code}
+    try:
+        body = response.json()
+    except Exception:
+        return fields
+    fields["body"] = body
+    detail = body.get("detail") if isinstance(body, dict) else None
+    if isinstance(detail, dict):
+        fields.update(_companion_fields(detail))
+    return fields
 
 
 # The retry decorators wait at most this long between attempts
@@ -885,6 +920,7 @@ class ComplyEdge:
             raise ComplianceError(
                 f"API error ({status}): {error_detail}",
                 retryable=_status_is_retryable(e.response),
+                **_refusal_fields(e.response),
             ) from e
 
         except httpx.RequestError as e:
@@ -1129,8 +1165,9 @@ class ComplyEdge:
                 check, sending the same one again records nothing new
                 (``duplicate`` is True). For an action a check asked for, the
                 check and interval identify it, so any retry is a duplicate.
-            source: ``complyedge`` (ComplyEdge's text was shown) or
-                ``operator`` (your own text).
+            source: ``complyedge`` (a check asked for this notice) or
+                ``operator`` (your app decided to show it on its own).
+                ComplyEdge ships no notice text; the wording is yours.
             shown_at: When the user saw it.
             session_id: Defaults to this client's session_id. Required.
             format: ``app``, ``browser`` or ``other`` (how the user reached
@@ -1665,6 +1702,7 @@ class ComplyEdgeClient:
             raise ComplianceError(
                 f"API error ({status}): {error_detail}",
                 retryable=_status_is_retryable(e.response),
+                **_refusal_fields(e.response),
             ) from e
 
         except httpx.RequestError as e:
@@ -1849,6 +1887,7 @@ class AsyncComplyEdgeClient:
             raise ComplianceError(
                 f"API error ({status}): {error_detail}",
                 retryable=_status_is_retryable(e.response),
+                **_refusal_fields(e.response),
             ) from e
 
         except httpx.RequestError as e:

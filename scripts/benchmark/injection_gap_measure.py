@@ -201,7 +201,7 @@ def main() -> int:
             "semantic": _arm_summary(rows, arm, "semantic"),
         }
 
-    # AUD-178: gap measure run_id stamp is ADCR Zulu.
+    # Gap measure run_id stamp is ADCR Zulu.
     sys.path.insert(0, str(REPO / "services" / "api"))
     from adcr_record import utc_timestamp
 

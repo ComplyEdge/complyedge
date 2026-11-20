@@ -1,6 +1,6 @@
 """The Python SDK does not retry a 429 it cannot outwait.
 
-Leo, 2026-09-29 (ledger PRV-152): every 429 was marked retryable, so a tenant
+Found 2026-09-29: every 429 was marked retryable, so a tenant
 over its daily check cap waited ~14s across three attempts and sent two more
 requests certain to be refused, because the cap resets at 00:00 UTC. A 429 is
 now retried only when the server's wait fits the retry budget. Transient

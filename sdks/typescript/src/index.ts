@@ -22,7 +22,8 @@ export {
   regionFromApiKey,
   resolveBaseUrl,
 } from "./client";
-export type { Region, AttributionFields } from "./client";
+export { checkRefusal } from "./client";
+export type { Region, AttributionFields, CheckRefusal } from "./client";
 export { ReceiptJournal } from "./receiptJournal";
 export type { ReceiptEntry } from "./receiptJournal";
 export { withCompliance, ComplianceError } from "./openai-middleware";

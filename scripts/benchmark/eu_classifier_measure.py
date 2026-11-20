@@ -89,7 +89,7 @@ async def _run(model: str, concurrency: int) -> dict:
     blocks = [r for r in rows if r["expected"] != "none"]
     passes = [r for r in rows if r["expected"] == "none"]
     lat = [r["latency_ms"] for r in rows]
-    # AUD-178: EU classifier measure run_at is ADCR Zulu.
+    # EU classifier measure run_at is ADCR Zulu.
     from adcr_record import utc_timestamp
 
     return {

@@ -116,7 +116,7 @@ TrustLint Report
 ────────────────────────────────────────────────────────────
 
 [CRITICAL] SOX_HYBRID_MATERIAL_DISCLOSURE_001
-  Hybrid SOX Material Information Disclosure Prevention
+  Regulation FD material information disclosure review
   Jurisdiction: US | Matched: Forward-looking statements requiring analysis
 
 ────────────────────────────────────────────────────────────

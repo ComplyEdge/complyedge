@@ -1,10 +1,10 @@
-"""ComplyEdge origin signature on anchor statements (GAP-TR-03 / tech-spec §13).
+"""ComplyEdge origin signature on anchor statements (tech-spec §13).
 
 Signs the same statement bytes the TSA timestamps. Proves the producer (CE)
 asserted that chain head; not an eIDAS qualified seal. Hot /v1/check path never
 calls this — only the hourly anchor job (and tests).
 
-When ``AUDIT_ORIGIN_KMS_KEY_ID`` is unset, signing is skipped so AUD-012 can
+When ``AUDIT_ORIGIN_KMS_KEY_ID`` is unset, signing is skipped so the anchor job can
 deploy before the origin key exists. When set, every stored anchor carries
 ``signatures: [{alg, key_ref, value}]``.
 """

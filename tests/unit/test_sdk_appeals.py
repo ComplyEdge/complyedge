@@ -146,7 +146,7 @@ def test_validation_error_names_the_field() -> None:
 
 def test_review_not_recorded_is_not_retryable() -> None:
     """The API says trying again will not help (the account's audit key is
-    unavailable); code that retries on e.retryable must not loop (PRV-191)."""
+    unavailable); code that retries on e.retryable must not loop."""
     seen: list[httpx.Request] = []
     detail = {"code": "review_not_recorded", "message": "The answer was not saved."}
     ce = _client(503, {"detail": detail}, seen)

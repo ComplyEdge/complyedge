@@ -2,7 +2,7 @@
 
 This directory holds the rules ComplyEdge checks AI inputs and outputs against. It is the machine-readable side of the open rulebook: every rule has a stable ID, and every ID resolves to the legal provision it implements and the citation that goes into the record.
 
-The rulebook itself (the versioned document, its schema, the rule index and its changelog) is published at [complyedge.io/rulebook](https://complyedge.io/rulebook/). Each rule also has its own page at `https://complyedge.io/rulebook/rules/<rule_id>`, for example [`/rulebook/rules/rego-art5-1c-001`](https://complyedge.io/rulebook/rules/rego-art5-1c-001). How the IDs and citations are written is set out in [`RULE_STANDARD.md`](RULE_STANDARD.md).
+The rulebook itself (the versioned document, its schema, the rule index and its changelog) is published at [complyedge.io/rulebook](https://complyedge.io/rulebook/). Every rule ID, with the law behind it and its approval state, is listed at [complyedge.io/rule-set](https://complyedge.io/rule-set/). How the IDs and citations are written is set out in [`RULE_STANDARD.md`](RULE_STANDARD.md).
 
 ## Directory map
 

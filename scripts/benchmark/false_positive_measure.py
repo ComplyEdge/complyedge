@@ -422,7 +422,7 @@ def main() -> int:
             engine.close()
     checks = len(pairs)
 
-    # AUD-178: measure receipt run_at is ADCR Zulu.
+    # Measure receipt run_at is ADCR Zulu.
     sys.path.insert(0, str(REPO / "services" / "api"))
     from adcr_record import utc_timestamp
 

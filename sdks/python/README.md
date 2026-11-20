@@ -287,6 +287,22 @@ ce.preserve(
 )
 ```
 
+A refused check still says what the law asks. When the daily limit is reached
+(429) or the service cannot answer (503), `check` raises `ComplianceError`, and
+the error carries the same fields as a result. Show those notices too:
+
+```python
+from complyedge import ComplianceError
+
+try:
+    result = ce.check(user_message, direction="prompt", use_case="companion_chatbot",
+                      context={"session_id": session_id})
+    actions = result.required_actions
+except ComplianceError as err:
+    actions = err.required_actions   # empty when the error names none
+    print(err.status_code, err.companion_not_assessed_reason)
+```
+
 Or the global convenience functions:
 
 ```python

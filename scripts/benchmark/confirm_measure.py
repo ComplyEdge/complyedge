@@ -223,7 +223,7 @@ def main() -> int:
         by_domain[r["domain"]][0] += r["cleared_at"].get(str(t_ship), False)
     leaks = [r for r in mb_rows if r["cleared_at"].get(str(t_ship), False)]
     lat = [r["latency_ms"] for r in rows]
-    # AUD-178: confirm measure run_at is ADCR Zulu.
+    # Confirm measure run_at is ADCR Zulu.
     from adcr_record import utc_timestamp
 
     report = {

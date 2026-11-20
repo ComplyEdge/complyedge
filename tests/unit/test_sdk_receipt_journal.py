@@ -1,4 +1,4 @@
-"""GAP-TR-05 / AUD-222: SDK receipt journal never stores prompt text."""
+"""SDK receipt journal never stores prompt text."""
 
 from __future__ import annotations
 

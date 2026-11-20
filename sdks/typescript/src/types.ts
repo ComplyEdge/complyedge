@@ -119,7 +119,10 @@ export interface RequiredAction {
 export interface ConfirmActionInput {
   /** Your own id for this confirmation. Sending it again records nothing new. */
   confirmationId: string;
-  /** "complyedge": ComplyEdge's text was shown. "operator": your own text. */
+  /**
+   * "complyedge": a check asked for this notice. "operator": your app decided
+   * to show it on its own. ComplyEdge ships no notice text; the wording is yours.
+   */
   source: "complyedge" | "operator";
   /** When the user saw it. */
   shownAt: Date | string;

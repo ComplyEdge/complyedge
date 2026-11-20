@@ -225,7 +225,7 @@ def json_value(value: Any, key: str = "") -> Any:
         d = Decimal(repr(value)) if isinstance(value, float) else value
         return int(d) if d == d.to_integral_value() else decimal_string(d)
     if isinstance(value, datetime):
-        # AUD-053: datetime objects must not keep a caller offset in the
+        # Datetime objects must not keep a caller offset in the
         # ADCR record / chain input. Same Zulu shape as occurred_at (REC-04).
         return utc_timestamp(value)
     if isinstance(value, UUID):
@@ -243,7 +243,7 @@ def utc_timestamp(value: Any) -> str:
     """RFC 3339 UTC with a Z: milliseconds when the value has no finer part,
     else microseconds, so no stored precision is lost.
 
-    AUD-103: junk / empty values raise ValueError (not bare TypeError), so
+    Junk / empty values raise ValueError (not bare TypeError), so
     ADCR export callers can fail closed with one exception type.
     """
     try:
@@ -268,7 +268,7 @@ def utc_timestamp(value: Any) -> str:
 
 
 def _optional_utc_timestamp(value: Any) -> str | None:
-    """UTC Zulu stamp, or None when unparseable (AUD-117 optional rights stamps)."""
+    """UTC Zulu stamp, or None when unparseable (optional rights stamps)."""
     try:
         return utc_timestamp(value)
     except ValueError:
@@ -378,8 +378,8 @@ def retention_fields(when: datetime, retention_days: int | None) -> dict[str, st
     # the floor. Positive lengths are written as given (the retention API only
     # accepts profile classes for new settings).
     days = AUDIT_RETENTION_DAYS if not retention_days else int(retention_days)
-    # UTC calendar arithmetic (AUD-037): same convention as EVENT# SK writers.
-    # AUD-131: store erase_after as ADCR Zulu (utc_timestamp), not bare +00:00
+    # UTC calendar arithmetic: same convention as EVENT# SK writers.
+    # Store erase_after as ADCR Zulu (utc_timestamp), not bare +00:00
     # isoformat, so write-time shape matches to_adcr / verifier.
     t = when.replace(tzinfo=UTC) if when.tzinfo is None else when.astimezone(UTC)
     return {
@@ -531,7 +531,7 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
         if row.get("retention_class"):
             retention["class"] = row["retention_class"]
         if row.get("retention_erase_after"):
-            # AUD-113: junk erase_after must not abort the whole ADCR record;
+            # Junk erase_after must not abort the whole ADCR record;
             # keep class and omit erase_after (occurred_at still fail-closed).
             try:
                 retention["erase_after"] = utc_timestamp(row["retention_erase_after"])
@@ -580,7 +580,7 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
             "rectified_at",
         ):
             if row.get(f) is not None:
-                # AUD-117: junk *_at must not abort the whole ADCR record.
+                # Junk *_at must not abort the whole ADCR record.
                 if f.endswith("_at"):
                     stamp = _optional_utc_timestamp(row[f])
                     if stamp is None:
@@ -674,7 +674,7 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
                 rec[f] = row[f]
                 used.add(f)
         if row.get("review_opened_at"):
-            # AUD-117: junk review_opened_at omits the field; keep oversight.
+            # Junk review_opened_at omits the field; keep oversight.
             stamp = _optional_utc_timestamp(row["review_opened_at"])
             if stamp is not None:
                 rec["review_opened_at"] = stamp
@@ -798,11 +798,11 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
 def _anchor_entry(stored: dict[str, Any]) -> dict[str, Any]:
     """One stored anchor (audit_anchor.anchor_head) as an EXP-01 anchor.
 
-    AUD-119: junk ``anchored_at`` must not abort the whole ADCR export;
+    Junk ``anchored_at`` must not abort the whole ADCR export;
     omit ``stored_at`` and keep statement / token / provider.
 
     Raises ValueError when required anchor fields are missing or statement
-    JSON is unparseable (AUD-130: export_document skips those anchors).
+    JSON is unparseable (export_document skips those anchors).
     """
     try:
         statement = json.loads(stored["statement"])
@@ -820,7 +820,7 @@ def _anchor_entry(stored: dict[str, Any]) -> dict[str, Any]:
     stored_at = _optional_utc_timestamp(stored.get("anchored_at"))
     if stored_at is not None:
         entry["stored_at"] = stored_at
-    # GAP-TR-03 / CHN-05: pass through producer origin signatures when present.
+    # CHN-05: pass through producer origin signatures when present.
     sigs = stored.get("signatures")
     if isinstance(sigs, list) and sigs:
         entry["signatures"] = sigs
@@ -853,7 +853,7 @@ def export_document(
             if not row.get("chain_alg"):
                 skipped_pre_chain += 1
             continue
-        # AUD-127: one junk occurred_at (or other fail-closed stamp) must not
+        # One junk occurred_at (or other fail-closed stamp) must not
         # abort the whole ADCR package; skip that row (still in storage / plain
         # export). to_adcr itself stays fail-closed for single-row callers.
         try:
@@ -861,7 +861,7 @@ def export_document(
         except ValueError:
             skipped_unmapped += 1
             continue
-        # AUD-129: empty/missing timestamp maps without occurred_at; skip so
+        # Empty/missing timestamp maps without occurred_at; skip so
         # the package does not ship records the verifier must reject.
         if not rec.get("occurred_at"):
             skipped_unmapped += 1
@@ -876,7 +876,7 @@ def export_document(
     chained.sort(key=lambda r: r["chain"]["seq"])
     seqs = [r["chain"]["seq"] for r in chained]
     last = max(seqs) if seqs else 0
-    # AUD-130: one broken stored anchor must not abort the whole package.
+    # One broken stored anchor must not abort the whole package.
     entries: list[dict[str, Any]] = []
     for a in anchors:
         try:
@@ -907,7 +907,7 @@ def export_document(
             "last_seq": last,
             "chained_rows": len(chained),
             "pre_chain_rows": skipped_pre_chain,
-            # AUD-127: exportable rows that failed to_adcr (e.g. junk timestamp).
+            # Exportable rows that failed to_adcr (e.g. junk timestamp).
             "unmapped_rows": skipped_unmapped,
         },
         "anchors": entries,

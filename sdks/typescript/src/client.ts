@@ -195,7 +195,7 @@ export class ComplyEdgeClient {
       }
     }
 
-    const response = await this.http.post(path, {
+    const response = await this.postCheck(path, {
       text,
       agent_id: context?.agentId || this.agentId,
       jurisdiction,
@@ -252,6 +252,24 @@ export class ComplyEdgeClient {
     };
     this.receiptJournal?.appendResult(result);
     return result;
+  }
+
+  /**
+   * POST a check. A refused check (daily cap 429, 503) is rethrown as the
+   * same error, with `refusal` set when the API's body holds the companion
+   * fields. They used to stay unparsed on `err.response.data`, so an app that
+   * caught the error could not show the crisis referral it was owed.
+   */
+  private async postCheck(path: string, body: unknown) {
+    try {
+      return await this.http.post(path, body);
+    } catch (err) {
+      const refusal = checkRefusal(err);
+      if (refusal && typeof err === "object" && err !== null) {
+        (err as { refusal?: CheckRefusal }).refusal = refusal;
+      }
+      throw err;
+    }
   }
 
   /**
@@ -603,6 +621,48 @@ export function canonicalConversation(conversation: ConversationMessage[] | stri
 function isoUtc(value?: Date | string): string {
   if (value === undefined) return new Date().toISOString();
   return typeof value === "string" ? value : value.toISOString();
+}
+
+/**
+ * What a refused check still says. Read it from a caught error with
+ * `checkRefusal(err)`, or from `err.refusal` on an error thrown by `check()`.
+ */
+export interface CheckRefusal {
+  /** HTTP status of the refusal, for example 429 or 503. */
+  status: number;
+  /** The API's parsed JSON body. */
+  body: unknown;
+  companionAssessment: string | null;
+  companionNotAssessedReason: string | null;
+  companionFallback: boolean;
+  /** What the law asks for this message; empty when the body names none. */
+  requiredActions: RequiredAction[];
+  upcomingActions: RequiredAction[];
+}
+
+/**
+ * The refusal carried by an error from `check()`, or null when the error is
+ * not an HTTP answer. A refused companion check (daily cap, service
+ * unavailable) still lists `requiredActions`: show them.
+ */
+export function checkRefusal(err: unknown): CheckRefusal | null {
+  const response = (err as { response?: { status?: unknown; data?: unknown } } | null)?.response;
+  if (!response || typeof response.status !== "number") return null;
+  const raw = (response.data as { detail?: unknown } | null | undefined)?.detail;
+  const detail = (raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {}) as Record<
+    string,
+    unknown
+  >;
+  return {
+    status: response.status,
+    body: response.data,
+    companionAssessment: (detail.companion_assessment as string | undefined) ?? null,
+    companionNotAssessedReason:
+      (detail.companion_not_assessed_reason as string | undefined) ?? null,
+    companionFallback: detail.companion_fallback === true,
+    requiredActions: parseRequiredActions(detail.required_actions),
+    upcomingActions: parseRequiredActions(detail.upcoming_actions),
+  };
 }
 
 /** The API's error detail as one line: a message, or each field and its problem. */

@@ -571,3 +571,66 @@ def test_preserve_returns_the_account_duties(post: MagicMock) -> None:
         CONVO_A, trigger="serious_self_harm", preserved_at="2026-11-14T20:00:00Z",
         deciding_system_version="pal-3")
     assert r.account_duties == ["notify_parent_if_practicable", "retain_account"]
+
+
+# --- a refused check still carries what the law asks ------------------------
+# The API puts the companion fields in the 429 and 503 body (spec X4). The SDK
+# used to flatten the whole body into the message string, so an app that caught
+# ComplianceError could not show the crisis referral it was owed.
+
+REFUSAL_DETAIL = {
+    "error": "daily_limit_exceeded",
+    "message": "Daily limit reached.",
+    **COMPANION_FIELDS,
+    "companion_assessment": "not_assessed",
+    "companion_not_assessed_reason": "unavailable",
+    "upcoming_actions": [
+        {
+            "action": "show_break_reminder",
+            "rule_ids": ["us-ca-22602c2-break"],
+            "jurisdiction": "US-CA",
+            "reason_code": "ca_22602c2_break",
+            "due_at": "2026-11-14T23:00:00Z",
+            "counted": True,
+        }
+    ],
+}
+
+
+@pytest.mark.parametrize("status", [429, 503])
+@patch("httpx.Client.post")
+def test_refused_companion_check_keeps_its_required_actions(
+    post: MagicMock, status: int
+) -> None:
+    post.return_value = _resp({"detail": REFUSAL_DETAIL}, status)
+    with pytest.raises(ComplianceError) as err:
+        _client().check(
+            "I keep thinking about ending it.",
+            direction="prompt",
+            use_case="companion_chatbot",
+            context={"session_id": "s-1"},
+        )
+    e = err.value
+    assert e.status_code == status
+    assert e.body == {"detail": REFUSAL_DETAIL}
+    assert [a.action for a in e.required_actions] == ["show_crisis_referral", "block_reply"]
+    assert isinstance(e.required_actions[0], RequiredAction)
+    assert [a.action for a in e.upcoming_actions] == ["show_break_reminder"]
+    assert e.companion_assessment == "not_assessed"
+    assert e.companion_not_assessed_reason == "unavailable"
+
+
+@patch("httpx.Client.post")
+def test_refusal_without_companion_fields_parses_as_empty(post: MagicMock) -> None:
+    post.return_value = _resp({"detail": "Daily limit reached."}, 429)
+    with pytest.raises(ComplianceError) as err:
+        _client().check("hello")
+    assert err.value.status_code == 429
+    assert err.value.required_actions == [] and err.value.upcoming_actions == []
+    assert err.value.companion_assessment is None
+    assert "Daily limit reached." in str(err.value)
+
+
+def test_an_error_with_no_http_answer_has_empty_refusal_fields() -> None:
+    e = ComplianceError("Request failed: timeout", retryable=True)
+    assert e.status_code is None and e.body is None and e.required_actions == []

@@ -167,7 +167,7 @@ def assess_evidence_completeness(events: list[dict[str, Any]]) -> dict[str, Any]
         if not missing:
             complete += 1
             continue
-        # AUD-043: compare UTC instants. Lexicographic string compare against
+        # Compare UTC instants. Lexicographic string compare against
         # EVIDENCE_CONTRACT_SINCE amnestied post-contract hollow rows stamped
         # with a negative offset (wall clock looked "before" the cutover).
         instant = _parse_event_instant(event.get("timestamp") or event.get("ts"))
@@ -247,7 +247,7 @@ def normalize_event(value: Any) -> Any:
         # 114 would serialize as 114.0 and break the wire/hash equality again.
         return int(value) if value == value.to_integral_value() else float(value)
     if isinstance(value, datetime):
-        # AUD-054: export wire must not keep a caller offset. Naive → UTC;
+        # Export wire must not keep a caller offset. Naive → UTC;
         # aware → UTC instant. date (no time) stays calendar-only below.
         if value.tzinfo is None:
             value = value.replace(tzinfo=UTC)
@@ -295,8 +295,8 @@ def _link_hash(previous_hash: str, event: dict[str, Any]) -> str:
 def _parse_event_instant(value: Any) -> datetime | None:
     """UTC datetime for an event timestamp, or None if unparseable.
 
-    Used by the evidence cutover (AUD-043) and export-time chain order
-    (AUD-044). Naive values are treated as UTC; offsets convert to UTC.
+    Used by the evidence cutover and export-time chain order. Naive values
+    are treated as UTC; offsets convert to UTC.
     """
     if value is None or value == "":
         return None
@@ -304,7 +304,7 @@ def _parse_event_instant(value: Any) -> datetime | None:
         t = value
     else:
         try:
-            # AUD-092: TypeError on junk types must not break export sort / cutover.
+            # TypeError on junk types must not break export sort / cutover.
             t = datetime.fromisoformat(str(value).strip().replace("Z", "+00:00"))
         except (TypeError, ValueError):
             return None
@@ -314,7 +314,7 @@ def _parse_event_instant(value: Any) -> datetime | None:
 
 
 def _sort_events_chronologically(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    # AUD-044: sort by UTC instant. String order put a later UTC row ahead of
+    # Sort by UTC instant. String order put a later UTC row ahead of
     # an earlier one when the later row used a smaller offset wall clock.
     far_future = datetime.max.replace(tzinfo=UTC)
 
@@ -346,8 +346,8 @@ EXPORT_INTERNAL_KEYS = frozenset(
 )
 
 #: Stamp fields that may arrive as ISO strings with a leftover offset.
-#: ``normalize_event`` only converts ``datetime`` objects (AUD-054); string
-#: offsets must be rewritten here so wire and export-time hash match (AUD-109).
+#: ``normalize_event`` only converts ``datetime`` objects; string
+#: offsets must be rewritten here so wire and export-time hash match.
 _EXPORT_STAMP_KEYS = (
     "timestamp",
     "ts",
@@ -359,7 +359,7 @@ _EXPORT_STAMP_KEYS = (
     "detected_at",
     "reported_at",
     "review_opened_at",
-    # AUD-128 / AUD-132: same UTC/None rewrite as list normalize.
+    # Same UTC/None rewrite as list normalize.
     "reviewed_at",
     "created_at",
     "updated_at",
@@ -371,9 +371,9 @@ _EXPORT_STAMP_KEYS = (
 def _utc_stamp_string(value: Any) -> Any:
     """ISO string → UTC isoformat; datetime left for normalize_event; junk → None.
 
-    AUD-122: do not re-echo unparseable stamp strings on the export wire
-    (same None contract as list normalize AUD-115/120).
-    AUD-137: empty string is None (same as utc_iso_text / AUD-135), not "".
+    Do not re-echo unparseable stamp strings on the export wire
+    (same None contract as list normalize).
+    Empty string is None (same as utc_iso_text), not "".
     """
     if value is None or isinstance(value, datetime):
         return value
@@ -387,7 +387,7 @@ def _utc_stamp_string(value: Any) -> Any:
 
 def export_event(event: dict[str, Any]) -> dict[str, Any]:
     """One event as the customer receives it: JSON-native, storage keys removed."""
-    # AUD-109: rewrite offset stamp *strings* before Decimal/datetime walk.
+    # Rewrite offset stamp *strings* before Decimal/datetime walk.
     shaped = dict(event)
     for key in _EXPORT_STAMP_KEYS:
         if key in shaped:
@@ -556,9 +556,9 @@ def write_time_chain_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
         summary["first_seq"] = first
         summary["last_seq"] = max(seqs)
         first_event = next(e for e in chained if _seq(e) == first)
-        # AUD-070: envelope chain_since must be UTC instant text, not a leftover
+        # Envelope chain_since must be UTC instant text, not a leftover
         # -03:00 wall clock from a pre-normalize row (stdlib-only module).
-        # AUD-121: omit chain_since when the first chained stamp is junk;
+        # Omit chain_since when the first chained stamp is junk;
         # do not str() garbage into the envelope.
         since = _parse_event_instant(first_event.get("timestamp"))
         if since is not None:
@@ -870,7 +870,7 @@ def _check_origin_signatures(
     statement: str,
     origin_pubkeys: list[str] | None,
 ) -> list[tuple[str, str]]:
-    """Findings about CE origin signatures on one anchor (GAP-TR-03 / §13).
+    """Findings about CE origin signatures on one anchor (§13).
 
     Missing signatures → informational ``no_origin_signature`` (not failing).
     Present but no pubkey → ``origin_signature_not_checked`` (blocks verified).
@@ -1009,7 +1009,7 @@ def verify_write_time_chain(
     # A pre-chain row dated after the chain began is not legacy: it is the
     # writer dropping the chain now. The July 2026 incident's shape, and it
     # must fail.
-    # AUD-045: compare UTC instants. String min/compare amnestied post-start
+    # Compare UTC instants. String min/compare amnestied post-start
     # hollow unchained rows when a later chained row used a smaller offset
     # wall clock as the "chain_since" string, and false-flagged pre-start rows.
     if chained:

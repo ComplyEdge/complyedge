@@ -37,7 +37,7 @@ ComplyEdge TrustLint is an MCP server built on the official [MCP Python SDK](htt
 | Tool | What it does |
 |---|---|
 | `check_compliance` | Check text against the TrustLint rule set. Returns PASS/FAIL with rule ID, severity, and the citation behind each finding. |
-| `list_rules` | List available rules, filterable by jurisdiction (`EU`, `US`, `Global`, `Universal`). |
+| `list_rules` | List available rules, filterable by jurisdiction (`EU`, `US`, `GLOBAL`). |
 | `scan_prompt` | Pre-generation prompt scan. Returns `SAFE` or `RISK_DETECTED` before the model is called. |
 | `sandbox_check` | Optional, with your API key: hosted enforcement in sandbox mode (`POST /v1/sandbox/check`). Your tenant's real rules and settings, the same verdict as production, and nothing recorded: no audit entry, no usage, and no count against your plan's daily limit (sandbox calls have their own caps: 60 a minute, 1,000 a day). Returns `BLOCKED` with rule ID and article citation, or `ALLOWED`. Never evidence. |
 
@@ -163,7 +163,7 @@ def my_agent(prompt):
     return llm.generate(prompt)  # every input and output checked
 ```
 
-Three lines. Every AI input and output checked against AI laws: with the default EU jurisdiction, the EU AI Act rule set (Article 5, Article 50, GPAI), plus prompt injection rules on every check. Every decision gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed text hash; a block by a rule also gets its legal citation. On a paid plan the injection check can also block when the month's model budget covers it, and that block names the law. A wider-review block does not cite an article. If that review is on and clears every hit, the request is allowed. With the default `fail_mode="open"`, an API outage lets traffic through unchecked and unrecorded; use `fail_mode="closed"` to block instead.
+Three lines. Every AI input and output checked against AI laws: with the default EU jurisdiction, the EU AI Act rule set (Article 5, Article 50, GPAI), plus prompt injection rules on every check. Every decision gets a record with an `event_id`, the rules that fired (if any), a timestamp and a keyed text hash; a block by a rule also gets its legal citation. On a paid plan the injection check can also block when the month's model budget covers it, and that block names the law. A wider-review block does not cite an article. If that review is on and clears every hit, the request is allowed. With the default `fail_mode="open"`, an API outage lets traffic through unchecked and unrecorded; set `COMPLYEDGE_FAIL_MODE=closed`, or pass `config=ComplianceConfig(fail_mode="closed")`, to block instead.
 
 Set `COMPLYEDGE_API_KEY` to your key. The decorator activates by default; to disable without removing the key (e.g., in CI), set `COMPLYEDGE_ENABLED=false`.
 
@@ -206,7 +206,7 @@ assert ce.verify_input(result.event_id, text)   # True only for this exact text
 
 In TypeScript the same call is `client.verifyInput(eventId, text)`. The text you send to verify is used for that request only; it is not stored and not logged. If your copy of the text is gone, the record still proves that a decision was made and which rule made it, but not which text it was about. Full walkthrough: [complyedge.io/docs/audit-reconciliation.html](https://complyedge.io/docs/audit-reconciliation.html).
 
-Each record joins your account's hash chain as it is written, in the same transaction. On Enterprise, the audit export carries that chain and is tamper-evident: any edit, deletion or reordering of a record is detectable, and a reviewer can check it offline with `python -m audit_export verify export.json` ([`services/api/audit_export.py`](services/api/audit_export.py)).
+Each record joins your account's hash chain as it is written, in the same transaction. On Enterprise, the audit export carries that chain and is tamper-evident: any edit, deletion or reordering of a record is detectable, and a reviewer can check it offline with `cd services/api && python -m audit_export verify export.json` ([`services/api/audit_export.py`](services/api/audit_export.py)).
 
 The log is written for the people who have to judge a decision afterwards: an auditor, a data protection officer, a certifier. It records what was checked and what was decided; it does not prove that every AI call went through it (only routed calls are checked), and it does not decide whether a law applies to your system.
 
@@ -253,8 +253,13 @@ Both cite the same legal article and differ only in engine. Map between them via
 
 ```
 sdks/python/          Python SDK (@compliance_check decorator, CLI)
-  └ complyedge/mcp_server.py   MCP server (stdio): check_compliance, list_rules, scan_prompt
+  └ complyedge/mcp_server.py   MCP server (stdio): check_compliance, list_rules, scan_prompt, sandbox_check
+sdks/typescript/      TypeScript SDK (@complyedge/sdk)
 packages/trustlint/   Offline regex linter (TrustLint): no API key, for CI/CD
+packages/mcp/         MCP server on Node (@complyedge/mcp)
+services/api/         Audit export and its offline verifier, ADCR record builder
+providers/            GPAI provider documentation files behind the leaderboard
+docs/                 Rule evidence classification, prompt-injection conformity notes
 rules/regulations/    YAML rules (EU AI Act, GDPR, HIPAA, SOX, PCI DSS, and more)
 rules/rego/           Leaf OPA/Rego policies + package aggregators
 rules/schemas/        Rule validation schema
@@ -268,11 +273,11 @@ tests/                Rule validation + acceptance tests
 
 YAML rules (EU, US, global and universal) and deterministic leaf OPA/Rego policies (plus package aggregators). The rule set page for each digest lists every rule.
 
-**What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf decides by matching the evaluated text (the leaf does not call a model). On a paid plan the hosted check also runs an injection meaning check after a clean pass when the month's model budget covers it. If that budget is used up, the phrase rules decide. For some of them the text *is* the regulated act (Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and secrets matched by format and checksum, one US disclosure control) so a block prevents the act and the citation on the decision is load-bearing. The others fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. On the hosted API any leaf that fires blocks the call and records it with its citation, whichever group it is in. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
+**What a decision from these policies establishes is not uniform, and we publish the split.** Every leaf in the eight packages the main check queries decides by matching the evaluated text (the leaf does not call a model). The companion chatbot pack is the exception: its leaves read the labels of the companion meaning check, which is a model. On a paid plan the hosted check also runs an injection meaning check after a clean pass when the month's model budget covers it. If that budget is used up, the phrase rules decide. For some of them the text *is* the regulated act (Article 5 prohibited practices, Article 15 prompt-injection resilience, personal data and secrets matched by format and checksum, one US disclosure control) so a block prevents the act and the citation on the decision is load-bearing. The others fire on text *describing* a state the engine cannot verify: no text matcher can establish whether a technical file, a quality management system, a human-oversight assignment or a FRIA exists. Those are useful for triage; they are not a compliance finding, and their silence is not one either. On the hosted API any leaf that fires blocks the call and records it with its citation, whichever group it is in. Per-rule table: [`docs/rules-management/corpus-evidence-classification.md`](docs/rules-management/corpus-evidence-classification.md).
 
 | Jurisdiction | Regulations |
 |---|---|
-| **EU** | EU AI Act Articles 4–6, 9–10, 12–16, 26–27, 50, 53, GPAI + Art 15 IPI (hosted); GDPR personal data and secrets, Articles 5(1)(c) and 32(1) (hosted, EU checks); other GDPR rules (offline, TrustLint) |
+| **EU** | EU AI Act Articles 4–6, 9–16, 26–27, 50, 53, GPAI + Art 15 IPI (hosted); GDPR personal data and secrets, Articles 5(1)(c) and 32(1) (hosted, EU checks); other GDPR rules (offline, TrustLint) |
 | **US** | Regulation FD (hosted, US checks); HIPAA, SOX §§404/802, COPPA, TCPA, BIPA, CCPA, NYC LL144, ECPA, OFAC sanctions (offline in TrustLint; hosted through `/v1/sensitivity/detect` by plan) |
 | **Global** | PCI DSS |
 | **Universal** | PII detection, prompt injection (direct + indirect) |
@@ -309,7 +314,7 @@ Validate: `cd rules && python scripts/validate_rules.py`
 
 A 60-prompt corpus runs against the live API. The runner, prompt YAMLs, and the latest result JSON are committed under [`scripts/benchmark/`](scripts/benchmark): inspect the results directly, or re-run with your own `COMPLYEDGE_API_KEY`.
 
-**False positives, measured.** The false-positive battery is 1,185 texts that must be allowed: plain explanations of the law, policies, refusals, negations and realistic outputs that mention regulated topics without doing them. Each is checked under both the EU and the US jurisdiction, so one run is 2,370 checks, evaluated by `opa eval` over the same Rego packages the API reads. The latest run (2026-10-10) blocked 514 of 2,370 checks, a false-positive rate of 0.2169 on this battery, with the count per rule in [`scripts/benchmark/results/false_positive_measure_opa_latest.json`](scripts/benchmark/results/false_positive_measure_opa_latest.json). The battery runs in CI against a baseline that may only shrink: a new false positive fails the build.
+**False positives, measured.** The false-positive battery is 1,185 texts that must be allowed: plain explanations of the law, policies, refusals, negations and realistic outputs that mention regulated topics without doing them. Each is checked under both the EU and the US jurisdiction, so one run is 2,370 checks, evaluated by `opa eval` over the same Rego packages the API reads. The latest run (2026-10-22) blocked 499 of 2,370 checks, a false-positive rate of 0.2105 on this battery, with the count per rule in [`scripts/benchmark/results/false_positive_measure_opa_latest.json`](scripts/benchmark/results/false_positive_measure_opa_latest.json). The battery runs in CI against a baseline that may only shrink: a new false positive fails the build.
 
 **GPAI leaderboard.** The [GPAI provider leaderboard](scripts/benchmark/results/leaderboard.md) scores providers' published documentation against Articles 50(2), 51 to 53 and 55. Every row is marked `needs_review`: the scores are a reading of public documents, not a legal verdict, and none has been confirmed by the provider or anyone else. Method: [`scripts/benchmark/gpai_benchmark_methodology.md`](scripts/benchmark/gpai_benchmark_methodology.md).
 

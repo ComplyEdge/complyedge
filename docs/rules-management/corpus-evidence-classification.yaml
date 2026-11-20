@@ -41,10 +41,10 @@
 #
 # REPRODUCE the census this file is checked against:
 #   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
-#     ! -path '*/us_companion/*' \
+#     ! -path '*/us_companion/*' ! -path '*/shared/*' \
 #     | xargs grep -L 'Aggregator carve-out' | wc -l     # -> 75 leaves
 #   find rules/rego/complyedge -name '*.rego' ! -name '*_test.rego' \
-#     ! -path '*/us_companion/*' \
+#     ! -path '*/us_companion/*' ! -path '*/shared/*' \
 #     | xargs grep -l 'Aggregator carve-out' | wc -l     # ->  8 aggregators
 #
 # Enforced by tests/unit/test_corpus_evidence_classification.py, which fails if

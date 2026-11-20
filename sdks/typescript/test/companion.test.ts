@@ -22,7 +22,7 @@ vi.mock("axios", () => ({
 }));
 
 import axios from "axios";
-import { ComplyEdgeClient, canonicalConversation } from "../src/client";
+import { ComplyEdgeClient, canonicalConversation, checkRefusal } from "../src/client";
 import type { ComplianceResult } from "../src/types";
 
 const CHECK_OK = {
@@ -467,6 +467,52 @@ describe("companion chatbot support", () => {
         conversation: CONVO_A,
       });
       expect(r.accountDuties).toEqual(["notify_parent_if_practicable", "retain_account"]);
+    });
+  });
+  // The API puts the companion fields in the 429 and 503 body (spec X4). They
+  // used to stay unparsed on err.response.data, so an app that caught the
+  // error could not show the crisis referral it was owed.
+  describe("a refused check still carries what the law asks", () => {
+    const detail = {
+      error: "daily_limit_exceeded",
+      message: "Daily limit reached.",
+      ...COMPANION_FIELDS,
+      companion_assessment: "not_assessed",
+      companion_not_assessed_reason: "unavailable",
+    };
+
+    it.each([429, 503])("a %i keeps its required actions on the same error", async (status) => {
+      const err = Object.assign(new Error(`Request failed with status code ${status}`), {
+        response: { status, data: { detail } },
+      });
+      mockPost.mockRejectedValueOnce(err);
+      const thrown = await client
+        .check("I keep thinking about ending it.", {
+          jurisdiction: "US-CA",
+          direction: "prompt",
+          useCase: "companion_chatbot",
+          sessionId: "s-1",
+        })
+        .catch((e) => e);
+      expect(thrown).toBe(err);
+      expect(thrown.refusal.status).toBe(status);
+      expect(thrown.refusal.requiredActions.map((a: { action: string }) => a.action)).toEqual(
+        COMPANION_FIELDS.required_actions.map((a) => a.action)
+      );
+      expect(thrown.refusal.companionAssessment).toBe("not_assessed");
+      expect(thrown.refusal.companionNotAssessedReason).toBe("unavailable");
+      expect(checkRefusal(thrown)).toEqual(thrown.refusal);
+    });
+
+    it("a refusal without companion fields parses as empty", () => {
+      const refusal = checkRefusal({ response: { status: 429, data: { detail: "Daily limit reached." } } });
+      expect(refusal?.status).toBe(429);
+      expect(refusal?.requiredActions).toEqual([]);
+      expect(refusal?.companionAssessment).toBeNull();
+    });
+
+    it("an error with no HTTP answer has no refusal", () => {
+      expect(checkRefusal(new Error("timeout"))).toBeNull();
     });
   });
 });
