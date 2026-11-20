@@ -8,7 +8,7 @@ name = "complyedge"
 # [tool.setuptools.dynamic]). pyproject 0.2.4 vs __init__ 0.2.3 once shipped
 # a wheel whose User-Agent header disagreed with its own PyPI version.
 dynamic = ["version"]
-description = "ComplyEdge Python SDK: the evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act and prompt injection."
+description = "ComplyEdge Python SDK: the evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act, US companion chatbot laws and prompt injection."
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"

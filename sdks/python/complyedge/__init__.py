@@ -165,7 +165,7 @@ class ComplianceViolation:
 
 
 #: ``use_case`` value that turns on the companion chatbot laws (California
-#: SB 243 and AB 1064, New York Art. 47 and 48, Washington, Oregon).
+#: SB 243 and SB 1119, New York Art. 47 and 48, Washington, Oregon).
 COMPANION_USE_CASE = "companion_chatbot"
 
 

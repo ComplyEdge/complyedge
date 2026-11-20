@@ -1,6 +1,6 @@
 # @complyedge/sdk
 
-TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io). The evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act and prompt injection.
+TypeScript/JavaScript SDK for [ComplyEdge](https://complyedge.io). The evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act, US companion chatbot laws and prompt injection.
 
 Phrase rules run on every check. On a paid plan a clean pass then runs an injection check when the month's model budget covers it, which can block. The wider review runs only when you turn it on and that budget covers it. A rule block cites the article, and the record is kept outside your AI system.
 

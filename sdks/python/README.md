@@ -1,6 +1,6 @@
 # ComplyEdge Python SDK
 
-The evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act and prompt injection.
+The evidence AI laws ask for, collected on every AI call. Each call is checked against the law and logged, ready for your auditor. We never store the conversation. Rules today: the EU AI Act, US companion chatbot laws and prompt injection.
 
 ## Choose the Right Package
 
