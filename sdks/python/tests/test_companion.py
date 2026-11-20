@@ -1,6 +1,5 @@
-"""T9 (Python): companion chatbot support in the SDK.
+"""Companion chatbot support in the Python SDK.
 
-Spec: docs/architecture/companion-chatbot-laws-tech-spec.md X10, X4, X5, X9.
 Mocked httpx, asserting the path and body the client actually issues, the same
 approach as tests/unit/test_sdk_appeals.py.
 
@@ -574,7 +573,7 @@ def test_preserve_returns_the_account_duties(post: MagicMock) -> None:
 
 
 # --- a refused check still carries what the law asks ------------------------
-# The API puts the companion fields in the 429 and 503 body (spec X4). The SDK
+# The API puts the companion fields in the 429 and 503 body. The SDK
 # used to flatten the whole body into the message string, so an app that caught
 # ComplianceError could not show the crisis referral it was owed.
 

@@ -476,7 +476,7 @@ def write_time_material(record: dict[str, Any]) -> str:
     return adcr_record.canonical(adcr_record.to_adcr(record)).decode("utf-8")
 
 
-#: The incident a key-moving transfer writes on the target (companion spec X9).
+#: The incident a key-moving transfer writes on the target account.
 TRANSFER_INCIDENT_KIND = "account_transfer"
 TRANSFER_REF_PREFIX = "transfer:"
 
@@ -870,7 +870,7 @@ def _check_origin_signatures(
     statement: str,
     origin_pubkeys: list[str] | None,
 ) -> list[tuple[str, str]]:
-    """Findings about CE origin signatures on one anchor (§13).
+    """Findings about CE origin signatures on one anchor.
 
     Missing signatures → informational ``no_origin_signature`` (not failing).
     Present but no pubkey → ``origin_signature_not_checked`` (blocks verified).
@@ -969,7 +969,7 @@ def verify_write_time_chain(
         add("malformed_export", "events is not a list")
         return {"verdict": "failed", "findings": findings}
 
-    # Rows moved in from another account (companion spec X9) keep their
+    # Rows moved in from another account keep their
     # source tenant_id and chain: each source is checked as its own chain, and
     # the owner's account_transfer incident row is the link to its last hash.
     # Links are read once, over every row, and each segment is checked on its

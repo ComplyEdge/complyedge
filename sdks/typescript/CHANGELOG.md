@@ -16,8 +16,11 @@ imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.12] - 2026-11-20
+
 ### Added
-- `ComplianceResult.companionWarnings` and `ComplyEdgeError.companionWarnings`: codes for what a companion check's request shows is wrong with the integration (`age_status_missing`, `session_start_changed`). Empty on an API that predates it.
+- `checkRefusal(err)` and `err.refusal`: a refused companion check (daily limit, service unavailable) still gives `requiredActions`, `upcomingActions`, `companionAssessment`, `companionNotAssessedReason` and `companionFallback`.
+- `ComplianceResult.companionWarnings` and `CheckRefusal.companionWarnings`: codes for what a companion check's request shows is wrong with the integration (`age_status_missing`, `session_start_changed`). Empty on an API that predates it.
 - `companionAssessment` can be `"operator_asserted"`: the actions came from the `operator_labels` you sent in `context`, and the meaning check did not run.
 
 ## [0.2.11] - 2026-11-18
@@ -174,6 +177,7 @@ imply a parity that does not exist.
 Released before this changelog existed. See the repository history.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/typescript
+[0.2.12]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.12
 [0.2.11]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.11
 [0.2.10]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.10
 [0.2.9]: https://www.npmjs.com/package/@complyedge/sdk/v/0.2.9

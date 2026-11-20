@@ -14,7 +14,10 @@ Matching numbers would imply a parity that does not exist.
 
 ## [Unreleased]
 
+## [0.2.28] - 2026-11-20
+
 ### Added
+- `ComplianceError` carries `status_code`, `body`, `required_actions`, `upcoming_actions`, `companion_assessment`, `companion_not_assessed_reason` and `companion_fallback`: a refused companion check (daily limit, service unavailable) still tells your app which notices are due.
 - `ComplianceResult.companion_warnings` and `ComplianceError.companion_warnings`: codes for what a companion check's request shows is wrong with the integration (`age_status_missing`, `session_start_changed`). Empty on an API that predates it.
 - `companion_assessment` can be `"operator_asserted"`: the actions came from the `operator_labels` you sent in `context`, and the meaning check did not run.
 
@@ -161,6 +164,7 @@ Matching numbers would imply a parity that does not exist.
   > `COMPLYEDGE_API_URL` > `region` / `COMPLYEDGE_REGION` > key prefix > US.
 
 [Unreleased]: https://github.com/ComplyEdge/complyedge/commits/main/sdks/python
+[0.2.28]: https://pypi.org/project/complyedge/0.2.28/
 [0.2.27]: https://pypi.org/project/complyedge/0.2.27/
 [0.2.26]: https://pypi.org/project/complyedge/0.2.26/
 [0.2.25]: https://pypi.org/project/complyedge/0.2.25/

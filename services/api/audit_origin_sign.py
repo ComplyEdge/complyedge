@@ -1,4 +1,4 @@
-"""ComplyEdge origin signature on anchor statements (tech-spec §13).
+"""ComplyEdge origin signature on anchor statements.
 
 Signs the same statement bytes the TSA timestamps. Proves the producer (CE)
 asserted that chain head; not an eIDAS qualified seal. Hot /v1/check path never

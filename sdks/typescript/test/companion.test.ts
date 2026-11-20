@@ -1,7 +1,6 @@
 /**
- * T9 (TypeScript): companion chatbot support in the SDK.
+ * Companion chatbot support in the TypeScript SDK.
  *
- * Spec: docs/architecture/companion-chatbot-laws-tech-spec.md X10, X4, X5, X9.
  * axios is mocked; the tests assert the path and body the client issues.
  *
  * - the SDK sends what it is given and nothing else; `direction` is absent
@@ -497,7 +496,7 @@ describe("companion chatbot support", () => {
       expect(r.accountDuties).toEqual(["notify_parent_if_practicable", "retain_account"]);
     });
   });
-  // The API puts the companion fields in the 429 and 503 body (spec X4). They
+  // The API puts the companion fields in the 429 and 503 body. They
   // used to stay unparsed on err.response.data, so an app that caught the
   // error could not show the crisis referral it was owed.
   describe("a refused check still carries what the law asks", () => {
