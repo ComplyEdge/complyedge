@@ -37,8 +37,12 @@ def _client(responses, seen: list[httpx.Request], **kw) -> ComplyEdge:
         status, payload = queue.pop(0) if len(queue) > 1 else queue[0]
         return httpx.Response(status, json=payload)
 
-    ce = ComplyEdge(api_key="k", base_url="https://example.test", agent_id="companion-bot", **kw)
-    ce._client = httpx.Client(base_url="https://example.test", transport=httpx.MockTransport(handler))
+    ce = ComplyEdge(
+        api_key="k", base_url="https://example.test", agent_id="companion-bot", **kw
+    )
+    ce._client = httpx.Client(
+        base_url="https://example.test", transport=httpx.MockTransport(handler)
+    )
     return ce
 
 
@@ -46,8 +50,12 @@ def _failing_client() -> ComplyEdge:
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("no route", request=request)
 
-    ce = ComplyEdge(api_key="k", base_url="https://example.test", agent_id="companion-bot")
-    ce._client = httpx.Client(base_url="https://example.test", transport=httpx.MockTransport(handler))
+    ce = ComplyEdge(
+        api_key="k", base_url="https://example.test", agent_id="companion-bot"
+    )
+    ce._client = httpx.Client(
+        base_url="https://example.test", transport=httpx.MockTransport(handler)
+    )
     return ce
 
 
@@ -72,7 +80,9 @@ def _check(timestamp: str) -> ComplianceResult:
 
 def test_confirm_action_fills_the_body_from_the_entry_and_the_check() -> None:
     seen: list[httpx.Request] = []
-    ce = _client((200, {"event_id": "n-1", "event_type": "notice", "confirm_key": "ck"}), seen)
+    ce = _client(
+        (200, {"event_id": "n-1", "event_type": "notice", "confirm_key": "ck"}), seen
+    )
     entry = RequiredAction(
         action="show_break_reminder",
         rule_ids=["us_companion.ca.break", "x"],
@@ -88,7 +98,9 @@ def test_confirm_action_fills_the_body_from_the_entry_and_the_check() -> None:
         session_id="s-1",
         format="app",
     )
-    assert out == CompanionActionReceipt(event_id="n-1", event_type="notice", confirm_key="ck", duplicate=False)
+    assert out == CompanionActionReceipt(
+        event_id="n-1", event_type="notice", confirm_key="ck", duplicate=False
+    )
     assert (seen[0].method, seen[0].url.path) == ("POST", "/v1/companion/action")
     assert _body(seen[0]) == {
         "confirmation_id": "c-1",
@@ -108,7 +120,9 @@ def test_confirm_action_fills_the_body_from_the_entry_and_the_check() -> None:
 
 def test_confirm_action_takes_a_dict_entry_and_arguments_win() -> None:
     seen: list[httpx.Request] = []
-    ce = _client((200, {"event_id": "n-2", "duplicate": True}), seen, session_id="s-default")
+    ce = _client(
+        (200, {"event_id": "n-2", "duplicate": True}), seen, session_id="s-default"
+    )
     out = ce.confirm_action(
         {"action": "show_ai_notice", "rule_ids": ["r1"], "jurisdiction": "US-NY"},
         confirmation_id="c-2",
@@ -118,7 +132,11 @@ def test_confirm_action_takes_a_dict_entry_and_arguments_win() -> None:
         rule_id="r9",
     )
     sent = _body(seen[0])
-    assert (sent["jurisdiction"], sent["rule_id"], sent["session_id"]) == ("US-WA", "r9", "s-default")
+    assert (sent["jurisdiction"], sent["rule_id"], sent["session_id"]) == (
+        "US-WA",
+        "r9",
+        "s-default",
+    )
     assert "check_event_id" not in sent
     assert out.duplicate is True and out.event_type == "notice"
 
@@ -127,16 +145,25 @@ def test_confirm_action_without_an_action_sends_nothing() -> None:
     seen: list[httpx.Request] = []
     ce = _client((200, {"event_id": "x"}), seen)
     with pytest.raises(ValueError, match="needs action"):
-        ce.confirm_action(confirmation_id="c", source="operator", shown_at=SHOWN, session_id="s")
+        ce.confirm_action(
+            confirmation_id="c", source="operator", shown_at=SHOWN, session_id="s"
+        )
     with pytest.raises(ValueError, match="needs session_id"):
-        ce.confirm_action(action="minors_notice", confirmation_id="c", source="operator", shown_at=SHOWN)
+        ce.confirm_action(
+            action="minors_notice",
+            confirmation_id="c",
+            source="operator",
+            shown_at=SHOWN,
+        )
     assert seen == []
 
 
 def test_confirm_action_retries_while_the_check_is_not_written(monkeypatch) -> None:
     sleeps: list[float] = []
     monkeypatch.setattr(ce_mod, "_sleep", sleeps.append)
-    monkeypatch.setattr(ce_mod, "_utcnow", lambda: datetime(2026, 11, 14, 20, 0, 5, tzinfo=UTC))
+    monkeypatch.setattr(
+        ce_mod, "_utcnow", lambda: datetime(2026, 11, 14, 20, 0, 5, tzinfo=UTC)
+    )
     seen: list[httpx.Request] = []
     not_yet = (409, {"detail": {"code": "check_not_written_yet"}})
     ce = _client([not_yet, not_yet, (200, {"event_id": "n-3"})], seen)
@@ -175,15 +202,29 @@ def test_confirm_action_without_a_check_does_not_retry_a_409() -> None:
     seen: list[httpx.Request] = []
     ce = _client((409, {"code": "check_not_written_yet"}), seen)
     with pytest.raises(ComplianceError, match="within 10 minutes"):
-        ce.confirm_action(action="minors_notice", confirmation_id="c", source="operator", shown_at=SHOWN, session_id="s")
+        ce.confirm_action(
+            action="minors_notice",
+            confirmation_id="c",
+            source="operator",
+            shown_at=SHOWN,
+            session_id="s",
+        )
     assert len(seen) == 1
 
 
 def test_confirm_action_surfaces_the_api_error_and_its_code() -> None:
     seen: list[httpx.Request] = []
-    ce = _client((422, {"detail": {"code": "unknown_action", "message": "no such action"}}), seen)
+    ce = _client(
+        (422, {"detail": {"code": "unknown_action", "message": "no such action"}}), seen
+    )
     with pytest.raises(ComplianceError) as err:
-        ce.confirm_action(action="nope", confirmation_id="c", source="operator", shown_at=SHOWN, session_id="s")
+        ce.confirm_action(
+            action="nope",
+            confirmation_id="c",
+            source="operator",
+            shown_at=SHOWN,
+            session_id="s",
+        )
     assert "422" in str(err.value)
     assert err.value.code == "unknown_action"
 
@@ -191,7 +232,11 @@ def test_confirm_action_surfaces_the_api_error_and_its_code() -> None:
 def test_confirm_action_network_failure_is_retryable() -> None:
     with pytest.raises(ComplianceError) as err:
         _failing_client().confirm_action(
-            action="minors_notice", confirmation_id="c", source="operator", shown_at=SHOWN, session_id="s"
+            action="minors_notice",
+            confirmation_id="c",
+            source="operator",
+            shown_at=SHOWN,
+            session_id="s",
         )
     assert err.value.retryable is True
 
@@ -232,22 +277,37 @@ def test_preserve_sends_the_canonical_conversation_bytes() -> None:
     raw = seen[0].content.decode("utf-8")
     assert canonical_conversation(CONVO).decode("utf-8") in raw
     sent = json.loads(raw)
-    assert sent["conversation"] == [{"role": "user", "sent_at": "2026-11-14T20:01:02.000Z", "text": "é"}]
-    assert (sent["trigger"], sent["session_id"], sent["agent_id"]) == ("serious_self_harm", "s-1", "companion-bot")
+    assert sent["conversation"] == [
+        {"role": "user", "sent_at": "2026-11-14T20:01:02.000Z", "text": "é"}
+    ]
+    assert (sent["trigger"], sent["session_id"], sent["agent_id"]) == (
+        "serious_self_harm",
+        "s-1",
+        "companion-bot",
+    )
     assert "user_id" not in sent
 
 
 def test_preserve_errors_carry_the_api_code() -> None:
     seen: list[httpx.Request] = []
-    ce = _client((403, {"detail": {"code": "plan_required", "message": "Enterprise"}}), seen)
+    ce = _client(
+        (403, {"detail": {"code": "plan_required", "message": "Enterprise"}}), seen
+    )
     with pytest.raises(ComplianceError) as err:
-        ce.preserve(CONVO, trigger="parent_notified", preserved_at=SHOWN, deciding_system_version="v")
+        ce.preserve(
+            CONVO,
+            trigger="parent_notified",
+            preserved_at=SHOWN,
+            deciding_system_version="v",
+        )
     assert err.value.code == "plan_required"
 
 
 def test_preserve_network_failure_is_retryable() -> None:
     with pytest.raises(ComplianceError) as err:
-        _failing_client().preserve(CONVO, trigger="child_died", preserved_at=SHOWN, deciding_system_version="v")
+        _failing_client().preserve(
+            CONVO, trigger="child_died", preserved_at=SHOWN, deciding_system_version="v"
+        )
     assert err.value.retryable is True
 
 
@@ -289,7 +349,9 @@ def test_verify_input_is_true_only_on_a_match() -> None:
 
 def test_verify_input_unknown_event_raises() -> None:
     with pytest.raises(ComplianceError, match="404"):
-        _client((404, {"detail": "Audit event not found"}), []).verify_input("missing", "t")
+        _client((404, {"detail": "Audit event not found"}), []).verify_input(
+            "missing", "t"
+        )
 
 
 def test_verify_input_network_failure_is_retryable() -> None:

@@ -20,10 +20,9 @@ import json
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
+import complyedge
 import httpx
 import pytest
-
-import complyedge
 from complyedge import (
     AsyncComplyEdgeClient,
     ComplianceError,
@@ -107,7 +106,9 @@ def test_advanced_client_sends_no_direction_unless_given(post: MagicMock) -> Non
     with ComplyEdgeClient(api_key="k", base_url="https://example.test") as c:
         c.check_compliance("hello", agent_id="a")
         assert "direction" not in post.call_args.kwargs["json"]
-        c.check_compliance("hello", agent_id="a", direction=complyedge.DirectionType.PROMPT)
+        c.check_compliance(
+            "hello", agent_id="a", direction=complyedge.DirectionType.PROMPT
+        )
         assert post.call_args.kwargs["json"]["direction"] == "prompt"
 
 
@@ -115,7 +116,9 @@ def test_advanced_client_sends_no_direction_unless_given(post: MagicMock) -> Non
 
 
 @patch("httpx.Client.post")
-def test_companion_check_sends_use_case_and_context_and_nothing_else(post: MagicMock) -> None:
+def test_companion_check_sends_use_case_and_context_and_nothing_else(
+    post: MagicMock,
+) -> None:
     post.return_value = _resp({**CHECK_OK, **COMPANION_FIELDS})
     ctx = {
         "age_status": "known_minor",
@@ -185,13 +188,17 @@ def test_module_check_sends_companion_user_message(post: MagicMock) -> None:
         session_id="sess-1",
         companion_user_message="ok I am logging off",
     )
-    assert post.call_args.kwargs["json"]["companion_user_message"] == "ok I am logging off"
+    assert (
+        post.call_args.kwargs["json"]["companion_user_message"] == "ok I am logging off"
+    )
 
 
 @patch("httpx.Client.post")
 def test_companion_user_message_absent_unless_given(post: MagicMock) -> None:
     post.return_value = _resp(CHECK_OK)
-    _client().check("hi", direction="output", use_case="companion_chatbot", session_id="s")
+    _client().check(
+        "hi", direction="output", use_case="companion_chatbot", session_id="s"
+    )
     assert "companion_user_message" not in post.call_args.kwargs["json"]
 
 
@@ -210,7 +217,9 @@ def test_companion_user_message_refused_off_a_companion_reply(
         _client().check("hi", companion_user_message="bye", **kwargs)
     with ComplyEdgeClient(api_key="k", base_url="https://example.test") as c:
         with pytest.raises(ValueError, match="companion_user_message"):
-            c.check_compliance("hi", agent_id="a", companion_user_message="bye", **kwargs)
+            c.check_compliance(
+                "hi", agent_id="a", companion_user_message="bye", **kwargs
+            )
     post.assert_not_called()
 
 
@@ -235,9 +244,13 @@ def test_incomplete_companion_check_is_refused_before_sending(
 def test_advanced_client_refuses_incomplete_companion_check(post: MagicMock) -> None:
     with ComplyEdgeClient(api_key="k", base_url="https://example.test") as c:
         with pytest.raises(ValueError, match="direction"):
-            c.check_compliance("hi", agent_id="a", use_case="companion_chatbot", session_id="s")
+            c.check_compliance(
+                "hi", agent_id="a", use_case="companion_chatbot", session_id="s"
+            )
         with pytest.raises(ValueError, match="session_id"):
-            c.check_compliance("hi", agent_id="a", use_case="companion_chatbot", direction="prompt")
+            c.check_compliance(
+                "hi", agent_id="a", use_case="companion_chatbot", direction="prompt"
+            )
     post.assert_not_called()
 
 
@@ -256,8 +269,12 @@ async def test_async_client_refuses_incomplete_companion_check(post: MagicMock) 
 
 @patch("httpx.Client.post")
 def test_companion_response_fields_parse(post: MagicMock) -> None:
-    post.return_value = _resp({**CHECK_OK, **COMPANION_FIELDS, "companion_fallback": True})
-    r = _client().check("x", direction="prompt", use_case="companion_chatbot", session_id="s")
+    post.return_value = _resp(
+        {**CHECK_OK, **COMPANION_FIELDS, "companion_fallback": True}
+    )
+    r = _client().check(
+        "x", direction="prompt", use_case="companion_chatbot", session_id="s"
+    )
     assert r.companion_assessment == "assessed"
     assert r.companion_not_assessed_reason is None
     assert r.companion_fallback is True
@@ -293,8 +310,13 @@ def test_not_assessed_reason_parses(post: MagicMock) -> None:
             "required_actions": [],
         }
     )
-    r = _client().check("x", direction="prompt", use_case="companion_chatbot", session_id="s")
-    assert (r.companion_assessment, r.companion_not_assessed_reason) == ("not_assessed", "budget")
+    r = _client().check(
+        "x", direction="prompt", use_case="companion_chatbot", session_id="s"
+    )
+    assert (r.companion_assessment, r.companion_not_assessed_reason) == (
+        "not_assessed",
+        "budget",
+    )
     assert r.required_actions == []
 
 
@@ -310,7 +332,12 @@ def test_older_api_without_companion_fields_parses_as_empty(post: MagicMock) -> 
 
 # --- confirm_action ----------------------------------------------------------
 
-RECEIPT = {"event_id": "ntc-1", "event_type": "notice", "confirm_key": "ck", "duplicate": False}
+RECEIPT = {
+    "event_id": "ntc-1",
+    "event_type": "notice",
+    "confirm_key": "ck",
+    "duplicate": False,
+}
 
 
 def _check_result(timestamp: str) -> complyedge.ComplianceResult:
@@ -394,7 +421,9 @@ def test_operator_only_notice_sends_no_check_fields(post: MagicMock) -> None:
 
 
 @patch("httpx.Client.post")
-def test_confirm_action_without_session_is_refused_before_sending(post: MagicMock) -> None:
+def test_confirm_action_without_session_is_refused_before_sending(
+    post: MagicMock,
+) -> None:
     with pytest.raises(ValueError, match="session_id"):
         _client().confirm_action(
             action="minors_notice", confirmation_id="x", source="operator", shown_at="t"
@@ -410,10 +439,18 @@ def test_confirm_action_retries_on_409_then_succeeds(
     sleeps: list[float] = []
     monkeypatch.setattr(complyedge, "_sleep", sleeps.append)
     not_yet = {"detail": {"code": "check_not_written_yet"}}
-    post.side_effect = [_resp(not_yet, 409), _resp({"code": "check_not_written_yet"}, 409), _resp(RECEIPT)]
+    post.side_effect = [
+        _resp(not_yet, 409),
+        _resp({"code": "check_not_written_yet"}, 409),
+        _resp(RECEIPT),
+    ]
     check = _check_result(now.isoformat().replace("+00:00", "Z"))
     receipt = _client(session_id="s").confirm_action(
-        check.required_actions[0], check, confirmation_id="c", source="complyedge", shown_at=now
+        check.required_actions[0],
+        check,
+        confirmation_id="c",
+        source="complyedge",
+        shown_at=now,
     )
     assert receipt.event_id == "ntc-1"
     assert post.call_count == 3
@@ -441,7 +478,11 @@ def test_confirm_action_gives_up_ten_minutes_after_the_check(
     check = _check_result("2026-11-14T20:00:00Z")
     with pytest.raises(ComplianceError, match="409"):
         _client(session_id="s").confirm_action(
-            check.required_actions[0], check, confirmation_id="c", source="complyedge", shown_at=clock[0]
+            check.required_actions[0],
+            check,
+            confirmation_id="c",
+            source="complyedge",
+            shown_at=clock[0],
         )
     # 1s, then the last 1s left in the window, then it stops.
     assert sleeps == [1.0, 1.0]
@@ -454,7 +495,11 @@ def test_confirm_action_does_not_retry_other_errors(post: MagicMock) -> None:
     check = _check_result("2026-11-14T20:00:00Z")
     with pytest.raises(ComplianceError, match="422"):
         _client(session_id="s").confirm_action(
-            check.required_actions[0], check, confirmation_id="c", source="complyedge", shown_at="t"
+            check.required_actions[0],
+            check,
+            confirmation_id="c",
+            source="complyedge",
+            shown_at="t",
         )
     assert post.call_count == 1
 
@@ -463,7 +508,11 @@ def test_confirm_action_does_not_retry_other_errors(post: MagicMock) -> None:
 
 CONVO_A = [
     {"role": "user", "text": "café", "sent_at": "2026-11-14T19:59:00.000Z"},
-    {"role": "assistant", "text": "I hear you.\nCall 988.", "sent_at": "2026-11-14T19:59:05.000Z"},
+    {
+        "role": "assistant",
+        "text": "I hear you.\nCall 988.",
+        "sent_at": "2026-11-14T19:59:05.000Z",
+    },
 ]
 # Same conversation: other key order, other whitespace, "e" + combining accent.
 CONVO_B_JSON = """
@@ -474,7 +523,7 @@ CONVO_B_JSON = """
 EXPECTED = (
     '[{"role":"user","sent_at":"2026-11-14T19:59:00.000Z","text":"café"},'
     '{"role":"assistant","sent_at":"2026-11-14T19:59:05.000Z","text":"I hear you.\\nCall 988."}]'
-).encode("utf-8")
+).encode()
 
 
 def test_canonical_bytes_equal_for_two_differently_formatted_inputs() -> None:
@@ -491,13 +540,19 @@ def test_canonical_form_writes_datetimes_like_javascript() -> None:
 
 def test_canonical_form_refuses_extra_keys() -> None:
     with pytest.raises(ValueError, match="unexpected: id"):
-        canonical_conversation([{"role": "user", "text": "hi", "sent_at": "t", "id": "1"}])
+        canonical_conversation(
+            [{"role": "user", "text": "hi", "sent_at": "t", "id": "1"}]
+        )
 
 
 @patch("httpx.Client.post")
 def test_preserve_sends_the_canonical_bytes(post: MagicMock) -> None:
     post.return_value = _resp(
-        {"event_id": "prs-1", "timestamp": "2026-11-14T20:00:02Z", "event_type": "preservation"}
+        {
+            "event_id": "prs-1",
+            "timestamp": "2026-11-14T20:00:02Z",
+            "event_type": "preservation",
+        }
     )
     ce = _client(agent_id="pal", session_id="sess-1")
     r1 = ce.preserve(
@@ -519,7 +574,9 @@ def test_preserve_sends_the_canonical_bytes(post: MagicMock) -> None:
     assert EXPECTED in first
     # Same bytes as the TypeScript SDK sends for the same input.
     assert first == (
-        b'{"agent_id":"pal","conversation":' + EXPECTED + b',"deciding_system_version":"pal-3",'
+        b'{"agent_id":"pal","conversation":'
+        + EXPECTED
+        + b',"deciding_system_version":"pal-3",'
         b'"preserved_at":"2026-11-14T20:00:00Z","session_id":"sess-1","trigger":"parent_notified"}'
     )
     assert json.loads(first) == {
@@ -530,7 +587,9 @@ def test_preserve_sends_the_canonical_bytes(post: MagicMock) -> None:
         "session_id": "sess-1",
         "trigger": "parent_notified",
     }
-    assert r1 == complyedge.PreservationReceipt("prs-1", "2026-11-14T20:00:02Z", "preservation")
+    assert r1 == complyedge.PreservationReceipt(
+        "prs-1", "2026-11-14T20:00:02Z", "preservation"
+    )
 
 
 # --- companion error bodies keep their code ----------------------------------
@@ -541,10 +600,16 @@ def test_companion_error_body_keeps_its_code_and_message(post: MagicMock) -> Non
     """The companion endpoints answer {"code", "message"} with no "detail"; the
     SDK used to raise the bare httpx text, so a caller could not tell
     trigger_invalid from any other 422."""
-    post.return_value = _resp({"code": "trigger_invalid", "message": "Unknown trigger."}, 422)
+    post.return_value = _resp(
+        {"code": "trigger_invalid", "message": "Unknown trigger."}, 422
+    )
     with pytest.raises(ComplianceError) as err:
-        _client().preserve([], trigger="x", preserved_at="2026-11-14T20:00:00Z",
-                           deciding_system_version="1")
+        _client().preserve(
+            [],
+            trigger="x",
+            preserved_at="2026-11-14T20:00:00Z",
+            deciding_system_version="1",
+        )
     assert err.value.code == "trigger_invalid"
     assert "Unknown trigger." in str(err.value)
 
@@ -552,8 +617,10 @@ def test_companion_error_body_keeps_its_code_and_message(post: MagicMock) -> Non
 @patch("httpx.Client.request")
 def test_get_requests_keep_the_error_code(request: MagicMock) -> None:
     request.return_value = httpx.Response(
-        404, json={"code": "not_found", "message": "No such appeal."},
-        request=httpx.Request("GET", "https://example.test"))
+        404,
+        json={"code": "not_found", "message": "No such appeal."},
+        request=httpx.Request("GET", "https://example.test"),
+    )
     with pytest.raises(ComplianceError) as err:
         _client().get_appeal("r-1")
     assert err.value.code == "not_found"
@@ -562,13 +629,20 @@ def test_get_requests_keep_the_error_code(request: MagicMock) -> None:
 
 @patch("httpx.Client.post")
 def test_preserve_returns_the_account_duties(post: MagicMock) -> None:
-    post.return_value = _resp({
-        "event_id": "prs-1", "timestamp": "2026-11-14T20:00:02Z", "event_type": "preservation",
-        "account_duties": ["notify_parent_if_practicable", "retain_account"],
-    })
+    post.return_value = _resp(
+        {
+            "event_id": "prs-1",
+            "timestamp": "2026-11-14T20:00:02Z",
+            "event_type": "preservation",
+            "account_duties": ["notify_parent_if_practicable", "retain_account"],
+        }
+    )
     r = _client(agent_id="pal", session_id="sess-1").preserve(
-        CONVO_A, trigger="serious_self_harm", preserved_at="2026-11-14T20:00:00Z",
-        deciding_system_version="pal-3")
+        CONVO_A,
+        trigger="serious_self_harm",
+        preserved_at="2026-11-14T20:00:00Z",
+        deciding_system_version="pal-3",
+    )
     assert r.account_duties == ["notify_parent_if_practicable", "retain_account"]
 
 
@@ -612,7 +686,10 @@ def test_refused_companion_check_keeps_its_required_actions(
     e = err.value
     assert e.status_code == status
     assert e.body == {"detail": REFUSAL_DETAIL}
-    assert [a.action for a in e.required_actions] == ["show_crisis_referral", "block_reply"]
+    assert [a.action for a in e.required_actions] == [
+        "show_crisis_referral",
+        "block_reply",
+    ]
     assert isinstance(e.required_actions[0], RequiredAction)
     assert [a.action for a in e.upcoming_actions] == ["show_break_reminder"]
     assert e.companion_assessment == "not_assessed"
@@ -639,7 +716,9 @@ def test_an_error_with_no_http_answer_has_empty_refusal_fields() -> None:
 
 
 @patch("httpx.Client.post")
-def test_warnings_and_operator_asserted_parse_and_labels_are_sent(post: MagicMock) -> None:
+def test_warnings_and_operator_asserted_parse_and_labels_are_sent(
+    post: MagicMock,
+) -> None:
     post.return_value = _resp(
         {
             **CHECK_OK,
@@ -656,13 +735,17 @@ def test_warnings_and_operator_asserted_parse_and_labels_are_sent(post: MagicMoc
     )
     assert r.companion_assessment == "operator_asserted"
     assert r.companion_warnings == ["age_status_missing"]
-    assert post.call_args.kwargs["json"]["context"]["operator_labels"] == ["expresses_self_harm"]
+    assert post.call_args.kwargs["json"]["context"]["operator_labels"] == [
+        "expresses_self_harm"
+    ]
 
 
 @patch("httpx.Client.post")
 def test_an_api_without_warnings_parses_as_empty(post: MagicMock) -> None:
     post.return_value = _resp({**CHECK_OK, **COMPANION_FIELDS})
-    r = _client().check("x", direction="prompt", use_case="companion_chatbot", session_id="s")
+    r = _client().check(
+        "x", direction="prompt", use_case="companion_chatbot", session_id="s"
+    )
     assert r.companion_warnings == []
 
 
@@ -672,6 +755,9 @@ def test_a_refused_check_keeps_its_warnings(post: MagicMock) -> None:
     post.return_value = _resp({"detail": detail}, 429)
     with pytest.raises(ComplianceError) as err:
         _client().check(
-            "x", direction="prompt", use_case="companion_chatbot", context={"session_id": "s"}
+            "x",
+            direction="prompt",
+            use_case="companion_chatbot",
+            context={"session_id": "s"},
         )
     assert err.value.companion_warnings == ["session_start_changed"]

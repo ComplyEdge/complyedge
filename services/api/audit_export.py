@@ -342,7 +342,17 @@ def _compute_chain_head_in_order(events: list[dict[str, Any]]) -> str | None:
 #: carries them (Leo, 2026-09-29). `timestamp` and `event_id` already say what
 #: `sk` encodes; retention is stated once in the envelope (`retention_days`).
 EXPORT_INTERNAL_KEYS = frozenset(
-    {"pk", "sk", "gsi1_pk", "gsi1_sk", "gsi3_pk", "gsi3_sk", "gsi4_pk", "gsi4_sk", "ttl"}
+    {
+        "pk",
+        "sk",
+        "gsi1_pk",
+        "gsi1_sk",
+        "gsi3_pk",
+        "gsi3_sk",
+        "gsi4_pk",
+        "gsi4_sk",
+        "ttl",
+    }
 )
 
 #: Stamp fields that may arrive as ISO strings with a leftover offset.
@@ -494,14 +504,17 @@ def transfer_links(events: list[dict[str, Any]]) -> dict[str, str]:
     transfers (A to B, then B to C) gives one link per source."""
     out: dict[str, str] = {}
     for e in events:
-        if e.get("event_type") != "incident" or e.get("incident_kind") != TRANSFER_INCIDENT_KIND:
+        if (
+            e.get("event_type") != "incident"
+            or e.get("incident_kind") != TRANSFER_INCIDENT_KIND
+        ):
             continue
         if not is_chained(e):
             continue
         ref = str(e.get("report_ref") or "")
         if not ref.startswith(TRANSFER_REF_PREFIX):
             continue
-        source, _, last = ref[len(TRANSFER_REF_PREFIX):].rpartition(":")
+        source, _, last = ref[len(TRANSFER_REF_PREFIX) :].rpartition(":")
         if source and last and source != str(e.get("tenant_id")):
             out[source] = last
     return out
@@ -983,22 +996,30 @@ def verify_write_time_chain(
                 # A date-range export can hold the transfer row without the
                 # older moved rows. Not a failure, never a pass: the rows the
                 # link vouches for are not here to check.
-                add("segment_absent",
-                    f"rows moved in from {source} are not in this export")
+                add(
+                    "segment_absent",
+                    f"rows moved in from {source} are not in this export",
+                )
                 continue
             seg = verify_write_time_chain({"events": segment}, _segment=True)
             for f in seg.get("findings", []):
                 if f["finding"] not in ("no_anchor", "unanchored_tail"):
-                    add(f["finding"], f"moved segment {source}: {f['detail']}",
-                        f["seq"], f["event_id"])
+                    add(
+                        f["finding"],
+                        f"moved segment {source}: {f['detail']}",
+                        f["seq"],
+                        f["event_id"],
+                    )
             tail = max(
                 (e for e in segment if is_chained(e) and _seq(e) is not None),
-                key=lambda e: _seq(e),
+                key=lambda e: _seq(e) or 0,
                 default=None,
             )
             if tail is None or tail.get("chain_hash") != last_hash:
-                add("segment_link_mismatch",
-                    f"moved segment {source} does not end at the recorded hash")
+                add(
+                    "segment_link_mismatch",
+                    f"moved segment {source} does not end at the recorded hash",
+                )
         events = [e for e in events if str(e.get("tenant_id")) not in links]
 
     chained = [e for e in events if is_chained(e)]

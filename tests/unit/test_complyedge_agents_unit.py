@@ -207,7 +207,9 @@ class TestGuardrailBlockedPath:
             guard = create_compliance_guardrail(
                 api_key="k", direction="output", jurisdiction="US"
             )
-            out = guard.guardrail_function(None, None, "the market expects revenue to grow")
+            out = guard.guardrail_function(
+                None, None, "the market expects revenue to grow"
+            )
         assert out.output_info["fired_rules"] == ["rego-sox-302-001"]
         assert "rego-sox-302-001" in out.output_info["reason"]
         assert "article-5" not in out.output_info["reason"]

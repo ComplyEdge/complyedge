@@ -57,7 +57,11 @@ class SheetError(ValueError):
 
 
 def read_candidates(path: Path) -> list[dict[str, Any]]:
-    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
     ids = [r["id"] for r in rows]
     if len(set(ids)) != len(ids):
         raise SheetError("the candidates file has a repeated id")
@@ -144,7 +148,9 @@ def signed_rows(
     missing = sorted(set(source) - seen)
     if missing:
         shown = ", ".join(missing[:10]) + (" ..." if len(missing) > 10 else "")
-        problems.append(f"{len(missing)} candidate rows are missing from the sheet: {shown}")
+        problems.append(
+            f"{len(missing)} candidate rows are missing from the sheet: {shown}"
+        )
     if problems:
         raise SheetError("\n".join(problems))
     return out
@@ -155,7 +161,8 @@ def import_sheet(
 ) -> int:
     rows = signed_rows(candidates, sheet, reviewer, signed_off_at)
     out.write_text(
-        "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8"
+        "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows),
+        encoding="utf-8",
     )
     return len(rows)
 
@@ -165,21 +172,37 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     ex = sub.add_parser("export", help="write the sheet the reviewer fills in")
-    ex.add_argument("--candidates", type=Path, default=fixtures / "companion_labelled_set.candidates.jsonl")
+    ex.add_argument(
+        "--candidates",
+        type=Path,
+        default=fixtures / "companion_labelled_set.candidates.jsonl",
+    )
     ex.add_argument("--sheet", type=Path, required=True)
     im = sub.add_parser("import", help="turn the filled sheet into the signed set")
-    im.add_argument("--candidates", type=Path, default=fixtures / "companion_labelled_set.candidates.jsonl")
+    im.add_argument(
+        "--candidates",
+        type=Path,
+        default=fixtures / "companion_labelled_set.candidates.jsonl",
+    )
     im.add_argument("--sheet", type=Path, required=True)
-    im.add_argument("--out", type=Path, default=fixtures / "companion_labelled_set.jsonl")
-    im.add_argument("--reviewer", required=True, help="name of the person who read every row")
-    im.add_argument("--date", default=date.today().isoformat(), help="sign-off date, ISO")
+    im.add_argument(
+        "--out", type=Path, default=fixtures / "companion_labelled_set.jsonl"
+    )
+    im.add_argument(
+        "--reviewer", required=True, help="name of the person who read every row"
+    )
+    im.add_argument(
+        "--date", default=date.today().isoformat(), help="sign-off date, ISO"
+    )
     args = ap.parse_args(argv)
     try:
         if args.cmd == "export":
             n = export_sheet(args.candidates, args.sheet)
             print(f"{n} rows written to {args.sheet}")
         else:
-            n = import_sheet(args.candidates, args.sheet, args.out, args.reviewer, args.date)
+            n = import_sheet(
+                args.candidates, args.sheet, args.out, args.reviewer, args.date
+            )
             print(f"{n} rows signed by {args.reviewer} written to {args.out}")
     except SheetError as e:
         print(f"Refused:\n{e}", file=sys.stderr)

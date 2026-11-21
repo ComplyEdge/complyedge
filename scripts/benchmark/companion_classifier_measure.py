@@ -114,6 +114,7 @@ def verdict(runs: Sequence[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         }
     return out
 
+
 _usage: list[dict] = []
 
 
@@ -316,8 +317,12 @@ def _measure(
                     [u.get("completion_tokens", 0) for u in usage]
                 ),
                 "predictions": [
-                    {"line": r["line"], "expected": r["labels"],
-                     "ambiguous": bool(r.get("ambiguous")), **p}
+                    {
+                        "line": r["line"],
+                        "expected": r["labels"],
+                        "ambiguous": bool(r.get("ambiguous")),
+                        **p,
+                    }
                     for r, p in zip(rows, preds, strict=True)
                 ],
             }

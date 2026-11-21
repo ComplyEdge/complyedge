@@ -48,9 +48,9 @@ import json
 import os
 import time
 import unicodedata
-from datetime import datetime, timedelta, timezone
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Literal
 from urllib.parse import quote
@@ -524,7 +524,8 @@ def _finish_check_request(
         missing.append("session_id")
     if missing:
         raise ValueError(
-            "A companion_chatbot check needs " + " and ".join(missing)
+            "A companion_chatbot check needs "
+            + " and ".join(missing)
             + "; nothing was sent."
         )
 
@@ -544,7 +545,7 @@ def _audit_logged_from_payload(data: dict[str, Any]) -> bool:
 # =============================================================================
 
 
-def _iso_utc(value: "datetime | str | None") -> str:
+def _iso_utc(value: datetime | str | None) -> str:
     """An ISO 8601 UTC stamp; now when value is None. Naive datetimes are UTC."""
     if value is None:
         value = datetime.now(timezone.utc)
@@ -591,7 +592,14 @@ def _jcs(value: Any) -> str:
     if isinstance(value, dict):
         # RFC 8785 sorts by UTF-16 code units; every key here is ASCII.
         keys = sorted(value, key=lambda k: str(k).encode("utf-16-be"))
-        return "{" + ",".join(f"{json.dumps(str(k), ensure_ascii=False)}:{_jcs(value[k])}" for k in keys) + "}"
+        return (
+            "{"
+            + ",".join(
+                f"{json.dumps(str(k), ensure_ascii=False)}:{_jcs(value[k])}"
+                for k in keys
+            )
+            + "}"
+        )
     raise TypeError(f"Cannot canonicalise {type(value).__name__}")
 
 
@@ -603,7 +611,7 @@ def _iso_ms(value: datetime) -> str:
     return value.strftime("%Y-%m-%dT%H:%M:%S.") + f"{value.microsecond // 1000:03d}Z"
 
 
-def canonical_conversation(conversation: "list[dict[str, Any]] | str") -> bytes:
+def canonical_conversation(conversation: list[dict[str, Any]] | str) -> bytes:
     """The conversation in the one form ComplyEdge commits to: a JSON array of
     ``{role, text, sent_at}``, text in Unicode NFC, serialised by RFC 8785.
 
@@ -632,7 +640,11 @@ def canonical_conversation(conversation: "list[dict[str, Any]] | str") -> bytes:
         sent_at = message["sent_at"]
         if isinstance(sent_at, datetime):
             sent_at = _iso_ms(sent_at)
-        for key, val in (("role", message["role"]), ("text", message["text"]), ("sent_at", sent_at)):
+        for key, val in (
+            ("role", message["role"]),
+            ("text", message["text"]),
+            ("sent_at", sent_at),
+        ):
             if not isinstance(val, str):
                 raise ValueError(f"conversation[{i}].{key} must be a string")
         entries.append(
@@ -662,7 +674,7 @@ def _error_code(response: httpx.Response) -> str | None:
     return None
 
 
-def _error_detail(e: "httpx.HTTPStatusError") -> str:
+def _error_detail(e: httpx.HTTPStatusError) -> str:
     """The API's own words: a message, or each field and what is wrong with it.
 
     Most endpoints answer {"detail": ...}; the companion endpoints answer
@@ -861,15 +873,21 @@ class ComplyEdge:
         merged = dict(context or {})
         context = _attribution_context(
             merged,
-            user_id=user_id
-            if user_id is not None
-            else (None if "user_id" in merged else self.user_id),
-            user_role=user_role
-            if user_role is not None
-            else (None if "user_role" in merged else self.user_role),
-            session_id=session_id
-            if session_id is not None
-            else (None if "session_id" in merged else self.session_id),
+            user_id=(
+                user_id
+                if user_id is not None
+                else (None if "user_id" in merged else self.user_id)
+            ),
+            user_role=(
+                user_role
+                if user_role is not None
+                else (None if "user_role" in merged else self.user_role)
+            ),
+            session_id=(
+                session_id
+                if session_id is not None
+                else (None if "session_id" in merged else self.session_id)
+            ),
         )
         if context:
             request_data["context"] = context
@@ -1225,10 +1243,17 @@ class ComplyEdge:
             try:
                 response = self._client.post("/v1/companion/action", json=body)
             except httpx.RequestError as e:
-                raise ComplianceError(f"Request failed: {str(e)}", retryable=True) from e
-            if response.status_code == 409 and _error_code(response) == "check_not_written_yet":
+                raise ComplianceError(
+                    f"Request failed: {str(e)}", retryable=True
+                ) from e
+            if (
+                response.status_code == 409
+                and _error_code(response) == "check_not_written_yet"
+            ):
                 remaining = (
-                    (deadline - _utcnow()).total_seconds() if deadline is not None else 0
+                    (deadline - _utcnow()).total_seconds()
+                    if deadline is not None
+                    else 0
                 )
                 if remaining <= 0:
                     raise ComplianceError(
@@ -1316,7 +1341,9 @@ class ComplyEdge:
     def _post_json(self, path: str, body: dict[str, Any]) -> dict[str, Any]:
         return self._send("POST", path, json=body)
 
-    def _get_json(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _get_json(
+        self, path: str, params: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         return self._send("GET", path, params=params)
 
     def _send(self, method: str, path: str, **kwargs: Any) -> dict[str, Any]:

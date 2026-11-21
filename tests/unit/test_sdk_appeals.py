@@ -21,8 +21,12 @@ def _client(status: int, payload: dict, seen: list[httpx.Request]) -> ComplyEdge
         seen.append(request)
         return httpx.Response(status, json=payload)
 
-    ce = ComplyEdge(api_key="k", base_url="https://example.test", agent_id="credit-assistant")
-    ce._client = httpx.Client(base_url="https://example.test", transport=httpx.MockTransport(handler))
+    ce = ComplyEdge(
+        api_key="k", base_url="https://example.test", agent_id="credit-assistant"
+    )
+    ce._client = httpx.Client(
+        base_url="https://example.test", transport=httpx.MockTransport(handler)
+    )
     return ce
 
 
@@ -32,7 +36,11 @@ def _body(req: httpx.Request) -> dict:
 
 def test_record_appeal_posts_the_request_and_returns_its_id() -> None:
     seen: list[httpx.Request] = []
-    ce = _client(200, {"event_id": "req-1", "event_type": "contest", "already_recorded": False}, seen)
+    ce = _client(
+        200,
+        {"event_id": "req-1", "event_type": "contest", "already_recorded": False},
+        seen,
+    )
     rid = ce.record_appeal(
         "dec-1",
         "human_intervention",
@@ -72,7 +80,12 @@ def test_record_answer_posts_by_request_id() -> None:
     seen: list[httpx.Request] = []
     ce = _client(
         200,
-        {"event_id": "ans-1", "event_type": "contest", "request_id": "req/1", "already_recorded": False},
+        {
+            "event_id": "ans-1",
+            "event_type": "contest",
+            "request_id": "req/1",
+            "already_recorded": False,
+        },
         seen,
     )
     out = ce.record_answer(
@@ -105,7 +118,9 @@ def test_record_answer_leaves_responded_at_to_the_server() -> None:
 def test_list_appeals_reads_open_appeals_by_default() -> None:
     seen: list[httpx.Request] = []
     item = {"request_id": "req-1", "due_at": "2026-12-14T23:59:59Z", "late": False}
-    out = _client(200, {"status": "open", "count": 1, "reviews": [item]}, seen).list_appeals()
+    out = _client(
+        200, {"status": "open", "count": 1, "reviews": [item]}, seen
+    ).list_appeals()
     assert out == [item]
     assert (seen[0].method, seen[0].url.path) == ("GET", "/v1/audit/reviews")
     assert seen[0].url.params["status"] == "open"
@@ -113,7 +128,11 @@ def test_list_appeals_reads_open_appeals_by_default() -> None:
 
 def test_get_appeal_reads_one_by_its_escaped_id() -> None:
     seen: list[httpx.Request] = []
-    payload = {"review": {"request_id": "req/1"}, "decision": None, "decision_missing": True}
+    payload = {
+        "review": {"request_id": "req/1"},
+        "decision": None,
+        "decision_missing": True,
+    }
     assert _client(200, payload, seen).get_appeal("req/1") == payload
     assert seen[0].url.raw_path == b"/v1/audit/reviews/req%2F1"
 
@@ -121,7 +140,9 @@ def test_get_appeal_reads_one_by_its_escaped_id() -> None:
 def test_api_error_carries_the_api_message() -> None:
     seen: list[httpx.Request] = []
     ce = _client(404, {"detail": "No such review request."}, seen)
-    with pytest.raises(ComplianceError, match=r"API error \(404\): No such review request\."):
+    with pytest.raises(
+        ComplianceError, match=r"API error \(404\): No such review request\."
+    ):
         ce.record_answer("nope", "upheld", statement_ref="ticket:1", reviewer="staff:1")
 
 
@@ -132,13 +153,20 @@ def test_missing_decision_facts_error_says_what_to_send() -> None:
         "message": "Send agent_id and deciding_system.version: the decision was not found on your account.",
     }
     ce = _client(422, {"detail": detail}, seen)
-    with pytest.raises(ComplianceError, match="Send agent_id and deciding_system.version"):
+    with pytest.raises(
+        ComplianceError, match="Send agent_id and deciding_system.version"
+    ):
         ce.record_appeal("dec-x", "contest")
 
 
 def test_validation_error_names_the_field() -> None:
     seen: list[httpx.Request] = []
-    detail = [{"loc": ["body", "request_kind"], "msg": "Input should be 'contest' or 'review'"}]
+    detail = [
+        {
+            "loc": ["body", "request_kind"],
+            "msg": "Input should be 'contest' or 'review'",
+        }
+    ]
     ce = _client(422, {"detail": detail}, seen)
     with pytest.raises(ComplianceError, match="request_kind: Input should be"):
         ce.record_appeal("dec-1", "appeal")
@@ -151,10 +179,14 @@ def test_review_not_recorded_is_not_retryable() -> None:
     detail = {"code": "review_not_recorded", "message": "The answer was not saved."}
     ce = _client(503, {"detail": detail}, seen)
     with pytest.raises(ComplianceError) as err:
-        ce.record_answer("req-1", "upheld", statement_ref="ticket:1", reviewer="staff:1")
+        ce.record_answer(
+            "req-1", "upheld", statement_ref="ticket:1", reviewer="staff:1"
+        )
     assert err.value.code == "review_not_recorded"
     assert err.value.retryable is False
-    other = _client(503, {"detail": "Review requests could not be read. Try again."}, [])
+    other = _client(
+        503, {"detail": "Review requests could not be read. Try again."}, []
+    )
     with pytest.raises(ComplianceError) as err2:
         other.list_appeals()
     assert err2.value.retryable is True

@@ -376,7 +376,9 @@ def pre_deploy(
 
     click.echo(f"\n{'─' * 50}")
     if risk_tier == "unacceptable":
-        click.echo(f"{RED}{BOLD}BLOCKED: the system uses prohibited AI practices{RESET}")
+        click.echo(
+            f"{RED}{BOLD}BLOCKED: the system uses prohibited AI practices{RESET}"
+        )
         sys.exit(1)
     elif risk_tier == "high":
         click.echo(f"{YELLOW}{BOLD}HIGH RISK: compliance obligations apply{RESET}")

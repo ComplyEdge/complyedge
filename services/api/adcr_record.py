@@ -160,6 +160,7 @@ DATA_CATEGORIES = SPECIAL_CATEGORIES | frozenset(
 #: Article 22(2) exceptions a legal basis may name.
 ART22_EXCEPTIONS = frozenset({"22(2)(a)", "22(2)(b)", "22(2)(c)"})
 
+
 def appeals_index_pk(tenant_id: object) -> str:
     """GSI1 key of a tenant's appeal (contest) rows: the Appeals list reads
     only these instead of the tenant's whole EVENT# keyspace."""
@@ -641,7 +642,12 @@ def to_adcr(row: dict[str, Any]) -> dict[str, Any]:
                 used.add(f)
 
     if event_type == EVENT_PRESERVATION:
-        for f in ("trigger", "conversation_commitment", "commitment_alg", "preserved_at"):
+        for f in (
+            "trigger",
+            "conversation_commitment",
+            "commitment_alg",
+            "preserved_at",
+        ):
             if row.get(f) is not None:
                 if f == "preserved_at":
                     stamp = _optional_utc_timestamp(row[f])
